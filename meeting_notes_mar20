@@ -1,0 +1,5 @@
+
+
+magnetometer @ 10Hz
+accel, gyro @ 50 Hz
+
