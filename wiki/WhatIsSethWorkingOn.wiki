@@ -1,0 +1,15 @@
+#summary here's seth's current work list.
+
+= In Progress =
+
+IMU code:
+ * Update IMU code to provide node ID, raw data, AHRS data
+ * Document protocol on the wiki
+
+= Planned =
+
+Server code:
+ * Test multiple incoming data streams
+
+Simulator:
+ * Graphical fire ring display (integrate into server?)
