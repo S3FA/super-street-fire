@@ -4,6 +4,7 @@
 
 IMU code:
  * Update IMU code to provide node ID, raw data, AHRS data
+   * Adding raw (but corrected for drift) data to the AHRS data is as easy as changing a #define from 0 to 1 in the AHRS code
  * Document protocol on the wiki
 
 = Planned =
