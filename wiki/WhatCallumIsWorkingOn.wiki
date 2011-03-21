@@ -3,7 +3,7 @@
 = In Progress =
 
 Python:
- * Learning python for the first time - watching some great google code tutorials (which can be found starting [http://www.youtube.com/watch?v=tKTZoB2Vjuk here].
+ * Learning python for the first time - watching some great google code tutorials (which can be found starting [http://www.youtube.com/watch?v=tKTZoB2Vjuk here]).
  * Started up a directory for the server and front-end, I was working in eclipse using PyDev and checked in some of the eclipse data files along with some _really_ preliminary code 
 
 = Planned =
