@@ -4,6 +4,22 @@
 
 These are just some initial notes I had on what we'll have to implement in terms of game state, data in and out, and on the gesture recognition.
 
+= Server Tasks =
+
+general program flow loop:
+ * process incoming serial data
+ * gesture recognition
+ * update game state
+ * send outgoing data based on changed game state
+
+some libraries that may help:
+ * pySerial for processing of serial data
+  * see visualization program from 9DoFAHRS for example
+ * python-xbee (on google code) - but this may be overkill if we're only using serial data
+ * the 9DoF AHRS arduino code for the glove modules
+ * Vpython for easy easy visualization
+
+
 = Notes = 
 
 game:
