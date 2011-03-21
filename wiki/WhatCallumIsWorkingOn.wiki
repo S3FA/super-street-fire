@@ -1,0 +1,16 @@
+#summary here's Callum's current work list.
+
+= In Progress =
+
+Python:
+ * Learning python for the first time - watching some great google code tutorials (which can be found starting [http://www.youtube.com/watch?v=tKTZoB2Vjuk here].
+ * Started up a directory for the server and front-end, I was working in eclipse using PyDev and checked in some of the eclipse data files along with some _really_ preliminary code 
+
+= Planned =
+
+Design Work:
+ * Break the code down into modules ala UML class/domain diagram
+
+Server code:
+ * Finish up writing the basic data structures for holding incoming data from sensor clients
+ * Start elucidating the code that will read data from a serial port and parse it into the above mentioned data structures
