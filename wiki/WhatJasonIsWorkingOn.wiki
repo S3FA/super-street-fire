@@ -1,5 +1,5 @@
+#summary Putting together the simulator.
 #labels Phase-Design,Phase-Requirements,Phase-Implementation
-%summary Putting together the simulator.
 
 
 I'm thinking:
