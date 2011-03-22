@@ -25,12 +25,19 @@ class GloveData:
         self.headingZ = hZ
     
 # Class for representing the head-set (EEG) data
-# TODO...
 class HeadsetData:
-    # TODO
-    
     def __init__(self):
-        pass
+        self.link       = 0
+        self.attention  = 0
+        self.meditation = 0
+        self.band1      = 0
+        self.band2      = 0
+        self.band3      = 0
+        self.band4      = 0
+        self.band5      = 0
+        self.band6      = 0
+        self.band7      = 0
+        self.band8      = 0
     
     
     
@@ -46,7 +53,7 @@ class PlayerData:
 
 # The Highest level representation of the input for the entire
 # Super Street Fire game - contains all input from all
-# relevant player sensor for a given capture of all
+# relevant player sensors for a given capture of all
 # received packets at some instance during game play.
 class GameData:
     def __init__(self):
