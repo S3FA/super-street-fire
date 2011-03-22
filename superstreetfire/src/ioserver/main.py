@@ -52,26 +52,68 @@ def GenerateSerialInput(num = None):
         
     return finalString
 
-def SerialParser(serialInput):
-    #(1H|2H|1L|1R|2L|2R):
+def GloveParser(bodyStr):
+    pass
+def HeadsetParser(bodyStr):
     pass
 
+def Player1LeftGloveParser(bodyStr):
+    print "Player 1 Left Glove: " + bodyStr
+    
+def Player1RightGloveParser(bodyStr):
+    print "Player 1 Right Glove: " + bodyStr
+    
+def Player2LeftGloveParser(bodyStr):        
+    print "Player 2 Left Glove: " + bodyStr
 
+def Player2RightGloveParser(bodyStr):    
+    print "Player 2 Right Glove: " + bodyStr
+    
+def Player1HeadsetSerialInputParser(bodyStr):
+    print "Player 1 Headset: " + bodyStr
+
+def Player2HeadsetSerialInputParser(bodyStr):
+    print "Player 2 Headset: " + bodyStr
 
 if __name__ == '__main__':
     
-    
-    
     # THIS IS A TESTING GROUND FOR PARSING SERIAL INPUT FROM SENSORS *********
     genInputStr = GenerateSerialInput()
+    print genInputStr
+    print ''
     
-    # TODO: Make this faster by using a hash table with 1H,1L,1R,etc.
-    # keys and function reference values
+    # We try to make parsing as fast as possible by using a hash table with 1H,1L,1R,etc.
+    # for keys and parse function references for values
+    parserFuncDict = {
+        '1L' : Player1LeftGloveParser,
+        '1R' : Player1RightGloveParser,
+        '1H' : Player1HeadsetSerialInputParser,
+        '2L' : Player2LeftGloveParser,
+        '2R' : Player2RightGloveParser,
+        '2H' : Player2HeadsetSerialInputParser
+    }
     
-    # Attempt to match a 9-DOF glove's serial input first 
-    gloveMatchStr = '(1L|1R|2L|2R):'
+    # Break the serial input up based on the various known headers that
+    # designate our input sources
+    splitInputList  = re.split('(1L|1R|2L|2R|1H|2H):', genInputStr)
+    splitListLength = len(splitInputList);
+    
+    for i in range(0, splitListLength):
+        # Try to find the corresponding parser for the data in the list
+        func = parserFuncDict.get(splitInputList[i]);
+        if func == None or i == splitListLength-1:
+            continue
+        else:
+            # We're dealing with proper, expected data from the client, parse it...
+            func(splitInputList[i+1])
+            
+        
+        
+    
+'''     
+    gloveMatchStr = '((1L|1R|2L|2R):'
     for i in range(7): gloveMatchStr = gloveMatchStr + '(-?\d+\.\d+),'
-    gloveMatchStr = gloveMatchStr + '(-?\d+\.\d+)'
+    gloveMatchStr = gloveMatchStr + '(-?\d+\.\d+))'
     
     regExMatch = re.match(gloveMatchStr, genInputStr)
     
@@ -82,7 +124,7 @@ if __name__ == '__main__':
         headMatchStr = headMatchStr + '(-?\d+\.\d+)'
         
         regExMatch = re.match(headMatchStr, genInputStr)
-        
+       
         # 1st or 2nd player head-set?
         if regExMatch.group(1) == '1H':
             print 'Player 1 headset data received.'
@@ -92,9 +134,18 @@ if __name__ == '__main__':
             # TODO
     else:
         # We're dealing with glove data right now
-        if (regExMatch.group(1) == )
-
-    print regExMatch.group()
+        if regExMatch.group(1) == '1L':
+            print 'Player 1 left glove data received'
+            
+        elif regExMatch.group(1) == '1R':
+            print 'Player 1 right glove data received'
+            
+        elif regExMatch.group(1) == '2L':
+            print 'Player 2 left glove data received'
+            
+        elif regExMatch.group(1) == '2R':
+            print 'Player 2 right glove data received'
+'''
 
 #    from client_datatypes import GloveData, HeadsetData, PlayerData, GameData
 #    g = GloveData()
