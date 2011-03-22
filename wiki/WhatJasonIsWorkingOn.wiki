@@ -1,5 +1,5 @@
 #labels Phase-Design,Phase-Requirements,Phase-Implementation
-I will be working on putting together the simulator.
+%Putting together the simulator.
 
 
 I'm thinking:
