@@ -1,31 +1,43 @@
-# client_datatypes.py
-# This file contains the basic data types that hold the various
-# expected inputs from the Super Street Fire game sensors
+'''
+client_datatypes.py
 
+This file contains the basic data types that hold the various
+expected inputs from the Super Street Fire game sensors
+
+@author: Callum Hay
+'''
 
 # The GloveData class defines the data type the holds
 # the various inputs expected from the 9-DOF glove sensor
 # on each hand of the two players of the game.
 class GloveData:
-    def __init__(self, aX = 0, aY = 0, aZ = 0, 
-                       rX = 0, rY = 0, rZ = 0,
+    NUM_GLOVE_DATA       = 9
+    GLOVE_DATA_REGEX_STR = ""
+    for i in range(NUM_GLOVE_DATA-1): GLOVE_DATA_REGEX_STR = GLOVE_DATA_REGEX_STR + '(-?\d+\.\d+),'
+    GLOVE_DATA_REGEX_STR = GLOVE_DATA_REGEX_STR + '(-?\d+\.\d+)'
+    
+    def __init__(self, rX = 0, rY = 0, rZ = 0,
+                       aX = 0, aY = 0, aZ = 0, 
                        hX = 0, hY = 0, hZ = 0):
-        # Acceleration data along the x, y and z axis
-        self.accelX = aX
-        self.accelY = aY
-        self.accelZ = aZ
+        
         # Gyro data - rotation about the x, y and z axis
-        self.rotX = rX
-        self.rotY = rY
-        self.rotZ = rZ
+        self.rotation = (rX, rY, rZ)
+        # Acceleration data along the x, y and z axis
+        self.acceleration = (aX, aY, aZ)
         # Heading data - the directional vector,
         # not necessarily normalized
-        self.headingX = hX
-        self.headingY = hY
-        self.headingZ = hZ
+        self.heading = (hX, hY, hZ)
+        
+    def __str__(self):
+        return "Rotation: " + str(self.rotation) + ", Acceleration: " + str(self.acceleration) + ", Heading: " + str(self.heading)
     
 # Class for representing the head-set (EEG) data
 class HeadsetData:
+    NUM_HEADSET_DATA       = 11
+    HEADSET_DATA_REGEX_STR = ""
+    for i in range(NUM_HEADSET_DATA-1): HEADSET_DATA_REGEX_STR = HEADSET_DATA_REGEX_STR + '(-?\d+\.\d+),'
+    HEADSET_DATA_REGEX_STR = HEADSET_DATA_REGEX_STR + '(-?\d+\.\d+)'
+    
     def __init__(self):
         self.link       = 0
         self.attention  = 0
@@ -38,6 +50,14 @@ class HeadsetData:
         self.band6      = 0
         self.band7      = 0
         self.band8      = 0
+ 
+    def __str__(self):
+        result = "Link: " + str(self.link) + ", Attention: " + str(self.attention) + ", Mediation: " + str(self.meditation)
+        result = result + ", Bands: (" + str(self.band1) + ", " + str(self.band2) + ", " + str(self.band3)
+        result = result + ", " + str(self.band4) + ", " + str(self.band5) + ", " + str(self.band6)
+        result = result + ", " + str(self.band7) + ", " + str(self.band8) + ")"
+        return result
+    
     
     
     

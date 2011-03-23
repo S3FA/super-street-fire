@@ -1,7 +1,17 @@
+'''
+test.py
 
+This file contains various functions used for testing the functionality
+of the superstreetfire ioserver.
+Run this as the main script in order to use it as a sandbox for prototyping
+and testing parts of the system that are under development.
+
+@author: Callum Hay
+'''
 
 import random
 import re
+from client_datatypes import *
 
 def GenerateRandomDeg():
     return (2 * random.random() - 1) * 180.0
@@ -16,7 +26,6 @@ def GenerateRandomXYZAcc():
     return [GenerateRandomAcc(), GenerateRandomAcc(), GenerateRandomAcc()]
 def GenerateRandomXYZMag():
     return [GenerateRandomMag(), GenerateRandomMag(), GenerateRandomMag()]
-
 
 def GenerateSerialInput(num = None):
     finalString = ""
@@ -53,27 +62,67 @@ def GenerateSerialInput(num = None):
     return finalString
 
 def GloveParser(bodyStr):
-    pass
+    matchResult = re.match(GloveData.GLOVE_DATA_REGEX_STR, bodyStr)
+    
+    # Get out of here immediately if there's a mismatch of the expected data
+    # for the glove, this really should never happen unless the serial input
+    # is being garbled somehow
+    if matchResult == None:
+        return
+    elif len(matchResult.groups()) != GloveData.NUM_GLOVE_DATA:
+        return
+    
+    # Turn the parsed glove data into an actual object
+    gloveData = GloveData(float(matchResult.group(1)), float(matchResult.group(2)), float(matchResult.group(3)), \
+                          float(matchResult.group(4)), float(matchResult.group(5)), float(matchResult.group(6)), \
+                          float(matchResult.group(7)), float(matchResult.group(8)), float(matchResult.group(9)))
+    return gloveData
+
 def HeadsetParser(bodyStr):
-    pass
+    matchResult = re.match(HeadsetData.HEADSET_DATA_REGEX_STR, bodyStr)
+    
+    # Get out of here immediately if there's a mismatch of the expected data
+    # for the head-set, this really should never happen unless the serial input
+    # is being garbled somehow
+    if matchResult == None:
+        return
+    elif len(matchResult.groups()) != HeadsetData.NUM_HEADSET_DATA:
+        return
+    
+    # Turn the parsed head-set data into an actual object
+    headsetData = HeadsetData(float(matchResult.group(1)), float(matchResult.group(2)),  \
+                              float(matchResult.group(3)), float(matchResult.group(4)),  \
+                              float(matchResult.group(5)), float(matchResult.group(6)),  \
+                              float(matchResult.group(7)), float(matchResult.group(8)),  \
+                              float(matchResult.group(9)), float(matchResult.group(10)), \
+                              float(matchResult.group(11)))
+    
+    return headsetData
+    
 
 def Player1LeftGloveParser(bodyStr):
     print "Player 1 Left Glove: " + bodyStr
+    print GloveParser(bodyStr)
     
 def Player1RightGloveParser(bodyStr):
     print "Player 1 Right Glove: " + bodyStr
-    
+    print GloveParser(bodyStr)
+        
 def Player2LeftGloveParser(bodyStr):        
     print "Player 2 Left Glove: " + bodyStr
-
+    print GloveParser(bodyStr)
+    
 def Player2RightGloveParser(bodyStr):    
     print "Player 2 Right Glove: " + bodyStr
-    
+    print GloveParser(bodyStr)
+        
 def Player1HeadsetSerialInputParser(bodyStr):
     print "Player 1 Headset: " + bodyStr
+    print HeadsetParser(bodyStr)
 
 def Player2HeadsetSerialInputParser(bodyStr):
     print "Player 2 Headset: " + bodyStr
+    print HeadsetParser(bodyStr)
 
 if __name__ == '__main__':
     
@@ -107,46 +156,6 @@ if __name__ == '__main__':
             # We're dealing with proper, expected data from the client, parse it...
             func(splitInputList[i+1])
             
-        
-        
-    
-'''     
-    gloveMatchStr = '((1L|1R|2L|2R):'
-    for i in range(7): gloveMatchStr = gloveMatchStr + '(-?\d+\.\d+),'
-    gloveMatchStr = gloveMatchStr + '(-?\d+\.\d+))'
-    
-    regExMatch = re.match(gloveMatchStr, genInputStr)
-    
-    # If we failed to find the glove's input then try to match the EEG headset's input
-    if regExMatch == None:
-        headMatchStr = '(1H|2H):'
-        for i in range(10): headMatchStr = headMatchStr + '(-?\d+\.\d+),'
-        headMatchStr = headMatchStr + '(-?\d+\.\d+)'
-        
-        regExMatch = re.match(headMatchStr, genInputStr)
-       
-        # 1st or 2nd player head-set?
-        if regExMatch.group(1) == '1H':
-            print 'Player 1 headset data received.'
-            # TODO
-        else:
-            print 'Player 1 headset data received.'
-            # TODO
-    else:
-        # We're dealing with glove data right now
-        if regExMatch.group(1) == '1L':
-            print 'Player 1 left glove data received'
-            
-        elif regExMatch.group(1) == '1R':
-            print 'Player 1 right glove data received'
-            
-        elif regExMatch.group(1) == '2L':
-            print 'Player 2 left glove data received'
-            
-        elif regExMatch.group(1) == '2R':
-            print 'Player 2 right glove data received'
-'''
-
 #    from client_datatypes import GloveData, HeadsetData, PlayerData, GameData
 #    g = GloveData()
 #    h = HeadsetData()
@@ -154,5 +163,4 @@ if __name__ == '__main__':
 #    q = GameData()
 #    
 #    print g.accelX
-    
-    
+
