@@ -125,7 +125,15 @@ def Player2HeadsetSerialInputParser(bodyStr):
     print HeadsetParser(bodyStr)
 
 if __name__ == '__main__':
-    
+
+
+    # TODO: Refactor this into a receiver and sender
+    #
+
+
+
+
+
     # THIS IS A TESTING GROUND FOR PARSING SERIAL INPUT FROM SENSORS *********
     genInputStr = GenerateSerialInput()
     print genInputStr
