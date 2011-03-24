@@ -38,18 +38,19 @@ class HeadsetData:
     for i in range(NUM_HEADSET_DATA-1): HEADSET_DATA_REGEX_STR = HEADSET_DATA_REGEX_STR + '(-?\d+\.\d+),'
     HEADSET_DATA_REGEX_STR = HEADSET_DATA_REGEX_STR + '(-?\d+\.\d+)'
     
-    def __init__(self):
-        self.link       = 0
-        self.attention  = 0
-        self.meditation = 0
-        self.band1      = 0
-        self.band2      = 0
-        self.band3      = 0
-        self.band4      = 0
-        self.band5      = 0
-        self.band6      = 0
-        self.band7      = 0
-        self.band8      = 0
+    def __init__(self, link, atten, med,
+                 b1, b2, b3, b4, b5, b6, b7, b8):
+        self.link       = link
+        self.attention  = atten
+        self.meditation = med
+        self.band1      = b1
+        self.band2      = b2
+        self.band3      = b3
+        self.band4      = b4
+        self.band5      = b5
+        self.band6      = b6
+        self.band7      = b7
+        self.band8      = b8
  
     def __str__(self):
         result = "Link: " + str(self.link) + ", Attention: " + str(self.attention) + ", Mediation: " + str(self.meditation)
