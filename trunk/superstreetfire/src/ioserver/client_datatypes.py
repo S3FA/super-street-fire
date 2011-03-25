@@ -83,7 +83,7 @@ class HeadsetData:
     
 # I DOUBT WE'LL ACTUALLY USE THE CLASSES BELOW SINCE WE'LL BE REACTING TO DATA    
 # AS IT COMES IN OVER THE PORT
-    
+'''
 # High level encapsulation of a single player's input
 # data - holds all the incoming data from both gloves
 # and their headset
@@ -103,8 +103,7 @@ class GameData:
         self.player1Data = PlayerData()
         self.player2Data = PlayerData()
         pass
-    
-    
+'''   
     
     
     
