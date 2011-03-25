@@ -41,15 +41,23 @@ if __name__ == '__main__':
     receiverThread = ioserver.receiver.Receiver(options.inputPort, DEFAULT_BAUDRATE)
     receiverThread.start()
     
+    #TODO
+    #senderThread = ioserver.sender.Sender(options.outputPort, DEFAULT_BAUDRATE)
+    #senderThread.start()
+    
     # The following loop and try/catch is to make sure that Ctrl+C still works
-    # even though we're running separate threads 
-    while receiverThread.isAlive():
+    # even though we're running separate threads
+    threadsAreAlive = receiverThread.isAlive() #and senderThread.isAlive()
+    while threadsAreAlive:
         try:
             receiverThread.join(1)
+            #senderThread.join(1)
             
+            threadsAreAlive = receiverThread.isAlive()
         except KeyboardInterrupt:
             print "Ctrl+c Issued, killing all threads and exiting..."
             receiverThread.exitThread = True
+            #senderThread.exitThread = True
 
     
     

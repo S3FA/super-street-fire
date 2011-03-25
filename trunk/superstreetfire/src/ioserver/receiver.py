@@ -3,10 +3,13 @@ import serial
 import parser
 import threading
 
+from receiver_queue_mgr import ReceiverQueueMgr
+
 class Receiver(threading.Thread):
 
     def __init__(self, inputSerialPort, baudRate):
         threading.Thread.__init__(self)
+        self.queueMgr   = ReceiverQueueMgr()
         self.serial     = None
         self.exitThread = False
         try:
@@ -22,7 +25,6 @@ class Receiver(threading.Thread):
             
 
     def run(self):
-        
         # Make sure this object is in a proper state before running...
         if self.serialInputPort == None:
             print "ERROR: Serial port was invalid/not found, could not run receiver."
@@ -34,6 +36,6 @@ class Receiver(threading.Thread):
         while not self.exitThread:
             # Listen for input on the serial port
             currSerialDataStr = self.serialInputPort.readline()
-            parser.ParseSerialData(currSerialDataStr)
+            parser.ParseSerialData(currSerialDataStr, self.queueMgr)
 
         self.serialInputPort.close()

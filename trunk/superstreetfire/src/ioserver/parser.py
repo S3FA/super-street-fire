@@ -1,9 +1,9 @@
 
 import re
 import string
-from client_datatypes import GloveData, HeadsetData
+from client_datatypes import *
 
-def ParseSerialData(serialDataStr):
+def ParseSerialData(serialDataStr, queueMgr):
     # Break the serial input up based on the various known headers that
     # designate our input sources...
     splitInputList  = string.split(serialDataStr, ":")
@@ -16,10 +16,10 @@ def ParseSerialData(serialDataStr):
         if func != None:
             # We're dealing with an expected package type from a client, parse it
             # and queue it for the game simulation to deal with
-            func(splitInputList[i+1])
+            func(splitInputList[i+1], queueMgr)
 
 
-def GloveParser(bodyStr):
+def GloveParser(player, hand, bodyStr):
     matchResult = re.match(GloveData.GLOVE_DATA_REGEX_STR, bodyStr)
     
     # Get out of here immediately if there's a mismatch of the expected data
@@ -31,12 +31,14 @@ def GloveParser(bodyStr):
         return
     
     # Turn the parsed glove data into an actual object
-    gloveData = GloveData(float(matchResult.group(1)), float(matchResult.group(2)), float(matchResult.group(3)), \
-                          float(matchResult.group(4)), float(matchResult.group(5)), float(matchResult.group(6)), \
-                          float(matchResult.group(7)), float(matchResult.group(8)), float(matchResult.group(9)))
+    gloveData = GloveData(float(matchResult.group(1)), float(matchResult.group(2)), \
+                          float(matchResult.group(3)), float(matchResult.group(4)), \
+                          float(matchResult.group(5)), float(matchResult.group(6)), \
+                          float(matchResult.group(7)), float(matchResult.group(8)), \
+                          float(matchResult.group(9)), player, hand)
     return gloveData
 
-def HeadsetParser(bodyStr):
+def HeadsetParser(player, bodyStr):
     matchResult = re.match(HeadsetData.HEADSET_DATA_REGEX_STR, bodyStr)
     
     # Get out of here immediately if there's a mismatch of the expected data
@@ -53,34 +55,38 @@ def HeadsetParser(bodyStr):
                               float(matchResult.group(5)), float(matchResult.group(6)),  \
                               float(matchResult.group(7)), float(matchResult.group(8)),  \
                               float(matchResult.group(9)), float(matchResult.group(10)), \
-                              float(matchResult.group(11)))
+                              float(matchResult.group(11)), player)
     
     return headsetData
     
 
-def Player1LeftGloveParser(bodyStr):
-    print "Player 1 Left Glove: " + bodyStr
-    print GloveParser(bodyStr)
+def Player1LeftGloveParser(bodyStr, queueMgr):
+    print "Player 1 left glove data received."
+    queueMgr.PushQueueData(queueMgr.p1LeftGloveQueue,
+                           GloveParser(PLAYER_ONE, GloveData.LEFT_HAND_GLOVE, bodyStr))
     
-def Player1RightGloveParser(bodyStr):
-    print "Player 1 Right Glove: " + bodyStr
-    print GloveParser(bodyStr)
+def Player1RightGloveParser(bodyStr, queueMgr):
+    print "Player 1 right glove data received."
+    queueMgr.PushQueueData(queueMgr.p1RightGloveQueue, \
+                           GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr))
         
-def Player2LeftGloveParser(bodyStr):        
-    print "Player 2 Left Glove: " + bodyStr
-    print GloveParser(bodyStr)
+def Player2LeftGloveParser(bodyStr, queueMgr):        
+    print "Player 2 left glove data received."
+    queueMgr.PushQueueData(queueMgr.p2LeftGloveQueue, \
+                           GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr))
     
-def Player2RightGloveParser(bodyStr):    
-    print "Player 2 Right Glove: " + bodyStr
-    print GloveParser(bodyStr)
+def Player2RightGloveParser(bodyStr, queueMgr):    
+    print "Player 2 right glove data received."
+    queueMgr.PushQueueData(queueMgr.p2RightGloveQueue, \
+                           GloveParser(PLAYER_TWO, GloveData.RIGHT_HAND_GLOVE, bodyStr))
         
-def Player1HeadsetSerialInputParser(bodyStr):
-    print "Player 1 Headset: " + bodyStr
-    print HeadsetParser(bodyStr)
+def Player1HeadsetSerialInputParser(bodyStr, queueMgr):
+    print "Player 1 headset data received."
+    queueMgr.PushQueueData(queueMgr.p1HeadsetQueue, HeadsetParser(PLAYER_ONE, bodyStr))
 
-def Player2HeadsetSerialInputParser(bodyStr):
-    print "Player 2 Headset: " + bodyStr
-    print HeadsetParser(bodyStr)
+def Player2HeadsetSerialInputParser(bodyStr, queueMgr):
+    print "Player 2 headset data received."
+    queueMgr.PushQueueData(queueMgr.p2HeadsetQueue, HeadsetParser(PLAYER_TWO, bodyStr))
 
 # We try to make parsing as fast as possible by using a hash table with 1H,1L,1R,etc.
 # for keys and parse function references for values
