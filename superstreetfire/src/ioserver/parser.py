@@ -1,7 +1,18 @@
+'''
+parser.py
+
+The parser contains a list of functions used to 
+a) Parse data received from super street fire clients via serial port
+b) Aggregate the parsed data for the appropriate client hardware (and player)
+c) Build high-level objects to represent the aggreated data
+d) Store the high-level objects on the receiver queues of the ReceiverQueueMgr 
+
+@author: Callum Hay
+'''
 
 import re
 import string
-from client_datatypes import *
+from client_datatypes import GloveData, HeadsetData, PLAYER_ONE, PLAYER_TWO
 
 def ParseSerialData(serialDataStr, queueMgr):
     # Break the serial input up based on the various known headers that
