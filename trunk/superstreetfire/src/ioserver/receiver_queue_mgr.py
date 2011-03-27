@@ -12,38 +12,126 @@ data up.
 @author: callumhay
 '''
 
-import Queue
+import collections
+import threading
 
 class ReceiverQueueMgr:
     MAX_QUEUE_SIZE = 8
     
     def __init__(self):
-        self.p1LeftGloveQueue  = Queue.Queue(ReceiverQueueMgr.MAX_QUEUE_SIZE)
-        self.p1RightGloveQueue = Queue.Queue(ReceiverQueueMgr.MAX_QUEUE_SIZE)
-        self.p1HeadsetQueue    = Queue.Queue(ReceiverQueueMgr.MAX_QUEUE_SIZE)
+        self.p1LeftGloveQueue  = collections.deque()
+        self.p1RightGloveQueue = collections.deque()
+        self.p1HeadsetQueue    = collections.deque()
         
-        self.p2LeftGloveQueue  = Queue.Queue(ReceiverQueueMgr.MAX_QUEUE_SIZE)
-        self.p2RightGloveQueue = Queue.Queue(ReceiverQueueMgr.MAX_QUEUE_SIZE)
-        self.p2HeadsetQueue    = Queue.Queue(ReceiverQueueMgr.MAX_QUEUE_SIZE)
+        self.p2LeftGloveQueue  = collections.deque()
+        self.p2RightGloveQueue = collections.deque()
+        self.p2HeadsetQueue    = collections.deque()
         
+        self.p1LeftGloveLock  = threading.Semaphore()
+        self.p1RightGloveLock = threading.Semaphore()
+        self.p1HeadsetLock    = threading.Semaphore()
+        
+        self.p2LeftGloveLock  = threading.Semaphore()
+        self.p2RightGloveLock = threading.Semaphore()
+        self.p2HeadsetLock    = threading.Semaphore()  
     
-    def PushQueueData(self, queue, data):
+    def PushP1LeftGloveData(self, data):
+        self.p1LeftGloveLock.acquire()
+        self._PushQueueData(self.p1LeftGloveQueue, data)
+        self.p1LeftGloveLock.release()
+        
+    def PushP1RightGloveData(self, data):
+        self.p1RightGloveLock.acquire()
+        self._PushQueueData(self.p1RightGloveQueue, data)
+        self.p1RightGloveLock.release()
+                
+    def PushP1HeadsetData(self, data):
+        self.p1HeadsetLock.acquire()
+        self._PushQueueData(self.p1HeadsetQueue, data)
+        self.p1HeadsetLock.release()
+        
+    def PushP2LeftGloveData(self, data):
+        self.p2LeftGloveLock.acquire()
+        self._PushQueueData(self.p2LeftGloveQueue, data)
+        self.p2LeftGloveLock.release()
+           
+    def PushP2RightGloveData(self, data):
+        self.p2RightGloveLock.acquire()
+        self._PushQueueData(self.p2RightGloveQueue, data)
+        self.p2RightGloveLock.release()
+                
+    def PushP2HeadsetData(self, data):
+        self.p2HeadsetLock.acquire()
+        self._PushQueueData(self.p2HeadsetQueue, data)
+        self.p2HeadsetLock.release()    
+    
+    def PopP1LeftGloveData(self):
+        self.p1LeftGloveLock.acquire()
+        data = self._PopQueueData(self.p1LeftGloveQueue)
+        self.p1LeftGloveLock.release()
+        return data
+        
+    def PopP1RightGloveData(self):
+        self.p1RightGloveLock.acquire()
+        data = self._PopQueueData(self.p1RightGloveQueue)
+        self.p1RightGloveLock.release()
+        return data
+                
+    def PopP1HeadsetData(self):
+        self.p1HeadsetLock.acquire()
+        data = self._PopQueueData(self.p1HeadsetQueue)
+        self.p1HeadsetLock.release()
+        return data
+        
+    def PopP2LeftGloveData(self):
+        self.p2LeftGloveLock.acquire()
+        data = self._PopQueueData(self.p2LeftGloveQueue)
+        self.p2LeftGloveLock.release()
+        return data
+           
+    def PopP2RightGloveData(self):
+        self.p2RightGloveLock.acquire()
+        data = self._PopQueueData(self.p2RightGloveQueue)
+        self.p2RightGloveLock.release()
+        return data
+                
+    def PopP2HeadsetData(self):
+        self.p2HeadsetLock.acquire()
+        data = self._PopQueueData(self.p2HeadsetQueue)
+        self.p2HeadsetLock.release()
+        return data
+    
+    def _PushQueueData(self, queue, data):
+        # Don't push empty data
+        if data == None:
+            return
+        
+        if len(queue) == ReceiverQueueMgr.MAX_QUEUE_SIZE:
+            print "WARNING: Receiver queue overflow"
+            queue.popleft()
+            
         print "Data is being placed on a receiver queue"
-        # In the case where the queue is already full then we drop the least
-        # recent item from the queue
-        if queue.full():
-            print "Tried to push data onto a full receiver queue, dumping data."
-            queue.get(block=False)
-        queue.put(data, block=False)
-        
+        queue.append(data)
     
-    def PopQueueData(self, queue):
-        print "Data is being popped off a receiver queue"
-        if queue.empty():
+    def _PopQueueData(self, queue):
+        if len(queue) == 0:
             print "Tried to retrieve data from an empty receiver queue."
             return None
         else:
-            return queue.get(block=False)
+            print "Averaging and popping data"
+            # Average all of the data on the queue and return the result,
+            # emptying the entire queue in the process
+            
+            count    = len(queue)
+            avgValue = queue.popleft()
+            for i in range(1, count):
+                avgValue += queue.popleft()
+
+            assert(avgValue != None)
+            assert(count > 0)
+            
+            avgValue = avgValue / count
+            return avgValue
     
     
     

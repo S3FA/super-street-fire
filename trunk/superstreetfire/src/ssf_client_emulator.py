@@ -120,8 +120,8 @@ if __name__ == '__main__':
         # Generate a fake serial input...
         outputData = GenerateSerialInput(random.randrange(1, 10)) 
         serialOutputPort.write(outputData)
-        time.sleep(1)
-        #time.sleep(0.02) # Simulate 50Hz
+        #time.sleep(1)
+        time.sleep(0.02) # Simulate 50Hz
     
     serialOutputPort.close()
 
