@@ -37,16 +37,17 @@ def GloveParser(player, hand, bodyStr):
     # for the glove, this really should never happen unless the serial input
     # is being garbled somehow
     if matchResult == None:
-        return
+        print "Failed match result in glove parser, no match."
+        return None
     elif len(matchResult.groups()) != GloveData.NUM_GLOVE_DATA:
-        return
+        print "Failed match result in glove parser: " + matchResult.group()
+        return None
     
     # Turn the parsed glove data into an actual object
-    gloveData = GloveData(float(matchResult.group(1)), float(matchResult.group(2)), \
-                          float(matchResult.group(3)), float(matchResult.group(4)), \
-                          float(matchResult.group(5)), float(matchResult.group(6)), \
-                          float(matchResult.group(7)), float(matchResult.group(8)), \
-                          float(matchResult.group(9)), player, hand)
+    gloveData = GloveData((float(matchResult.group(1)), float(matchResult.group(2)), float(matchResult.group(3))), \
+                          (float(matchResult.group(4)), float(matchResult.group(5)), float(matchResult.group(6))), \
+                          (float(matchResult.group(7)), float(matchResult.group(8)), float(matchResult.group(9))), \
+                          player, hand)
     return gloveData
 
 def HeadsetParser(player, bodyStr):
@@ -56,9 +57,11 @@ def HeadsetParser(player, bodyStr):
     # for the head-set, this really should never happen unless the serial input
     # is being garbled somehow
     if matchResult == None:
-        return
+        print "Failed match result in headset parser, no match."
+        return None
     elif len(matchResult.groups()) != HeadsetData.NUM_HEADSET_DATA:
-        return
+        print "Failed match result in headset parser: " + matchResult.group()
+        return None
     
     # Turn the parsed head-set data into an actual object
     headsetData = HeadsetData(float(matchResult.group(1)), float(matchResult.group(2)),  \
@@ -73,31 +76,27 @@ def HeadsetParser(player, bodyStr):
 
 def Player1LeftGloveParser(bodyStr, queueMgr):
     print "Player 1 left glove data received."
-    queueMgr.PushQueueData(queueMgr.p1LeftGloveQueue,
-                           GloveParser(PLAYER_ONE, GloveData.LEFT_HAND_GLOVE, bodyStr))
+    queueMgr.PushP1LeftGloveData(GloveParser(PLAYER_ONE, GloveData.LEFT_HAND_GLOVE, bodyStr))
     
 def Player1RightGloveParser(bodyStr, queueMgr):
     print "Player 1 right glove data received."
-    queueMgr.PushQueueData(queueMgr.p1RightGloveQueue, \
-                           GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr))
+    queueMgr.PushP1RightGloveData(GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr))
         
 def Player2LeftGloveParser(bodyStr, queueMgr):        
     print "Player 2 left glove data received."
-    queueMgr.PushQueueData(queueMgr.p2LeftGloveQueue, \
-                           GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr))
+    queueMgr.PushP2LeftGloveData(GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr))
     
 def Player2RightGloveParser(bodyStr, queueMgr):    
     print "Player 2 right glove data received."
-    queueMgr.PushQueueData(queueMgr.p2RightGloveQueue, \
-                           GloveParser(PLAYER_TWO, GloveData.RIGHT_HAND_GLOVE, bodyStr))
+    queueMgr.PushP2RightGloveData(GloveParser(PLAYER_TWO, GloveData.RIGHT_HAND_GLOVE, bodyStr))
         
 def Player1HeadsetSerialInputParser(bodyStr, queueMgr):
     print "Player 1 headset data received."
-    queueMgr.PushQueueData(queueMgr.p1HeadsetQueue, HeadsetParser(PLAYER_ONE, bodyStr))
+    queueMgr.PushP1HeadsetData(HeadsetParser(PLAYER_ONE, bodyStr))
 
 def Player2HeadsetSerialInputParser(bodyStr, queueMgr):
     print "Player 2 headset data received."
-    queueMgr.PushQueueData(queueMgr.p2HeadsetQueue, HeadsetParser(PLAYER_TWO, bodyStr))
+    queueMgr.PushP2HeadsetData(HeadsetParser(PLAYER_TWO, bodyStr))
 
 # We try to make parsing as fast as possible by using a hash table with 1H,1L,1R,etc.
 # for keys and parse function references for values

@@ -5,12 +5,20 @@ The entry point for the superstreetfire server/application.
 '''
 
 #import sys
+import time
 from optparse import OptionParser
 
 
 import ioserver.receiver 
 #from ioserver.client_emulator import ClientEmulator
 from ioserver.receiver_queue_mgr import ReceiverQueueMgr
+
+def KillEverything(threadList):
+    print "Killing all threads..."
+    for thread in threadList:
+        thread.ExitThread()
+        thread.join()
+
 
 if __name__ == '__main__':
 
@@ -52,26 +60,23 @@ if __name__ == '__main__':
     
     # The following loop and try/catch is to make sure that Ctrl+c still works
     # even though we're running separate threads
-    threadsAreAlive = receiverThread.isAlive() #and senderThread.isAlive()
-    while threadsAreAlive:
-        try:
-            # Every frame of the simulation we try to join the threads,
-            # this ensures that we can handle exceptions (e.g., keyboard interrupts)
-            # on the superstreetfire process.
-            receiverThread.join(timeout=0.001)
-            #senderThread.join(timeout=0.001)
-            
+    
+    try:
+    
+        threadsAreAlive = receiverThread.isAlive() #and senderThread.isAlive()
+        while threadsAreAlive:
             # The receiver has been asynchronously receiving data and dumping it
             # onto the receiverQueueMgr, we need to grab that data and apply it to the simulation...
             
             # TODO: Execute the new data on the current game model thus furthering the simulation
-            #receiverQueueMgr.PopQueueData(receiverQueueMgr.p1HeadsetQueue)
-            #receiverQueueMgr.PopQueueData(receiverQueueMgr.p1LeftGloveQueue)
-            #receiverQueueMgr.PopQueueData(receiverQueueMgr.p1RightGloveQueue)
-       
-            #receiverQueueMgr.PopQueueData(receiverQueueMgr.p2HeadsetQueue)
-            #receiverQueueMgr.PopQueueData(receiverQueueMgr.p2LeftGloveQueue)
-            #receiverQueueMgr.PopQueueData(receiverQueueMgr.p2RightGloveQueue)      
+            receiverQueueMgr.PopP1LeftGloveData()
+            receiverQueueMgr.PopP2LeftGloveData()
+            
+            receiverQueueMgr.PopP1RightGloveData()
+            receiverQueueMgr.PopP2RightGloveData()
+            
+            receiverQueueMgr.PopP1HeadsetData()
+            receiverQueueMgr.PopP2HeadsetData()
             
             # TODO: Now that the simulation has iterated, grab
             # any resulting outputs to actuator clients (i.e., fire, lights, etc.)
@@ -81,12 +86,13 @@ if __name__ == '__main__':
             #...
             
             threadsAreAlive = receiverThread.isAlive()
+            time.sleep(0.02)
             
-        except KeyboardInterrupt:
-            print "Ctrl+c Issued, killing all threads and exiting..."
-            receiverThread.exitThread = True
-            #senderThread.exitThread = True
-
+    except KeyboardInterrupt:
+        print "Ctrl+c Issued..."
+    finally:
+        KillEverything([receiverThread])
+        print "Exiting..."
     
     
     
