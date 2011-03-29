@@ -8,40 +8,11 @@ server.
 @author: Callum Hay
 '''
 
-
 import random
-#import threading
 import serial
 import time
-import sys
 
 from optparse import OptionParser
-
-'''
-class ClientEmulator(threading.Thread):
-
-    def __init__(self, outputSerialPortName, baudRate):
-        threading.Thread.__init__(self)
-        try:
-            # NOTE: timeout=x means we wait up to x seconds to read from the serial port
-            self.serialOutputPort = serial.Serial(outputSerialPortName, baudrate=baudRate, timeout=1)
-        except serial.SerialException:
-            print "ERROR: Serial port " + outputSerialPortName + " was invalid/not found."
-            exit(-1)
-    
-    def run(self):
-        # Make sure this object is in a proper state before running...
-        if self.serialOutputPort == None:
-            print "ERROR: Serial port was invalid/not found, could not run receiver."
-            return
-        
-        while True:
-            # Generate a fake serial input...
-            outputData = GenerateSerialInput(random.randrange(1, 10)) 
-            self.serialOutputPort.write(outputData)
-            time.sleep(0.02) # Simulate 50Hz
-'''
-            
     
 def GenerateSerialInput(num=1):
     finalString = ""
@@ -105,11 +76,7 @@ if __name__ == '__main__':
     
     (options, args) = argParser.parse_args()
     DEFAULT_BAUDRATE = 57600
-    
-    if options.emulatorPort == None:
-        argParser.error("An emulator port must be specified")
-        
-        
+
     try:    
         serialOutputPort = serial.Serial(options.emulatorPort, baudrate=DEFAULT_BAUDRATE, timeout=1)
     except serial.SerialException:

@@ -58,13 +58,32 @@ if __name__ == '__main__':
     #senderThread = ioserver.sender.Sender(options.outputPort, DEFAULT_BAUDRATE)
     #senderThread.start()
     
-    # The following loop and try/catch is to make sure that Ctrl+c still works
-    # even though we're running separate threads
     
+    # TODO: Move time stuff into the gamemodel...
+    
+    # Time data initialization
+    deltaFrameTime = 0             # Holds the current frame's delta time
+    lastFrameTime  = time.time()   # Holds the absolute time of the last frame
+    currTime       = lastFrameTime # Temporary variable for the current absolute time
+    
+    # Constant for the starting time of the simulation
+    SIMULATION_START_TIME = currTime # Don't change this value!
+    
+    
+    # The following loop and try/catch is to make sure that we kill the whole
+    # process in cases of imposed exceptions
     try:
-    
+        
         threadsAreAlive = receiverThread.isAlive() #and senderThread.isAlive()
         while threadsAreAlive:
+            
+            # Keep track of a delta time for each frame, this will be used to 
+            # calculate values for the current frame of the simulation and also keep
+            # track of the time so far
+            currTime       = time.time()
+            deltaFrameTime = currTime - lastFrameTime
+            lastFrameTime  = currTime
+            
             # The receiver has been asynchronously receiving data and dumping it
             # onto the receiverQueueMgr, we need to grab that data and apply it to the simulation...
             
@@ -82,7 +101,6 @@ if __name__ == '__main__':
             # any resulting outputs to actuator clients (i.e., fire, lights, etc.)
             # and place them on the sender queues
             
-            #senderQueueMgr.PushQueueData(senderQueueMgr.fireFx1, simulation.fireFx1)
             #...
             
             threadsAreAlive = receiverThread.isAlive()
