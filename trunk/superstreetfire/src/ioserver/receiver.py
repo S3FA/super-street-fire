@@ -20,16 +20,17 @@ class Receiver(threading.Thread):
         threading.Thread.__init__(self)
         
         assert(receiverQueueMgr != None)
-        self.queueMgr   = receiverQueueMgr
-        self.serial     = None
-        self.exitThread = False
-        self.lock       = threading.Semaphore()
+        self.queueMgr           = receiverQueueMgr
+        self.serialInputPort    = None
+        self.exitThread         = False
+        self.lock               = threading.Semaphore()
         try:
             # NOTE: timeout=x means we wait up to x seconds to read from the serial port
             self.serialInputPort = serial.Serial(inputSerialPort, baudrate=baudRate, timeout=1)
             self.serialInputPort.timeout = 1
         except serial.SerialException:
             print "ERROR: Serial port " + inputSerialPort + " was invalid/not found."
+            print "************ Killing Receiver Thread ****************"
             exit(-1)    
 
     def ExitThread(self):
@@ -41,6 +42,7 @@ class Receiver(threading.Thread):
         # Make sure this object is in a proper state before running...
         if self.serialInputPort == None:
             print "ERROR: Serial port was invalid/not found, could not run receiver."
+            print "************ Killing Receiver Thread ****************"
             return
         
         # Temporary variables used in the while loop
