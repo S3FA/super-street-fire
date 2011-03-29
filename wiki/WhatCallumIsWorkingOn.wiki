@@ -9,8 +9,10 @@ Python:
 = Planned =
 
 Design Work:
- * Break the code down into modules ala UML class/domain diagram
+ * ~~Break the code down into modules ala UML class/domain diagram~~
+ * Start designing the game model representation
 
 Server code:
- * Finish up writing the basic data structures for holding incoming data from sensor clients
- * Start elucidating the code that will read data from a serial port and parse it into the above mentioned data structures
+ * ~~Finish up writing the basic data structures for holding incoming data from sensor clients~~
+ * ~~Start elucidating the code that will read data from a serial port and parse it into the above mentioned data structures~~
+ * Start programming the game model code
