@@ -1,0 +1,29 @@
+
+Super Street Fighter Simulator
+==============================
+
+Simulator Objective:
+
+  Untimately the purpose of this code is to simulate the real ring of fire 
+  controlled by fighting gloves for the very physical game of Super Street Fire.
+  
+  The simulator was built with the idea that it may be used a lot by non-developers; 
+  it is designed to look like a game itself. Albeit, a very simple game. There will 
+  be 2 players with 16 flame spouts around them and their moves will come entirely 
+  from keyboard commands or commands from another library. 
+  
+  Thus, this is a very simple 2d sprite-based game where different fighting
+  animations play based on input from other software modules.
+  
+  
+
+Setup:
+- ensure python 2.7 is installed on the target computer. Download install here:
+  http://www.python.org/download/releases/2.7/
+- ensure the python 2.7 version of pygame is installed. These files were built with pygame 1.9.2 for win32
+  http://www.lfd.uci.edu/~gohlke/pythonlibs/#pygame
+  
+build instructions:
+- run 'python.exe main.py' from command line to launch the simulator
+- you can change various attributes from the commandline such as width and height:
+  python.exe main.py 800 600
