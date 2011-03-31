@@ -29,6 +29,8 @@ Gloves:
 
 Headsets:
  `1H:link,attention,meditation,band1,band2,band3,band4,band5,band6,band7,band8`
+ * Maybe headsets have lights/outputs and can receive commands too?
+  * Att>80, Med>80, special, gesture received, ...?
 
 Fire and color control:
  `xx:y`
