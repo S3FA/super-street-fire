@@ -2,15 +2,25 @@
 
 = In Progress =
 
+Hardware:
+ * Build glove prototype
+ * Build headset prototype
+ * Build 3x wifire16 boards (1 currently completed)
+
 IMU code:
- * Update IMU code to provide node ID, raw data, AHRS data
-   * Adding raw (but corrected for drift) data to the AHRS data is as easy as changing a #define from 0 to 1 in the AHRS code
- * Document protocol on the wiki
+ * Update IMU code to use XBee API mode
+   
+Headset code:
+ * Write it with simple serial data transfer to verify the hardware works
+ * Implement XBee API mode
+
+Flame effect control code:
+ * Update for three wifire16 boards chained
+  * not allow color systems to activate without fire
+ * Update XBee code to use API mode
 
 = Planned =
 
 Server code:
+ * Implement XBee API mode for receiving packets from multiple devices
  * Test multiple incoming data streams
-
-Simulator:
- * Graphical fire ring display (integrate into server?)
