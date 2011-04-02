@@ -41,14 +41,12 @@ class SSFGame:
             GestureRecognizer.RIGHT_BLOCK_DEFENSE_GESTURE : self._RightBlockGesture
         }
         
-        
     def Reset(self):
         self.player1.Reset()
         self.player2.Reset()
         for leftEmitter, rightEmitter in self.leftEmitters, self.rightEmitters:
             leftEmitter.Reset()
             rightEmitter.Reset()
-    
     
     def Tick(self, dT):
         # Check for any newly recognized gestures, execute any that get found
@@ -130,6 +128,8 @@ class SSFGame:
             assert(False)
     
     def _HadoukenGesture(self, playerNum):
+        # Fire on both sides of the player with a 4 second travel time on both side,
+        # jets are 2 emitters thick on both sides
         if playerNum == 1:
             self._Attack(self.leftEmitter[0], self.leftEmitter[-1], 4.0, 2)
             self._Attack(self.rightEmitter[0], self.rightEmitter[-1], 4.0, 2)

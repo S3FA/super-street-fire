@@ -17,8 +17,8 @@ class GestureRecognizer:
     LEFT_BLOCK_DEFENSE_GESTURE  = 101
     RIGHT_BLOCK_DEFENSE_GESTURE = 102
     
-    def __init__(self, calibrationData): 
-        # TODO: What the heck is our calibration data and where does it come from?
+    def __init__(self): 
+        
         self._p1GestureState = IdleGestureState(self, 1)
         self._p2GestureState = IdleGestureState(self, 2)
         
@@ -59,3 +59,5 @@ class GestureRecognizer:
         self._p1GestureState = newState
     def _ChangeP2State(self, newState):
         self._p2GestureState = newState
+        
+    
