@@ -28,6 +28,7 @@ class SSFGame:
         for i in range(0, SSFGame.NUM_FIRE_EMITTERS_PER_ARC):
             self.leftEmitters.append(fire_emitter.FireEmitter(i))
             self.rightEmitters.append(fire_emitter.FireEmitter(i))
+            
         # Gesture dictionary - maps various gestures from the gesture recognizer
         # to functions that handle those gestures
         self.GESTURE_FUNCTIONS = {
@@ -68,24 +69,90 @@ class SSFGame:
     def _ExecuteGesture(self, playerNum, gesture):
         assert(gesture != GestureRecognizer.NO_GESTURE)
         gestureFunction = self.GESTURE_FUNCTIONS.get(gesture)
+        assert(gestureFunction != None)
         gestureFunction(playerNum)
 
+
+    def _Attack(self, atkStartEmitter, atkEndEmitter, tripLength, jetThickness):
+        # TODO
+        pass
+    
+    def _Block(self, blockEmitter, timeLength):
+        # TODO
+        pass
+    
     def _LeftJabGesture(self, playerNum):
-        pass
+        if playerNum == 1:
+            # Start fire at the leftEmitter[0] fire emitter and propagate 
+            # to leftEmitter[-1] for a 2 second trip, jet is 1 emitter thick
+            self._Attack(self.leftEmitter[0], self.leftEmitter[-1], 2.0, 1)
+        elif playerNum == 2:
+            # Start fire at the rightEmitter[-1] fire emitter and propagate 
+            # to rightEmitter[0] for a 2 second trip, jet is 1 emitter thick
+            self._Attack(self.rightEmitter[-1], self.rightEmitter[0], 2.0, 1)
+        else:
+            assert(False)
+        
     def _RightJabGesture(self, playerNum):
-        pass
+        if playerNum == 1:
+            # Start fire at the rightEmitter[0] fire emitter and propagate 
+            # to rightEmitter[-1] for a 2 second trip, jet is 1 emitter thick
+            self._Attack(self.rightEmitter[0], self.rightEmitter[-1], 2.0, 1)
+        elif playerNum == 2:
+            # Start fire at the leftEmitter[-1] fire emitter and propagate 
+            # to leftEmitter[0] for a 2 second trip, jet is 1 emitter thick
+            self._Attack(self.leftEmitter[-1], self.leftEmitter[0], 2.0, 1)
+        else:
+            assert(False)
     
     def _LeftHookGesture(self, playerNum):
-        pass
+        if playerNum == 1:
+            # Start fire at the leftEmitter[0] fire emitter and propagate 
+            # to leftEmitter[-1] for a 3 second trip, jet is 2 emitters thick
+            self._Attack(self.leftEmitter[0], self.leftEmitter[-1], 3.0, 2)
+        elif playerNum == 2:
+            # Start fire at the rightEmitter[-1] fire emitter and propagate 
+            # to rightEmitter[0] for a 3 second trip, jet is 2 emitters thick
+            self._Attack(self.rightEmitter[-1], self.rightEmitter[0], 3.0, 2)
+        else:
+            assert(False)
+    
     def _RightHookGesture(self, playerNum):
-        pass
+        if playerNum == 1:
+            # Start fire at the rightEmitter[0] fire emitter and propagate 
+            # to rightEmitter[-1] for a 3 second trip, jet is 2 emitter thick
+            self._Attack(self.rightEmitter[0], self.rightEmitter[-1], 3.0, 2)
+        elif playerNum == 2:
+            # Start fire at the leftEmitter[-1] fire emitter and propagate 
+            # to leftEmitter[0] for a 3 second trip, jet is 2 emitter thick
+            self._Attack(self.leftEmitter[-1], self.leftEmitter[0], 3.0, 2)
+        else:
+            assert(False)
     
     def _HadoukenGesture(self, playerNum):
-        pass
+        if playerNum == 1:
+            self._Attack(self.leftEmitter[0], self.leftEmitter[-1], 4.0, 2)
+            self._Attack(self.rightEmitter[0], self.rightEmitter[-1], 4.0, 2)
+        elif playerNum == 2:
+            self._Attack(self.rightEmitter[-1], self.rightEmitter[0], 4.0, 2)
+            self._Attack(self.leftEmitter[-1], self.leftEmitter[0], 4.0, 2)
+        else:
+            assert(False)
     
     def _LeftBlockGesture(self, playerNum):
-        pass
+        if playerNum == 1:
+            self._Block(self.leftEmitter[0], 4.0)
+        elif playerNum == 2:
+            self._Block(self.rightEmitter[-1], 4.0)
+        else:
+            assert(False)
+            
     def _RightBlockGesture(self, playerNum):
-        pass
+        if playerNum == 1:
+            self._Attack(self.rightEmitter[0], 4.0)
+        elif playerNum == 2:
+            self._Attack(self.leftEmitter[-1], 4.0)
+        else:
+            assert(False)
     
     
