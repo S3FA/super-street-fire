@@ -4,14 +4,15 @@ superstreetfire.py
 The entry point for the superstreetfire server/application.
 '''
 
-#import sys
 import time
 from optparse import OptionParser
-
 
 import ioserver.receiver 
 #from ioserver.client_emulator import ClientEmulator
 from ioserver.receiver_queue_mgr import ReceiverQueueMgr
+
+from gamemodel.gesture_recognizer import GestureRecognizer
+from gamemodel.ssf_game import SSFGame
 
 def KillEverything(threadList):
     print "Killing all threads..."
@@ -32,14 +33,25 @@ if __name__ == '__main__':
     argParser.add_option("-o", "--output_port", action="store", type="string", dest="outputPort", \
                          help="The serial port name/number that sends output to clients. [%default]", \
                          default="/dev/slave")
+    argParser.add_option("-f", "--frequency", action="store", type="int", dest="frequency", \
+                         help="The simulation tick frequency. [%default]", default=50)    
     #argParser.add_option("-b", "--baud_rate", action="store", type="int", dest="baudRate", \
     #                     help="The serial port baud rate defaults to 57600.", default=57600)
 
     (options, args) = argParser.parse_args()
-    DEFAULT_BAUDRATE = 57600
+    
+    
+    # Error checking on the command line input parameters
+    if options.frequency <= 0:
+        argParser.error("Specified frequency must be greater than zero.")
     
     print "Supplied Options:"
     print options
+    
+    
+    DEFAULT_BAUDRATE = 57600
+    FIXED_FRAME_TIME = 1.0 / float(options.frequency) 
+    
     
     # Start the emulator if it was specified as an argument
     #clientEmulator = None
@@ -62,13 +74,20 @@ if __name__ == '__main__':
     # TODO: Move time stuff into the gamemodel...
     
     # Time data initialization
-    deltaFrameTime = 0             # Holds the current frame's delta time
-    lastFrameTime  = time.time()   # Holds the absolute time of the last frame
-    currTime       = lastFrameTime # Temporary variable for the current absolute time
+    startOfSimulationTime = time.time()
+    
+    deltaFrameTime = 0            # Holds the current frame's delta time
+    lastFrameTime  = time.time()  # Holds the absolute time of the last frame
+    currTime       = time.time()  # Temporary variable for the current absolute time
+    currTimeStamp  = time.time()  # Holds the total time since the start of the simulation
     
     # Constant for the starting time of the simulation
     SIMULATION_START_TIME = currTime # Don't change this value!
     
+    # Game model and gesture recognition system initialization
+    # TODO: What the heck is our calibration data and where does it come from?
+    gestureRecognizer = GestureRecognizer()
+    ssfGame           = SSFGame(gestureRecognizer)
     
     # The following loop and try/catch is to make sure that we kill the whole
     # process in cases of imposed exceptions
@@ -83,17 +102,20 @@ if __name__ == '__main__':
             currTime       = time.time()
             deltaFrameTime = currTime - lastFrameTime
             lastFrameTime  = currTime
+            currTimeStamp  = currTime - startOfSimulationTime
             
             # The receiver has been asynchronously receiving data and dumping it
             # onto the receiverQueueMgr, we need to grab that data and apply it to the simulation...
             
-            # TODO: Execute the new data on the current game model thus furthering the simulation
-            receiverQueueMgr.PopP1LeftGloveData()
-            receiverQueueMgr.PopP2LeftGloveData()
+            # Feed any newly received data to the gesture recognizer
+            gestureRecognizer.UpdateWithGestureData(receiverQueueMgr.PopP1LeftGloveData(),  \
+                                                    receiverQueueMgr.PopP1RightGloveData(), \
+                                                    receiverQueueMgr.PopP2LeftGloveData(),  \
+                                                    receiverQueueMgr.PopP2RightGloveData(), \
+                                                    deltaFrameTime, lastFrameTime)
             
-            receiverQueueMgr.PopP1RightGloveData()
-            receiverQueueMgr.PopP2RightGloveData()
-            
+            # TODO: What do we do with head-set data ??
+            # is it part of the gesture recognition or is it a compliment to it?
             receiverQueueMgr.PopP1HeadsetData()
             receiverQueueMgr.PopP2HeadsetData()
             
@@ -104,7 +126,10 @@ if __name__ == '__main__':
             #...
             
             threadsAreAlive = receiverThread.isAlive()
-            time.sleep(0.02)
+            
+            # Sync to the specified frequency
+            if deltaFrameTime < FIXED_FRAME_TIME:
+                time.sleep(FIXED_FRAME_TIME - deltaFrameTime)
             
     except KeyboardInterrupt:
         print "Ctrl+c Issued..."
