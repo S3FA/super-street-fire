@@ -21,14 +21,17 @@ class SSFGame:
         self.player1 = player.Player()
         self.player2 = player.Player()
         
-        # There are two arcs of fire emitters (on on the left and one on the right
+        # There are two arcs of fire emitters (one on the left and one on the right
         # of player 1) each with eight emitters
         self.leftEmitters  = []
         self.rightEmitters = []
         for i in range(0, SSFGame.NUM_FIRE_EMITTERS_PER_ARC):
             self.leftEmitters.append(fire_emitter.FireEmitter(i))
             self.rightEmitters.append(fire_emitter.FireEmitter(i))
-            
+        
+        self._SetupPrevNextEmitters(self.leftEmitters)
+        self._SetupPrevNextEmitters(self.rightEmitters)
+        
         # Gesture dictionary - maps various gestures from the gesture recognizer
         # to functions that handle those gestures
         self.GESTURE_FUNCTIONS = {
@@ -56,13 +59,26 @@ class SSFGame:
         if self.gestureRecognizer.GetP2HasNewGesture():
             p2Gesture = self.gestureRecognizer.PopP2Gesture()
             self._ExecuteGesture(2, p2Gesture)
-        
-        # Tick the fire emitters...
-        for leftEmitter, rightEmitter in self.leftEmitters, self.rightEmitters:
-            leftEmitter.Tick(dT)
-            rightEmitter.Tick(dT)
-        
+
+        # Tick any actions (e.g., attacks, blocks) that are currently active within the game
+        # TODO
+
+            
     # Private functions *****************************************    
+    
+    # Sets the next and previous emitters for the emitter arc list
+    # passed to this function
+    def _SetupPrevNextEmitters(self, emitters):
+        emitterArrayLength = len(emitters)
+        for i in range(0, emitterArrayLength):
+            prevEmitter = None
+            nextEmitter = None
+            if i != 0:
+                prevEmitter = emitters[i-1]
+            if i != emitterArrayLength-1:
+                nextEmitter = emitters[i+1]
+            
+            emitters[i].SetPrevAndNextEmitters(prevEmitter, nextEmitter)
     
     def _ExecuteGesture(self, playerNum, gesture):
         assert(gesture != GestureRecognizer.NO_GESTURE)
@@ -131,11 +147,11 @@ class SSFGame:
         # Fire on both sides of the player with a 4 second travel time on both side,
         # jets are 2 emitters thick on both sides
         if playerNum == 1:
-            self._Attack(self.leftEmitter[0], self.leftEmitter[-1], 4.0, 2)
+            self._Attack(self.leftEmitter[0],  self.leftEmitter[-1],  4.0, 2)
             self._Attack(self.rightEmitter[0], self.rightEmitter[-1], 4.0, 2)
         elif playerNum == 2:
             self._Attack(self.rightEmitter[-1], self.rightEmitter[0], 4.0, 2)
-            self._Attack(self.leftEmitter[-1], self.leftEmitter[0], 4.0, 2)
+            self._Attack(self.leftEmitter[-1],  self.leftEmitter[0],  4.0, 2)
         else:
             assert(False)
     

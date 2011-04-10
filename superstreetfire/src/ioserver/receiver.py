@@ -53,7 +53,7 @@ class Receiver(threading.Thread):
         while not self.exitThread:
             self.lock.release()
             
-            print "Listening on serial port"
+            #print "Listening on serial port"
             # Listen for input on the serial port
             currSerialDataStr = self.serialInputPort.readline()
             parser.ParseSerialData(currSerialDataStr, self.queueMgr)
