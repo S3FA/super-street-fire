@@ -110,12 +110,12 @@ class ReceiverQueueMgr:
             print "WARNING: Receiver queue overflow"
             queue.popleft()
             
-        print "Data is being placed on a receiver queue"
+        #print "Data is being placed on a receiver queue"
         queue.append(data)
     
     def _PopQueueData(self, queue):
         if len(queue) == 0:
-            print "Tried to retrieve data from an empty receiver queue."
+            #print "Tried to retrieve data from an empty receiver queue."
             return None
         else:
             print "Averaging and popping data"

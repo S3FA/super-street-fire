@@ -20,3 +20,11 @@ class Player:
     
     def SetDamage(self, hpDamage):
         self.hitPoints -= hpDamage
+        
+def GetOtherPlayerNum(playerNum):
+    if playerNum == 1:
+        return 2
+    elif playerNum == 2:
+        return 1
+    else
+        assert(False)

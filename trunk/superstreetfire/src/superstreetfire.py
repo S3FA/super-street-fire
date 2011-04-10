@@ -5,6 +5,7 @@ The entry point for the superstreetfire server/application.
 '''
 
 import time
+import traceback
 from optparse import OptionParser
 
 import ioserver.receiver 
@@ -48,50 +49,47 @@ if __name__ == '__main__':
     print "Supplied Options:"
     print options
     
-    
     DEFAULT_BAUDRATE = 57600
     FIXED_FRAME_TIME = 1.0 / float(options.frequency) 
-    
-    
-    # Start the emulator if it was specified as an argument
-    #clientEmulator = None
-    #if options.emulatorPort != None:
-    #    clientEmulator = ClientEmulator(options.emulatorPort, DEFAULT_BAUDRATE)
-    #    clientEmulator.start()
-    
-    # Build the queue managers for holding aggregated send and receive data
-    receiverQueueMgr = ReceiverQueueMgr()
-
-    # Spawn threads for listening and sending data over the serial port
-    receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
-    receiverThread.start()
-    
-    #TODO
-    #senderThread = ioserver.sender.Sender(options.outputPort, DEFAULT_BAUDRATE)
-    #senderThread.start()
-    
-    
-    # TODO: Move time stuff into the gamemodel...
-    
-    # Time data initialization
-    startOfSimulationTime = time.time()
-    
-    deltaFrameTime = 0            # Holds the current frame's delta time
-    lastFrameTime  = time.time()  # Holds the absolute time of the last frame
-    currTime       = time.time()  # Temporary variable for the current absolute time
-    currTimeStamp  = time.time()  # Holds the total time since the start of the simulation
-    
-    # Constant for the starting time of the simulation
-    SIMULATION_START_TIME = currTime # Don't change this value!
-    
-    # Game model and gesture recognition system initialization
-    # TODO: What the heck is our calibration data and where does it come from?
-    gestureRecognizer = GestureRecognizer()
-    ssfGame           = SSFGame(gestureRecognizer)
     
     # The following loop and try/catch is to make sure that we kill the whole
     # process in cases of imposed exceptions
     try:
+            # Start the emulator if it was specified as an argument
+        #clientEmulator = None
+        #if options.emulatorPort != None:
+        #    clientEmulator = ClientEmulator(options.emulatorPort, DEFAULT_BAUDRATE)
+        #    clientEmulator.start()
+        
+        # Build the queue managers for holding aggregated send and receive data
+        receiverQueueMgr = ReceiverQueueMgr()
+    
+        # Spawn threads for listening and sending data over the serial port
+        receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
+        receiverThread.start()
+        
+        #TODO
+        #senderThread = ioserver.sender.Sender(options.outputPort, DEFAULT_BAUDRATE)
+        #senderThread.start()
+        
+        
+        # TODO: Move time stuff into the gamemodel...
+        
+        # Time data initialization
+        startOfSimulationTime = time.time()
+        
+        deltaFrameTime = 0            # Holds the current frame's delta time
+        lastFrameTime  = time.time()  # Holds the absolute time of the last frame
+        currTime       = time.time()  # Temporary variable for the current absolute time
+        currTimeStamp  = time.time()  # Holds the total time since the start of the simulation
+        
+        # Constant for the starting time of the simulation
+        SIMULATION_START_TIME = currTime # Don't change this value!
+        
+        # Game model and gesture recognition system initialization
+        # TODO: What the heck is our calibration data and where does it come from?
+        gestureRecognizer = GestureRecognizer()
+        ssfGame           = SSFGame(gestureRecognizer)
         
         threadsAreAlive = receiverThread.isAlive() #and senderThread.isAlive()
         while threadsAreAlive:
@@ -119,6 +117,8 @@ if __name__ == '__main__':
             receiverQueueMgr.PopP1HeadsetData()
             receiverQueueMgr.PopP2HeadsetData()
             
+            ssfGame.Tick(deltaFrameTime)
+            
             # TODO: Now that the simulation has iterated, grab
             # any resulting outputs to actuator clients (i.e., fire, lights, etc.)
             # and place them on the sender queues
@@ -133,9 +133,12 @@ if __name__ == '__main__':
             
     except KeyboardInterrupt:
         print "Ctrl+c Issued..."
-    finally:
-        KillEverything([receiverThread])
-        print "Exiting..."
+    except:
+        print "Unexpected exception occurred!"
+        traceback.print_exc()
+
+    KillEverything([receiverThread])
+    print "Exiting..."
     
     
     

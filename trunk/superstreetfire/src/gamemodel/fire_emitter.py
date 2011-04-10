@@ -8,72 +8,121 @@ Super Street Fire game.
 @author: Callum Hay
 '''
 
+import player
+
 class FireEmitter:
-    # State Constants:
+    # State Constants/Enumeration:
     # The emitter can be in the following states
     TURNED_OFF_STATE = 0
     TURNED_ON_STATE  = 1
-    #ARMED_STATE ?
     
-    # Speed/Time Constraint Constants:
-    #MIN_FLAME_ON_TIME = 1.0
-    #MAX_FLAME_ON_TIME = 2.0
+    # Enumeration constant for no player fire owners
+    NO_PLAYER_OWNER    = 0
+    BOTH_PLAYERS_OWNER = 3
+    
+    # Enumeration constants to describe the nature/type of the Emitter's flame :
+    # The emitter can either have no nature at all (because it's not on)
+    # or it can either be an 'attack' flame or a 'block' flame
+    NO_FLAME     = 0
+    BLOCK_FLAME  = 1
+    ATTACK_FLAME = 2
     
     def __init__(self, idx):
         # Keep this emitter's index within its arc of emitters (starting at zero)
-        self.arcIndex = idx
-        
-        # Hold a mapping of each state to its associated "Tick" function
-        self.STATE_TO_FUNC_DICT = {
-            FireEmitter.TURNED_OFF_STATE : self._TurnedOnStateTick,
-            FireEmitter.TURNED_ON_STATE  : self._TurnedOffStateTick                   
-        }
-               
+        self.arcIndex   = idx
+        self._playerNum = FireEmitter.NO_PLAYER_OWNER
+        self._flameType = FireEmitter.NO_FLAME
+        self.state      = FireEmitter.TURNED_OFF_STATE
+
         self.Reset()
+    
+    def SetPrevAndNextEmitters(self, prevEmitter, nextEmitter):
+        assert(prevEmitter != None or nextEmitter != None)
+        self.prevEmitter = prevEmitter
+        self.nextEmitter = nextEmitter
         
     def Reset(self):
         # The initial state is off, for obvious reasons
-        self._SetState(FireEmitter.TURNED_OFF_STATE)
-        # The fire counter is used when the fire is turned on,
-        # we only allow the fire to be on for a specified length of time...
-        self._fireOnTimeCounter = 0.0
-        self._currFireTime      = 0.0
-        
-    # Simulate a tick over some given delta time in seconds
-    def Tick(self, dT):
-        self._stateTickFunc(dT)
-    
-    # Turn on this fire effect for the given length of time
-    # If the fire is already on then this will just keep it on
-    # and overwrite the previous time length to the one given
-    def TurnFireOn(self, timeLength):
-        assert(timeLength >= 0)
-        self._currFireTime      = timeLength
-        self._fireOnTimeCounter = 0.0
-        self._SetState(FireEmitter.TURNED_ON_STATE)
+        self.KillFire()
 
-    # Turn off this fire effect, immediately
-    def TurnFireOff(self):
-        self._currFireTime      = 0.0
-        self._fireOnTimeCounter = 0.0
+    # Turn on this fire effect for the given player with the given flame type
+    # Returns: True if the emitter was turned on by this call, False if not
+    def TurnFireOn(self, playerNum, flameType):
+        assert(flameType == FireEmitter.BLOCK_FLAME or flameType == FireEmitter.ATTACK_FLAME)
+        assert(playerNum == 1 or playerNum == 2)
+        
+        # First check to see whether this flame is currently turned on and active
+        # for some other purpose...
+        if self.state == FireEmitter.TURNED_ON_STATE:
+            # The flame is already on - if it's turned on for the player that requested
+            # it then we don't need to do anything extra - however, if the player is different
+            # then we may be encountering a block or attack from the another player 
+            if self._playerNum != playerNum:
+                
+                if self._flameType == FireEmitter.BLOCK_FLAME:
+                    if flameType == FireEmitter.ATTACK_FLAME:
+                        # A block had already existed on this emitter and attack was attempted,
+                        # thus, an attack was just blocked
+                        self.TurnFireOff()
+                        return False
+                    else:
+                        # This should never happen - can't have blocks from both players in the same emitter
+                        assert(False)
+                        return False
+                    
+                elif self._flameType == FireEmitter.ATTACK_FLAME:
+                    if flameType == FireEmitter.BLOCK_FLAME:
+                        # A attack had already existed on this emitter and a block was just issued
+                        # to defend it...
+                        
+                        # TODO: TIMING???
+                        # For now this counts as blocked
+                        self.TurnFireOff()
+                        return False
+                    
+                    else flameType == FireEmitter.ATTACK_FLAME:
+                        # The attacks from both players are passing through this emitter
+                        self._playerNum = FireEmitter.BOTH_PLAYERS_OWNER
+                        self._flameType = flameType
+                        self._SetState(FireEmitter.TURNED_ON_STATE)
+                        return True
+            else:
+                # The emitter is already turned on for the player
+                return True
+            
+        self._playerNum = playerNum
+        self._flameType = flameType
+        self._SetState(FireEmitter.TURNED_ON_STATE)
+        return True
+
+    def KillFire(self):
+        self._playerNum = FireEmitter.NO_PLAYER_OWNER
+        self._flameType = FireEmitter.NO_FLAME
         self._SetState(FireEmitter.TURNED_OFF_STATE)
+
+    # Turn off this fire effect for the given player
+    def TurnFireOff(self, playerNum):
+        assert(playerNum == 1 or playerNum == 2)
+        
+        # We have to check to see who owns this flame...
+        if self._playerNum != FireEmitter.NO_PLAYER_OWNER:
+            if self._playerNum == FireEmitter.BOTH_PLAYERS_OWNER:
+                # Both players had owned the flame,
+                # remove the ownership of the player who just asked to turn off the fire
+                self._playerNum = player.GetOtherPlayerNum(playerNum)
+                return
+            elif self._playerNum != playerNum
+                # The other player owns this flame, therefore we just ignore this request...
+                return
+            
+        assert(self._playerNum == FireEmitter.NO_PLAYER_OWNER or \
+               self._playerNum == playerNum)
+        self.KillFire()
 
     # Private Functions *************************************
 
     def _SetState(self, state):
-        self._stateTickFunc = self.STATE_TO_FUNC_DICT.get(state, default=None)
         assert(self._stateTickFunc != None)
         self.state = state
 
-    # Tick function for when the fire is on    
-    def _TurnedOnStateTick(self, dT):
-        assert(self.state == FireEmitter.TURNED_ON_STATE)
-        
-        self._fireOnTimeCounter += dT
-        if self._fireOnTimeCounter >= self._currFireTime:
-            self.TurnFireOff()
 
-    # Tick function for when the fire is off
-    def _TurnedOffStateTick(self, dT):
-        assert(self.state == FireEmitter.TURNED_OFF_STATE)
-        pass # Do nothing
