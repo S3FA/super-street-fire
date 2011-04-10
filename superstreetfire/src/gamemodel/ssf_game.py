@@ -29,8 +29,8 @@ class SSFGame:
             self.leftEmitters.append(fire_emitter.FireEmitter(i))
             self.rightEmitters.append(fire_emitter.FireEmitter(i))
         
-        self._SetupPrevNextEmitters(self.leftEmitters)
-        self._SetupPrevNextEmitters(self.rightEmitters)
+        #self._SetupPrevNextEmitters(self.leftEmitters)
+        #self._SetupPrevNextEmitters(self.rightEmitters)
         
         # Gesture dictionary - maps various gestures from the gesture recognizer
         # to functions that handle those gestures
@@ -66,6 +66,7 @@ class SSFGame:
             
     # Private functions *****************************************    
     
+    '''
     # Sets the next and previous emitters for the emitter arc list
     # passed to this function
     def _SetupPrevNextEmitters(self, emitters):
@@ -79,6 +80,7 @@ class SSFGame:
                 nextEmitter = emitters[i+1]
             
             emitters[i].SetPrevAndNextEmitters(prevEmitter, nextEmitter)
+    '''
     
     def _ExecuteGesture(self, playerNum, gesture):
         assert(gesture != GestureRecognizer.NO_GESTURE)

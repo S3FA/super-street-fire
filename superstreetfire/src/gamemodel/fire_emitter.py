@@ -9,120 +9,117 @@ Super Street Fire game.
 '''
 
 import player
+from fire_emitter_states import FireOffState 
 
 class FireEmitter:
-    # State Constants/Enumeration:
-    # The emitter can be in the following states
-    TURNED_OFF_STATE = 0
-    TURNED_ON_STATE  = 1
-    
-    # Enumeration constant for no player fire owners
-    NO_PLAYER_OWNER    = 0
-    BOTH_PLAYERS_OWNER = 3
-    
-    # Enumeration constants to describe the nature/type of the Emitter's flame :
-    # The emitter can either have no nature at all (because it's not on)
-    # or it can either be an 'attack' flame or a 'block' flame
-    NO_FLAME     = 0
-    BLOCK_FLAME  = 1
-    ATTACK_FLAME = 2
+    # Enumeration constants for defining types of flames that can be turned on/off
+    # by either player during the game
+    ATTACK_FLAME = 1
+    BLOCK_FLAME  = 2
     
     def __init__(self, idx):
         # Keep this emitter's index within its arc of emitters (starting at zero)
-        self.arcIndex   = idx
-        self._playerNum = FireEmitter.NO_PLAYER_OWNER
-        self._flameType = FireEmitter.NO_FLAME
-        self.state      = FireEmitter.TURNED_OFF_STATE
-
+        self.arcIndex     = idx
+        self.flameIsOn    = False
+        self.p1ColourIsOn = False
+        self.p2ColourIsOn = False
+        self.state        = FireOffState(self)
         self.Reset()
     
-    def SetPrevAndNextEmitters(self, prevEmitter, nextEmitter):
-        assert(prevEmitter != None or nextEmitter != None)
-        self.prevEmitter = prevEmitter
-        self.nextEmitter = nextEmitter
-        
     def Reset(self):
         # The initial state is off, for obvious reasons
-        self.KillFire()
+        self.Kill()
 
     # Turn on this fire effect for the given player with the given flame type
     # Returns: True if the emitter was turned on by this call, False if not
-    def TurnFireOn(self, playerNum, flameType):
+    def FireOn(self, playerNum, flameType):
+        assert(playerNum == 1 or playerNum == 2)
         assert(flameType == FireEmitter.BLOCK_FLAME or flameType == FireEmitter.ATTACK_FLAME)
-        assert(playerNum == 1 or playerNum == 2)
         
-        # First check to see whether this flame is currently turned on and active
-        # for some other purpose...
-        if self.state == FireEmitter.TURNED_ON_STATE:
-            # The flame is already on - if it's turned on for the player that requested
-            # it then we don't need to do anything extra - however, if the player is different
-            # then we may be encountering a block or attack from the another player 
-            if self._playerNum != playerNum:
-                
-                if self._flameType == FireEmitter.BLOCK_FLAME:
-                    if flameType == FireEmitter.ATTACK_FLAME:
-                        # A block had already existed on this emitter and attack was attempted,
-                        # thus, an attack was just blocked
-                        self.TurnFireOff()
-                        return False
-                    else:
-                        # This should never happen - can't have blocks from both players in the same emitter
-                        assert(False)
-                        return False
-                    
-                elif self._flameType == FireEmitter.ATTACK_FLAME:
-                    if flameType == FireEmitter.BLOCK_FLAME:
-                        # A attack had already existed on this emitter and a block was just issued
-                        # to defend it...
-                        
-                        # TODO: TIMING???
-                        # For now this counts as blocked
-                        self.TurnFireOff()
-                        return False
-                    
-                    else flameType == FireEmitter.ATTACK_FLAME:
-                        # The attacks from both players are passing through this emitter
-                        self._playerNum = FireEmitter.BOTH_PLAYERS_OWNER
-                        self._flameType = flameType
-                        self._SetState(FireEmitter.TURNED_ON_STATE)
-                        return True
+        if playerNum == 1:
+            if flameType == FireEmitter.ATTACK_FLAME:
+                self.state.TurnOnP1Attack()
             else:
-                # The emitter is already turned on for the player
-                return True
-            
-        self._playerNum = playerNum
-        self._flameType = flameType
-        self._SetState(FireEmitter.TURNED_ON_STATE)
-        return True
-
-    def KillFire(self):
-        self._playerNum = FireEmitter.NO_PLAYER_OWNER
-        self._flameType = FireEmitter.NO_FLAME
-        self._SetState(FireEmitter.TURNED_OFF_STATE)
-
-    # Turn off this fire effect for the given player
-    def TurnFireOff(self, playerNum):
-        assert(playerNum == 1 or playerNum == 2)
+                self.state.TurnOnP1Block()
+        else:
+            if flameType == FireEmitter.ATTACK_FLAME:
+                self.state.TurnOnP2Attack()
+            else:
+                self.state.TurnOnP2Block()
         
-        # We have to check to see who owns this flame...
-        if self._playerNum != FireEmitter.NO_PLAYER_OWNER:
-            if self._playerNum == FireEmitter.BOTH_PLAYERS_OWNER:
-                # Both players had owned the flame,
-                # remove the ownership of the player who just asked to turn off the fire
-                self._playerNum = player.GetOtherPlayerNum(playerNum)
-                return
-            elif self._playerNum != playerNum
-                # The other player owns this flame, therefore we just ignore this request...
-                return
-            
-        assert(self._playerNum == FireEmitter.NO_PLAYER_OWNER or \
-               self._playerNum == playerNum)
-        self.KillFire()
+        # Query to see whether the emitter is now on for the given player...
+        return (playerNum in self.state.GetPlayerOwners())
+        
+    # Turn off this fire effect for the given player
+    def FireOff(self, playerNum, flameType):
+        assert(playerNum == 1 or playerNum == 2)
+        assert(flameType == FireEmitter.BLOCK_FLAME or flameType == FireEmitter.ATTACK_FLAME)
+        
+        if playerNum == 1:
+            if flameType == FireEmitter.ATTACK_FLAME:
+                self.state.TurnOffP1Attack()
+            else:
+                self.state.TurnOffP1Block()
+        else:
+            if flameType == FireEmitter.ATTACK_FLAME:
+                self.state.TurnOffP2Attack()
+            else:
+                self.state.TurnOffP2Block()        
+
+    # Kill the emitter, and do it NOW!!
+    def Kill(self):
+        self._SetState(FireOffState(self))
+        # Just for good measure...
+        self._TurnFireOff()
 
     # Private Functions *************************************
-
-    def _SetState(self, state):
-        assert(self._stateTickFunc != None)
-        self.state = state
-
-
+    
+    def _SetState(self, newState):
+        assert(self.state != None)
+        assert(newState != None)
+        # End the previous state, set the new state and start it
+        self.state = newState
+        self.state.StartState()
+        
+    # This function will ACTUALLY turn the fire on, should only be called from
+    # the fire emitter state machine
+    def _TurnFireOn(self):
+        if not self.flameIsOn:
+            # SEND DATA TO WIFIRE FOR FLAME EFFECT!
+            self.flameIsOn = True
+    
+    def _TurnFireOnWithColour(self, playerNum):
+        assert(playerNum == 1 or playerNum == 2)
+        self._TurnFireOn()
+        if playerNum == 1:
+            self._TurnP1ColourOn()
+        else:
+            self._TurnP2ColourOn()
+    
+    # This function will ACTUALLY turn the fire off, should only be called from
+    # the fire emitter state machine
+    def _TurnFireOff(self):
+        # SEND DATA TO WIFIRE FOR FLAME EFFECT!
+        self.flameIsOn = False
+        self._TurnP1ColourOff()
+        self._TurnP2ColourOff()
+    
+    def _TurnP1ColourOn(self):
+        if not self.p1ColourIsOn:
+            # SEND DATA TO WIFIRE FOR THE COLOUR!
+            self.p1ColourIsOn = True
+            
+    def _TurnP1ColourOff(self):
+        # SEND DATA TO WIFIRE FOR THE COLOUR!
+        self.p1ColourIsOn = False
+        
+    def _TurnP2ColourOn(self):
+        if not self.p2ColourIsOn:
+            # SEND DATA TO WIFIRE FOR THE COLOUR!
+            self.p2ColourIsOn = True
+            
+    def _TurnP2ColourOff(self):
+        # SEND DATA TO WIFIRE FOR THE COLOUR!
+        self.p2ColourIsOn = False
+    
+    

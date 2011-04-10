@@ -26,5 +26,5 @@ def GetOtherPlayerNum(playerNum):
         return 2
     elif playerNum == 2:
         return 1
-    else
+    else:
         assert(False)
