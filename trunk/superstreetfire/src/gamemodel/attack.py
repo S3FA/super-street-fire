@@ -134,7 +134,7 @@ class Attack:
             # and the emitter is actually inside the arc (it may be the case that the attack
             # is still starting up and has a thickness > 1)
             if passedEmitter != None and self._leftAttackWindow[0] == Attack.ACTIVE_ATTACK_PART:
-                passedEmitter.TurnFireOff(self.playerNum)
+                passedEmitter.FireOff(self.playerNum, FireEmitter.ATTACK_FLAME)
             
             # Shift the attack window
             self._attackLWindowIdx += 1
@@ -166,7 +166,7 @@ class Attack:
         for i in range(firstIdx, lastIdx):
             if self._leftAttackWindow[i] == Attack.ACTIVE_ATTACK_PART:
                 currEmitter = self._GetEmitter(ssfGame.leftEmitters, i)
-                wasBlocked = currEmitter.TurnFireOn(self.playerNum, FireEmitter.ATTACK_FLAME)
+                wasBlocked = currEmitter.FireOn(self.playerNum, FireEmitter.ATTACK_FLAME)
                 self._leftAttackWindow[i] = wasBlocked
 
     
@@ -179,20 +179,6 @@ class Attack:
             self._currDeltaREmitterTime = self._currDeltaREmitterTime - self._timePerEmitter
 
     
-    
-    #def _GetCurrentWindowIndex(self):
-    #    startEmitterNum = int(self._currAttackTime / self._timePerEmitter)
-    #    return startEmitterNum - self._thickness + 1
-
-    def _GetRelevantEmitterList(self, ssfGame, isLeft):
-        if self.playerNum == 1:
-            if isLeft:
-                return ssfGame.leftEmitters
-        else:
-            if not isLeft:
-                return ssfGame.leftEmitters
-        return ssfGame.rightEmitters
-
 
     def _GetEmitter(self, arcEmitters, idx):
         if idx < 0 or idx >= SSFGame.NUM_FIRE_EMITTERS_PER_ARC:
