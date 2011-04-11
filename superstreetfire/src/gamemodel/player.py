@@ -18,7 +18,7 @@ class Player:
     def IsKnockedOut(self):
         return (self.hitPoints <= 0)
     
-    def SetDamage(self, hpDamage):
+    def DoDamage(self, hpDamage):
         self.hitPoints -= hpDamage
         
 def GetOtherPlayerNum(playerNum):
