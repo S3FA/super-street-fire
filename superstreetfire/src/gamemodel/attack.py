@@ -6,11 +6,12 @@ attack.py
 
 #import logging
 
+from action import Action
 from ssf_game import SSFGame
 from fire_emitter import FireEmitter
 import player
 
-class Attack:
+class Attack(Action):
     # Enumeration constants for the fire emitter arcs that an Attack may apply to.
     LEFT_SIDE            = 0
     RIGHT_SIDE           = 1
@@ -27,7 +28,8 @@ class Attack:
     # Constructor for the Attack class
     # playerNum:  The number of the player (1 or 2) that initiated the attack.
     # sideEnum:   Must be one of the side enumerations (to define 
-    #             which fire arc the attack takes place on).
+    #             which fire arc the attack takes place on). This is from the same
+    #             perspective as seen by playerNum.
     # thickness:  The number of fire emitters thick that the attack is.
     # timeLength: The total time that the attack will take to travel
     #             from one side to the other of the arc.
@@ -36,13 +38,17 @@ class Attack:
         assert(timeLength > 0.0)
         assert(thickness >= 1)
         
-        self.playerNum  = playerNum
-
+        Action.__init__(self, playerNum)
+        
         self._sideEnum       = sideEnum
         self._thickness      = thickness
-        self._timeLength     = timeLength
-        self._timePerEmitter = timeLength / float(FireEmitter.NUM_FIRE_EMITTERS_PER_ARC)
+        self._timeLength     = timeLength        
         self._dmgPerFlame    = dmgPerFlame
+        
+        # The time per emitter is calculated using the total number of fire emitters AND
+        # the thickness of the attack - the thicker the attack the more emitters will actually
+        # go off...
+        self._timePerEmitter = timeLength / float(FireEmitter.NUM_FIRE_EMITTERS_PER_ARC + thickness - 1)
         
         # Track the amount of time that the attack has been active for
         self._currAttackTime       = 0.0
@@ -54,7 +60,7 @@ class Attack:
         self._currDeltaLEmitterTime = self._timePerEmitter
         self._currDeltaREmitterTime = self._timePerEmitter
         
-        # An attack is like a shift register - basically we keep a array that acts as the 
+        # We keep a array that acts as the 
         # attack 'window', this window shifts across the relevant flame emitter arc
         # as it does so it turns the emitters on (if that part of the window is still alive)
         # Parts of the window can be diminished when they encounter blocks (or some other feature
@@ -131,14 +137,32 @@ class Attack:
             assert(False)
             
     def _TickLeftAttack(self, ssfGame):
+        # We need to make sure we are modifying the correct emitter - the emitters are, by
+        # default, layed out from player 1's perspective so we need to reverse them for player 2
+        emitterArc = None
+        if self.playerNum == 1:
+            emitterArc = ssfGame.leftEmitters
+        else:
+            emitterArc = ssfGame.rightEmitters
+        
+        # Simulate the attack
         (self._attackLWindowIdx, self._currDeltaLEmitterTime) = \
         self._SimulateAttack(ssfGame, self._leftAttackWindow, self._attackLWindowIdx, \
-                             ssfGame.leftEmitters, self._currDeltaLEmitterTime)
+                             emitterArc, self._currDeltaLEmitterTime)
 
     def _TickRightAttack(self, ssfGame):
+        # We need to make sure we are modifying the correct emitter - the emitters are, by
+        # default, layed out from player 1's perspective so we need to reverse them for player 2
+        emitterArc = None
+        if self.playerNum == 1:
+            emitterArc = ssfGame.rightEmitters
+        else:
+            emitterArc = ssfGame.leftEmitters
+        
+        # Simulate the attack
         (self._attackRWindowIdx, self._currDeltaREmitterTime) = \
         self._SimulateAttack(ssfGame, self._rightAttackWindow, self._attackRWindowIdx, \
-                             ssfGame.rightEmitters, self._currDeltaREmitterTime)
+                             emitterArc, self._currDeltaREmitterTime)
         
     # Generalized Attack simulation function - used to update the state of the attack whenever
     # it is being executed/ticked.
@@ -161,11 +185,14 @@ class Attack:
                 # If the emitter in the arc no longer holds an attack flame for self.playerNum
                 # then it must have been extinguished by a block from the other player...
                 if currEmitter != None and not currEmitter.HasAttackFlameOwnedByPlayer(self.playerNum):
+                    print "CANCELLED BY BLOCK"
                     attackWindow[i] = Attack.INACTIVE_ATTACK_PART
         
         # Shift the attack window if we've exceeded the emitter time
         if deltaEmitterTime >= self._timePerEmitter:
-            print attackWindowIdx, attackWindow[0]
+            #print attackWindowIdx, attackWindow[0]
+            #print self._currAttackTime
+            
             # We'll first need to turn off the emitter that we're about to pass
             passedEmitter = self._GetEmitter(arcEmitters, attackWindowIdx)
             # We only need to turn it off if the attack is still active on that part
@@ -184,7 +211,7 @@ class Attack:
                 # Go through all of the hits so far if we encounter new hits,
                 # each new hit will affect the game state...
                 assert(self._thickness >= totalNumFinishedAttackParts)
-                for i in range(0, totalNumFinishedAttackParts):
+                for i in range(self._thickness-1, self._thickness - totalNumFinishedAttackParts - 1, -1):
                     if attackWindow[i] == Attack.ACTIVE_ATTACK_PART:
                         # A new attack was just landed
                         ssfGame.Hurt(player.GetOtherPlayerNum(self.playerNum), self._dmgPerFlame)

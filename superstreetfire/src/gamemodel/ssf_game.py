@@ -10,7 +10,7 @@ from fire_emitter import FireEmitter
 from gesture_recognizer import GestureRecognizer
 
 class SSFGame:
-    ROUND_TIME_IN_SECONDS     = 60.0
+    ROUND_TIME_IN_SECONDS = 60.0
 
     def __init__(self, gestureRecognizer):
         assert(gestureRecognizer != None)
