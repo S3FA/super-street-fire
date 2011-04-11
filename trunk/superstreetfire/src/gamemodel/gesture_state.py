@@ -30,7 +30,7 @@ class GestureState:
             assert(False)
             
     # Abstract method used to update the state with new glove data
-    def Update(self, leftGloveData, rightGloveData, dT, timeStamp): abstract()
+    def Update(self, leftGloveData, rightGloveData, dT, timeStamp): assert(False)
     
     
     
