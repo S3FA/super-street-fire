@@ -12,14 +12,24 @@ import player
 from fire_emitter_states import FireOffState 
 
 class FireEmitter:
+    NUM_FIRE_EMITTERS_PER_ARC = 8
+    TOTAL_NUM_FIRE_EMITTERS   = 2 * NUM_FIRE_EMITTERS_PER_ARC    
+    
+    RIGHT_ARC = "Right Arc"
+    LEFT_ARC  = "Left Arc"
+    
     # Enumeration constants for defining types of flames that can be turned on/off
     # by either player during the game
     ATTACK_FLAME = 1
     BLOCK_FLAME  = 2
     
-    def __init__(self, idx):
+    def __init__(self, idx, arc):
+        assert(idx >= 0 and idx < FireEmitter.NUM_FIRE_EMITTERS_PER_ARC)
+        assert(arc == FireEmitter.RIGHT_ARC or arc == FireEmitter.LEFT_ARC)
+        
         # Keep this emitter's index within its arc of emitters (starting at zero)
         self.arcIndex     = idx
+        self.arc          = arc
         self.flameIsOn    = False
         self.p1ColourIsOn = False
         self.p2ColourIsOn = False
