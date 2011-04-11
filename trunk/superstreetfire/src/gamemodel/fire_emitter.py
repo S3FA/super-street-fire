@@ -30,6 +30,11 @@ class FireEmitter:
         # The initial state is off, for obvious reasons
         self.Kill()
 
+    def HasAttackFlameOwnedByPlayer(self, playerNum):
+        return playerNum in self.state.GetAttackOwners()
+    def HasBlockFlameOwnedByPlayer(self, playerNum):
+        return playerNum in self.state.GetBlockOwners()
+
     # Turn on this fire effect for the given player with the given flame type
     # Returns: True if the emitter was turned on by this call, False if not
     def FireOn(self, playerNum, flameType):
@@ -48,7 +53,7 @@ class FireEmitter:
                 self.state.TurnOnP2Block()
         
         # Query to see whether the emitter is now on for the given player...
-        return (playerNum in self.state.GetPlayerOwners())
+        return self.HasAttackFlameOwnedByPlayer(playerNum)
         
     # Turn off this fire effect for the given player
     def FireOff(self, playerNum, flameType):

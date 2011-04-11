@@ -107,7 +107,7 @@ class Attack:
         
         # NOTE: For now the delta emitter times for the left and right arcs are the same
         self._currDeltaLEmitterTime += dT
-        self._currDeltaREmitterTime  = self._currDeltaLEmitterTime
+        self._currDeltaREmitterTime += dT
         
         if self._sideEnum == Attack.LEFT_SIDE:
             self._LeftAttack(ssfGame, dT)
@@ -122,11 +122,23 @@ class Attack:
     def _LeftAttack(self, ssfGame, dT):
         assert(self._leftAttackWindow != None)
         assert(not self.IsFinished())
-        
+    
         windowLastIdx  = self._attackLWindowIdx + self._thickness
         emitterArcSize = len(ssfGame.leftEmitters)
+
+        # TRICKY STUFF: WE NEED TO CHECK THE ATTACK WINDOW TO SEE IF ANY HAVE SINCE BEEN DIMINISHED
+        # BY A BLOCK THAT MAY HAVE OCCURRED IN THE MEANTIME
+        firstIdx = max(self._attackLWindowIdx, 0)
+        lastIdx  = min(emitterArcSize, windowLastIdx)
+        for i, j in zip(range(self._thickness), range(firstIdx, lastIdx)):
+            if self._leftAttackWindow[i] == Attack.ACTIVE_ATTACK_PART:
+                currEmitter = self._GetEmitter(ssfGame.leftEmitters, j)
+                # If the emitter is in the arc no longer holds an attack flame for self.playerNum
+                # then it must have been extinguished by a block from the other player...
+                if currEmitter != None and currEmitter.HasAttackFlameOwnedByPlayer(self.playerNum):
+                    self._leftAttackWindow[i] = Attack.INACTIVE_ATTACK_PART
         
-        # Shift the left attack window if we've exceeded the amount of time per emitter... 
+        # Shift the left attack window if we've exceeded the emitter time
         if self._currDeltaLEmitterTime >= self._timePerEmitter:
             # We'll first need to turn off the emitter that we're about to pass
             passedEmitter = self._GetEmitter(ssfGame.leftEmitters, self._attackLWindowIdx)
@@ -163,11 +175,12 @@ class Attack:
         # emitters that are being touched by the attack
         firstIdx = max(self._attackLWindowIdx, 0)
         lastIdx  = min(emitterArcSize, windowLastIdx)
-        for i in range(firstIdx, lastIdx):
+        for i, j in zip(range(self._thickness), range(firstIdx, lastIdx)):
             if self._leftAttackWindow[i] == Attack.ACTIVE_ATTACK_PART:
-                currEmitter = self._GetEmitter(ssfGame.leftEmitters, i)
-                wasBlocked = currEmitter.FireOn(self.playerNum, FireEmitter.ATTACK_FLAME)
-                self._leftAttackWindow[i] = wasBlocked
+                currEmitter = self._GetEmitter(ssfGame.leftEmitters, j)
+                if currEmitter != None:
+                    wasBlocked = currEmitter.FireOn(self.playerNum, FireEmitter.ATTACK_FLAME)
+                    self._leftAttackWindow[i] = wasBlocked
 
     
     def _RightAttack(self, ssfGame, dT):

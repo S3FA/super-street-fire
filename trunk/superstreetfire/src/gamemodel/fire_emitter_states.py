@@ -13,8 +13,10 @@ class FireState:
         self._logger = logging.getLogger('fire_state_logger')
         pass
 
+    # Initializer function - called when this state is set in the owning FireEmitter object
     def StartState(self): pass
 
+    # Event functions - these are called to alter the state when an external event happens
     def TurnOnP1Attack(self): pass
     def TurnOnP1Block(self):  pass
     def TurnOnP2Attack(self): pass
@@ -25,7 +27,9 @@ class FireState:
     def TurnOffP2Attack(self): pass
     def TurnOffP2Block(self):  pass
 
-    def GetPlayerOwners(self): return []
+    def GetPlayerOwners(self): return [] # Gets a list of players that are associated with this state
+    def GetAttackOwners(self): return [] # Gets a list of players that are associated with an attack in this state
+    def GetBlockOwners(self):  return [] # Gets a list of players that are associated with a block in this state
 
 class FireOffState(FireState):
     def __init__(self, fireEmitter):
@@ -89,6 +93,7 @@ class P1AttackFireOnState(FireState):
     def TurnOffP2Block(self):  pass
     
     def GetPlayerOwners(self): return [1]
+    def GetAttackOwners(self): return [1]
     
 class P2AttackFireOnState(FireState):
     def __init__(self, fireEmitter):
@@ -114,6 +119,7 @@ class P2AttackFireOnState(FireState):
     def TurnOffP2Block(self):  pass
 
     def GetPlayerOwners(self): return [2]
+    def GetAttackOwners(self): return [2]
 
 class P1AndP2AttackFireOnState(FireState):
     def __init__(self, fireEmitter):
@@ -140,6 +146,7 @@ class P1AndP2AttackFireOnState(FireState):
     def TurnOffP2Block(self):  pass
     
     def GetPlayerOwners(self): return [1, 2]
+    def GetAttackOwners(self): return [1, 2]
 
 class P1BlockFireOnState(FireState):
     def __init__(self, fireEmitter):
@@ -164,6 +171,7 @@ class P1BlockFireOnState(FireState):
     def TurnOffP2Block(self):  pass
     
     def GetPlayerOwners(self): return [1]
+    def GetBlockOwners(self):  return [1]
     
 class P2BlockFireOnState(FireState):
     def __init__(self, fireEmitter):
@@ -188,6 +196,7 @@ class P2BlockFireOnState(FireState):
         self._fireEmitter._SetState(FireOffState(self._fireEmitter))
     
     def GetPlayerOwners(self): return [2]
+    def GetBlockOwners(self):  return [2]
 
 class P1AttackAndBlockFireOnState(FireState):
     def __init__(self, fireEmitter):
@@ -212,7 +221,9 @@ class P1AttackAndBlockFireOnState(FireState):
     def TurnOffP2Block(self):  pass
     
     def GetPlayerOwners(self): return [1]  
-    
+    def GetAttackOwners(self): return [1]
+    def GetBlockOwners(self):  return [1]
+        
 class P2AttackAndBlockFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -236,6 +247,8 @@ class P2AttackAndBlockFireOnState(FireState):
         self._fireEmitter._SetState(P2AttackFireOnState(self._fireEmitter))
 
     def GetPlayerOwners(self): return [2]
+    def GetAttackOwners(self): return [2]   
+    def GetBlockOwners(self):  return [2]
 
 if __name__ == "__main__":
     from fire_emitter import FireEmitter
@@ -244,9 +257,14 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
     
-    fireEmitter = FireEmitter(0)
-    assert(fireEmitter.FireOn(1, FireEmitter.ATTACK_FLAME) == True)
-    assert(fireEmitter.FireOn(2, FireEmitter.ATTACK_FLAME) == True)
-    assert(fireEmitter.FireOn(1, FireEmitter.BLOCK_FLAME)  == True)
+    fireEmitter = FireEmitter(0) # Fire OFF state
+    assert(fireEmitter.FireOn(1, FireEmitter.ATTACK_FLAME) == True) # Player 1 Attack state
+    assert(fireEmitter.FireOn(2, FireEmitter.ATTACK_FLAME) == True) # Player 1 & 2 attack state
+    assert(fireEmitter.FireOn(1, FireEmitter.BLOCK_FLAME)  == True) # Blocking ---> Player 1 Attack state
+    fireEmitter.FireOff(1, FireEmitter.ATTACK_FLAME)                # Fire OFF state
+    
+    assert(fireEmitter.FireOn(1, FireEmitter.BLOCK_FLAME)  == True)  # Player 1 Block state
+    assert(fireEmitter.FireOn(2, FireEmitter.ATTACK_FLAME) == False) # Blocking ---> Fire OFF state
+    
     #assert(fireEmitter.FireOn())
     

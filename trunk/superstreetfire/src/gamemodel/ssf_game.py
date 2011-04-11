@@ -10,8 +10,10 @@ import fire_emitter
 from gesture_recognizer import GestureRecognizer
 
 class SSFGame:
+    
     NUM_FIRE_EMITTERS_PER_ARC = 8
     TOTAL_NUM_FIRE_EMITTERS   = 2 * NUM_FIRE_EMITTERS_PER_ARC
+    ROUND_TIME_IN_SECONDS     = 60.0
 
     def __init__(self, gestureRecognizer):
         assert(gestureRecognizer != None)
@@ -20,6 +22,9 @@ class SSFGame:
         # There are two players, facing off against each other
         self.player1 = player.Player()
         self.player2 = player.Player()
+        
+        # There's always a game timer, which counts down throughout a match
+        self.roundTime = 0.0
         
         # There are two arcs of fire emitters (one on the left and one on the right
         # of player 1) each with eight emitters
@@ -51,6 +56,10 @@ class SSFGame:
             leftEmitter.Reset()
             rightEmitter.Reset()
     
+    def IsRoundOver(self):
+        return (self.player1.IsKnockedOut() or self.player2.IsKnockedOut() or \
+               self.roundTime >= SSFGame.ROUND_TIME_IN_SECONDS)
+    
     def Tick(self, dT):
         # Check for any newly recognized gestures, execute any that get found
         if self.gestureRecognizer.GetP1HasNewGesture():
@@ -62,8 +71,22 @@ class SSFGame:
 
         # Tick any actions (e.g., attacks, blocks) that are currently active within the game
         # TODO
+        
+        # Diminish the round timer
+        self.roundTime += dT
+        
+        # Check to see if the current round is over...
+        #if self.IsRoundOver():
 
-            
+    def Hurt(self, playerNum, dmgAmt):
+        assert(playerNum == 1 or playerNum == 2)
+        if playerNum == 1:
+            self.player1.DoDamage(dmgAmt)
+        else:
+            self.player2.DoDamage(dmgAmt)
+    
+  
+  
     # Private functions *****************************************    
     
     '''
