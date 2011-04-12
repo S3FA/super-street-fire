@@ -1,7 +1,7 @@
 '''
-Created on Apr 10, 2011
+fire_emitter_states.py
 
-@author: callumhay
+@author: Callum Hay
 '''
 
 import logging
