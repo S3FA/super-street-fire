@@ -11,9 +11,12 @@ Python:
 
 Design Work:
  * ~~Break the code down into modules ala UML class/domain diagram~~
- * Start designing the game model representation
+ * ~~Start designing the game model representation~~
+ * ~~Fire emitter state machine~~
+ * Finishing up design for the flow of data through the game model 
 
-Server code:
+ioserver/gamemodel Code:
  * ~~Finish up writing the basic data structures for holding incoming data from sensor clients~~
  * ~~Start elucidating the code that will read data from a serial port and parse it into the above mentioned data structures~~
- * Start programming the game model code
+ * ~~Start programming the game model code~~
+ * Finishing basic game model elements for Attack, Block, Fire Emitters, Players and the very basic game state (no rounds yet)
