@@ -17,8 +17,8 @@ class SSFGame:
         self.gestureRecognizer = gestureRecognizer
         
         # There are two players, facing off against each other
-        self.player1 = player.Player()
-        self.player2 = player.Player()
+        self.player1 = player.Player(1)
+        self.player2 = player.Player(2)
         
         # There's always a game timer, which counts down throughout a match
         self.roundTime = 0.0

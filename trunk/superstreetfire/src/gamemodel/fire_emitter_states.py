@@ -6,11 +6,14 @@ Created on Apr 10, 2011
 
 import logging
 
+# This is the 'abstract' superclass for all fire emitter states
 class FireState:
+    LOGGER_NAME = 'fire_state_logger'
+    
     def __init__(self, fireEmitter):
         assert(fireEmitter != None)
         self._fireEmitter = fireEmitter
-        self._logger = logging.getLogger('fire_state_logger')
+        self._logger = logging.getLogger(FireState.LOGGER_NAME)
         pass
 
     # Initializer function - called when this state is set in the owning FireEmitter object
@@ -31,6 +34,7 @@ class FireState:
     def GetAttackOwners(self): return [] # Gets a list of players that are associated with an attack in this state
     def GetBlockOwners(self):  return [] # Gets a list of players that are associated with a block in this state
 
+# FireOffState represents a state where the fire is completely turned off
 class FireOffState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -48,7 +52,15 @@ class FireOffState(FireState):
         self._fireEmitter._SetState(P2AttackFireOnState(self._fireEmitter))
     def TurnOnP2Block(self):
         self._fireEmitter._SetState(P2BlockFireOnState(self._fireEmitter))
+        
+    # All the TurnOff* states are ignored since everything is already off
 
+
+# BlockedFireState represents a state where (part of - i.e., one emitter of) 
+# the attack from one player was blocked by the other player.
+# NOTE: This is currently NOT a sustained - the state will immediately transition
+# to another specified state, this state exists incase we want to do something fancy/
+# special when a block occurs
 class BlockedFireState(FireState):
     def __init__(self, fireEmitter, nextState):
         FireState.__init__(self, fireEmitter)
@@ -70,7 +82,9 @@ class BlockedFireState(FireState):
     def TurnOffP1Block(self):  assert(False)
     def TurnOffP2Attack(self): assert(False)
     def TurnOffP2Block(self):  assert(False)
-    
+
+# P1AttackFireOnState represents a state where only player 1 owns an attack
+# on the fire emitter 
 class P1AttackFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -97,7 +111,9 @@ class P1AttackFireOnState(FireState):
     
     def GetPlayerOwners(self): return [1]
     def GetAttackOwners(self): return [1]
-    
+
+# P2AttackFireOnState represents a state where only player 2 owns an attack
+# on the fire emitter 
 class P2AttackFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -125,6 +141,9 @@ class P2AttackFireOnState(FireState):
     def GetPlayerOwners(self): return [2]
     def GetAttackOwners(self): return [2]
 
+# P1AndP2AttackFireOnState represents a state where both player 1 and player 2 own an attack
+# on the fire emitter - for example, when both players have attacks on the same arc of fire emitters
+# the two flame colours will cross over each other as they move to towards their opposite sides
 class P1AndP2AttackFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -153,6 +172,8 @@ class P1AndP2AttackFireOnState(FireState):
     def GetPlayerOwners(self): return [1, 2]
     def GetAttackOwners(self): return [1, 2]
 
+# P1BlockFireOnState represents a state where only player 1 owns a block
+# on the fire emitter 
 class P1BlockFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -178,7 +199,9 @@ class P1BlockFireOnState(FireState):
     
     def GetPlayerOwners(self): return [1]
     def GetBlockOwners(self):  return [1]
-    
+
+# P2BlockFireOnState represents a state where only player 2 owns a block
+# on the fire emitter 
 class P2BlockFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -206,6 +229,9 @@ class P2BlockFireOnState(FireState):
     def GetPlayerOwners(self): return [2]
     def GetBlockOwners(self):  return [2]
 
+# P1AttackAndBlockFireOnState represents a state where only player 1 owns
+# both an attack and a block on the fire emitter - for example, this may happen
+# when a player attacks and then throws up a block on the same arc of fire emitters 
 class P1AttackAndBlockFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
@@ -232,7 +258,10 @@ class P1AttackAndBlockFireOnState(FireState):
     def GetPlayerOwners(self): return [1]  
     def GetAttackOwners(self): return [1]
     def GetBlockOwners(self):  return [1]
-        
+
+# P2AttackAndBlockFireOnState represents a state where only player 2 owns
+# both an attack and a block on the fire emitter - for example, this may happen
+# when a player attacks and then throws up a block on the same arc of fire emitters 
 class P2AttackAndBlockFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)

@@ -12,11 +12,7 @@ from fire_emitter import FireEmitter
 import player
 
 class Attack(Action):
-    # Enumeration constants for the fire emitter arcs that an Attack may apply to.
-    LEFT_SIDE            = 0
-    RIGHT_SIDE           = 1
-    LEFT_AND_RIGHT_SIDES = 2
-    
+
     # Enumeration constants for active/inactive attack parts - an attack part
     # is a single emitter at any given time that is part of an attack - thus
     # if an attack had a thickness of 2 there would be 2 attack parts.
@@ -38,9 +34,8 @@ class Attack(Action):
         assert(timeLength > 0.0)
         assert(thickness >= 1)
         
-        Action.__init__(self, playerNum)
+        Action.__init__(self, playerNum, sideEnum)
         
-        self._sideEnum       = sideEnum
         self._thickness      = thickness
         self._timeLength     = timeLength        
         self._dmgPerFlame    = dmgPerFlame
@@ -95,11 +90,11 @@ class Attack(Action):
         
         print "Time per emitter: ", self._timePerEmitter
         
-        if self._sideEnum == Attack.LEFT_SIDE:
+        if self._sideEnum == Action.LEFT_SIDE:
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
-        elif self._sideEnum == Attack.RIGHT_SIDE:
+        elif self._sideEnum == Action.RIGHT_SIDE:
             self._rightAttackWindow = [Attack.ACTIVE_ATTACK_PART] * self._thickness
-        elif self._sideEnum == Attack.LEFT_AND_RIGHT_SIDES:
+        elif self._sideEnum == Action.LEFT_AND_RIGHT_SIDES:
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
             self._rightAttackWindow = [Attack.ACTIVE_ATTACK_PART] * self._thickness
         else:
@@ -120,15 +115,15 @@ class Attack(Action):
         self._currDeltaLEmitterTime += dT
         self._currDeltaREmitterTime += dT
         
-        if self._sideEnum == Attack.LEFT_SIDE:
+        if self._sideEnum == Action.LEFT_SIDE:
             assert(self._leftAttackWindow  != None)
             self._TickLeftAttack(ssfGame)
             
-        elif self._sideEnum == Attack.RIGHT_SIDE:
+        elif self._sideEnum == Action.RIGHT_SIDE:
             assert(self._rightAttackWindow != None)
             self._TickRightAttack(ssfGame)
             
-        elif self._sideEnum == Attack.LEFT_AND_RIGHT_SIDES:
+        elif self._sideEnum == Action.LEFT_AND_RIGHT_SIDES:
             assert(self._leftAttackWindow  != None)
             self._TickLeftAttack(ssfGame)
             assert(self._rightAttackWindow != None)
@@ -250,12 +245,12 @@ class Attack(Action):
 
 # Factory/Builder Methods for various Super Street Fire Attacks 
 def BuildLeftJabAttack(playerNum):
-    return Attack(playerNum, Attack.LEFT_SIDE, 1, 2.0, 5)
+    return Attack(playerNum, Action.LEFT_SIDE, 1, 2.0, 5)
 def BuildRightJabAttack(playerNum):
-    return Attack(playerNum, Attack.RIGHT_SIDE, 1, 2.0, 5)
+    return Attack(playerNum, Action.RIGHT_SIDE, 1, 2.0, 5)
 def BuildLeftHookAttack(playerNum):
-    return Attack(playerNum, Attack.LEFT_SIDE, 2, 3.0, 5)
+    return Attack(playerNum, Action.LEFT_SIDE, 2, 3.0, 5)
 def BuildRightHookAttack(playerNum):
-    return Attack(playerNum, Attack.RIGHT_SIDE, 2, 3.0, 5)
+    return Attack(playerNum, Action.RIGHT_SIDE, 2, 3.0, 5)
 def BuildHadoukenAttack(playerNum):
-    return Attack(playerNum, Attack.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5)
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5)
