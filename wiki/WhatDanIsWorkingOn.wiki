@@ -1,0 +1,11 @@
+#Task list for Dan
+
+*Current Tasks*
+* Currently working on a wireframe layout for the GUI - Add to wiki when done
+* Creating stubs for all of the needed controls/commands
+* Transpose use cases to Wiki
+
+*Need to do's*
+* Will need to talk to Jason in regards to moving simulator into the GUI as the visual output of game state
+* Finalize what information is required/wanted on the GUI.
+* Put some ideas back to the game-play group that arose from writing use case stories.
