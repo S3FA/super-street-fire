@@ -1,3 +1,4 @@
+#summary Dan's work list
 *Current Tasks*
 
   *Currently working on a wireframe layout for the GUI - Add to wiki when done
