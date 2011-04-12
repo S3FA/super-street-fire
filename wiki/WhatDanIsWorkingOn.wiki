@@ -1,5 +1,3 @@
-#Task list for Dan
-
 *Current Tasks*
 
   *Currently working on a wireframe layout for the GUI - Add to wiki when done
