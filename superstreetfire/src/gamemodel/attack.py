@@ -7,7 +7,6 @@ attack.py
 #import logging
 
 from action import Action
-from ssf_game import SSFGame
 from fire_emitter import FireEmitter
 import player
 
@@ -31,14 +30,12 @@ class Attack(Action):
     #             from one side to the other of the arc.
     # dmgPerFlame: The total damage per flame that hits the other player, in percent 
     def __init__(self, playerNum, sideEnum, thickness, timeLength, dmgPerFlame):
-        assert(timeLength > 0.0)
         assert(thickness >= 1)
+
+        Action.__init__(self, playerNum, sideEnum, timeLength)
         
-        Action.__init__(self, playerNum, sideEnum)
-        
-        self._thickness      = thickness
-        self._timeLength     = timeLength        
-        self._dmgPerFlame    = dmgPerFlame
+        self._thickness   = thickness      
+        self._dmgPerFlame = dmgPerFlame
         
         # The time per emitter is calculated using the total number of fire emitters AND
         # the thickness of the attack - the thicker the attack the more emitters will actually
@@ -46,7 +43,7 @@ class Attack(Action):
         self._timePerEmitter = timeLength / float(FireEmitter.NUM_FIRE_EMITTERS_PER_ARC + thickness - 1)
         
         # Track the amount of time that the attack has been active for
-        self._currAttackTime       = 0.0
+        self._currAttackTime = 0.0
         
         # Track the amount of time that the current emitter has been on for so that
         # We know when to shift the attack window 
