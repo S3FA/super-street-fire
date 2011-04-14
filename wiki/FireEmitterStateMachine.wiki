@@ -3,10 +3,10 @@
 = Fire Emitter State Machine =
 
 || || *Off* || *P1_ATK* || *P2_ATK* || *P1_ATK_P2_ATK* || *P1_BLK* || *P2_BLK* || *P1_ATK_BLK* || *P2_ATK_BLK* || *Blocked(nextState)* ||
-|| *On(1, ATK)* ||P1_ATK||P1_ATK||P1_ATK_P2_ATK||P1_ATK_P2_ATK||P1_ATK_BLK||Blocked(Off)||P1_ATK_BLK||Blocked(P2_ATK)||nextState||
-|| *On(1, BLK)* ||P1_BLK||P1_ATK_BLK||Blocked(Off)||Blocked(P1_ATK)||P1_BLK||ERROR||P1_ATK_BLK||ERROR||nextState||
-|| *On(2, ATK)* ||P2_ATK||P1_ATK_P2_ATK||P2_ATK||P1_ATK_P2_ATK||Blocked(Off)||P2_ATK_BLK||Blocked(P1_ATK)||P2_ATK_BLK||nextState||
-|| *On(2, BLK)* ||P2_BLK||Blocked(Off)||P2_ATK_BLK||Blocked(P2_ATK)||ERROR||P2_BLK||ERROR||P2_ATK_BLK||nextState||
+|| *On(1, ATK)* ||P1_ATK||P1_ATK||P1_ATK_P2_ATK||P1_ATK_P2_ATK||P1_ATK_BLK|| _Blocked(P2_BLK)_ ||P1_ATK_BLK|| _Blocked(P2_ATK_BLK)_ ||nextState||
+|| *On(1, BLK)* ||P1_BLK||P1_ATK_BLK|| Blocked(P1_BLK) ||Blocked(P1_ATK_BLK)||P1_BLK||ERROR||P1_ATK_BLK||ERROR||nextState||
+|| *On(2, ATK)* ||P2_ATK||P1_ATK_P2_ATK||P2_ATK||P1_ATK_P2_ATK|| _Blocked(P1_BLK)_ ||P2_ATK_BLK|| _Blocked(P1_ATK_BLK)_ ||P2_ATK_BLK||nextState||
+|| *On(2, BLK)* ||P2_BLK|| Blocked(P2_BLK)||P2_ATK_BLK||Blocked(P2_ATK_BLK)||ERROR||P2_BLK||ERROR||P2_ATK_BLK||nextState||
 || *Off(1, ATK)* ||Off||Off||P2_ATK||P2_ATK||P1_BLK||P2_BLK||P1_BLK||P2_ATK_BLK||nextState||
 || *Off(1, BLK)* ||Off||P1_ATK||P2_ATK||P1_ATK_P2_ATK||Off||P2_BLK||P1_ATK||P2_ATK_BLK||nextState||
 || *Off(2, ATK)* ||Off||P1_ATK||Off||P1_ATK||P1_BLK||P2_BLK||P1_ATK_BLK||P2_BLK||nextState||
@@ -48,3 +48,5 @@
 *P2_ATK_BLK* : The fire emitter is turned on for an attack and block flame owned by player 2.
 
 *Blocked(nextState)* : A block occurred - this is a transitory state and currently it immediately transitions to the given nextState.
+
+NOTE: Blocks in italics are "perfect" blocks i.e., they existed before th attack go there and are therefore as effective as possible. The other blocks are subject to the game rules on block timing.
