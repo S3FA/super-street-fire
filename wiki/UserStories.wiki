@@ -8,7 +8,8 @@ Please if you are working on an area that affects/consumes these use cases, upda
 
 = Player Interactions =
 
-== Player Object == ("Stretch goal")
+== Player Object ("Stretch goal") ==
+
 The players may be allowed to enter their names into the database for “high score keeping” and other interesting stats. 
 
 Player ID (Unique fighter name”
@@ -37,7 +38,7 @@ Move Recorder
 
 Block function will take a Block object (To allow introducing of multiple types of blocking at a later point. High/Low/Parry) And trigger the appropriate reactions.
 
-Block object
+*Block object*
 Name/Type
 Deploy delay (How long does it take to become active)
 Block Duration (How long it stays active)
