@@ -68,23 +68,23 @@ When the attention threshold is hit, and held for a set amount of time, a super 
 == Game UI ==
 The consensus is that the game will need a UI.  The UI will allow for; Starting a new game, replaying a saved game, checking the status of the safety cutoffs, checking the fuel level of the colour/fire systems, displaying what player has initiated what, monitoring the attention/med levels, calibration of the gloves, select the handedness of the fighters, monitoring the current round, turning the flame system on and off for a match.
 
-= Round timer =
+== Round timer ==
 The round timer will be a two phase timer, the first will be a short “ready” period to allow the fighters to assume the ready stance and fight.  The second will be a time that when it finishes all systems are shut down.  This will also trigger the “comparative victory” routine to figure out who wins by current health
 
-= Match Counter =
+== Match Counter ==
 The system will need a provision to count the number of rounds that have taken place, and who has won each round. (Round wins may be stored in the player object.)
 
-= Health Monitoring =
+== Health Monitoring ==
 The game will maintain the health of each player; these “bars” will be decremented by the attack and block functions.
 
-= Move recoding =
+== Move recoding ==
 It was set out as a requirement to be able to record matches and play them back.  By storing the action and time stamp, the games can be played by creating a sub routine that accepts the database inputs and returns outputs to the game in the same manner the state machine does.  The game would know no difference between a real game and a playback game.
 
-= Fire Control =
+== Fire Control ==
 The game will need a set of commands that will accept an attack object, and based off of the values computer the shape/speed of the fire wave/fire pillar.
 
-= Safety Cutoffs =
+== Safety Cutoffs ==
 The system will need provisions for some sort of safety cutoffs (Like dead man switches) to be a full override of all flame based systems.  Games should be allowed to continue if the safety cutoffs are released, however all flame activity should cease immediately.
 
-= Player Storage =
+== Player Storage ==
 Since SSFT will be heading to multi-day events.  It may be a neat feature ti be able to store players, and allow players to track their stats.
