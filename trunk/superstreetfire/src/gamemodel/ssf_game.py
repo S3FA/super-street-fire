@@ -38,6 +38,21 @@ class SSFGame:
             leftEmitter.Reset()
             rightEmitter.Reset()
     
+    
+    # These functions provide convenience, when accessing the fire emitter arc lists:
+    # The emitters are, by default, layed out from player 1's perspective so 
+    # we need to reverse them for player 2...    
+    def GetLeftEmitterArc(self, playerNum):
+        if playerNum == 1:
+            return self.leftEmitters
+        else:
+            return self.rightEmitters
+    def GetRightEmitterArc(self, playerNum):
+        if playerNum == 1:
+            return self.rightEmitters
+        else:
+            return self.leftEmitters    
+    
     def IsRoundOver(self):
         return (self.player1.IsKnockedOut() or self.player2.IsKnockedOut() or \
                self.roundTime >= SSFGame.ROUND_TIME_IN_SECONDS)
