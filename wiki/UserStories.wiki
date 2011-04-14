@@ -1,6 +1,6 @@
 #summary VERY high level use cases for the game model
 
-= pre-ramble...=
+= pre-ramble... =
 
 For the most part these are very high level, and just flesh out the areas which will need an investment of time.
 
@@ -12,7 +12,7 @@ Please if you are working on an area that affects/consumes these use cases, upda
 
 The players may be allowed to enter their names into the database for “high score keeping” and other interesting stats. 
 
-Player ID (Unique fighter name”
+Player ID (Unique fighter name)<br />
 Player Name (Optional player real name)
 Current Fight Matches won
 Total Wins
