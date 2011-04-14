@@ -49,4 +49,4 @@
 
 *Blocked(nextState)* : A block occurred - this is a transitory state and currently it immediately transitions to the given nextState.
 
-NOTE: Blocks in italics are "perfect" blocks i.e., they existed before th attack go there and are therefore as effective as possible. The other blocks are subject to the game rules on block timing.
+NOTE: Blocks in italics are "perfect" blocks i.e., they existed before the attack got there and are therefore as effective as possible. The other blocks are subject to the game rules on block timing.
