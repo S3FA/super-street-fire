@@ -30,11 +30,9 @@ class Attack(Action):
     #             from one side to the other of the arc.
     # dmgPerFlame: The total damage per flame that hits the other player, in percent 
     def __init__(self, playerNum, sideEnum, thickness, timeLength, dmgPerFlame):
-        assert(thickness >= 1)
+        Action.__init__(self, playerNum, sideEnum, thickness, timeLength)
 
-        Action.__init__(self, playerNum, sideEnum, timeLength)
-        
-        self._thickness   = thickness      
+        # The total damage each flame of the attack does to the player it hits, when it hits        
         self._dmgPerFlame = dmgPerFlame
         
         # The time per emitter is calculated using the total number of fire emitters AND
@@ -91,11 +89,10 @@ class Attack(Action):
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
         elif self._sideEnum == Action.RIGHT_SIDE:
             self._rightAttackWindow = [Attack.ACTIVE_ATTACK_PART] * self._thickness
-        elif self._sideEnum == Action.LEFT_AND_RIGHT_SIDES:
+        else:
+            assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
             self._rightAttackWindow = [Attack.ACTIVE_ATTACK_PART] * self._thickness
-        else:
-            assert(False)  
     
     def IsFinished(self):
         return self._currAttackTime >= self._timeLength
@@ -120,41 +117,24 @@ class Attack(Action):
             assert(self._rightAttackWindow != None)
             self._TickRightAttack(ssfGame)
             
-        elif self._sideEnum == Action.LEFT_AND_RIGHT_SIDES:
+        else:
+            assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
             assert(self._leftAttackWindow  != None)
             self._TickLeftAttack(ssfGame)
             assert(self._rightAttackWindow != None)
             self._TickRightAttack(ssfGame)
-        else:
-            assert(False)
             
     def _TickLeftAttack(self, ssfGame):
-        # We need to make sure we are modifying the correct emitter - the emitters are, by
-        # default, layed out from player 1's perspective so we need to reverse them for player 2
-        emitterArc = None
-        if self.playerNum == 1:
-            emitterArc = ssfGame.leftEmitters
-        else:
-            emitterArc = ssfGame.rightEmitters
-        
         # Simulate the attack
         (self._attackLWindowIdx, self._currDeltaLEmitterTime) = \
         self._SimulateAttack(ssfGame, self._leftAttackWindow, self._attackLWindowIdx, \
-                             emitterArc, self._currDeltaLEmitterTime)
+                             ssfGame.GetLeftEmitterArc(self.playerNum), self._currDeltaLEmitterTime)
 
     def _TickRightAttack(self, ssfGame):
-        # We need to make sure we are modifying the correct emitter - the emitters are, by
-        # default, layed out from player 1's perspective so we need to reverse them for player 2
-        emitterArc = None
-        if self.playerNum == 1:
-            emitterArc = ssfGame.rightEmitters
-        else:
-            emitterArc = ssfGame.leftEmitters
-        
         # Simulate the attack
         (self._attackRWindowIdx, self._currDeltaREmitterTime) = \
         self._SimulateAttack(ssfGame, self._rightAttackWindow, self._attackRWindowIdx, \
-                             emitterArc, self._currDeltaREmitterTime)
+                             ssfGame.GetRightEmitterArc(self.playerNum), self._currDeltaREmitterTime)
         
     # Generalized Attack simulation function - used to update the state of the attack whenever
     # it is being executed/ticked.
@@ -231,14 +211,7 @@ class Attack(Action):
                     
         return (attackWindowIdx, deltaEmitterTime)
     
-    def _GetEmitter(self, arcEmitters, idx):
-        if idx < 0 or idx >= FireEmitter.NUM_FIRE_EMITTERS_PER_ARC:
-            return None
-        
-        if self.playerNum == 1:
-            return arcEmitters[idx]
-        else:
-            return arcEmitters[-idx-1]
+
 
 # Factory/Builder Methods for various Super Street Fire Attacks 
 def BuildLeftJabAttack(playerNum):

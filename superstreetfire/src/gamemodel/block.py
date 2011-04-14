@@ -8,14 +8,29 @@ from action import Action
 
 class Block(Action):
 
-    def __init__(self, playerNum, sideEnum, timeLimit):
-        Action.__init__(self, playerNum, sideEnum, timeLimit)
+    def __init__(self, playerNum, sideEnum, thickness, timeLimit):
+        Action.__init__(self, playerNum, sideEnum, thickness, timeLimit)
         
         # Track the amount of time that the block has been active for
         self._currBlockTime = 0.0
         self._killMe        = False
+        
+        # These will be initialized in the initialize method, and will be set to
+        # the emitters that the block will reside on, on the emitter arcs of the game
+        self._blockLEmitters = None
+        self._blockREmitters = None
 
     def Initialize(self, ssfGame):
+        # Setup the emitter list(s) for the block - blocks always stay on the
+        # same emitters that they are initialized with until they are killed/expire
+        if self._sideEnum == Action.LEFT_SIDE:
+            pass
+        elif self._sideEnum == Action.RIGHT_SIDE:
+            pass
+        else:
+            assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
+            
+        
         pass
     
     def IsFinished(self):
