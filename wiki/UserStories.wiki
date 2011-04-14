@@ -23,13 +23,13 @@ Fire Colour<br />
 
 Attack function takes an Attack object, and processes commands to the various game systems
 
-*Attack object:*
+*Attack object:*<br />
 Name/Type<br />
 Damage (In % of total health)<br />
 Speed (The travel time the flame wave takes to complete the circuit. Also determines block timer)<br />
 Ring Flag (Left/Right/Both)<br />
 
-*Attack Function Triggers the following sub routines*
+*Attack Function Triggers the following sub routines*<br />
 Fire Control<br />
 Block Timer<br />
 Move Recorder<br />
@@ -38,7 +38,7 @@ Move Recorder<br />
 
 Block function will take a Block object (To allow introducing of multiple types of blocking at a later point. High/Low/Parry) And trigger the appropriate reactions.
 
-*Block object*
+*Block object*<br />
 Name/Type<br />
 Deploy delay (How long does it take to become active)<br />
 Block Duration (How long it stays active)<br />
@@ -46,7 +46,7 @@ Time during attack which block is effective (To parry the parry has to be done w
 “Chip” damage (In a % of the attack damage)<br />
 Other effects (IE. Parry could double the recovery time of the attacker)<br />
 
-*Block Function Triggers the following sub routines*
+*Block Function Triggers the following sub routines*<br />
 Fire Control<br />
 Move Recorder<br />
 Block interpreter<br />
@@ -57,10 +57,10 @@ When meditation threshold is hit, the system will automatically trigger an X sec
 
 == Attention Threshold Hit ==
 
-*Possibility A*
+*Possibility A*<br />
 When the Attention Threshold is hit, any special moves the attacker performs will have the next (Or time frame of) special attack (Hadouken, dragon punch, etc…) to be unblockable.
 
-*Possibility B*
+*Possibility B*<br />
 When the attention threshold is hit, and held for a set amount of time, a super move it performed
 
 = System Actions =
