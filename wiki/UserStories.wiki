@@ -10,46 +10,46 @@ Please if you are working on an area that affects/consumes these use cases, upda
 
 == Player Object ("Stretch goal") ==
 
-The players may be allowed to enter their names into the database for “high score keeping” and other interesting stats. 
+The players may be allowed to enter their names into the database for “high score keeping” and other interesting stats. <br />
 
 Player ID (Unique fighter name)<br />
-Player Name (Optional player real name)
-Current Fight Matches won
-Total Wins
-Total Losses
-Fire Colour
+Player Name (Optional player real name)<br />
+Current Fight Matches won<br />
+Total Wins<br />
+Total Losses<br />
+Fire Colour<br />
 
 == Attack ==
 
 Attack function takes an Attack object, and processes commands to the various game systems
 
 *Attack object:*
-Name/Type
-Damage (In % of total health)
-Speed (The travel time the flame wave takes to complete the circuit. Also determines block timer)
-Ring Flag (Left/Right/Both)
+Name/Type<br />
+Damage (In % of total health)<br />
+Speed (The travel time the flame wave takes to complete the circuit. Also determines block timer)<br />
+Ring Flag (Left/Right/Both)<br />
 
 *Attack Function Triggers the following sub routines*
-Fire Control
-Block Timer
-Move Recorder
+Fire Control<br />
+Block Timer<br />
+Move Recorder<br />
 
 == Block ==
 
 Block function will take a Block object (To allow introducing of multiple types of blocking at a later point. High/Low/Parry) And trigger the appropriate reactions.
 
 *Block object*
-Name/Type
-Deploy delay (How long does it take to become active)
-Block Duration (How long it stays active)
-Time during attack which block is effective (To parry the parry has to be done with precise timings)
-“Chip” damage (In a % of the attack damage)
-Other effects (IE. Parry could double the recovery time of the attacker)
+Name/Type<br />
+Deploy delay (How long does it take to become active)<br />
+Block Duration (How long it stays active)<br />
+Time during attack which block is effective (To parry the parry has to be done with precise timings)<br />
+“Chip” damage (In a % of the attack damage)<br />
+Other effects (IE. Parry could double the recovery time of the attacker)<br />
 
 *Block Function Triggers the following sub routines*
-Fire Control
-Move Recorder
-Block interpreter
+Fire Control<br />
+Move Recorder<br />
+Block interpreter<br />
 
 == Meditation Threshold Hit == 
 
