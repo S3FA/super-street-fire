@@ -26,6 +26,7 @@ class Action:
         self._sideEnum   = sideEnum
         self._thickness  = thickness
         self._timeLength = timeLength
+        self._isKilled   = False
         
     # Functions for getting the emitter from the given arc emitter list and the given
     # zero-based index, depending on which player this action is executed by.
@@ -46,3 +47,5 @@ class Action:
     def Initialize(self, ssfGame): assert(False)
     def IsFinished(self):          assert(False)
     def Tick(self, ssfGame, dT):   assert(False)
+    def Kill(self, ssfGame):
+        self._isKilled = True
