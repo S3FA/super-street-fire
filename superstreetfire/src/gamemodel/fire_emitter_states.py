@@ -48,11 +48,11 @@ class FireOffState(FireState):
     def TurnOnP1Attack(self):
         self._fireEmitter._SetState(P1AttackFireOnState(self._fireEmitter, 0.0))
     def TurnOnP1Block(self):
-        self._fireEmitter._SetState(P1BlockFireOnState(self._fireEmitter,  0.0))
+        self._fireEmitter._SetState(P1BlockFireOnState(self._fireEmitter))
     def TurnOnP2Attack(self):
         self._fireEmitter._SetState(P2AttackFireOnState(self._fireEmitter, 0.0))
     def TurnOnP2Block(self):
-        self._fireEmitter._SetState(P2BlockFireOnState(self._fireEmitter,  0.0))
+        self._fireEmitter._SetState(P2BlockFireOnState(self._fireEmitter))
         
     # All the TurnOff* states are ignored since everything is already off
 

@@ -50,7 +50,7 @@ class Block(Action):
                 for emitter in self._blockLEmitters:
                     emitter.FireOn(self.playerNum, FireEmitter.BLOCK_FLAME)
             if self._blockREmitters != None:
-                for emitter in self._blockLEmitters:
+                for emitter in self._blockREmitters:
                     emitter.FireOn(self.playerNum, FireEmitter.BLOCK_FLAME)
         
         self._currBlockTime += dT
@@ -76,13 +76,12 @@ class Block(Action):
             for emitter in self._blockLEmitters:
                 emitter.FireOff(self.playerNum, FireEmitter.BLOCK_FLAME)
         if self._blockREmitters != None:
-            for emitter in self._blockLEmitters:
+            for emitter in self._blockREmitters:
                 emitter.FireOff(self.playerNum, FireEmitter.BLOCK_FLAME)
-    
 
 # Factory/Builder Methods for various Super Street Fire Blocks 
 def BuildLeftBasicBlock(playerNum):
-    return Block(playerNum, Action.LEFT_SIDE, 4.0)
+    return Block(playerNum, Action.LEFT_SIDE, 1, 4.0)
 def BuildRightBasicBlock(playerNum):
-    return Block(playerNum, Action.RIGHT_SIDE, 4.0)
+    return Block(playerNum, Action.RIGHT_SIDE, 1, 4.0)
 
