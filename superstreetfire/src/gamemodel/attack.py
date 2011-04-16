@@ -95,11 +95,11 @@ class Attack(Action):
             self._rightAttackWindow = [Attack.ACTIVE_ATTACK_PART] * self._thickness
     
     def IsFinished(self):
-        return self._currAttackTime >= self._timeLength
+        return self._currAttackTime >= self._timeLength or self._isKilled
     
     def Tick(self, ssfGame, dT):
         # Don't execute anything if the attack is finished
-        if self.IsFinished():
+        if self._isKilled or self.IsFinished():
             return
         
         # Increment the time tracker(s)...
@@ -123,7 +123,21 @@ class Attack(Action):
             self._TickLeftAttack(ssfGame)
             assert(self._rightAttackWindow != None)
             self._TickRightAttack(ssfGame)
-            
+    
+    def Kill(self, ssfGame):
+        Action.Kill(self)
+        # Make sure all the emitters that the attack is currently taking
+        # place on are turned off immediately
+        if self._sideEnum == Action.LEFT_SIDE:
+            self._KillEmitters(self._leftAttackWindow, self._attackLWindowIdx, ssfGame.GetLeftEmitterArc(self.playerNum))
+        elif self._sideEnum == Action.RIGHT_SIDE:
+            self._KillEmitters(self._rightAttackWindow, self._attackRWindowIdx, ssfGame.GetRightEmitterArc(self.playerNum))
+        else:
+            assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
+            self._KillEmitters(self._leftAttackWindow, self._attackLWindowIdx, ssfGame.GetLeftEmitterArc(self.playerNum))
+            self._KillEmitters(self._rightAttackWindow, self._attackRWindowIdx, ssfGame.GetRightEmitterArc(self.playerNum))
+    
+    # Private Functions for Attack ********************************* 
     def _TickLeftAttack(self, ssfGame):
         # Simulate the attack
         (self._attackLWindowIdx, self._currDeltaLEmitterTime) = \
@@ -135,7 +149,7 @@ class Attack(Action):
         (self._attackRWindowIdx, self._currDeltaREmitterTime) = \
         self._SimulateAttack(ssfGame, self._rightAttackWindow, self._attackRWindowIdx, \
                              ssfGame.GetRightEmitterArc(self.playerNum), self._currDeltaREmitterTime)
-        
+    
     # Generalized Attack simulation function - used to update the state of the attack whenever
     # it is being executed/ticked.
     # Returns: A tuple of the (updated attack window index, current delta emitter time)
@@ -211,7 +225,15 @@ class Attack(Action):
                     
         return (attackWindowIdx, deltaEmitterTime)
     
-
+    def _KillEmitters(self, attackWindow, attackWindowIdx, arcEmitters):
+        windowLastIdx  = attackWindowIdx + self._thickness
+        for i, j in zip(range(self._thickness), range(attackWindowIdx, windowLastIdx)):
+            # i is the index in the attack window
+            # j is the index of the emitter
+            if attackWindow[i] == Attack.ACTIVE_ATTACK_PART:
+                currEmitter = self._GetEmitter(arcEmitters, j)
+                currEmitter.FireOff(self.playerNum, FireEmitter.ATTACK_FLAME)
+                attackWindow[i] = Attack.INACTIVE_ATTACK_PART
 
 # Factory/Builder Methods for various Super Street Fire Attacks 
 def BuildLeftJabAttack(playerNum):
