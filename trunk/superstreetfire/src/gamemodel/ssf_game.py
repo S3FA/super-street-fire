@@ -23,6 +23,9 @@ class SSFGame:
         # There's always a game timer, which counts down throughout a match
         self.roundTime = 0.0
         
+        # A list of all active actions in the game
+        self._activeActions = []
+        
         # There are two arcs of fire emitters (one on the left and one on the right
         # of player 1) each with eight emitters
         self.leftEmitters  = []
@@ -59,15 +62,26 @@ class SSFGame:
     
     def Tick(self, dT):
         # Check for any newly recognized gestures, execute any that get found
-        if self.gestureRecognizer.GetP1HasNewGesture():
-            p1Gesture = self.gestureRecognizer.PopP1Gesture()
-            self._ExecuteGesture(1, p1Gesture)
-        if self.gestureRecognizer.GetP2HasNewGesture():
-            p2Gesture = self.gestureRecognizer.PopP2Gesture()
-            self._ExecuteGesture(2, p2Gesture)
-
+        if self.gestureRecognizer.HasNewActionsAvailable():
+            newActions = self.gestureRecognizer.PopActions()
+            assert(len(newActions) > 0)
+            # Initialize all the new actions
+            for action in newActions:
+                action.Initialize(self)
+            self._activeActions.extend(newActions)
+            
         # Tick any actions (e.g., attacks, blocks) that are currently active within the game
-        # TODO
+        # This will update the state of the fire emitters and the game in general
+        actionsToRemove = []
+        for action in self._activeActions:
+            if action.IsFinished():
+                actionsToRemove.append(action)
+            else:
+                action.Tick(self, dT)
+        
+        # Clear up all finished actions
+        for action in actionsToRemove:
+            self._activeActions.remove(action)
         
         # Diminish the round timer
         self.roundTime += dT

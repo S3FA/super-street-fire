@@ -13,6 +13,8 @@ from player import Player
 
 import attack
 from attack import Attack
+import block
+from block import Block
 
 def RunActionLoop(game, actionList):
     for i in actionList:
@@ -32,7 +34,10 @@ def RunActionLoop(game, actionList):
         lastTime  = time.time()
 
     for i in actionList:
-        print "Total time:", i._currAttackTime
+        if isinstance(i, Attack):
+            print "Total time:", i._currAttackTime
+        else:
+            print "Total time:", i._currBlockTime
 
 if __name__ == "__main__":
     gestureRec = GestureRecognizer()
@@ -60,7 +65,7 @@ if __name__ == "__main__":
     logger.addHandler(logging.StreamHandler())
     
     # Standalone jabs
-    RunActionLoop(game, [p1LeftJab])
+    #RunActionLoop(game, [p1LeftJab])
     #RunActionLoop(game, [p2LeftJab])
     #RunActionLoop(game, [p1RightJab])
     #RunActionLoop(game, [p2RightJab])
@@ -81,5 +86,13 @@ if __name__ == "__main__":
     #RunActionLoop(game, [p1RightJab, p2LeftHook])             # Same arc different attacks
     #RunActionLoop(game, [p1Hadouken, p2LeftHook, p2RightJab]) # Multi attack
     
+    p1LeftBlock = block.BuildLeftBasicBlock(1)
+    p2LeftBlock = block.BuildLeftBasicBlock(2)
+    
+    p1RightBlock = block.BuildRightBasicBlock(1)
+    p2RightBlock = block.BuildRightBasicBlock(2)
+    
+    RunActionLoop(game, [p1LeftBlock, p2LeftBlock])
+    RunActionLoop(game, [p1RightBlock, p2RightBlock])
     print "Finished."
     
