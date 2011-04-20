@@ -1,0 +1,5 @@
+#summary Basic Wireframe for the GUI
+
+The wireframe includes some additional ideas for game customization etc...
+
+http://super-street-fire.googlecode.com/files/Wireframe.jpg
