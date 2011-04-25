@@ -18,9 +18,6 @@ PLAYER_TWO = 2
 class GloveData:
     # Static data
     NUM_GLOVE_DATA       = 9
-    GLOVE_DATA_REGEX_STR = ""
-    for i in range(NUM_GLOVE_DATA-1): GLOVE_DATA_REGEX_STR = GLOVE_DATA_REGEX_STR + '(-?\d+\.\d+),'
-    GLOVE_DATA_REGEX_STR = GLOVE_DATA_REGEX_STR + '(-?\d+\.\d+)'
     
     # Enumeration for left and right hand gloves
     LEFT_HAND_GLOVE = 0

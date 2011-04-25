@@ -19,6 +19,7 @@ def ParseSerialData(serialDataStr, queueMgr):
     # designate our input sources...
     splitInputList  = string.split(serialDataStr, ":")
     splitListLength = len(splitInputList)
+    #print 'Player %s - Data: %s ' % (splitInputList[0], splitInputList[1])
 
     # splitListLength should likely be 2 here, but just for robustness
     # we pretend like it could be longer
@@ -31,23 +32,25 @@ def ParseSerialData(serialDataStr, queueMgr):
 
 
 def GloveParser(player, hand, bodyStr):
-    matchResult = re.match(GloveData.GLOVE_DATA_REGEX_STR, bodyStr)
+    
+    blocks = bodyStr.split("_")
     
     # Get out of here immediately if there's a mismatch of the expected data
-    # for the glove, this really should never happen unless the serial input
-    # is being garbled somehow
-    if matchResult == None:
-        print "Failed match result in glove parser, no match."
-        return None
-    elif len(matchResult.groups()) != GloveData.NUM_GLOVE_DATA:
-        print "Failed match result in glove parser: " + matchResult.group()
+    # for the glove.
+    if len(blocks) < 3:
+        print "Unexpected format in glove parser input, no match."
         return None
     
+    head = string.split(blocks[0],",")
+    accel = string.split(blocks[1],",")
+    gyros = string.split(blocks[2],",")
+
     # Turn the parsed glove data into an actual object
-    gloveData = GloveData((float(matchResult.group(1)), float(matchResult.group(2)), float(matchResult.group(3))), \
-                          (float(matchResult.group(4)), float(matchResult.group(5)), float(matchResult.group(6))), \
-                          (float(matchResult.group(7)), float(matchResult.group(8)), float(matchResult.group(9))), \
+    gloveData = GloveData((float(gyros[0]), float(gyros[1]), float(gyros[2])), \
+                          (float(accel[0]), float(accel[1]), float(accel[2])), \
+                          (float(head[0]), float(head[1]), float(head[2])), \
                           player, hand)
+    #print 'GloveData setup %s ' % (str(gloveData))
     return gloveData
 
 def HeadsetParser(player, bodyStr):
