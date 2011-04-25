@@ -77,6 +77,7 @@ float G_Dt=0.02;    // Integration time (DCM algorithm)  We will run the integra
 long timer=0;   //general purpuse timer
 long timer_old;
 long timer24=0; //Second timer used to print values 
+long timeracc=0;
 int AN[6]; //array that store the 3 ADC filtered data (gyros)
 int AN_OFFSET[6]={0,0,0,0,0,0}; //Array that stores the Offset of the sensors
 int ACC[3];          //array that store the accelerometers data
@@ -90,6 +91,7 @@ int magnetom_z;
 float MAG_Heading;
 
 float Accel_Vector[3]= {0,0,0}; //Store the acceleration in a vector
+float DAcc_Vector[3]= {0,0,0}; //Store the acceleration in a vector
 float Gyro_Vector[3]= {0,0,0};//Store the gyros turn rate in a vector
 float Omega_Vector[3]= {0,0,0}; //Corrected Gyro_Vector data
 float Omega_P[3]= {0,0,0};//Omega Proportional correction
@@ -168,12 +170,17 @@ void setup()
     
   AN_OFFSET[5]-=GRAVITY*SENSOR_SIGN[5];
   
-  //Serial.println("Offset:");
-  for(int y=0; y<6; y++)
-    Serial.println(AN_OFFSET[y]);
-  
+  Serial.print("Offsets:");
+  for(int y=0; y<6; y++) {
+    Serial.print(AN_OFFSET[y]);
+    if (y < 5) Serial.print(",");
+  }
+  // why is this delay here?
   delay(2000);
   digitalWrite(STATUS_LED,HIGH);
+
+  Serial.println("");
+  Serial.println("P:roll,pitch,yaw;gyrox,gyroy,gyroz;accelx,accely,accelz;magx,magy,magz");
     
   Read_adc_raw();     // ADC initialization
   timer=millis();
@@ -197,7 +204,7 @@ void loop() //Main Loop
     // Data adquisition
     Read_adc_raw();   // This read gyro data
     Read_Accel();     // Read I2C accelerometer
-    
+       
     if (counter > 5)  // Read compass data at 10Hz... (5 loop runs)
       {
       counter=0;
