@@ -64,7 +64,7 @@ class SSFGame:
         # Check for any newly recognized gestures, execute any that get found
         if self.gestureRecognizer.HasNewActionsAvailable():
             newActions = self.gestureRecognizer.PopActions()
-            assert(len(newActions) > 0)
+            # assert(len(newActions) > 0)
             # Initialize all the new actions
             for action in newActions:
                 action.Initialize(self)
