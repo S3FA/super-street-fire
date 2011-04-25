@@ -6,7 +6,7 @@ the queues that hold data that has been aggregated from the incoming
 serial port data stream from all of the super street fire clients.
 
 The queues of the manager are thread safe, the Receiver dumps data
-onto the appropriate queues and analyzers for the game state pick the
+onto the appropriate queues and analyzes for the game state pick the
 data up. 
 
 @author: callumhay
@@ -16,7 +16,7 @@ import collections
 import threading
 
 class ReceiverQueueMgr:
-    MAX_QUEUE_SIZE = 8
+    MAX_QUEUE_SIZE = 4
     
     def __init__(self):
         self.p1LeftGloveQueue  = collections.deque()
@@ -107,7 +107,7 @@ class ReceiverQueueMgr:
             return
         
         if len(queue) == ReceiverQueueMgr.MAX_QUEUE_SIZE:
-            print "WARNING: Receiver queue overflow"
+            #print "WARNING: Receiver queue overflow"
             queue.popleft()
             
         #print "Data is being placed on a receiver queue"
@@ -118,10 +118,10 @@ class ReceiverQueueMgr:
             #print "Tried to retrieve data from an empty receiver queue."
             return None
         else:
-            print "Averaging and popping data"
             # Average all of the data on the queue and return the result,
             # emptying the entire queue in the process
             
+            # print "Averaging and popping data"
             count    = len(queue)
             avgValue = queue.popleft()
             for i in range(1, count):
