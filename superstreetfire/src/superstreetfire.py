@@ -8,7 +8,9 @@ import time
 import traceback
 from optparse import OptionParser
 
+import os
 import ioserver.receiver 
+import ioserver.receive_from_file
 #from ioserver.client_emulator import ClientEmulator
 from ioserver.receiver_queue_mgr import ReceiverQueueMgr
 
@@ -24,13 +26,18 @@ def KillEverything(threadList):
 
 if __name__ == '__main__':
 
+    #snb: hate typing but didn't want to change the default..
+    IN_PORT="/dev/slave"
+    if (os.name.find("nt") > -1):
+        IN_PORT = "COM4"
+    
     # Parse options from the command line
     usageStr = "usage: %prog [options]"
     cmdLineDescStr = "The server for the superstreetfire application..."
     argParser = OptionParser(usage=usageStr, description=cmdLineDescStr)
     argParser.add_option("-i", "--input_port", action="store", type="string", dest="inputPort", \
                          help="The serial port name/number that provides input from clients. [%default]", \
-                         default="/dev/slave")
+                         default=IN_PORT)
     argParser.add_option("-o", "--output_port", action="store", type="string", dest="outputPort", \
                          help="The serial port name/number that sends output to clients. [%default]", \
                          default="/dev/slave")
@@ -66,6 +73,8 @@ if __name__ == '__main__':
     
         # Spawn threads for listening and sending data over the serial port
         receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
+        #print "Running receiver with file input ..."
+        #receiverThread = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
         receiverThread.start()
         
         #TODO
@@ -113,7 +122,7 @@ if __name__ == '__main__':
                                                     deltaFrameTime, lastFrameTime)
             
             # TODO: What do we do with head-set data ??
-            # is it part of the gesture recognition or is it a compliment to it?
+            # is it part of the gesture recognition or is it a complement to it?
             receiverQueueMgr.PopP1HeadsetData()
             receiverQueueMgr.PopP2HeadsetData()
             
