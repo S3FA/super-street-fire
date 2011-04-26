@@ -92,7 +92,54 @@ if __name__ == "__main__":
     p1RightBlock = block.BuildRightBasicBlock(1)
     p2RightBlock = block.BuildRightBasicBlock(2)
     
-    RunActionLoop(game, [p1LeftBlock, p2LeftBlock])
-    RunActionLoop(game, [p1RightBlock, p2RightBlock])
+    # Simultaneous Blocks
+    #RunActionLoop(game, [p1LeftBlock, p2LeftBlock])
+    #RunActionLoop(game, [p1RightBlock, p2RightBlock])
+    
+    
+    # Blocks + Attacks...
+    
+    # Basic single blocking on the left and right arcs
+    #RunActionLoop(game, [p1LeftBlock, p2RightJab])
+    #RunActionLoop(game, [p1LeftBlock, p2RightHook])
+    #RunActionLoop(game, [p1RightBlock, p2LeftJab])
+    #RunActionLoop(game, [p1RightBlock, p2LeftHook])
+    
+    #RunActionLoop(game, [p2LeftBlock,  p1RightJab])
+    #RunActionLoop(game, [p2LeftBlock,  p1RightHook])
+    #RunActionLoop(game, [p2RightBlock, p1LeftJab])
+    #RunActionLoop(game, [p2RightBlock, p1LeftHook])    
+    
+    # Blocking with no affect on incoming attacks
+    #RunActionLoop(game, [p1RightBlock, p2RightJab])
+    #RunActionLoop(game, [p1RightBlock, p2RightHook])
+    #RunActionLoop(game, [p1LeftBlock, p2LeftJab])
+    #RunActionLoop(game, [p1LeftBlock, p2LeftHook])
+    
+    #RunActionLoop(game, [p2RightBlock, p1RightJab])
+    #RunActionLoop(game, [p2RightBlock, p1RightHook])
+    #RunActionLoop(game, [p2LeftBlock,  p1LeftJab])
+    #RunActionLoop(game, [p2LeftBlock,  p1LeftHook])
+    
+    # Same player blocking and attacking simultaneously
+    #RunActionLoop(game, [p1LeftBlock,  p1LeftJab])
+    #RunActionLoop(game, [p1RightBlock, p1RightJab])
+    #RunActionLoop(game, [p1LeftBlock,  p1LeftHook])
+    #RunActionLoop(game, [p1RightBlock, p1RightHook])
+    
+    #RunActionLoop(game, [p2LeftBlock,  p2LeftJab])
+    #RunActionLoop(game, [p2RightBlock, p2RightJab])
+    #RunActionLoop(game, [p2LeftBlock,  p2LeftHook])
+    #RunActionLoop(game, [p2RightBlock, p2RightHook])    
+    
+    # Some fun combinations...
+    
+    # Player 2 blocks on both arcs against player 1's Hadouken
+    #RunActionLoop(game, [p2LeftBlock, p2RightBlock, p1Hadouken])
+    
+    # Player 1 attacks on one arc and defends on the other, player 2 does the same
+    # but on opposite arcs
+    RunActionLoop(game, [p1LeftBlock, p1RightJab, p2LeftBlock, p2RightJab])
+    
     print "Finished."
     
