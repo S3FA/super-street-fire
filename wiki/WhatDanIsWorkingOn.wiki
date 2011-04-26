@@ -6,6 +6,6 @@
   *Transpose use cases to Wiki
 
 *Need to do's*
-  *Will need to talk to Jason in regards to moving simulator into the GUI as the visual output of game state
+  *Will need to talk to Jason in regards to moving simulator into the GUI as the visual output of game state *-- Completed --* Jason will have a flame ring simulator sorted out hopefully for the weekend of May 6th.
   *Finalize what information is required/wanted on the GUI.
   *Put some ideas back to the game-play group that arose from writing use case stories.
