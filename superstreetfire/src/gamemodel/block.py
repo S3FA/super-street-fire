@@ -22,20 +22,32 @@ class Block(Action):
 
     def Initialize(self, ssfGame):
         self._currBlockTime = 0.0
+        
+        # The list of emitters in each arc in the game model is reversed for player 2
+        # (since they're stored from the perspective of player 1), we need to account
+        # for this when specifying which emitters will be activated by this block
+        rangeList = None
+        if self.playerNum == 1:
+            rangeList = range(self._thickness)
+        else:
+            rangeList = range(FireEmitter.NUM_FIRE_EMITTERS_PER_ARC - 1, \
+                              FireEmitter.NUM_FIRE_EMITTERS_PER_ARC - self._thickness - 1, -1)
+            
         # Setup the emitter list(s) for the block - blocks always stay on the
         # same emitters that they are initialized with until they are killed/expire
         if self._sideEnum == Action.LEFT_SIDE:
             leftEmitters = ssfGame.GetLeftEmitterArc(self.playerNum)
-            self._blockLEmitters = [leftEmitters[i] for i in range(self._thickness)]  
+            self._blockLEmitters = [leftEmitters[i] for i in rangeList]
+              
         elif self._sideEnum == Action.RIGHT_SIDE:
             rightEmitters = ssfGame.GetRightEmitterArc(self.playerNum)
-            self._blockREmitters = [rightEmitters[i] for i in range(self._thickness)]  
+            self._blockREmitters = [rightEmitters[i] for i in rangeList]  
         else:
             assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
             leftEmitters  = ssfGame.GetLeftEmitterArc(self.playerNum)
             rightEmitters = ssfGame.GetRightEmitterArc(self.playerNum)
-            self._blockLEmitters = [leftEmitters[i] for i in range(self._thickness)]
-            self._blockREmitters = [rightEmitters[i] for i in range(self._thickness)]    
+            self._blockLEmitters = [leftEmitters[i] for i in rangeList]
+            self._blockREmitters = [rightEmitters[i] for i in rangeList]    
     
     def IsFinished(self):
         return self._currBlockTime >= self._timeLength or self._isKilled
