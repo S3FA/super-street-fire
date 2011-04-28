@@ -1,5 +1,5 @@
 
-// Sparkfveun 9DOF Razor IMU AHRS
+// Sparkfun 9DOF Razor IMU AHRS
 // 9 Degree of Measurement Attitude and Heading Reference System
 // Firmware v1.0
 //
@@ -32,8 +32,8 @@
 // This code works also on ATMega168 Hardware
 
 #include <Wire.h>
-
-#define NODE "1L"
+// Either 1R , 2R, 1L, 2L
+#define NODE "1L:"
 
 // ADXL345 Sensitivity(from datasheet) => 4mg/LSB   1G => 1000mg/4mg = 256 steps
 // Tested value : 248
@@ -175,12 +175,13 @@ void setup()
     Serial.print(AN_OFFSET[y]);
     if (y < 5) Serial.print(",");
   }
+ // Serial.println("");
+  
   // why is this delay here?
   delay(2000);
   digitalWrite(STATUS_LED,HIGH);
 
-  Serial.println("");
-  Serial.println("P:roll,pitch,yaw;gyrox,gyroy,gyroz;accelx,accely,accelz;magx,magy,magz");
+ // Serial.println("P:roll,pitch,yaw_gyrox,gyroy,gyroz_accelx,accely,accelz_magx,magy,magz");
     
   Read_adc_raw();     // ADC initialization
   timer=millis();
@@ -190,7 +191,8 @@ void setup()
 
 void loop() //Main Loop
 {
-  if((millis()-timer)>=20)  // Main loop runs at 50Hz
+  // if((millis()-timer)>=20)  // Main loop runs at 50Hz
+  if((millis()-timer)>=40)  // Main loop runs at 50Hz
   {
     counter++;
     timer_old = timer;
