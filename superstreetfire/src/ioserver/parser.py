@@ -12,23 +12,52 @@ d) Store the high-level objects on the receiver queues of the ReceiverQueueMgr
 
 import re
 import string
+import struct
 from client_datatypes import GloveData, HeadsetData, PLAYER_ONE, PLAYER_TWO
+
+# look guys, no wires!
+def ParseWirelessData(xbeePacket, queueMgr):
+    #print xbeePacket
+    # pull out the useful stuff..
+    data = xbeePacket['rf_data']
+    
+    # try to find a device id based on source address
+    source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
+    if (SOURCE_ADDRESS_MAP.get(source,'0') == '0'):
+        # which device are we? is there a "NODE:" delimiter
+        nodePos = data.find(":");
+        if (nodePos > 2 and data[nodePos-1:nodePos].isalpha() ):
+            nodeId = data[nodePos-2:nodePos]
+            SOURCE_ADDRESS_MAP[source] = nodeId
+            print "found a node %s for %s " % (nodeId, source)
+        else:
+            print "no node identifier in rf_data." 
+            return
+        
+    # the data packet is likely still disjoint, pass it on anyway
+    func = PARSER_FUNCTION_DICT.get(SOURCE_ADDRESS_MAP[source]);
+    if func != None:
+        # We're dealing with an expected package type from a client, parse it
+        # and queue it for the game simulation to deal with
+        func(data, queueMgr)
+    else:
+        print "oh noes, no parser, junking packet.. " 
 
 def ParseSerialData(serialDataStr, queueMgr):
     # Break the serial input up based on the various known headers that
     # designate our input sources...
-    splitInputList  = string.split(serialDataStr, ":")
-    splitListLength = len(splitInputList)
-    #print 'Player %s - Data: %s ' % (splitInputList[0], splitInputList[1])
+    splitNodeData  = string.split(serialDataStr, ":")
+    splitListLength = len(splitNodeData)
+    #print 'Player %s - Data: %s ' % (splitNodeData[0], splitNodeData[1])
 
     # splitListLength should likely be 2 here, but just for robustness
     # we pretend like it could be longer
     for i in range(0, splitListLength-1):
-        func = PARSER_FUNCTION_DICT.get(splitInputList[i]);
+        func = PARSER_FUNCTION_DICT.get(splitNodeData[i]);
         if func != None:
             # We're dealing with an expected package type from a client, parse it
             # and queue it for the game simulation to deal with
-            func(splitInputList[i+1], queueMgr)
+            func(splitNodeData[i+1], queueMgr)
 
 
 def GloveParser(player, hand, bodyStr):
@@ -110,5 +139,17 @@ PARSER_FUNCTION_DICT = {
     '2L' : Player2LeftGloveParser,
     '2R' : Player2RightGloveParser,
     '2H' : Player2HeadsetSerialInputParser
+}
+
+CURRENT_FRAME = {
+    '1L' : '',
+    '1R' : '',
+    '1H' : '',
+    '2L' : '',
+    '2R' : '',
+    '2H' : ''
+}
+
+SOURCE_ADDRESS_MAP = {
 }
 
