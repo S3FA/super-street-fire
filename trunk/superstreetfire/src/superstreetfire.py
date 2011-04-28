@@ -9,8 +9,9 @@ import traceback
 from optparse import OptionParser
 
 import os
-import ioserver.receiver 
-import ioserver.receive_from_file
+#import ioserver.receiver 
+import ioserver.receive_direct_serial
+#import ioserver.receive_from_file
 #from ioserver.client_emulator import ClientEmulator
 from ioserver.receiver_queue_mgr import ReceiverQueueMgr
 
@@ -29,7 +30,7 @@ if __name__ == '__main__':
     #snb: hate typing but didn't want to change the default..
     IN_PORT="/dev/slave"
     if (os.name.find("nt") > -1):
-        IN_PORT = "COM4"
+        IN_PORT = "COM5"
     
     # Parse options from the command line
     usageStr = "usage: %prog [options]"
@@ -72,9 +73,11 @@ if __name__ == '__main__':
         receiverQueueMgr = ReceiverQueueMgr()
     
         # Spawn threads for listening and sending data over the serial port
-        receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
+        #receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
         #print "Running receiver with file input ..."
         #receiverThread = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
+        #print "Running receiving with direct serial connection .."
+        receiverThread = ioserver.receive_direct_serial.LineReceiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
         receiverThread.start()
         
         #TODO
