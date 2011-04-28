@@ -10,6 +10,7 @@ ReceiverQueueMgr object.
 @author: Callum Hay
 '''
 
+from xbee import ZigBee # http://code.google.com/p/python-xbee/
 import serial
 import parser
 import threading
@@ -21,13 +22,13 @@ class Receiver(threading.Thread):
         
         assert(receiverQueueMgr != None)
         self.queueMgr           = receiverQueueMgr
-        self.serialInputPort    = None
+        self.xbee               = None
         self.exitThread         = False
         self.lock               = threading.Semaphore()
         try:
-            # NOTE: timeout=x means we wait up to x seconds to read from the serial port
-            self.serialInputPort = serial.Serial(inputSerialPort, baudrate=baudRate, timeout=1)
-            self.serialInputPort.timeout = 1
+            serialIn = serial.Serial(inputSerialPort, baudrate=baudRate)
+            self.xbee = ZigBee(serialIn, escaped=True)
+            
         except serial.SerialException:
             print "ERROR: Serial port " + inputSerialPort + " was invalid/not found."
             print "************ Killing Receiver Thread ****************"
@@ -40,13 +41,13 @@ class Receiver(threading.Thread):
 
     def run(self):
         # Make sure this object is in a proper state before running...
-        if self.serialInputPort == None:
-            print "ERROR: Serial port was invalid/not found, could not run receiver."
+        if self.xbee == None:
+            print "ERROR: Xbee connection was invalid/not found, could not run receiver."
             print "************ Killing Receiver Thread ****************"
             return
         
         # Temporary variables used in the while loop
-        currSerialDataStr = ""
+        xbeeFrame = ""
         print "Running receiver..."
         
         self.lock.acquire() 
@@ -55,8 +56,8 @@ class Receiver(threading.Thread):
             
             #print "Listening on serial port"
             # Listen for input on the serial port
-            currSerialDataStr = self.serialInputPort.readline()
-            parser.ParseSerialData(currSerialDataStr, self.queueMgr)
+            xbeeFrame = self.xbee.wait_read_frame()
+            parser.ParseWirelessData(xbeeFrame, self.queueMgr)
             
             self.lock.acquire()
             
