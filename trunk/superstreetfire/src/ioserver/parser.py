@@ -13,35 +13,57 @@ d) Store the high-level objects on the receiver queues of the ReceiverQueueMgr
 import re
 import string
 import struct
+from collections import deque
 from client_datatypes import GloveData, HeadsetData, PLAYER_ONE, PLAYER_TWO
 
 # look guys, no wires!
 def ParseWirelessData(xbeePacket, queueMgr):
     #print xbeePacket
-    # pull out the useful stuff..
-    data = xbeePacket['rf_data']
+    #each frame starts with Node ID colon, ends with pipe.. e.g. 1L:x,x,x..|
+    rfdata = xbeePacket['rf_data'].replace(' ','')
+    print 'rfdata:%s' % (rfdata)
     
     # try to find a device id based on source address
     source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
-    if (SOURCE_ADDRESS_MAP.get(source,'0') == '0'):
-        # which device are we? is there a "NODE:" delimiter
-        nodePos = data.find(":");
-        if (nodePos > 2 and data[nodePos-1:nodePos].isalpha() ):
-            nodeId = data[nodePos-2:nodePos]
+    nodeId = SOURCE_ADDRESS_MAP.get(source,'0')
+    frameData = deque()
+
+    startDataPos = rfdata.find(":")
+    # if we're just starting up, read each of the device ids into a map
+    if (nodeId == '0'):
+        # which device are we? is there a "[digit][char]:"
+        if (startDataPos >= 2 and rfdata[startDataPos-1:startDataPos].isalpha() ):
+            nodeId = rfdata[startDataPos-2:startDataPos]
             SOURCE_ADDRESS_MAP[source] = nodeId
-            print "found a node %s for %s " % (nodeId, source)
+            print 'found a node %s for %s ' % (nodeId, source)
         else:
-            print "no node identifier in rf_data." 
+            print 'no node identifier in rf_data.' 
             return
+    
+    # when we have a full frame, pass it on
+    func = PARSER_FUNCTION_DICT.get(nodeId);
+
+    # the data packet may be disjoint, frame it    
+    frameData.append( HOLDING_FRAME[nodeId] )
+    restartFrame = (startDataPos == 3)
+    for c in rfdata:
+        if (restartFrame and c != ":"):
+            continue
+        elif (restartFrame and c == ":"):
+            restartFrame = False
+            continue
+        frameData[-1] += c
+        if (c == "|"):
+            if (string.count(frameData[-1], ',') >= 8):
+                print 'popping frame:%s' % (frameData)
+                func(frameData.pop(), queueMgr)
+            frameData.append('')
+            restartFrame = True
         
-    # the data packet is likely still disjoint, pass it on anyway
-    func = PARSER_FUNCTION_DICT.get(SOURCE_ADDRESS_MAP[source]);
-    if func != None:
-        # We're dealing with an expected package type from a client, parse it
-        # and queue it for the game simulation to deal with
-        func(data, queueMgr)
-    else:
-        print "oh noes, no parser, junking packet.. " 
+    HOLDING_FRAME[nodeId] = frameData.pop()   
+    print '%s:Current: %s ' % (nodeId,HOLDING_FRAME[nodeId])
+    print '%s:Frame: %s \n' % (nodeId, frameData)
+    
 
 def ParseSerialData(serialDataStr, queueMgr):
     # Break the serial input up based on the various known headers that
@@ -74,11 +96,12 @@ def GloveParser(player, hand, bodyStr):
     accel = string.split(blocks[1],",")
     gyros = string.split(blocks[2],",")
 
+    headF = (float(head[0]), float(head[1]), float(head[2]))
+    accF = (float(accel[0]), float(accel[1]), float(accel[2]))
+    gryoF = (float(gyros[0]), float(gyros[1]), float(gyros[2]))    
     # Turn the parsed glove data into an actual object
-    gloveData = GloveData((float(gyros[0]), float(gyros[1]), float(gyros[2])), \
-                          (float(accel[0]), float(accel[1]), float(accel[2])), \
-                          (float(head[0]), float(head[1]), float(head[2])), \
-                          player, hand)
+    gloveData = GloveData(gryoF, accF, headF, player, hand)
+    
     #print 'GloveData setup %s ' % (str(gloveData))
     return gloveData
 
@@ -141,7 +164,8 @@ PARSER_FUNCTION_DICT = {
     '2H' : Player2HeadsetSerialInputParser
 }
 
-CURRENT_FRAME = {
+# holds the current device line data, might be split over multiple reads.
+HOLDING_FRAME = {
     '1L' : '',
     '1R' : '',
     '1H' : '',
@@ -150,6 +174,8 @@ CURRENT_FRAME = {
     '2H' : ''
 }
 
+# looks for nodes within the output data, and assigns a mapping 
+# device soure address to player device.
 SOURCE_ADDRESS_MAP = {
 }
 
