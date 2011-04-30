@@ -192,7 +192,7 @@ void setup()
 void loop() //Main Loop
 {
   // if((millis()-timer)>=20)  // Main loop runs at 50Hz
-  if((millis()-timer)>=40)  // Main loop runs at 50Hz
+  if((millis()-timer)>=40) 
   {
     counter++;
     timer_old = timer;
