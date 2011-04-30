@@ -11,6 +11,7 @@ d) Store the high-level objects on the receiver queues of the ReceiverQueueMgr
 '''
 
 import re
+import sys
 import string
 import struct
 from collections import deque
@@ -55,12 +56,21 @@ def ParseWirelessData(xbeePacket, queueMgr):
         frameData[-1] += c
         if (c == "|"):
             if (string.count(frameData[-1], ',') >= 8):
+                # data is a mess. check for node headers
+                badNode = frameData[-1].find(':')
+                if (badNode > -1):
+                    frameData[-1] = frameData[-1][badNode+1:]
                 print 'popping frame:%s' % (frameData)
                 func(frameData.pop(), queueMgr)
             frameData.append('')
             restartFrame = True
-        
-    HOLDING_FRAME[nodeId] = frameData.pop()   
+            
+    #messy... need to fix radio inputs
+    badNode = frameData[-1].find(':')
+    if (badNode > -1):
+        HOLDING_FRAME[nodeId] = frameData[-1][badNode+1:]
+    else:
+        HOLDING_FRAME[nodeId] = frameData.pop()   
     print '%s:Current: %s ' % (nodeId,HOLDING_FRAME[nodeId])
     print '%s:Frame: %s \n' % (nodeId, frameData)
     
@@ -84,7 +94,7 @@ def ParseSerialData(serialDataStr, queueMgr):
 
 def GloveParser(player, hand, bodyStr):
     
-    blocks = bodyStr.split("_")
+    blocks = bodyStr.replace('|','').split("_")
     
     # Get out of here immediately if there's a mismatch of the expected data
     # for the glove.
@@ -96,14 +106,17 @@ def GloveParser(player, hand, bodyStr):
     accel = string.split(blocks[1],",")
     gyros = string.split(blocks[2],",")
 
-    headF = (float(head[0]), float(head[1]), float(head[2]))
-    accF = (float(accel[0]), float(accel[1]), float(accel[2]))
-    gryoF = (float(gyros[0]), float(gyros[1]), float(gyros[2]))    
-    # Turn the parsed glove data into an actual object
-    gloveData = GloveData(gryoF, accF, headF, player, hand)
-    
-    #print 'GloveData setup %s ' % (str(gloveData))
-    return gloveData
+    try:
+        headF = (float(head[0]), float(head[1]), float(head[2]))
+        accF = (float(accel[0]), float(accel[1]), float(accel[2]))
+        gryoF = (float(gyros[0]), float(gyros[1]), float(gyros[2]))    
+        # Turn the parsed glove data into an actual object
+        gloveData = GloveData(gryoF, accF, headF, player, hand)
+        
+        #print 'GloveData setup %s ' % (str(gloveData))
+        return gloveData
+    except: 
+        print "Glove data error:", sys.exc_info()[0]
 
 def HeadsetParser(player, bodyStr):
     matchResult = re.match(HeadsetData.HEADSET_DATA_REGEX_STR, bodyStr)
