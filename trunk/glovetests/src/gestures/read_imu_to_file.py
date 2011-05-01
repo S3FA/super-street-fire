@@ -13,7 +13,7 @@ from mpl_toolkits.mplot3d import Axes3D
 grad2rad = 3.141592/180.0
 
 # Check your COM port and baud rate
-ser = serial.Serial(port='COM4',baudrate=57600, timeout=1)
+ser = serial.Serial(port='COM3',baudrate=57600, timeout=1)
 
 # Main scene
 scene=display(title="9DOF Razor IMU test")
@@ -103,95 +103,98 @@ while elapsed < 18:
     elapsed = now-start;
 
     #print/log line
-    line = ser.readline()
-         
-    if line.startswith("1L") != True:
+    line = ser.read(256)
+    
+    if line.find("1R")  == -1:
         if elapsed < 3: print "   CALIBRATING .. "
-        print line
         f.write(line)
         continue  # skip the non-movement-data lines
 
     #put in the time elapsed & just one newline
-    clean = '{:.3f}_{}\n'.format(elapsed, line.rstrip() );
+    clean = '{:.3f}_{}\n'.format(elapsed, line.replace(' ',''));
     f.write(clean)                     # Write to the output log file
 
-    head = []
-    dataline = line.partition(":")    # Fields split (five items, unless we're just starting)
-    player = dataline[0]
-    blocks = dataline[2].split("_")
+    # we're going to throw away a bunch of data on either end - but that's OK
+    lines = clean.split("|")
+    for line in lines:
     
-    if len(blocks) > 3:
-        if isStarted == False:
-            print " *********** GO ************ "
-            isStarted = True
-
-        head = string.split(blocks[0],",")
-        gyros = string.split(blocks[1],",")
-        accel = string.split(blocks[2],",")
+        head = []
+        dataline = line.partition(":")    # Fields split (five items, unless we're just starting)
+        player = dataline[0]
+        blocks = dataline[2].split("_")
         
-        if len(pAcc) == 5:
-            pAcc.pop()
-            pGyro.pop()
-
-        pGyro.appendleft( [float(gyros[x]),float(gyros[y]),float(gyros[z])] )
-        dG  = tuple(map(operator.sub, pGyro[0], pGyro[-1] ))
-
-        pAcc.appendleft( [float(accel[x]),float(accel[y]),float(accel[z])] )
-
-        dA  = tuple(map(operator.sub, pAcc[0], pAcc[-1] ))
-        dAXT.appendleft(dA[x])
-        dAYT.appendleft(dA[y])
-        dAZT.appendleft(dA[z])
-
-        # smooth out the acceleration
-        # average the delta A - over "n" ~5 items 
-        avA.insert(0, ( float(sum(dAXT)) / len(dAXT),
-                float(sum(dAYT)) / len(dAYT),
-                float(sum(dAZT)) / len(dAZT)) )
-          
-        pR.append(float(head[0]))
-        pP.append(float(head[1]))
-        pY.append(float(head[2])) 
-        
-        # slightly less than raw data
-        print '%.3f Heading: %.2f,%.2f,%.2f  avAcc: %s  Gyros: %s ' % (elapsed, pR[-1],pP[-1],pY[-1], str(avA[0]), str(dG))        
-
-        # write out the raw
-        rout = '{}:{:4.0f},{:4.0f},{:4.0f}_{:4.0f},{:4.0f},{:4.0f}_{:4.0f},{:4.0f},{:4.0f}_{:.3f}\n'.format(player,pR[-1],pP[-1],pY[-1],
-                                                                                                dA[x],dA[y],dA[z],dG[x],dG[y],dG[z],elapsed)
-        fr.write(rout)
-        # write out the data with average accelerations.
-        aout = '{}:{:4.0f},{:4.0f},{:4.0f}_{:>7.2f},{:>7.2f},{:>7.2f}_{:4.0f},{:4.0f},{:4.0f}_{:.3f}\n'.format(player,pR[-1],pP[-1],pY[-1],
-                                                                                                avA[0][x],avA[0][y],avA[0][z], dG[x],dG[y],dG[z], elapsed)
-        fav.write(aout)
-
-        # original sample code for the visualizer
-        try:
-            roll = float(head[0])*grad2rad
-            pitch = float(head[1])*grad2rad
-            yaw = float(head[2])*grad2rad
+        if len(blocks) > 3:
+            if isStarted == False:
+                print " *********** GO ************ "
+                isStarted = True
+    
+            head = string.split(blocks[0],",")
+            gyros = string.split(blocks[1],",")
+            accel = string.split(blocks[2],",")
             
-            axis=(cos(pitch)*cos(yaw),-cos(pitch)*sin(yaw),sin(pitch)) 
-            up=(sin(roll)*sin(yaw)+cos(roll)*sin(pitch)*cos(yaw),sin(roll)*cos(yaw)-cos(roll)*sin(pitch)*sin(yaw),-cos(roll)*cos(pitch))
-            platform.axis=axis
-            platform.up=up
-            platform.length=1.0
-            platform.width=0.65
-            plat_arrow.axis=axis
-            plat_arrow.up=up
-            plat_arrow.length=0.8
-            p_line.axis=axis
-            p_line.up=up
-            cil_roll.axis=(0.2*cos(roll),0.2*sin(roll),0)
-            cil_roll2.axis=(-0.2*cos(roll),-0.2*sin(roll),0)
-            cil_pitch.axis=(0.2*cos(pitch),0.2*sin(pitch),0)
-            cil_pitch2.axis=(-0.2*cos(pitch),-0.2*sin(pitch),0)
-            arrow_course.axis=(0.2*sin(yaw),0.2*cos(yaw),0)
-            L1.text = str(float(head[0]))
-            L2.text = str(float(head[1]))
-            L3.text = str(float(head[2]))      
-        except: 
-            pass # don't care
+            if len(pAcc) == 5:
+                pAcc.pop()
+                pGyro.pop()
+    
+            pGyro.appendleft( [float(gyros[x]),float(gyros[y]),float(gyros[z])] )
+            dG  = tuple(map(operator.sub, pGyro[0], pGyro[-1] ))
+    
+            pAcc.appendleft( [float(accel[x]),float(accel[y]),float(accel[z])] )
+    
+            dA  = tuple(map(operator.sub, pAcc[0], pAcc[-1] ))
+            dAXT.appendleft(dA[x])
+            dAYT.appendleft(dA[y])
+            dAZT.appendleft(dA[z])
+    
+            # smooth out the acceleration
+            # average the delta A - over "n" ~5 items 
+            avA.insert(0, ( float(sum(dAXT)) / len(dAXT),
+                    float(sum(dAYT)) / len(dAYT),
+                    float(sum(dAZT)) / len(dAZT)) )
+              
+            pR.append(float(head[0]))
+            pP.append(float(head[1]))
+            pY.append(float(head[2])) 
+            
+            # slightly less than raw data
+            #print '%.3f Heading: %.2f,%.2f,%.2f  avAcc: %s  Gyros: %s ' % (elapsed, pR[-1],pP[-1],pY[-1], str(avA[0]), str(dG))        
+    
+            # write out the raw
+            rout = '{}:{:4.0f},{:4.0f},{:4.0f}_{:4.0f},{:4.0f},{:4.0f}_{:4.0f},{:4.0f},{:4.0f}_{:.3f}\n'.format(player,pR[-1],pP[-1],pY[-1],
+                                                                                                    dA[x],dA[y],dA[z],dG[x],dG[y],dG[z],elapsed)
+            fr.write(rout)
+            # write out the data with average accelerations.
+            aout = '{}:{:4.0f},{:4.0f},{:4.0f}_{:>7.2f},{:>7.2f},{:>7.2f}_{:4.0f},{:4.0f},{:4.0f}_{:.3f}\n'.format(player,pR[-1],pP[-1],pY[-1],
+                                                                                                    avA[0][x],avA[0][y],avA[0][z], dG[x],dG[y],dG[z], elapsed)
+            fav.write(aout)
+    
+            # original sample code for the visualizer
+            try:
+                roll = float(head[0])*grad2rad
+                pitch = float(head[1])*grad2rad
+                yaw = float(head[2])*grad2rad
+                
+                axis=(cos(pitch)*cos(yaw),-cos(pitch)*sin(yaw),sin(pitch)) 
+                up=(sin(roll)*sin(yaw)+cos(roll)*sin(pitch)*cos(yaw),sin(roll)*cos(yaw)-cos(roll)*sin(pitch)*sin(yaw),-cos(roll)*cos(pitch))
+                platform.axis=axis
+                platform.up=up
+                platform.length=1.0
+                platform.width=0.65
+                plat_arrow.axis=axis
+                plat_arrow.up=up
+                plat_arrow.length=0.8
+                p_line.axis=axis
+                p_line.up=up
+                cil_roll.axis=(0.2*cos(roll),0.2*sin(roll),0)
+                cil_roll2.axis=(-0.2*cos(roll),-0.2*sin(roll),0)
+                cil_pitch.axis=(0.2*cos(pitch),0.2*sin(pitch),0)
+                cil_pitch2.axis=(-0.2*cos(pitch),-0.2*sin(pitch),0)
+                arrow_course.axis=(0.2*sin(yaw),0.2*cos(yaw),0)
+                L1.text = str(float(head[0]))
+                L2.text = str(float(head[1]))
+                L3.text = str(float(head[2]))      
+            except: 
+                pass # don't care
 
 
 print 'Done - closing resources'  
