@@ -20,7 +20,11 @@ For any real testing, (as of May 1st) the game is processing wireless input and 
 
 === What makes a move? ===
 
-The elements of a move are building blocks of data-changes, to make the easiest detection possible - detect the more complicated of similar moves first. i.e. hadouken, hook, jab.
+The elements of a move are building blocks of data-changes. 
+
+Generally using acceleration as a threshold value, and gyros as a delta value. Orientation (headings) are good for block or more complicated combos.
+
+To make the simplest definition possible - detect the more complicated of similar moves first. i.e. hadouken (both hands must match), hook (L/or/R), then jab (L/or/R). 
 
   * Jab: X acceleration exceeds 700-800, maybe include gyros increasing X, discard orientation because humans can't be relied on to have good punching technique.
   * Hook: X + Y acceleration exceeding ~700/~400, gyros increasing for both X,Y, again ignore orientation.
