@@ -6,7 +6,7 @@ After a bit of fiddling with the IMU output, the three basic states are defined 
 
 === Gestures ===
 
-There are some test programs in the "GestureTests" project that work with a single device over direct serial, plus some "testdata". 
+There are some test programs in the "GloveTests" project that work with a single device over direct serial, plus some "testdata". 
 
 The data is four streams of x-y-z or roll-pitch-yaw: 
   * Headings (orientation relative to the calibration orientation)
