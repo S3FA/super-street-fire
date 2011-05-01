@@ -4,7 +4,7 @@
 
 After a bit of fiddling with the IMU output, the three basic states are defined (jab, hook, block). We're looking to expand to hadouken, dragon punch, and a couple more. In discussion.
 
-=== Gestures ===
+== Gestures ==
 
 There are some test programs in the "GloveTests" project that work with a single device over direct serial, plus some "testdata". 
 
@@ -18,7 +18,17 @@ For any real testing, (as of May 1st) the game is processing wireless input and 
 
 *TODO:* make sure those moves are turned into the right state!
 
-=== IO ===
+=== What makes a move? ===
+
+The elements of a move are building blocks of data-changes, to make the easiest detection possible - detect the more complicated of similar moves first. i.e. hadouken, hook, jab.
+
+  * Jab: X acceleration exceeds 700-800, maybe include gyros increasing X, discard orientation because humans can't be relied on to have good punching technique.
+  * Hook: X + Y acceleration exceeding ~700/~400, gyros increasing for both X,Y, again ignore orientation.
+  * Block: hands up, vertical with body; low acceleration, orientation (Pitch) exceeds 70 degrees from flat.
+  * Hadouken: X+Y acceleration, Y+Z gyros increasing, hands *must* be correct position (Roll + Pitch greater than 40 degrees from flat?).
+  
+
+=== I/O ===
 
 All the data goes through the sender/receiver modules. Pretty simple stuff.
 
