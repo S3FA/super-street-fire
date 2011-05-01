@@ -1,0 +1,25 @@
+#summary IO and gesture recognizer
+
+== Introduction ==
+
+After a bit of fiddling with the IMU output, the three basic states are defined (jab, hook, block). We're looking to expand to hadouken, dragon punch, and a couple more. In discussion.
+
+=== Gestures ===
+
+There are some test programs in the "GestureTests" project that work with a single device over direct serial, plus some "testdata". 
+
+The data is four streams of x-y-z or roll-pitch-yaw: 
+  * Headings (orientation relative to the calibration orientation)
+  * Acceleration (useful for punches, and power of move)
+  * Gyros (useful for twisting/turn based movement)
+  * Magnetometer (not used)
+
+For any real testing, (as of May 1st) the game is processing wireless input and throwing it into the gesture state machine.
+
+*TODO:* make sure those moves are turned into the right state!
+
+=== IO ===
+
+All the data goes through the sender/receiver modules. Pretty simple stuff.
+
+*TODO:* output the fire state bytes. 
