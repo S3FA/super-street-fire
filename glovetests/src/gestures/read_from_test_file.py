@@ -4,10 +4,11 @@ from mpl_toolkits.mplot3d import Axes3D
 from ssf_moves import *
 
 # read test files in currect directory
-dirList=os.listdir(".")
+DIR = "../../testdata/"
+dirList=os.listdir(DIR)
 testfile = ""
 for fname in dirList: 
-    if fname.find("-av") > -1: testfile = fname
+    if fname.find("-av") > -1: testfile = DIR+fname
     
 print 'found a test file: %s ' % (testfile)
 f = open(testfile, 'r')
@@ -23,6 +24,8 @@ for line in f:
     #print line
     #ignore the file header
     if line.startswith("P"): continue;
+    
+    #print line
     
     # expecting Heading, Av Acc, dGyro, time
     dataline = line.partition(":")    # Fields split (five items, unless we're just starting)
