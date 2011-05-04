@@ -43,7 +43,7 @@ class GloveData:
         self.hand = hand
         
     def __str__(self):
-        return "Rotation: " + str(self.rotation) + ", Acceleration: " + str(self.acceleration) + ", Heading: " + str(self.heading)
+        return "R: " + str(self.heading) + ", A: " + str(self.acceleration) + ", G: " + str(self.rotation)
     
     # add operator - A GloveData may only be added to another GloveData with the 
     # same player and hand
