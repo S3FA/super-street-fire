@@ -69,7 +69,7 @@ while elapsed < 15:
                 print " *********** GO ************ "
                 isStarted = True
     
-            #print "dataline %s=%s" % (dataline[0], blocks)
+            print "dataline %s=%s" % (dataline[0], blocks)
             playerId = dataline[0][0] # either 1/2
             gloveId = dataline[0][1] # either L/R
             head = string.split(blocks[0],",")
