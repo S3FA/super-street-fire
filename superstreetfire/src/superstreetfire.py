@@ -9,8 +9,9 @@ import traceback
 from optparse import OptionParser
 
 import os
-#import ioserver.receiver 
-import ioserver.receive_direct_serial
+import logging
+import ioserver.receiver 
+#import ioserver.receive_direct_serial
 #import ioserver.receive_from_file
 #from ioserver.client_emulator import ClientEmulator
 from ioserver.receiver_queue_mgr import ReceiverQueueMgr
@@ -19,13 +20,14 @@ from gamemodel.gesture_recognizer import GestureRecognizer
 from gamemodel.ssf_game import SSFGame
 
 def KillEverything(threadList):
-    print "Killing all threads..."
+    logging.warn("Killing all threads...")
     for thread in threadList:
         thread.ExitThread()
         thread.join()
 
 
 if __name__ == '__main__':
+
 
     #snb: hate typing but didn't want to change the default..
     IN_PORT="/dev/slave"
@@ -49,7 +51,17 @@ if __name__ == '__main__':
 
     (options, args) = argParser.parse_args()
     
-    
+    # setup some default log config
+    logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                    datefmt='%m-%d %H:%M',
+                    filename='ssf.log',
+                    filemode='w')
+    # create console handler with a higher log level, add it to the root logger
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.WARN)
+    logging.getLogger('').addHandler(ch)
+
     # Error checking on the command line input parameters
     if options.frequency <= 0:
         argParser.error("Specified frequency must be greater than zero.")
@@ -63,7 +75,7 @@ if __name__ == '__main__':
     # The following loop and try/catch is to make sure that we kill the whole
     # process in cases of imposed exceptions
     try:
-            # Start the emulator if it was specified as an argument
+        # Start the emulator if it was specified as an argument
         #clientEmulator = None
         #if options.emulatorPort != None:
         #    clientEmulator = ClientEmulator(options.emulatorPort, DEFAULT_BAUDRATE)
@@ -73,11 +85,11 @@ if __name__ == '__main__':
         receiverQueueMgr = ReceiverQueueMgr()
     
         # Spawn threads for listening and sending data over the serial port
-        #receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
+        receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
         #print "Running receiver with file input ..."
         #receiverThread = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
         #print "Running receiving with direct serial connection .."
-        receiverThread = ioserver.receive_direct_serial.LineReceiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
+        #receiverThread = ioserver.receive_direct_serial.LineReceiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
         receiverThread.start()
         
         #TODO
@@ -146,7 +158,7 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print "Ctrl+c Issued..."
     except:
-        print "Unexpected exception occurred!"
+        logging.warn("Unexpected state! (Is everything turned on?)")
         traceback.print_exc()
 
     KillEverything([receiverThread])
