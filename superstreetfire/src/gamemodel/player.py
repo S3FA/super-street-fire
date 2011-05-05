@@ -15,12 +15,16 @@ class Player:
     
     def __init__(self, playerNum):
         assert(playerNum == 1 or playerNum == 2)
-        self.playerNum = playerNum
-        self._logger = logging.getLogger(Player.LOGGER_NAME)
+        self.playerNum    = playerNum
+        self._logger      = logging.getLogger(Player.LOGGER_NAME)
         self.Reset()
         
     def Reset(self):
-        self.hitPoints = Player.MAX_HIT_POINTS 
+        self.ResetHealth()
+        self.numRoundWins = 0
+    
+    def ResetHealth(self):
+        self.hitPoints = Player.MAX_HIT_POINTS
     
     def IsKnockedOut(self):
         return (self.hitPoints <= 0)
