@@ -13,56 +13,37 @@ ReceiverQueueMgr object.
 from xbee import ZigBee # http://code.google.com/p/python-xbee/
 import serial
 import parser
-import threading
 
-class Receiver(threading.Thread):
+# Since the xbee library requires a non-member function for its callbacks, we
+# need to make the variables available to that function non-members as well...
+recieverQueueMgr = None
 
-    def __init__(self, receiverQueueMgr, inputSerialPort, baudRate):
-        threading.Thread.__init__(self)
+# Callback function for asynchronous receiving of data from the xbee library
+def XBeeCallback(xbeeDataFrame):
+    parser.ParseWirelessData(xbeeDataFrame, recieverQueueMgr)
+
+class Receiver:
+
+    def __init__(self, receiverQMgr, inputSerialPort, baudRate):
+        assert(receiverQMgr != None)
+        recieverQueueMgr = receiverQMgr
+        self.serialIn    = None
+        self.xbee        = None
         
-        assert(receiverQueueMgr != None)
-        self.queueMgr           = receiverQueueMgr
-        self.xbee               = None
-        self.exitThread         = False
-        self.lock               = threading.Semaphore()
         try:
-            serialIn = serial.Serial(inputSerialPort, baudrate=baudRate)
-            self.xbee = ZigBee(serialIn, escaped=True)
+            self.serialIn = serial.Serial(inputSerialPort, baudrate=baudRate)
+            self.xbee = ZigBee(self.serialIn, callback=XBeeCallback, escaped=True)
             
         except serial.SerialException:
             print "ERROR: Serial port " + inputSerialPort + " was invalid/not found."
             print "************ Killing Receiver Thread ****************"
             exit(-1)    
-
-    def ExitThread(self):
-        self.lock.acquire()
-        self.exitThread = True
-        self.lock.release()
-
-    def run(self):
-        # Make sure this object is in a proper state before running...
-        if self.xbee == None:
-            print "ERROR: Xbee connection was invalid/not found, could not run receiver."
-            print "************ Killing Receiver Thread ****************"
-            return
         
-        # Temporary variables used in the while loop
-        xbeeFrame = ""
         print "Running receiver..."
         
-        self.lock.acquire() 
-        while not self.exitThread:
-            self.lock.release()
+    def Kill(self):
+        if self.xbee != None:
+            self.xbee.halt()
+        if self.serialIn != None:
+            self.serialIn.close()
             
-            #print "Listening on serial port"
-            # Listen for input on the serial port
-            xbeeFrame = self.xbee.wait_read_frame()
-            parser.ParseWirelessData(xbeeFrame, self.queueMgr)
-            
-            self.lock.acquire()
-            
-        self.lock.release()
-        self.serialInputPort.close()
-        
-        
-        

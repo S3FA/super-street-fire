@@ -19,15 +19,15 @@ from ioserver.receiver_queue_mgr import ReceiverQueueMgr
 from gamemodel.gesture_recognizer import GestureRecognizer
 from gamemodel.ssf_game import SSFGame
 
+'''
 def KillEverything(threadList):
     logging.warn("Killing all threads...")
     for thread in threadList:
         thread.ExitThread()
         thread.join()
-
+'''
 
 if __name__ == '__main__':
-
 
     #snb: hate typing but didn't want to change the default..
     IN_PORT="/dev/slave"
@@ -85,16 +85,14 @@ if __name__ == '__main__':
         receiverQueueMgr = ReceiverQueueMgr()
     
         # Spawn threads for listening and sending data over the serial port
-        receiverThread = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
+        receiver = ioserver.receiver.Receiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
         #print "Running receiver with file input ..."
-        #receiverThread = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
+        #receiver = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
         #print "Running receiving with direct serial connection .."
-        #receiverThread = ioserver.receive_direct_serial.LineReceiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
-        receiverThread.start()
-        
+        #receiver = ioserver.receive_direct_serial.LineReceiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
+
         #TODO
-        #senderThread = ioserver.sender.Sender(options.outputPort, DEFAULT_BAUDRATE)
-        #senderThread.start()
+        #sender = ioserver.sender.Sender(options.outputPort, DEFAULT_BAUDRATE)
         
         
         # TODO: Move time stuff into the gamemodel...
@@ -112,11 +110,9 @@ if __name__ == '__main__':
         
         # Game model and gesture recognition system initialization
         # TODO: What the heck is our calibration data and where does it come from?
-        gestureRecognizer = GestureRecognizer()
-        ssfGame           = SSFGame(gestureRecognizer)
+        ssfGame = SSFGame()
         
-        threadsAreAlive = receiverThread.isAlive() #and senderThread.isAlive()
-        while threadsAreAlive:
+        while True:
             
             # Keep track of a delta time for each frame, this will be used to 
             # calculate values for the current frame of the simulation and also keep
@@ -130,11 +126,15 @@ if __name__ == '__main__':
             # onto the receiverQueueMgr, we need to grab that data and apply it to the simulation...
             
             # Feed any newly received data to the gesture recognizer
-            gestureRecognizer.UpdateWithGestureData(receiverQueueMgr.PopP1LeftGloveData(),  \
-                                                    receiverQueueMgr.PopP1RightGloveData(), \
-                                                    receiverQueueMgr.PopP2LeftGloveData(),  \
-                                                    receiverQueueMgr.PopP2RightGloveData(), \
-                                                    deltaFrameTime, lastFrameTime)
+            ssfGame.UpdateWithGloveData(receiverQueueMgr.PopP1LeftGloveData(),  \
+                                        receiverQueueMgr.PopP1RightGloveData(), \
+                                        receiverQueueMgr.PopP2LeftGloveData(),  \
+                                        receiverQueueMgr.PopP2RightGloveData(), \
+                                        deltaFrameTime, lastFrameTime)
+            ssfGame.UpdateWithHeadsetData(receiverQueueMgr.PopP1HeadsetData(), \
+                                          receiverQueueMgr.PopP2HeadsetData(), \
+                                          deltaFrameTime, lastFrameTime)
+            
             
             # TODO: What do we do with head-set data ??
             # is it part of the gesture recognition or is it a complement to it?
@@ -149,8 +149,6 @@ if __name__ == '__main__':
             
             #...
             
-            threadsAreAlive = receiverThread.isAlive()
-            
             # Sync to the specified frequency
             if deltaFrameTime < FIXED_FRAME_TIME:
                 time.sleep(FIXED_FRAME_TIME - deltaFrameTime)
@@ -161,7 +159,9 @@ if __name__ == '__main__':
         logging.warn("Unexpected state! (Is everything turned on?)")
         traceback.print_exc()
 
-    KillEverything([receiverThread])
+    #KillEverything([receiverThread])
+    receiver.Kill()
+    #sender.Kill()
     print "Exiting..."
     
     
