@@ -22,7 +22,7 @@ def ParseWirelessData(xbeePacket, queueMgr):
     #print xbeePacket
     #each frame starts with Node ID colon, ends with pipe.. e.g. 1L:x,x,x..|
     rfdata = xbeePacket['rf_data'].replace(' ','')
-    print 'rfdata:%s' % (rfdata)
+    #print 'rfdata:%s' % (rfdata)
     
     # try to find a device id based on source address
     source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
@@ -56,23 +56,20 @@ def ParseWirelessData(xbeePacket, queueMgr):
         frameData[-1] += c
         if (c == "|"):
             if (string.count(frameData[-1], ',') >= 8):
-                # data is a mess. check for node headers
+                # data is a bit weird.. check for node headers
                 badNode = frameData[-1].find(':')
                 if (badNode > -1):
                     frameData[-1] = frameData[-1][badNode+1:]
-                print 'popping frame:%s' % (frameData)
+                #print 'popping frame:%s' % (frameData)
                 func(frameData.pop(), queueMgr)
             frameData.append('')
             restartFrame = True
             
-    #messy... need to fix radio inputs
     badNode = frameData[-1].find(':')
     if (badNode > -1):
         HOLDING_FRAME[nodeId] = frameData[-1][badNode+1:]
     else:
         HOLDING_FRAME[nodeId] = frameData.pop()   
-    print '%s:Current: %s ' % (nodeId,HOLDING_FRAME[nodeId])
-    print '%s:Frame: %s \n' % (nodeId, frameData)
     
 
 def ParseSerialData(serialDataStr, queueMgr):
@@ -95,6 +92,7 @@ def ParseSerialData(serialDataStr, queueMgr):
 def GloveParser(player, hand, bodyStr):
     
     blocks = bodyStr.replace('|','').split("_")
+    #print 'parsing blocks %s ' % (blocks)
     
     # Get out of here immediately if there's a mismatch of the expected data
     # for the glove.
@@ -103,8 +101,8 @@ def GloveParser(player, hand, bodyStr):
         return None
     
     head = string.split(blocks[0],",")
-    accel = string.split(blocks[1],",")
-    gyros = string.split(blocks[2],",")
+    gyros = string.split(blocks[1],",")
+    accel = string.split(blocks[2],",")
 
     try:
         headF = (float(head[0]), float(head[1]), float(head[2]))
@@ -143,19 +141,19 @@ def HeadsetParser(player, bodyStr):
     
 
 def Player1LeftGloveParser(bodyStr, queueMgr):
-    print "Player 1 left glove data received."
+    #print "Player 1 left glove data received."
     queueMgr.PushP1LeftGloveData(GloveParser(PLAYER_ONE, GloveData.LEFT_HAND_GLOVE, bodyStr))
     
 def Player1RightGloveParser(bodyStr, queueMgr):
-    print "Player 1 right glove data received."
+    #print "Player 1 right glove data received."
     queueMgr.PushP1RightGloveData(GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr))
         
 def Player2LeftGloveParser(bodyStr, queueMgr):        
-    print "Player 2 left glove data received."
+    #print "Player 2 left glove data received."
     queueMgr.PushP2LeftGloveData(GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr))
     
 def Player2RightGloveParser(bodyStr, queueMgr):    
-    print "Player 2 right glove data received."
+    #print "Player 2 right glove data received."
     queueMgr.PushP2RightGloveData(GloveParser(PLAYER_TWO, GloveData.RIGHT_HAND_GLOVE, bodyStr))
         
 def Player1HeadsetSerialInputParser(bodyStr, queueMgr):
