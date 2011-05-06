@@ -52,22 +52,6 @@ class SSFGame:
         else:
             return self.leftEmitters
 
-    def IsRoundOver(self):
-        return (self.player1.IsKnockedOut() or self.player2.IsKnockedOut() or self.roundTime <= 0.0)
-    
-    def IsGameOver(self):
-        return self.player1.numRoundWins == 2 or self.player2.numRoundWins == 2
-    
-    def GetRoundWinner(self):
-        if self.player1.IsKnockedOut():
-            if self.player2.IsKnockedOut():
-                return 0
-            else:
-                return 2
-        elif self.player2.IsKnockedOut():
-            return 1
-        else:
-            return -1
 
     # Gets the winner of the game - if there is no winner -1 is returned,
     # if the game is a tie then 0 is returned.
