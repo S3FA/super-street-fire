@@ -33,10 +33,11 @@ Headsets:
   * Att>80, Med>80, special, gesture received, ...?
 
 Fire and color control:
-  2 bytes for fire control:     16[x x x x x x x x][x x x x x x x x]1
+{{{
+  2 bytes for fire control:   16[x x x x x x x x][x x x x x x x x]1
   2 bytes for player 1 color: 16[x x x x x x x x][x x x x x x x x]1
   2 bytes for player 2 color: 16[x x x x x x x x][x x x x x x x x]1
-
+}}}
 This needs to be sent out in an API packet. This command may be sufficient but I haven't tested it, the documentation isn't great:
 
 xbee.send("tx", dest_addr=' , dest_addr_long=' ', data=' ');
