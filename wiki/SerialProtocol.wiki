@@ -33,12 +33,10 @@ Headsets:
   * Att>80, Med>80, special, gesture received, ...?
 
 Fire and color control:
- `xx:y`
- * xx is the device node to control
- * y is a simple wifire16 command:
-  * `[`0-9a-f`]` toggles channel 1 - 16
-  * ? requests armed state
-  * + means system is armed (sent from the device)
-  * - means system is not armed (sent from the device)
-  * x turns all channels off
-  * do we want an explicit on/off command for each channel?
+  2 bytes for fire control:     16[x x x x x x x x][x x x x x x x x]1
+  2 bytes for player 1 color: 16[x x x x x x x x][x x x x x x x x]1
+  2 bytes for player 2 color: 16[x x x x x x x x][x x x x x x x x]1
+
+This needs to be sent out in an API packet. This command may be sufficient but I haven't tested it, the documentation isn't great:
+
+xbee.send("tx", dest_addr=' , dest_addr_long=' ', data=' ');
