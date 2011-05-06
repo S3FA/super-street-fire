@@ -22,7 +22,12 @@ class CalibrationData:
         self.p2LGloveAtkDirAvg = Vector3(0,0,0)
         self.p2RGloveAtkDirAvg = Vector3(0,0,0)
 
-        # 
+        # Initialize variables that will hold the average gyro for each glove
+        # when it's in a state where it's pointing at the opposite player
+        self.p1LGloveGyroAvg = Vector3(0,0,0)
+        self.p1RGloveGyroAvg = Vector3(0,0,0)
+        self.p2LGloveGyroAvg = Vector3(0,0,0)
+        self.p2RGloveGyroAvg = Vector3(0,0,0)
 
         # Initialize variables that will hold the 'zero' acceleration vector
         # coming from each of the player gloves - since sensors are never perfect
@@ -49,21 +54,25 @@ class CalibrationData:
         
         if p1LGloveData != None:
             self.p1LGloveAtkDirAvg  += apply(Vector3, p1LGloveData.heading)
+            self.p1LGloveGyroAvg    += apply(Vector3, p1LGloveData.rotation)
             self.p1LGloveNoAccelAvg += apply(Vector3, p1LGloveData.acceleration)
             self.numP1LGloveSamples += 1
         
         if p1RGloveData != None: 
             self.p1RGloveAtkDirAvg  += apply(Vector3, p1RGloveData.heading)
+            self.p1RGloveGyroAvg    += apply(Vector3, p1RGloveData.rotation)
             self.p1RGloveNoAccelAvg += apply(Vector3, p1RGloveData.acceleration)
             self.numP1RGloveSamples += 1
         
         if p2LGloveData != None:
             self.p2LGloveAtkDirAvg  += apply(Vector3, p2LGloveData.heading)
+            self.p2LGloveGyroAvg    += apply(Vector3, p2LGloveData.rotation)
             self.p2LGloveNoAccelAvg += apply(Vector3, p2LGloveData.acceleration)
             self.numP2LGloveSamples += 1
         
         if p2RGloveData != None:
             self.p2RGloveAtkDirAvg  += apply(Vector3, p2RGloveData.heading)
+            self.p2RGloveGyroAvg    += apply(Vector3, p2RGloveData.rotation)
             self.p2RGloveNoAccelAvg += apply(Vector3, p2RGloveData.acceleration)
             self.numP2RGloveSamples += 1
     
@@ -83,6 +92,15 @@ class CalibrationData:
         self.p2RGloveAtkDirAvg /= self.numP2RGloveSamples
         self.p2RGloveAtkDirAvg.normalize()
         
+        self.p1LGloveGyroAvg /= self.numP1LGloveSamples
+        self.p1LGloveGyroAvg.normalize()
+        self.p1RGloveGyroAvg /= self.numP1RGloveSamples
+        self.p1RGloveGyroAvg.normalize()
+        self.p2LGloveGyroAvg /= self.numP2LGloveSamples
+        self.p2LGloveGyroAvg.normalize()
+        self.p2RGloveGyroAvg /= self.numP2RGloveSamples
+        self.p2RGloveGyroAvg.normalize()
+        
         self.p1LGloveNoAccelAvg /= self.numP1LGloveSamples
         self.p1LGloveNoAccelAvg.normalize()
         self.p1RGloveNoAccelAvg /= self.numP1RGloveSamples
@@ -97,6 +115,8 @@ class CalibrationData:
     def __str__(self):
         result =  str(self.p1LGloveAtkDirAvg) + " " + str(self.p1RGloveAtkDirAvg) + " " + \
                str(self.p2LGloveAtkDirAvg) + " " + str(self.p2RGloveAtkDirAvg) + "\n"
+        result += str(self.p1LGloveGyroAvg) + " " + str(self.p1RGloveGyroAvg) + " " + \
+               str(self.p2LGloveGyroAvg) + " " + str(self.p2RGloveGyroAvg) + "\n"
         result += str(self.p1LGloveNoAccelAvg) + " " + str(self.p1RGloveNoAccelAvg) + " " + \
                str(self.p2LGloveNoAccelAvg) + " " + str(self.p2RGloveNoAccelAvg)
         return result
@@ -105,10 +125,10 @@ class CalibrationData:
 if __name__ == "__main__":
     from ioserver.client_datatypes import *
     
-    p1R_0 = GloveData((1,1,1), (1,1,1), (0,0,0), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
-    p1L_0 = GloveData((2,3,5), (2,2,2), (0,0,0), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
-    p2R_0 = GloveData((1,1,1), (1,1,1), (0,0,0), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
-    p2L_0 = GloveData((2,3,5), (2,2,2), (0,0,0), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
+    p1R_0 = GloveData((1,1,1), (1,1,1), (6,8,1), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
+    p1L_0 = GloveData((2,3,5), (2,2,2), (1,5,4), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
+    p2R_0 = GloveData((1,1,1), (1,1,1), (3,5,7), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
+    p2L_0 = GloveData((2,3,5), (2,2,2), (4,3,2), PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE)
     
     calibrationData = CalibrationData()
     calibrationData.AddGloveDataSample(p1L_0, p1R_0, p2L_0, p2R_0)
