@@ -24,9 +24,7 @@ def XBeeCallback(xbeeDataFrame):
 
 class Receiver:
 
-    def __init__(self, receiverQMgr, inputSerialPort, baudRate):
-        assert(receiverQMgr != None)
-        recieverQueueMgr = receiverQMgr
+    def __init__(self, inputSerialPort, baudRate):
         self.serialIn    = None
         self.xbee        = None
         

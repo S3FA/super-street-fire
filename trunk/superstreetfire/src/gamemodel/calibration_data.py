@@ -14,13 +14,15 @@ from util.euclid import Vector3
 class CalibrationData:
 
     def __init__(self):
-        # Initialize variables that will hold the average directions
+        # Initialize variables that will hold the average directions (heading)
         # for each glove's attack vector (i.e., the vector from that glove's
         # player to the opposing player)
         self.p1LGloveAtkDirAvg = Vector3(0,0,0)
         self.p1RGloveAtkDirAvg = Vector3(0,0,0)
         self.p2LGloveAtkDirAvg = Vector3(0,0,0)
         self.p2RGloveAtkDirAvg = Vector3(0,0,0)
+
+        # 
 
         # Initialize variables that will hold the 'zero' acceleration vector
         # coming from each of the player gloves - since sensors are never perfect
@@ -46,22 +48,22 @@ class CalibrationData:
             return
         
         if p1LGloveData != None:
-            self.p1LGloveAtkDirAvg  += apply(Vector3, p1LGloveData.rotation)
+            self.p1LGloveAtkDirAvg  += apply(Vector3, p1LGloveData.heading)
             self.p1LGloveNoAccelAvg += apply(Vector3, p1LGloveData.acceleration)
             self.numP1LGloveSamples += 1
         
         if p1RGloveData != None: 
-            self.p1RGloveAtkDirAvg  += apply(Vector3, p1RGloveData.rotation)
+            self.p1RGloveAtkDirAvg  += apply(Vector3, p1RGloveData.heading)
             self.p1RGloveNoAccelAvg += apply(Vector3, p1RGloveData.acceleration)
             self.numP1RGloveSamples += 1
         
         if p2LGloveData != None:
-            self.p2LGloveAtkDirAvg  += apply(Vector3, p2LGloveData.rotation)
+            self.p2LGloveAtkDirAvg  += apply(Vector3, p2LGloveData.heading)
             self.p2LGloveNoAccelAvg += apply(Vector3, p2LGloveData.acceleration)
             self.numP2LGloveSamples += 1
         
         if p2RGloveData != None:
-            self.p2RGloveAtkDirAvg  += apply(Vector3, p2RGloveData.rotation)
+            self.p2RGloveAtkDirAvg  += apply(Vector3, p2RGloveData.heading)
             self.p2RGloveNoAccelAvg += apply(Vector3, p2RGloveData.acceleration)
             self.numP2RGloveSamples += 1
     
