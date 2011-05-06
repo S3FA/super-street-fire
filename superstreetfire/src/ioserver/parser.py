@@ -115,6 +115,8 @@ def GloveParser(player, hand, bodyStr):
         return gloveData
     except: 
         print "Glove data error:", sys.exc_info()[0]
+        
+    return None
 
 def HeadsetParser(player, bodyStr):
     matchResult = re.match(HeadsetData.HEADSET_DATA_REGEX_STR, bodyStr)
@@ -142,27 +144,39 @@ def HeadsetParser(player, bodyStr):
 
 def Player1LeftGloveParser(bodyStr, queueMgr):
     #print "Player 1 left glove data received."
-    queueMgr.PushP1LeftGloveData(GloveParser(PLAYER_ONE, GloveData.LEFT_HAND_GLOVE, bodyStr))
+    gloveData = GloveParser(PLAYER_ONE, GloveData.LEFT_HAND_GLOVE, bodyStr)
+    if gloveData != None:
+        queueMgr.PushP1LeftGloveData(gloveData)
     
 def Player1RightGloveParser(bodyStr, queueMgr):
     #print "Player 1 right glove data received."
-    queueMgr.PushP1RightGloveData(GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr))
+    gloveData = GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr)
+    if gloveData != None:
+        queueMgr.PushP1RightGloveData(gloveData)
         
 def Player2LeftGloveParser(bodyStr, queueMgr):        
     #print "Player 2 left glove data received."
-    queueMgr.PushP2LeftGloveData(GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr))
+    gloveData = GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr)
+    if gloveData != None:
+        queueMgr.PushP2LeftGloveData(gloveData)
     
 def Player2RightGloveParser(bodyStr, queueMgr):    
     #print "Player 2 right glove data received."
-    queueMgr.PushP2RightGloveData(GloveParser(PLAYER_TWO, GloveData.RIGHT_HAND_GLOVE, bodyStr))
+    gloveData = GloveParser(PLAYER_TWO, GloveData.RIGHT_HAND_GLOVE, bodyStr)
+    if gloveData != None:
+        queueMgr.PushP2RightGloveData(gloveData)
         
 def Player1HeadsetSerialInputParser(bodyStr, queueMgr):
     print "Player 1 headset data received."
-    queueMgr.PushP1HeadsetData(HeadsetParser(PLAYER_ONE, bodyStr))
+    headsetData = HeadsetParser(PLAYER_ONE, bodyStr)
+    if headsetData != None:
+        queueMgr.PushP1HeadsetData(headsetData)
 
 def Player2HeadsetSerialInputParser(bodyStr, queueMgr):
     print "Player 2 headset data received."
-    queueMgr.PushP2HeadsetData(HeadsetParser(PLAYER_TWO, bodyStr))
+    headsetData = HeadsetParser(PLAYER_TWO, bodyStr)
+    if headsetData != None:
+        queueMgr.PushP2HeadsetData(headsetData)
 
 # We try to make parsing as fast as possible by using a hash table with 1H,1L,1R,etc.
 # for keys and parse function references for values
