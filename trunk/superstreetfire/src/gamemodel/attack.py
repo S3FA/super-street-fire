@@ -200,7 +200,7 @@ class Attack(Action):
                 for i in range(self._thickness-1, self._thickness - totalNumFinishedAttackParts - 1, -1):
                     if attackWindow[i] == Attack.ACTIVE_ATTACK_PART:
                         # A new attack was just landed
-                        ssfGame.Hurt(player.GetOtherPlayerNum(self.playerNum), self._dmgPerFlame)
+                        ssfGame.Hurt(player.GetOtherPlayerNum(self.playerNum), self._dmgPerFlame, False)
                         attackWindow[i] = Attack.INACTIVE_ATTACK_PART
             
             # If the attack window just shifted completely off the end the of the emitter arc

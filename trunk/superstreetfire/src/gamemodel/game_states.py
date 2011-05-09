@@ -4,9 +4,9 @@
 '''
 
 from calibration_data import CalibrationData
+from player import Player
 
 class GameState:
-
     def __init__(self, ssfGame):
         assert(ssfGame != None)
         self.ssfGame = ssfGame
@@ -16,6 +16,7 @@ class GameState:
     def Tick(self, dT):  pass
     def Calibrate(self): pass
     def StartGame(self): pass
+    def TogglePauseGame(self): pass
     def StopGame(self):  pass
     def UpdateWithHeadsetData(self, p1HeadsetData, 
                               p2HeadsetData, dT, timeStamp): pass
@@ -95,6 +96,9 @@ class RoundBeginGameState(GameState):
         
         self.countdownTime -= dT
 
+    def TogglePauseGame(self):
+        self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
+
     def StopGame(self):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
@@ -113,28 +117,8 @@ class RoundInPlayGameState(GameState):
         self._roundTime = RoundInPlayGameState.ROUND_TIME_IN_SECONDS
         
     def Tick(self, dT):
-        # Check for any newly recognized gestures, execute any that get found
-        if self.ssfGame.gestureRecognizer.HasNewActionsAvailable():
-            newActions = self.ssfGame.gestureRecognizer.PopActions()
-            assert(len(newActions) > 0)
-            
-            # Initialize all the new actions
-            for action in newActions:
-                action.Initialize(self.ssfGame)
-            self._activeActions.extend(newActions)
-            
-        # Tick any actions (e.g., attacks, blocks) that are currently active within the game
-        # This will update the state of the fire emitters and the game in general
-        actionsToRemove = []
-        for action in self._activeActions:
-            if action.IsFinished():
-                actionsToRemove.append(action)
-            else:
-                action.Tick(self.ssfGame, dT)
-        
-        # Clear up all finished actions
-        for action in actionsToRemove:
-            self._activeActions.remove(action)
+        # Execute the actions (attacks, blocks, etc.)
+        self.ssfGame._ExecuteGameActions(dT, self._activeActions)
         
         # Diminish the round timer
         self._roundTime -= dT
@@ -144,7 +128,10 @@ class RoundInPlayGameState(GameState):
             # Switch states to the RoundEndedGameState
             self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
             return
-        
+ 
+    def TogglePauseGame(self):
+        self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
+                
     def StopGame(self):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
@@ -221,7 +208,7 @@ class RoundEndedGameState(GameState):
                 self.ssfGame._SetState(MatchOverGameState(self.ssfGame, self._roundWinner))
         else:
             self.ssfGame._SetState(RoundBeginGameState(self.ssfGame))
-    
+            
     def StopGame(self):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
@@ -231,24 +218,98 @@ class RoundEndedGameState(GameState):
     def _IsMatchTie(self):
         return self.player1.numRoundWins == 2 and self.player2.numRoundWins == 2
 
+# Ties are sudden death - the first player to deliver a hit wins
 class SettleTieGameState(GameState):
     def __init__(self, ssfGame):
         GameState.__init__(self, ssfGame)
-        # TODO: Place player health back up to full
-        # TODO: Make sure all fire emitters are turned off 
+        # Turn off chip damage, only delivered attacks count...
+        self.ssfGame.chipDamageOn = False
         
-    # TODO: What does the SettleTieGameState look like...?
+        # A list of all active actions during this round
+        self._activeActions = []
+        
+        # Reset player health
+        self.ssfGame.player1.ResetHealth()
+        self.ssfGame.player2.ResetHealth()
+
+        # Turn off all the emitters
+        self.ssfGame.KillEmitters()
+        
+    # The tie breaker is almost the exact same as a typical match, however,
+    # whoever delivers the first hit wins...
+    def Tick(self, dT):
+        # Execute the actions (attacks, blocks, etc.)
+        self.ssfGame._ExecuteGameActions(dT, self._activeActions)
+        
+        # Check to see if any player is hurt - if anyone is hurt then it's game over
+        # for that player
+        player1IsHurt = self.ssfGame.player1.hitPoints < Player.MAX_HIT_POINTS
+        player2IsHurt = self.ssfGame.player2.hitPoints < Player.MAX_HIT_POINTS
+        
+        if player1IsHurt and player2IsHurt:
+            # OK... so this is pretty absurd, the tie is down to the fraction of
+            # a second, not really sure what to do here, both players truly deserve
+            # to win equally, so let's just ignore this and keep going
+            self.ssfGame.player1.ResetHealth()
+            self.ssfGame.player2.ResetHealth()
+            
+        elif player1IsHurt:
+            # Player 2 wins!!
+            self.ssfGame.chipDamageOn = True
+            self.ssfGame._SetState(MatchOverGameState(self.ssfGame, 2))
+        elif player2IsHurt:
+            # Player 1 wins!!
+            self.ssfGame.chipDamageOn = True
+            self.ssfGame._SetState(MatchOverGameState(self.ssfGame, 1))
+
+    def TogglePauseGame(self):
+        self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
+
+    def StopGame(self):
+        # Immediately end the game by going to the idle state...
+        self.ssfGame.chipDamageOn = True
+        self.ssfGame._SetState(IdleGameState(self.ssfGame))
+
+    def UpdateWithHeadsetData(self, p1HeadsetData, 
+                              p2HeadsetData, dT, timeStamp):
+        # TODO: What do we do with head set data??
+        pass
+                              
+    def UpdateWithGloveData(self, p1LGloveData, p1RGloveData, 
+                            p2LGloveData, p2RGloveData, dT, timeStamp):
+        self.ssfGame.gestureRecognizer.UpdateWithGloveData(p1LGloveData, p1RGloveData, \
+                                                           p2LGloveData, p2RGloveData, \
+                                                           dT, timeStamp)
 
 class MatchOverGameState(GameState):
     def __init__(self, ssfGame, winnerPlayerNum):
+        assert(winnerPlayerNum == 1 or winnerPlayerNum == 2)
         GameState.__init__(self, ssfGame)
         self.winnerPlayerNum = winnerPlayerNum
         
     def Tick(self, dT):
+        # TODO: Make all the fire emitters shoot flames for the player??
+        # Do something here!!
+        
+        self.ssfGame._SetState(IdleGameState(self.ssfGame))
         pass
     
     def StopGame(self):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
-         
+
+class PausedGameState(GameState):
+    def __init__(self, ssfGame, statePaused):
+        assert(statePaused != None)
+        GameState.__init__(self, ssfGame)
+        self._statePaused = statePaused
+ 
+    def TogglePauseGame(self):
+        # Unpause the game - go back to the state we paused on...
+        self.ssfGame._SetState(self._statePaused)
+
+    def StopGame(self):
+        # Immediately end the game by going to the idle state...
+        self.ssfGame._SetState(IdleGameState(self.ssfGame))
+    
     

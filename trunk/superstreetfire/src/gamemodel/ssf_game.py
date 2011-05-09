@@ -19,6 +19,7 @@ class SSFGame:
         # There are two players, facing off against each other
         self.player1 = player.Player(1)
         self.player2 = player.Player(2)
+        self.chipDamageOn = True
 
         self.roundNumber = 1
         
@@ -31,12 +32,15 @@ class SSFGame:
             self.rightEmitters.append(FireEmitter(i, FireEmitter.RIGHT_ARC))
 
     def Reset(self):
+        self.ssfGame.chipDamageOn = True
         self.player1.Reset()
         self.player2.Reset()
+        self.KillEmitters()
+    
+    def KillEmitters(self):
         for leftEmitter, rightEmitter in self.leftEmitters, self.rightEmitters:
             leftEmitter.Reset()
             rightEmitter.Reset()
-    
     
     # These functions provide convenience, when accessing the fire emitter arc lists:
     # The emitters are, by default, layed out from player 1's perspective so 
@@ -83,8 +87,14 @@ class SSFGame:
         self.state.UpdateWithGloveData(p1LGloveData, p1RGloveData, p2LGloveData, \
                                        p2RGloveData, dT, timeStamp)
     
-    def Hurt(self, playerNum, dmgAmt):
+    def Hurt(self, playerNum, dmgAmt, isChipDmg):
         assert(playerNum == 1 or playerNum == 2)
+        
+        # If chip damage is disabled and the damage being dealt
+        # is chip damage then we ignore it
+        if isChipDmg and not self.chipDamageOn:
+            return
+        
         if playerNum == 1:
             self.player1.DoDamage(dmgAmt)
         else:
@@ -95,4 +105,28 @@ class SSFGame:
     def _SetState(self, gameState):
         assert(gameState != None)
         self.state = gameState
+    
+    def _ExecuteGameActions(self, dT, actionsQueue):
+        # Check for any newly recognized gestures, execute any that get found
+        if self.gestureRecognizer.HasNewActionsAvailable():
+            newActions = self.gestureRecognizer.PopActions()
+            assert(len(newActions) > 0)
+            
+            # Initialize all the new actions
+            for action in newActions:
+                action.Initialize(self)
+            actionsQueue.extend(newActions)
+            
+        # Tick any actions (e.g., attacks, blocks) that are currently active within the game
+        # This will update the state of the fire emitters and the game in general
+        actionsToRemove = []
+        for action in actionsQueue:
+            if action.IsFinished():
+                actionsToRemove.append(action)
+            else:
+                action.Tick(self, dT)
+        
+        # Clear up all finished actions
+        for action in actionsToRemove:
+            actionsQueue.remove(action)
     
