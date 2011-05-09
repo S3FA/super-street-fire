@@ -22,6 +22,7 @@ class Player:
     def Reset(self):
         self.ResetHealth()
         self.numRoundWins = 0
+        self.isInvincible = False
     
     def ResetHealth(self):
         self.hitPoints = Player.MAX_HIT_POINTS
@@ -30,6 +31,8 @@ class Player:
         return (self.hitPoints <= 0)
     
     def DoDamage(self, hpDamage):
+        if self.isInvincible:
+            return
         self.hitPoints -= hpDamage
         self._logger.debug("Player " + str(self.playerNum) + " has been damaged (damage amt = " + \
                            str(hpDamage) + ", life left = " + str(self.hitPoints) + ")")
