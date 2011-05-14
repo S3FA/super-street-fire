@@ -9,7 +9,7 @@ d) Store the high-level objects on the receiver queues of the ReceiverQueueMgr
 
 @author: Callum Hay
 '''
-
+import logging
 import re
 import sys
 import string
@@ -17,6 +17,8 @@ import struct
 from collections import deque
 from client_datatypes import GloveData, HeadsetData, PLAYER_ONE, PLAYER_TWO
 
+log = logging.getLogger('parser')
+    
 # look guys, no wires!
 def ParseWirelessData(xbeePacket, queueMgr):
     #print xbeePacket
@@ -97,7 +99,7 @@ def GloveParser(player, hand, bodyStr):
     # Get out of here immediately if there's a mismatch of the expected data
     # for the glove.
     if len(blocks) < 3:
-        print "Unexpected format in glove parser input, no match."
+        log.error( "Unexpected format in glove parser input, no match." )
         return None
     
     head = string.split(blocks[0],",")
@@ -114,8 +116,8 @@ def GloveParser(player, hand, bodyStr):
         #print 'GloveData setup %s ' % (str(gloveData))
         return gloveData
     except: 
-        print "Glove data error:", sys.exc_info()[0]
-        
+        log.error( "Glove data error " + str(blocks) )
+    
     return None
 
 def HeadsetParser(player, bodyStr):
