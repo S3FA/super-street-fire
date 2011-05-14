@@ -40,6 +40,9 @@ class FireOffState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
         
+    def  __str__(self):
+        return 'FireOffState' 
+
     def StartState(self):
         self._logger.debug("Entering Fire Off State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
@@ -79,6 +82,9 @@ class BlockedFireState(FireState):
         self._nextState = nextState
         self._elapsedAtkTimeBeforeBlk = elapsedAtkTimeBeforeBlk
         
+    def  __str__(self):
+        return 'BlockedFireState' 
+
     def StartState(self):
         self._logger.debug("Entering Blocking State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
@@ -107,6 +113,9 @@ class P1AttackFireOnState(FireState):
         FireState.__init__(self, fireEmitter)
         self._prevAtkTime = prevAtkTime
         
+    def  __str__(self):
+        return 'P1AttackFireOnState' 
+
     def StartState(self):
         self._startStateTime = time.time()
         self._logger.debug("Entering Player 1 Attack Fire On State (Emitter: " + \
@@ -150,6 +159,9 @@ class P2AttackFireOnState(FireState):
     def __init__(self, fireEmitter, prevAtkTime):
         FireState.__init__(self, fireEmitter)
         self._prevAtkTime = prevAtkTime
+
+    def  __str__(self):
+        return 'P2AttackFireOnState' 
 
     def StartState(self):
         self._startStateTime = time.time()
@@ -198,6 +210,9 @@ class P1AndP2AttackFireOnState(FireState):
         self._prevP1AtkTime = prevP1AtkTime
         self._prevP2AtkTime = prevP2AtkTime
 
+    def  __str__(self):
+        return 'P1AndP2AttackFireOnState' 
+
     def StartState(self):
         self._startStateTime = time.time()
         self._logger.debug("Entering Player 1 and Player 2 Attack Fire On State (Emitter: " + \
@@ -244,6 +259,9 @@ class P1BlockFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
 
+    def  __str__(self):
+        return 'P1BlockFireOnState' 
+
     def StartState(self):
         self._logger.debug("Entering Player 1 Block Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
@@ -272,6 +290,9 @@ class P1BlockFireOnState(FireState):
 class P2BlockFireOnState(FireState):
     def __init__(self, fireEmitter):
         FireState.__init__(self, fireEmitter)
+
+    def  __str__(self):
+        return 'P2BlockFireOnState' 
 
     def StartState(self):
         self._logger.debug("Entering Player 2 Block Fire On State (Emitter: " + \
@@ -310,6 +331,9 @@ class P1AttackAndBlockFireOnState(FireState):
         FireState.__init__(self, fireEmitter)
         self._prevAtkTime = prevAtkTime
         
+    def  __str__(self):
+        return 'P1AttackAndBlockFireOnState' 
+
     def StartState(self):
         self._stateStartTime = time.time()
         self._logger.debug("Entering Player 1 Attack and Block Fire On State (Emitter: " + \
@@ -353,6 +377,9 @@ class P2AttackAndBlockFireOnState(FireState):
     def __init__(self, fireEmitter, prevAtkTime):
         FireState.__init__(self, fireEmitter)
         self._prevAtkTime = prevAtkTime
+
+    def  __str__(self):
+        return 'P2AttackAndBlockFireOnState' 
 
     def StartState(self):
         self._stateStartTime = time.time()
