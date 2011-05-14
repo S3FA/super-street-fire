@@ -36,6 +36,10 @@ class FireEmitter:
         self.state        = FireOffState(self)
         self.Reset()
     
+    def  __str__(self):
+        return 'ardIdx=%d, arc=%s, on=%s, p1C=%s, p2C=%s, state=%s' % (self.arcIndex, 
+                self.arc, self.flameIsOn, self.p1ColourIsOn, self.p2ColourIsOn, self.state) 
+        
     def Reset(self):
         # The initial state is off, for obvious reasons
         self.Kill()
