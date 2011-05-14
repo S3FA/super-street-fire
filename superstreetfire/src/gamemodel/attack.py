@@ -73,6 +73,9 @@ class Attack(Action):
         self._leftAttackWindow  = None
         self._rightAttackWindow = None
     
+    def __str__(self):
+        return 'Attack:P' + str(self.playerNum) + ',T=' + str(self._currAttackTime)
+        
     def Initialize(self, ssfGame):
         assert(self._leftAttackWindow  == None)
         assert(self._rightAttackWindow == None)
