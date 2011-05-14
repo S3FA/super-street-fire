@@ -40,8 +40,8 @@ def RunActionLoop(game, actionList):
             print "Total time:", i._currBlockTime
 
 if __name__ == "__main__":
-    gestureRec = GestureRecognizer()
-    game = SSFGame(gestureRec)
+
+    game = SSFGame()
     
     p1LeftJab  = attack.BuildLeftJabAttack(1)
     p2LeftJab  = attack.BuildLeftJabAttack(2)
