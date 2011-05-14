@@ -13,10 +13,10 @@ import logging
 import ioserver.receiver 
 #import ioserver.receive_direct_serial
 #import ioserver.receive_from_file
+import gamemodel.game_states
 #from ioserver.client_emulator import ClientEmulator
 from ioserver.receiver_queue_mgr import ReceiverQueueMgr
 
-from gamemodel.gesture_recognizer import GestureRecognizer
 from gamemodel.ssf_game import SSFGame
 
 '''
@@ -31,8 +31,10 @@ if __name__ == '__main__':
 
     #snb: hate typing but didn't want to change the default..
     IN_PORT="/dev/slave"
+    NI_PORT="/dev/slave"
     if (os.name.find("nt") > -1):
-        IN_PORT = "COM5"
+        IN_PORT = "COM6"
+        NI_PORT = "COM6"
     
     # Parse options from the command line
     usageStr = "usage: %prog [options]"
@@ -43,7 +45,7 @@ if __name__ == '__main__':
                          default=IN_PORT)
     argParser.add_option("-o", "--output_port", action="store", type="string", dest="outputPort", \
                          help="The serial port name/number that sends output to clients. [%default]", \
-                         default="/dev/slave")
+                         default=NI_PORT)
     argParser.add_option("-f", "--frequency", action="store", type="int", dest="frequency", \
                          help="The simulation tick frequency. [%default]", default=50)    
     #argParser.add_option("-b", "--baud_rate", action="store", type="int", dest="baudRate", \
@@ -59,8 +61,10 @@ if __name__ == '__main__':
                     filemode='w')
     # create console handler with a higher log level, add it to the root logger
     ch = logging.StreamHandler()
-    ch.setLevel(logging.WARN)
+    ch.setLevel(logging.INFO)
     logging.getLogger('').addHandler(ch)
+    
+    receiverObj = None
 
     # Error checking on the command line input parameters
     if options.frequency <= 0:
@@ -89,13 +93,9 @@ if __name__ == '__main__':
         receiverObj = ioserver.receiver.Receiver(options.inputPort, DEFAULT_BAUDRATE)
         
         #print "Running receiver with file input ..."
-        #receiver = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
+        #receiverObj = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
         #print "Running receiving with direct serial connection .."
         #receiver = ioserver.receive_direct_serial.LineReceiver(receiverQueueMgr, options.inputPort, DEFAULT_BAUDRATE)
-
-        #TODO
-        #sender = ioserver.sender.Sender(options.outputPort, DEFAULT_BAUDRATE)
-        
         
         # TODO: Move time stuff into the gamemodel...
         
@@ -114,6 +114,9 @@ if __name__ == '__main__':
         # TODO: What the heck is our calibration data and where does it come from?
         ssfGame = SSFGame()
         
+        # Jump straight to the round-in-play for testing
+        ssfGame._SetState(gamemodel.game_states.RoundInPlayGameState(ssfGame))
+
         while True:
             
             # Keep track of a delta time for each frame, this will be used to 
@@ -139,11 +142,9 @@ if __name__ == '__main__':
             
             ssfGame.Tick(deltaFrameTime)
             
-            # TODO: Now that the simulation has iterated, grab
-            # any resulting outputs to actuator clients (i.e., fire, lights, etc.)
-            # and place them on the sender queues
-            
-            #...
+            # looking at the emitter states from the P1 perspective
+            # send the full state to the wifire board
+            receiverObj.SendFireEmitterData(ssfGame.GetLeftEmitterArc(1), ssfGame.GetRightEmitterArc(1))
             
             # Sync to the specified frequency
             if deltaFrameTime < FIXED_FRAME_TIME:
@@ -156,7 +157,7 @@ if __name__ == '__main__':
         traceback.print_exc()
 
     #KillEverything([receiverThread])
-    receiverObj.Kill()
+    if receiverObj != None: receiverObj.Kill()
     #sender.Kill()
     print "Exiting..."
     
