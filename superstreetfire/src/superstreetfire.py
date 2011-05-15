@@ -29,12 +29,9 @@ def KillEverything(threadList):
 
 if __name__ == '__main__':
 
-    #snb: hate typing but didn't want to change the default..
     IN_PORT="/dev/slave"
-    NI_PORT="/dev/slave"
     if (os.name.find("nt") > -1):
         IN_PORT = "COM6"
-        NI_PORT = "COM6"
     
     # Parse options from the command line
     usageStr = "usage: %prog [options]"
@@ -43,13 +40,8 @@ if __name__ == '__main__':
     argParser.add_option("-i", "--input_port", action="store", type="string", dest="inputPort", \
                          help="The serial port name/number that provides input from clients. [%default]", \
                          default=IN_PORT)
-    argParser.add_option("-o", "--output_port", action="store", type="string", dest="outputPort", \
-                         help="The serial port name/number that sends output to clients. [%default]", \
-                         default=NI_PORT)
     argParser.add_option("-f", "--frequency", action="store", type="int", dest="frequency", \
                          help="The simulation tick frequency. [%default]", default=50)    
-    #argParser.add_option("-b", "--baud_rate", action="store", type="int", dest="baudRate", \
-    #                     help="The serial port baud rate defaults to 57600.", default=57600)
 
     (options, args) = argParser.parse_args()
     
