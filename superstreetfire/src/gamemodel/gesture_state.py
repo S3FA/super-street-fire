@@ -11,6 +11,7 @@ Super Street Fire game.
 '''
 import time
 import logging
+import pygame  # http://www.pygame.org/download.shtml
 from collections import deque
 from action import Action
 import attack
@@ -39,7 +40,7 @@ BLOCK_RELEASE_ANGLE = 45
 TIME_BETWEEN_MOVES = 0.1
 
 class GestureState: 
-    LOGGER_NAME = 'gesture_state'
+    LOGGER_NAME = 'gestures'
     
     # High-level attack/defend gesture enumeration values
     NO_GESTURE                  = 0
@@ -61,6 +62,15 @@ class GestureState:
         self.gestureRecognizer = gestureRecognizer
         self.playerNum         = playerNum
         self._changeStateFunc  = None
+        
+        # probably not the right place to set these up.. 
+        pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=2042)
+        # files are relative to "main" entry point: superstreetfire.py
+        self.blockSound = pygame.mixer.Sound('../sounds/Hit-impact/Block.wav')
+        self.jabSound = pygame.mixer.Sound('../sounds/Hit-impact/Punch-jab.wav')
+        self.hookSound = pygame.mixer.Sound('../sounds/Hit-impact/Punch-fierce.wav')
+        self.hadokenSound = pygame.mixer.Sound('../sounds/Character-speech/Hadoken.wav')
+        self.sonicboomSound = pygame.mixer.Sound('../sounds/Character-speech/Sonic-boom.wav')
         
         # Set the state change function based on the player number...
         if playerNum == 1:
@@ -128,15 +138,15 @@ class GestureState:
                 rGlove.heading[PITCH] > 45 and rGlove.heading[ROLL] > 45):
                 newMove = GestureState.HADOUKEN_ATTACK_GESTURE
             
-            if (newMove > -1): self._logger.info( 'BOTH:' + str(newMove)) 
+            #if (newMove > -1): self._logger.info( 'BOTH:' + str(newMove)) 
 
         if (newMove == -1 and lGlove != None):
             newMove = self.getHandedMove(prevMove, player, player.left)
-            if (newMove > -1): self._logger.info( 'L:' + str(newMove)) 
+            #if (newMove > -1): self._logger.info( 'L:' + str(newMove)) 
 
         if (newMove == -1 and rGlove != None):  
             newMove = self.getHandedMove(prevMove, player, player.right)
-            if (newMove > -1): self._logger.debug( 'R:' + str(newMove)) 
+            #if (newMove > -1): self._logger.debug( 'R:' + str(newMove)) 
 
         # do we consider this a new/valid gesture?
         deltaMoveTime = time.time()-player.lastMoveTs
@@ -165,22 +175,27 @@ class GestureState:
             hand = Action.LEFT_AND_RIGHT_SIDES
             #return a block..
             if (newMove >= 100):
+                self.blockSound.play()
                 hand = newMove - 100
-                print ' --- BLOCK ! --- '
+                print ' --- BLOCK ! --- ' + str(hand)
                 return block.Block(playerState.playerNum, hand, playerState.power, 5)
             
             # print some debug info on what kind of attack this was:
             if (newMove >= 10):
+                self.hadokenSound.play()
                 print ' *** ATTACK ! *** HADOUKEN '
                 return attack.BuildHadoukenAttack(playerState.playerNum)
             
             if (newMove >= 3): 
-                print ' *** ATTACK ! *** HOOK '
+                self.hookSound.play()
                 hand = newMove - 3
+                print ' *** ATTACK ! *** HOOK ' + str(hand)
                 return attack.Attack(playerState.playerNum, hand, newMove, playerState.power, 5)
                 
-            print ' *** ATTACK ! *** JAB '
+            # standard jab punch attack
             hand = newMove - 1
+            self.jabSound.play()
+            print ' *** ATTACK ! *** JAB ' + str(hand)
             return attack.Attack(playerState.playerNum, hand, newMove, playerState.power, 5)
             
 
