@@ -15,12 +15,23 @@ from ssf_moves import *
 
 grad2rad = 3.141592/180.0
 
+ports = ('COM5','COM6','COM3')
+
 # Check your COM port and baud rate
-ser = serial.Serial( port='COM5',baudrate=57600 )
-xbee = ZigBee(ser, escaped=True)
+for port in ports:
+    try:
+        ser = serial.Serial( port=port,baudrate=57600 )
+        xbee = ZigBee(ser, escaped=True)
+        break
+    except serial.serialutil.SerialException:
+        pass
+
+if xbee == None: 
+    print "unable to find the xbee serial line.. "
+    exit
 
 # Main scene
-scene=display(title="9DOF Razor IMU test")
+scene=display(title="Super Street Fire gesture test")
 scene.range=(1.2,1.2,1.2)
 scene.forward = (1,0,-0.25)
 scene.up=(0,0,1)
@@ -63,7 +74,7 @@ arrow(color=color.green,axis=(1,0,0), shaftwidth=0.02, fixedwidth=1)
 arrow(color=color.green,axis=(0,-1,0), shaftwidth=0.02 , fixedwidth=1)
 arrow(color=color.green,axis=(0,0,-1), shaftwidth=0.02, fixedwidth=1)
 # labels
-label(pos=(0,0,0.8),text="9DOF Razor IMU test",box=0,opacity=0)
+label(pos=(0,0,0.8),text="SSF Razor IMU test",box=0,opacity=0)
 label(pos=(1,0,0),text="X",box=0,opacity=0)
 label(pos=(0,-1,0),text="Y",box=0,opacity=0)
 label(pos=(0,0,-1),text="Z",box=0,opacity=0)
@@ -86,7 +97,11 @@ pGyro = ( collections.deque(), collections.deque() )
 dAXT = ( collections.deque(list(), 5), collections.deque(list(), 5) )
 dAYT = ( collections.deque(list(), 5), collections.deque(list(), 5) )
 dAZT = ( collections.deque(list(), 5), collections.deque(list(), 5) )
+dGXT = ( collections.deque(list(), 5), collections.deque(list(), 5) )
+dGYT = ( collections.deque(list(), 5), collections.deque(list(), 5) )
+dGZT = ( collections.deque(list(), 5), collections.deque(list(), 5) )
 avA = ( list(), list() )
+avG = ( list(), list() )
 dH = ()
 dA = ()
 dG = ()
@@ -107,7 +122,7 @@ i = 0
 
 # after x seconds, break
 # base calibration takes ~5seconds
-while elapsed < 6: 
+while elapsed < 26: 
     now = time.time();
     elapsed = now-start;
 
@@ -164,7 +179,6 @@ while elapsed < 6:
                 continue
 
     
-            dG  = tuple(map(operator.sub, pGyro[glove][0], pGyro[glove][-1] ))
             dA  = tuple(map(operator.sub, pAcc[glove][0], pAcc[glove][-1] ))
             dAXT[glove].appendleft(dA[x])
             dAYT[glove].appendleft(dA[y])
@@ -175,6 +189,17 @@ while elapsed < 6:
             avA[glove].insert(0, ( float(sum(dAXT[glove])) / len(dAXT[glove]),
                     float(sum(dAYT[glove])) / len(dAYT[glove]),
                     float(sum(dAZT[glove])) / len(dAZT[glove])) )
+              
+            dG  = tuple(map(operator.sub, pGyro[glove][0], pGyro[glove][-1] ))
+            dGXT[glove].appendleft(dG[x])
+            dGYT[glove].appendleft(dG[y])
+            dGZT[glove].appendleft(dG[z])
+    
+            # smooth out the acceleration
+            # average the delta A - over "n" ~5 items 
+            avG[glove].insert(0, ( float(sum(dGXT[glove])) / len(dGXT[glove]),
+                    float(sum(dGYT[glove])) / len(dGYT[glove]),
+                    float(sum(dGZT[glove])) / len(dGZT[glove])) )
               
             
             # slightly less than raw data
@@ -193,13 +218,15 @@ while elapsed < 6:
     
             # detect move from headings, delta gyros and average acceleration 
             players[playerId].setupData(gloveId, (pR[glove][-1],pP[glove][-1],pY[glove][-1]), dG, avA[glove][0])
-
-            ssf.determineMove(players[playerId])            
-            # print current move (if changed)
-            move = SSFPlayer.showMove(players[playerId])
-            if move != "" and (now - lastmovets) > 0.325:
-                print "\n -- %s -- \n" % (move)
-                lastmovets = now;
+            
+            if players[playerId].bothHandsSet():
+                
+                ssf.determineMove(players[playerId])            
+                # print current move (if changed)
+                move = SSFPlayer.showMove(players[playerId])
+                if move != "" and (now - lastmovets) > 0.325:
+                    print "\n -- %s -- \n" % (move)
+                    lastmovets = now;
 
             if (nodeId == '1L'):
                 continue
@@ -240,9 +267,12 @@ f.close
 
 fig = plot.figure()
 ax = fig.add_subplot(111, projection='3d')
-acx = list(a[x] for a in avA[1])
-acy = list(a[y] for a in avA[1])
-acz = list(a[z] for a in avA[1])
-ax.plot(acx, acy, acz)
+#x = list(a[x] for a in avA[1])
+#y = list(a[y] for a in avA[1])
+#z = list(a[z] for a in avA[1])
+x = list(a[x] for a in avG[1])
+y = list(a[y] for a in avG[1])
+z = list(a[z] for a in avG[1])
+ax.plot(x, y, z)
 #ax.plot(pR, pP, pY)
 plot.show()
