@@ -16,7 +16,11 @@ The data is four streams of x-y-z or roll-pitch-yaw:
 
 For any real testing, (as of May 1st) the game is processing wireless input and throwing it into the gesture state machine.
 
-*TODO:* make sure those moves are turned into the right state!
+=== Sound effects added ===
+
+Using pygame.mixer and some theme sound effects, there's now audio feedback when the GloveData sets the attack/block state. 
+
+Pretty useful for testing!
 
 === What makes a move? ===
 
@@ -34,6 +38,10 @@ To make the simplest definition possible - detect the more complicated of simila
 
 === I/O ===
 
-All the data goes through the sender/receiver modules. Pretty simple stuff.
+Now all the data goes through the Receiver module. Which means I should probably rename it "IOChannel" or something.
 
-*TODO:* output the fire state bytes. 
+On each tick, the incoming data is parsed (parser module) and creates GloveData objects.
+
+At the end of the tick process, all fire emitter states are all queried and sent to the xbee (fake address for now).
+
+ 
