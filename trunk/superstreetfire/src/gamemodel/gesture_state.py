@@ -134,12 +134,12 @@ class GestureState:
             #if (newMove > -1): self._logger.info( 'BOTH:' + str(newMove)) 
 
         if (newMove == -1 and lGlove != None):
-            newMove = self.getHandedMove(prevMove, player, player.left)
-            #if (newMove > -1): self._logger.info( 'L:' + str(newMove)) 
+            newMove = self.getHandedMove(prevMove, player, lGlove)
+            if (newMove > -1): self._logger.info( 'L:' + str(newMove)) 
 
         if (newMove == -1 and rGlove != None):  
-            newMove = self.getHandedMove(prevMove, player, player.right)
-            #if (newMove > -1): self._logger.debug( 'R:' + str(newMove)) 
+            newMove = self.getHandedMove(prevMove, player, rGlove)
+            if (newMove > -1): self._logger.debug( 'R:' + str(newMove)) 
 
         # do we consider this a new/valid gesture?
         deltaMoveTime = time.time()-player.lastMoveTs
@@ -180,7 +180,7 @@ class GestureState:
                 return attack.BuildHadoukenAttack(playerState.playerNum)
             
             if (newMove >= 3): 
-                sounds.punchFierceSounds.play()
+                sounds.punchFierceSound.play()
                 hand = newMove - 3
                 print ' *** ATTACK ! *** HOOK ' + str(hand)
                 return attack.Attack(playerState.playerNum, hand, newMove, playerState.power, 5)
