@@ -28,8 +28,8 @@ class Receiver:
     LOGGER_NAME = 'xbee-tx'
 
     #sample xbee address
-    p1leftAddrL = ('\x00\x13\xa2\x00@i\n4')
-    p1LeftAddrS = ('M{')
+    p1leftAddrL = '\x00\x13\xa2\x00\x40\x69\x0a\x35'
+    p1leftAddrS = '\x00\x13'
 
     def __init__(self, inputSerialPort, baudRate):
         self.serialIn    = None
@@ -44,8 +44,7 @@ class Receiver:
             print "************ Killing XBee IO Thread ****************"
             exit(-1)    
         
-        self.addrL = struct.unpack(">q", Receiver.p1leftAddrL)[0]
-        self.addrS = struct.unpack(">h", Receiver.p1LeftAddrS)[0]
+        self.addrL = struct.unpack(">Q", Receiver.p1leftAddrL)[0]
 
         print "Running xbee io thread... fake wifire addr setup:%s" % (self.addrL)
 
@@ -57,12 +56,12 @@ class Receiver:
             return
         
         try:
+        
             # Write data to the xbee->wifire interpreter
-            self.xbee.send('tx', dest_addr_long=self.addrL, \
-                           data=fireEmitterData);            
+            self.xbee.send('tx', dest_addr=Receiver.p1leftAddrS, dest_addr_long=Receiver.p1leftAddrL, data=fireEmitterData);            
         except TypeError:
-            #print 'Type error on xbee sender '
-            pass
+            print 'Type error on xbee sender '
+            #pass
         
 
         
