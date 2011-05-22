@@ -131,66 +131,68 @@ class GestureState:
                 rGlove.heading[PITCH] > 45 and rGlove.heading[ROLL] > 45):
                 newMove = GestureState.HADOUKEN_ATTACK_GESTURE
             
-            #if (newMove > -1): self._logger.info( 'BOTH:' + str(newMove)) 
+            if (newMove > -1): 
+                #self._logger.info( 'BOTH:' + str(newMove)) 
+                # ensure we record a return to "No Gesture" base state. 
+                self.recordMove( newMove, player.lastMoveTs )
 
-        if (newMove == -1 and lGlove != None):
+        if (lGlove != None):
             newMove = self.getHandedMove(prevMove, player, lGlove)
-            if (newMove > -1): self._logger.info( 'L:' + str(newMove)) 
+            if (newMove > -1): 
+                # ensure we record a return to "No Gesture" base state. 
+                #self._logger.info( 'L:' + str(newMove)) 
+                self.recordMove( newMove, player.lastMoveTs )
 
-        if (newMove == -1 and rGlove != None):  
+        if (rGlove != None):  
             newMove = self.getHandedMove(prevMove, player, rGlove)
-            if (newMove > -1): self._logger.debug( 'R:' + str(newMove)) 
-
-        # do we consider this a new/valid gesture?
-        deltaMoveTime = time.time()-player.lastMoveTs
-        if (newMove > -1):
-            # same move, or not enough time elapsed.. do nothing
-            if (newMove == prevMove):
-                self._logger.info( 'Same move; ' + str(prevMove)) 
-                return 0
-            if (deltaMoveTime < TIME_BETWEEN_MOVES):
-                self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime)) 
-                return 0
-            
-            # ensure we record a return to "No Gesture" base state. 
-            self.recordMove( newMove )
+            if (newMove > -1): 
+                #self._logger.debug( 'R:' + str(newMove)) 
+                self.recordMove( newMove, player.lastMoveTs )
 
         return newMove
             
        
     def _interpretState(self, playerState):
         prevMove = None
-        if (len(playerState.moves) > 0): prevMove = playerState.moves[-1]
+        if (len(playerState.allMoves) > 0): prevMove = playerState.allMoves[-1]
         
-        newMove = self._determineMove(prevMove, playerState)
-        if (newMove > 0):
+        self._determineMove(prevMove, playerState)
+        
+        for newMove in playerState.moves:
             self._logger.info( 'Gesture state change; ' + str(playerState)) 
-            hand = Action.LEFT_AND_RIGHT_SIDES
             #return a block..
             if (newMove >= 100):
                 sounds.blockSound.play()
                 hand = newMove - 100
                 print ' --- BLOCK ! --- ' + str(hand)
-                return block.Block(playerState.playerNum, hand, playerState.power, 5)
+                playerState._changeStateFunc(block.Block(playerState.playerNum, hand, playerState.power, 5))
             
             # print some debug info on what kind of attack this was:
             if (newMove >= 10):
                 sounds.hadouken.play()
                 print ' *** ATTACK ! *** HADOUKEN '
-                return attack.BuildHadoukenAttack(playerState.playerNum)
+                playerState._changeStateFunc(attack.BuildHadoukenAttack(playerState.playerNum))
             
-            if (newMove >= 3): 
+            if (newMove == 3 or newMove == 4): 
                 sounds.punchFierceSound.play()
-                hand = newMove - 3
-                print ' *** ATTACK ! *** HOOK ' + str(hand)
-                return attack.Attack(playerState.playerNum, hand, newMove, playerState.power, 5)
+                print ' *** ATTACK ! *** HOOK ' + str(newMove)
+                if (newMove == 3): 
+                    playerState._changeStateFunc(attack.BuildLeftHookAttack(playerState.playerNum))
+                else:
+                    playerState._changeStateFunc(attack.BuildRightHookAttack(playerState.playerNum))
                 
-            # standard jab punch attack
-            hand = newMove - 1
-            sounds.punchJabSound.play()
-            print ' *** ATTACK ! *** JAB ' + str(hand)
-            return attack.Attack(playerState.playerNum, hand, newMove, playerState.power, 5)
-            
+            if (newMove == 1 or newMove == 2):
+                # standard jab punch attack
+                sounds.punchJabSound.play()
+                print ' *** ATTACK ! *** JAB ' + str(newMove)
+                if (newMove == 1): 
+                    playerState._changeStateFunc(attack.BuildLeftJabAttack(playerState.playerNum))
+                else:
+                    playerState._changeStateFunc(attack.BuildRightJabAttack(playerState.playerNum))
+
+        # done.. 
+        playerState.moves.clear()
+
 
 class PlayerGestureState(GestureState):
     
@@ -202,15 +204,27 @@ class PlayerGestureState(GestureState):
         self.right = None
         #store some history - the past 6 moves.
         self.moves = deque(list(), 6)
+        self.allMoves = list()
         # store a "power" of movement (i.e. higher acceleration, greater power)
         self.power = 1
         
     def __str__(self):
         return 'GestureState P' + str(self.playerNum) + ' dMoveTs=' + str(self.lastMoveTs)
 
-    def recordMove(self, move):
+    def recordMove(self, move, lastTs):
+        # do we consider this a new/valid gesture?
+        deltaMoveTime = time.time()-lastTs
+        # same move, or not enough time elapsed.. do nothing
+        if (len(self.allMoves) > 0 and move == self.allMoves[-1]):
+            self._logger.info( 'Same move; ' + str(move)) 
+            return 
+        if (deltaMoveTime < TIME_BETWEEN_MOVES):
+            self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime)) 
+            return
+            
         # record the move value, and reset all the data
         self.moves.append(move)
+        self.allMoves.append(move)
         self.lastMoveTs = time.time()
         self.left = None
         self.right = None
@@ -221,19 +235,13 @@ class PlayerGestureState(GestureState):
         if (leftGloveData == None and rightGloveData == None): return
         
         if (leftGloveData != None):
-            self._logger.debug(str(timeStamp-self.lastMoveTs) + " L:"+ str(leftGloveData) )
             self.left = leftGloveData
             
         if (rightGloveData != None):
-            self._logger.debug(str(timeStamp-self.lastMoveTs) + " R:" + str(rightGloveData) )
             self.right = rightGloveData
 
-        
-        action = None
-        if (self.left != None or self.right != None):
+        self._logger.debug(str(self.playerNum)+"-left:" + str(self.left) + "-right:" + str(self.right) )
+        if (self.left != None and self.right != None):
             #print "got some data for both hands " % ( self.left, self.right )
-            action = self._interpretState(self)
+            self._interpretState(self)
         
-        if (action != None):
-            self._logger.info("Send action to queue: " + str(action) )
-            self._changeStateFunc(action)
