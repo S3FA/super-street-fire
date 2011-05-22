@@ -117,7 +117,7 @@ class P1AttackFireOnState(FireState):
         return 'P1AttackFireOnState' 
 
     def StartState(self):
-        self._startStateTime = time.time()
+        self._stateStartTime = time.time()
         self._logger.debug("Entering Player 1 Attack Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOnWithColour(1)
@@ -164,7 +164,7 @@ class P2AttackFireOnState(FireState):
         return 'P2AttackFireOnState' 
 
     def StartState(self):
-        self._startStateTime = time.time()
+        self._stateStartTime = time.time()
         self._logger.debug("Entering Player 2 Attack Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOnWithColour(2)
@@ -214,7 +214,7 @@ class P1AndP2AttackFireOnState(FireState):
         return 'P1AndP2AttackFireOnState' 
 
     def StartState(self):
-        self._startStateTime = time.time()
+        self._stateStartTime = time.time()
         self._logger.debug("Entering Player 1 and Player 2 Attack Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOn()
