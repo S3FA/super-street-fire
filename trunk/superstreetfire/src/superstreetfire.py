@@ -29,7 +29,8 @@ def KillEverything(threadList):
 
 if __name__ == '__main__':
 
-    IN_PORT="/dev/slave"
+    # IN_PORT="/dev/slave"
+    IN_PORT = "/dev/tty.xbee"
     if (os.name.find("nt") > -1):
         IN_PORT = "COM6"
     
