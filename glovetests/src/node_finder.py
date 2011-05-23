@@ -1,5 +1,6 @@
 import serial
 from xbee import ZigBee
+from binascii import hexlify
 
 ser = serial.Serial('COM6', 57600)
 xbee = ZigBee(ser, escaped=True)
@@ -13,6 +14,8 @@ xbee.at(command='ND')
 nodefound = 0
 numnodes = 2
 
+# this currently works with a known number of nodes
+# maybe have it work with a timeout instead?
 while nodefound < numnodes:
     response = xbee.wait_read_frame()
     if response['id'] == 'at_response':
@@ -25,5 +28,5 @@ while nodefound < numnodes:
             wifirename = wifirename[:index]
             #where is hexlify ? 
             print "received node reply for node %s short %s long %s" \
-                % (wifirename, str(wifireaddrS), str(wifireaddr))
+                % (wifirename, hexlify(wifireaddrS), hexlify(wifireaddr))
             nodefound += 1
