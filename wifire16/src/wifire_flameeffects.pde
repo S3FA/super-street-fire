@@ -1,3 +1,24 @@
+/*
+
+super street fire - flame effect control system
+
+uses three wifire16 boards:
+  flame effects - player 1 color - player 2 color
+  
+the flame effect board has the xbee + mcu, the other boards are chained.
+
+reads 6 bytes to set all channels, writes one byte as a response.
+
+reads:
+  2 bytes for fire control:   16[x x x x x x x x][x x x x x x x x]1
+  2 bytes for player 1 color: 16[x x x x x x x x][x x x x x x x x]1
+  2 bytes for player 2 color: 16[x x x x x x x x][x x x x x x x x]1
+
+writes:
+  1 byte for armed status: + armed, - disarmed
+
+*/
+
 #include <SPI.h>
 
 // pin definitions
@@ -11,7 +32,11 @@
 #define bitFlip(x,n)  bitRead(x,n) ? bitClear(x,n) : bitSet(x,n)
 
 char c;
-byte r1 = 0, r2 = 0;
+
+// registers with state value
+byte r1 = 0, r2 = 0;  // flame effects
+byte r3 = 0, r4 = 0;  // player 1 color
+byte r5 = 0, r6 = 0;  // player 2 color
 
 // setup
 void setup() {
@@ -31,6 +56,10 @@ void setup() {
   digitalWrite(OEPIN, HIGH);
   c = SPI.transfer(0);
   c = SPI.transfer(0);
+  c = SPI.transfer(0);
+  c = SPI.transfer(0);
+  c = SPI.transfer(0);
+  c = SPI.transfer(0);
   digitalWrite(LATCHPIN, HIGH);
   digitalWrite(OEPIN, LOW);
   
@@ -38,51 +67,35 @@ void setup() {
   digitalWrite(ARMEDPIN, HIGH);
 
   // start the serial communication with the xbee
-  Serial.begin(38400);
+  Serial.begin(57600);
 
-/*
-  delay(1500);
-  Serial.print("+++");
-  delay(1500);
-  Serial.println("ATDNWICOORD");
-  delay(5000);
-*/
 }
 
 
 // main loop
 void loop() {
 
-  if(Serial.available()) {
-    c = Serial.read();
-    switch(c) {
-      case '0' : bitFlip(r1,0); break;
-      case '1' : bitFlip(r1,1); break;
-      case '2' : bitFlip(r1,2); break;
-      case '3' : bitFlip(r1,3); break;
-      case '4' : bitFlip(r1,4); break;
-      case '5' : bitFlip(r1,5); break;
-      case '6' : bitFlip(r1,6); break;
-      case '7' : bitFlip(r1,7); break;
-      case '8' : bitFlip(r2,0); break;
-      case '9' : bitFlip(r2,1); break;
-      case 'a' : bitFlip(r2,2); break;
-      case 'b' : bitFlip(r2,3); break;
-      case 'c' : bitFlip(r2,4); break;
-      case 'd' : bitFlip(r2,5); break;
-      case 'e' : bitFlip(r2,6); break;
-      case 'f' : bitFlip(r2,7); break;
-      case '?' : 
-        // load power on = low, off = high
-        digitalRead(ARMEDPIN) ? Serial.print("-") : Serial.print("+");
-        break;  
-    }
+  if(Serial.available() >= 6) {
+    r2 = Serial.read();
+    r1 = Serial.read();
+    r4 = Serial.read();
+    r3 = Serial.read();
+    r6 = Serial.read();
+    r5 = Serial.read();
     digitalWrite(LATCHPIN, LOW);
     digitalWrite(OEPIN, HIGH);
+    c = SPI.transfer(r5);
+    c = SPI.transfer(r6);
+    c = SPI.transfer(r3);
+    c = SPI.transfer(r4);
     c = SPI.transfer(r1);
     c = SPI.transfer(r2);
     digitalWrite(LATCHPIN, HIGH);
     digitalWrite(OEPIN, LOW);
+    
+    // send back armed state as confirmation
+    // load power on = low, off = high
+    digitalRead(ARMEDPIN) ? Serial.print("-") : Serial.print("+");
   }
   
 }
