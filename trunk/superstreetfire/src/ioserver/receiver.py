@@ -34,6 +34,7 @@ class Receiver:
     def __init__(self, inputSerialPort, baudRate):
         self.serialIn    = None
         self.xbee        = None
+        self.visualizer  = None
         
         try:
             self.serialIn = serial.Serial(inputSerialPort, baudrate=baudRate)
@@ -44,11 +45,24 @@ class Receiver:
             print "************ Killing XBee IO Thread ****************"
             exit(-1)    
         
+        try:
+            self.visualizer = serial.Serial('/dev/master', baudrate=57600)
+        
+        except serial.SerialException:
+            print "ERROR: Serial port /dev/master for visualizer was invalid/not found."
+        
         self.addrL = struct.unpack(">Q", Receiver.p1leftAddrL)[0]
 
         print "Running xbee io thread... fake wifire addr setup:%s" % (self.addrL)
 
     def _send(self, fireEmitterData):
+        
+        try:
+            self.visualizer.write(fireEmitterData)
+       
+        except:
+            pass
+        
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
             print "ERROR: Output port was invalid/not found, can not send."
@@ -56,9 +70,8 @@ class Receiver:
             return
         
         try:
-        
             # Write data to the xbee->wifire interpreter
-            self.xbee.send('tx', dest_addr=Receiver.p1leftAddrS, dest_addr_long=Receiver.p1leftAddrL, data=fireEmitterData);            
+            self.xbee.send('tx', dest_addr=Receiver.p1leftAddrS, dest_addr_long=Receiver.p1leftAddrL, data=fireEmitterData);                   
         except TypeError:
             print 'Type error on xbee sender '
             #pass
