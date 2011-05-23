@@ -30,7 +30,7 @@ class IdleGameState(GameState):
         GameState.__init__(self, ssfGame)
         # Make sure all of the game objects are in their natural, base state
         # (e.g., all emitters are off, players have full life, etc.)
-        ssfGame.Reset()
+        # ssfGame.Reset()
         
     def Calibrate(self):
         self.ssfGame._SetState(CalibrationGameState(self.ssfGame))
@@ -124,10 +124,10 @@ class RoundInPlayGameState(GameState):
         self._roundTime -= dT
         
         # Check to see if the current round is over...
-        if self.IsRoundOver():
+        # if self.IsRoundOver():
             # Switch states to the RoundEndedGameState
-            self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
-            return
+            # self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
+            # return
  
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))

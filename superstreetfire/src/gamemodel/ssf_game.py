@@ -32,7 +32,7 @@ class SSFGame:
             self.rightEmitters.append(FireEmitter(i, FireEmitter.RIGHT_ARC))
 
     def Reset(self):
-        self.ssfGame.chipDamageOn = True
+        self.chipDamageOn = True
         self.player1.Reset()
         self.player2.Reset()
         self.KillEmitters()
