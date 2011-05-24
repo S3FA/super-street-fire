@@ -44,7 +44,16 @@ class GloveData:
         self.hand = hand
         
     def __str__(self):
-        return "Rotation: " + str(self.rotation) + ", Acceleration: " + str(self.acceleration) + ", Heading: " + str(self.heading)
+        return "A: " + str(self.acceleration) + ", H: " + str(self.heading) + ",R: " + str(self.rotation)
+    
+    # delta/sub operator - GloveData must be from same player and hand
+    def __sub__(self, other):
+        assert(self.player == other.player)
+        assert(self.hand == other.hand)
+        # don't use delta for heading - it doesn't make sense
+        dR = tuple(map(operator.sub, self.rotation, other.rotation))
+        dA = tuple(map(operator.sub, self.acceleration, other.acceleration))
+        return GloveData(dR, dA, self.heading, self.player, self.hand) 
     
     # add operator - A GloveData may only be added to another GloveData with the 
     # same player and hand
@@ -60,7 +69,7 @@ class GloveData:
     # divide operator - A GloveData may only be divided by a scalar (int or float) value
     def __div__(self, other):
         rotDiv     = tuple(map(operator.div, self.rotation, (other, other, other)))
-        accelDiv   = tuple(map(operator.div, self.acceleration, (other, other, other)))
+        accelDiv   = tuple(map(operator.floordiv, self.acceleration, (other, other, other)))
         headingDiv = tuple(map(operator.div, self.heading, (other, other, other)))
         return GloveData(rotDiv, accelDiv, headingDiv, self.player, self.hand)
         
