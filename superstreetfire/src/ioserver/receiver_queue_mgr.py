@@ -16,16 +16,21 @@ import collections
 import threading
 
 class ReceiverQueueMgr:
+    # why is this value chosen?
     MAX_QUEUE_SIZE = 4
     
     def __init__(self):
-        self.p1LeftGloveQueue  = collections.deque()
-        self.p1RightGloveQueue = collections.deque()
+        self.p1LeftGloveQueue  = collections.deque(list(),ReceiverQueueMgr.MAX_QUEUE_SIZE)
+        self.p1RightGloveQueue = collections.deque(list(),ReceiverQueueMgr.MAX_QUEUE_SIZE)
         self.p1HeadsetQueue    = collections.deque()
+        self.p1RightGlove = None
+        self.p1LeftGlove = None
         
-        self.p2LeftGloveQueue  = collections.deque()
-        self.p2RightGloveQueue = collections.deque()
+        self.p2LeftGloveQueue  = collections.deque(list(),ReceiverQueueMgr.MAX_QUEUE_SIZE)
+        self.p2RightGloveQueue = collections.deque(list(),ReceiverQueueMgr.MAX_QUEUE_SIZE)
         self.p2HeadsetQueue    = collections.deque()
+        self.p2RightGlove = None
+        self.p2LeftGlove = None
         
         self.p1LeftGloveLock  = threading.Semaphore()
         self.p1RightGloveLock = threading.Semaphore()
@@ -37,12 +42,18 @@ class ReceiverQueueMgr:
     
     def PushP1LeftGloveData(self, data):
         self.p1LeftGloveLock.acquire()
-        self._PushQueueData(self.p1LeftGloveQueue, data)
+        if (self.p1LeftGlove == None):
+            self.p1LeftGlove = data
+        self._PushQueueData(self.p1LeftGloveQueue, data - self.p1LeftGlove)
+        self.p1LeftGlove = data
         self.p1LeftGloveLock.release()
         
     def PushP1RightGloveData(self, data):
         self.p1RightGloveLock.acquire()
-        self._PushQueueData(self.p1RightGloveQueue, data)
+        if (self.p1RightGlove == None):
+            self.p1RightGlove = data
+        self._PushQueueData(self.p1RightGloveQueue, data - self.p1RightGlove)
+        self.p1RightGlove = data
         self.p1RightGloveLock.release()
                 
     def PushP1HeadsetData(self, data):
@@ -52,12 +63,18 @@ class ReceiverQueueMgr:
         
     def PushP2LeftGloveData(self, data):
         self.p2LeftGloveLock.acquire()
-        self._PushQueueData(self.p2LeftGloveQueue, data)
+        if (self.p2LeftGlove == None):
+            self.p2LeftGlove = data
+        self._PushQueueData(self.p2LeftGloveQueue, self.p2LeftGlove.__sub__(data))
+        self.p2LeftGlove = data
         self.p2LeftGloveLock.release()
            
     def PushP2RightGloveData(self, data):
         self.p2RightGloveLock.acquire()
-        self._PushQueueData(self.p2RightGloveQueue, data)
+        if (self.p2RightGlove == None):
+            self.p2RightGlove = data
+        self._PushQueueData(self.p2RightGloveQueue, self.p2RightGlove.__sub__(data))
+        self.p2RightGlove = data
         self.p2RightGloveLock.release()
                 
     def PushP2HeadsetData(self, data):
@@ -114,24 +131,23 @@ class ReceiverQueueMgr:
         queue.append(data)
     
     def _PopQueueData(self, queue):
-        if len(queue) == 0:
+        if len(queue) < 2:
             #print "Tried to retrieve data from an empty receiver queue."
             return None
         else:
             # Average all of the data on the queue and return the result,
-            # emptying the entire queue in the process
-            
-            # print "Averaging and popping data"
+            #print "Averaging data "
             count    = len(queue)
-            avgValue = queue.popleft()
+            avgSum = queue.pop()
             for i in range(1, count):
-                avgValue += queue.popleft()
-
-            assert(avgValue != None)
+                avgSum += queue.pop()
+                
+            assert(avgSum != None)
             assert(count > 0)
             
-            avgValue = avgValue / count
-            return avgValue
+            av = avgSum/count
+            #print "count %d avg=%s" % (count, av)
+            return av
     
     
     
