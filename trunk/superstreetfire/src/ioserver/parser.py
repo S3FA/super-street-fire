@@ -21,7 +21,8 @@ log = logging.getLogger('parser')
     
 # look guys, no wires!
 def ParseWirelessData(xbeePacket, queueMgr):
-    #print xbeePacket
+    #print xbeePacket  
+    if (xbeePacket.has_key('rf_data') == False): return  
     #each frame starts with Node ID colon, ends with pipe.. e.g. 1L:x,x,x..|
     rfdata = xbeePacket['rf_data'].replace(' ','')
     #print 'rfdata:%s' % (rfdata)
