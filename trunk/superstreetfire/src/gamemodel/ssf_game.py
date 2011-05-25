@@ -5,6 +5,7 @@ ssf_game.py
 @author: Callum Hay
 '''
 
+import logging
 import player
 from game_states import IdleGameState
 from fire_emitter import FireEmitter
@@ -12,8 +13,11 @@ from gesture_recognizer import GestureRecognizer
 
 
 class SSFGame:
+    SSF_GAME_LOGGER = 'ssf_game_logger'
+    
     def __init__(self):
-        self.state = IdleGameState(self)
+        self._logger = logging.getLogger(SSFGame.SSF_GAME_LOGGER)
+        
         self.gestureRecognizer = GestureRecognizer()
         
         # There are two players, facing off against each other
@@ -31,6 +35,11 @@ class SSFGame:
             self.leftEmitters.append(FireEmitter(i, FireEmitter.LEFT_ARC))
             self.rightEmitters.append(FireEmitter(i, FireEmitter.RIGHT_ARC))
 
+        # Set the first state for the game
+        # NOTE: Always be sure to set the state LAST in the constructor since
+        # it might make use of members that belong to this object
+        self.state = IdleGameState(self)
+
     def Reset(self):
         self.chipDamageOn = True
         self.player1.Reset()
@@ -38,7 +47,8 @@ class SSFGame:
         self.KillEmitters()
     
     def KillEmitters(self):
-        for leftEmitter, rightEmitter in self.leftEmitters, self.rightEmitters:
+        self._logger.debug("Killing fire emitters")
+        for leftEmitter, rightEmitter in map(None, self.leftEmitters, self.rightEmitters):
             leftEmitter.Reset()
             rightEmitter.Reset()
     
@@ -55,7 +65,6 @@ class SSFGame:
             return self.rightEmitters
         else:
             return self.leftEmitters
-
 
     # Gets the winner of the game - if there is no winner -1 is returned,
     # if the game is a tie then 0 is returned.
@@ -93,6 +102,7 @@ class SSFGame:
         # If chip damage is disabled and the damage being dealt
         # is chip damage then we ignore it
         if isChipDmg and not self.chipDamageOn:
+            self._logger.debug("Attack landed while blocking - chip damage is off, no damage dealt")
             return
         
         if playerNum == 1:

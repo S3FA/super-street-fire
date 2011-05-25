@@ -34,7 +34,7 @@ class Player:
         if self.isInvincible:
             return
         self.hitPoints -= hpDamage
-        self._logger.warn("Player " + str(self.playerNum) + " has been damaged (damage amt = " + \
+        self._logger.debug("Player " + str(self.playerNum) + " has been damaged (damage amt = " + \
                            str(hpDamage) + ", life left = " + str(self.hitPoints) + ")")
         
 def GetOtherPlayerNum(playerNum):
