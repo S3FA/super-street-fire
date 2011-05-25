@@ -121,8 +121,8 @@ line = ''
 i = 0
 
 # after x seconds, break
-# base calibration takes ~5seconds
-while elapsed < 26: 
+# reset calibration takes ~5seconds
+while elapsed < 6: 
     now = time.time();
     elapsed = now-start;
 
@@ -155,6 +155,8 @@ while elapsed < 26:
             try:
                 playerId = int(nodeId[0]) # either 1/2
                 gloveId = nodeId[1] # either L/R
+                
+        
                 head = string.split(blocks[0],",")
                 gyros = string.split(blocks[1],",")
                 accel = string.split(blocks[2],",")
@@ -227,7 +229,7 @@ while elapsed < 26:
                 if move != "" and (now - lastmovets) > 0.325:
                     print "\n -- %s -- \n" % (move)
                     lastmovets = now;
-
+                    
             if (nodeId == '1L'):
                 continue
             # original sample code for the visualizer
@@ -267,12 +269,12 @@ f.close
 
 fig = plot.figure()
 ax = fig.add_subplot(111, projection='3d')
-#x = list(a[x] for a in avA[1])
-#y = list(a[y] for a in avA[1])
-#z = list(a[z] for a in avA[1])
-x = list(a[x] for a in avG[1])
-y = list(a[y] for a in avG[1])
-z = list(a[z] for a in avG[1])
+x = list(a[x] for a in avA[1])
+y = list(a[y] for a in avA[1])
+z = list(a[z] for a in avA[1])
+#x = list(a[x] for a in avG[1])
+#y = list(a[y] for a in avG[1])
+#z = list(a[z] for a in avG[1])
 ax.plot(x, y, z)
 #ax.plot(pR, pP, pY)
 plot.show()
