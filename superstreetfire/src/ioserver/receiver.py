@@ -13,8 +13,8 @@ ReceiverQueueMgr object.
 from xbee import ZigBee # http://code.google.com/p/python-xbee/
 import serial
 import parser
-import sys
-import struct
+import os
+import logging
 
 # Since the xbee library requires a non-member function for its callbacks, we
 # need to make the variables available to that function non-members as well...
@@ -32,9 +32,11 @@ class Receiver:
     p1leftAddrS = '\x00\x13'
 
     def __init__(self, inputSerialPort, baudRate):
+        self._logger = logging.getLogger(Receiver.LOGGER_NAME)
         self.serialIn    = None
         self.xbee        = None
         self.visualizer  = None
+        self.outputData  = None
         
         try:
             self.serialIn = serial.Serial(inputSerialPort, baudrate=baudRate)
@@ -46,20 +48,21 @@ class Receiver:
             exit(-1)    
         
         try:
-            self.visualizer = serial.Serial('/dev/master', baudrate=57600)
+            port = '/dev/master'
+            if (os.name.find("nt") > -1):
+                port = "COM1" # using virtual serial port driver for windows
+            self.visualizer = serial.Serial(port, baudrate=57600)
         
         except serial.SerialException:
-            print "ERROR: Serial port /dev/master for visualizer was invalid/not found."
+            print 'ERROR: Serial'+port+' for visualizer was invalid/not found.'
         
-        self.addrL = struct.unpack(">Q", Receiver.p1leftAddrL)[0]
-
-        print "Running xbee io thread... fake wifire addr setup:%s" % (self.addrL)
-
-    def _send(self, fireEmitterData):
+    def _send(self):
+        
+        fireEmitterData = self.outputData
+        self._logger.debug('sending fire emitter data ' + fireEmitterData)
         
         try:
             self.visualizer.write(fireEmitterData)
-       
         except:
             pass
         
@@ -103,8 +106,10 @@ class Receiver:
                     
         #print 'fire=%s,p1c=%s,p2c=%s' % (fire, p1c, p2c)
         dataset = ''.join(fire) + ':' + ''.join(p1c) + ':' + ''.join(p2c)
-        #print 'send wifire data=%s' % (dataset)
-        self._send( dataset )
+        if (self.outputData != dataset):
+            self.outputData = dataset
+            #print 'send wifire data=%s' % (dataset)
+            self._send()
         
     def Kill(self):
         if self.xbee != None:
