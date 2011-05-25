@@ -12,6 +12,7 @@ reads in bytes from the serial port in the same format that the wifire boards wi
 from visual import *
 import serial
 import sys
+import os
 from struct import unpack
 
 p0 = color.white
@@ -42,7 +43,10 @@ player.append(p)
 p = sphere(pos=(3,0,0), color=color.blue, radius=1)
 player.append(p)
 
-s = serial.Serial(port='/dev/slave', baudrate=57600)
+simPort = '/dev/slave'
+if (os.name.find("nt") > -1):
+    simPort = "COM2"
+s = serial.Serial(port=simPort, baudrate=57600)
 
 #rate(4)
 
@@ -53,6 +57,7 @@ p2colorstate = ''
 while True:
     if( s.inWaiting() >= 6 ):
         firestate, p1colorstate, p2colorstate = unpack(">HHH", s.read(6))
+        print firestate 
         for x in range(15,-1,-1):
             fireon = firestate & 1<<x
             p1on = p1colorstate & 1<<x
