@@ -40,6 +40,12 @@ class SSFMoves:
     
 
     def getHandedMove(self, prevMove, glove):
+        # uppercut - use accel + gyros twist, final position up
+        ## this move will need to be sampled over a longer time period? 
+        if (glove.heading[PITCH] > 50 and glove.acceleration[Z] > 200 and \
+            glove.rotation[X] > 200 ):
+            return "UPPERCUT"
+
         if (abs(glove.acceleration[X]) > HOOK_FWDACC_L1 and abs(glove.rotation[X]) > HOOK_LATGYR):
             # swinging punch - lateral movement
             if (abs(glove.acceleration[X]) > HOOK_FWDACC_L2 and abs(glove.rotation[X]) > 350):
@@ -47,14 +53,12 @@ class SSFMoves:
             return "HOOK1"
 
         # using the abs acceleration - punch is positive/negative during swing  
-        if (abs(glove.acceleration[X]) > JAB_FWDACC_L1 and abs(glove.rotation[X]) < HOOK_LATGYR):
+        if (abs(glove.acceleration[X]) > JAB_FWDACC_L1 and abs(glove.rotation[X]) < HOOK_LATGYR and \
+            abs(glove.acceleration[Y]) < 100 and glove.acceleration[Z] < 140 ):
             # straight punch - less lateral movement
             if (abs(glove.acceleration[X]) > JAB_FWDACC_L2):
                 return "JAB2"
             return "JAB1"
-    
-        if (glove.acceleration[Z] > 700):
-            return "DRAGONPUNCH1"
         
         return ''
     
@@ -64,7 +68,7 @@ class SSFMoves:
     def determineMove(self, player):
         lGlove = player.leftGlove
         rGlove = player.rightGlove
-        print '%s | %s ' % (lGlove,rGlove)
+        print 'L%s | R%s ' % (lGlove,rGlove)
         
         bothMove = ''
         # must release from block to read next move
@@ -77,11 +81,19 @@ class SSFMoves:
         # hadouken - has a well defined end position at the end of the move..
         if (lGlove.heading[PITCH] > 45 and lGlove.heading[ROLL] > 45 and \
             rGlove.heading[PITCH] < -45 and rGlove.heading[ROLL] < -45):
-            bothMove= "HADOUKEN_LEFT_POSITION"
+            bothMove= "HADOUKEN_LEFTY"
         if (lGlove.heading[PITCH] < -45 and lGlove.heading[ROLL] < -45 and \
             rGlove.heading[PITCH] > 45 and rGlove.heading[ROLL] > 45):
-            bothMove= "HADOUKEN_RIGHT_POSITION"
-        
+            bothMove= "HADOUKEN"
+            
+        # sonic boom - two handed move - use accel + gyros rolling inward
+        # fists sideways: roll is L:-80 R:80
+        if (lGlove.heading[ROLL] < -80 and lGlove.acceleration[X] > 150 and \
+            lGlove.rotation[X] < -300 and rGlove.rotation[X] < -300 and  \
+            rGlove.heading[ROLL] > 80 and rGlove.acceleration[X] > 150 ):
+            bothMove = "SONIC_BOOM"
+
+                    
         leftMove = self.getHandedMove(player.prevMove, lGlove)
         rightMove = self.getHandedMove(player.prevMove, rGlove)
         
