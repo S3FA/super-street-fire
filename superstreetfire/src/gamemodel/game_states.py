@@ -1,15 +1,25 @@
 '''
+game_states.py
+
+Holds the Game States that make up the game logic for the super
+street fire game. These states are what define the 'parts' of the
+game when it's being played (e.g., when a round starts, is in progress, ends)
+and when it's not being played (e.g., calibration, idle)
 
 @author: Callum Hay
 '''
 
+import logging
 from calibration_data import CalibrationData
 from player import Player
 
 class GameState:
+    GAME_STATE_LOGGER = 'game_state_logger'
+    
     def __init__(self, ssfGame):
         assert(ssfGame != None)
         self.ssfGame = ssfGame
+        self._logger = logging.getLogger(GameState.GAME_STATE_LOGGER)
     
     # Override these functions - they are the 'event' functions
     # that will cause state changes
@@ -28,9 +38,12 @@ class GameState:
 class IdleGameState(GameState):
     def __init__(self, ssfGame):
         GameState.__init__(self, ssfGame)
+        self._logger.debug("Entering Idle Game State")
+        
         # Make sure all of the game objects are in their natural, base state
         # (e.g., all emitters are off, players have full life, etc.)
-        # ssfGame.Reset()
+        ssfGame.Reset()
+        
         
     def Calibrate(self):
         self.ssfGame._SetState(CalibrationGameState(self.ssfGame))
@@ -46,6 +59,7 @@ class CalibrationGameState(GameState):
     
     def __init__(self, ssfGame):
         GameState.__init__(self, ssfGame)
+        self._logger.debug("Entering Calibration Game State")
         self.timeCounter = 0.0
         self.calibrationData = CalibrationData()
         
@@ -83,6 +97,7 @@ class RoundBeginGameState(GameState):
     
     def __init__(self, ssfGame):
         GameState.__init__(self, ssfGame)
+        self._logger.debug("Entering Round Begin Game State")
         self.countdownTime = RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS
         
         # TODO: Place player health back up to full
@@ -110,7 +125,7 @@ class RoundInPlayGameState(GameState):
     
     def __init__(self, ssfGame):
         GameState.__init__(self, ssfGame)
-        
+        self._logger.debug("Entering Round In-Play Game State")
         # A list of all active actions during this round
         self._activeActions = []
         # There's always a game timer, which counts down throughout a match
@@ -177,6 +192,8 @@ class RoundEndedGameState(GameState):
                roundWinner == RoundEndedGameState.TIE_ROUND)
         
         GameState.__init__(self, ssfGame)
+        self._logger.debug("Entering Round Ended Game State")
+        
         self._roundWinner = roundWinner
         # Based on the round winner, increment the number of wins for the
         # corresponding player(s)
@@ -199,6 +216,7 @@ class RoundEndedGameState(GameState):
         # Check to see whether the match is over via tie or a win/loss condition and if
         # not start up the next round of this match
         if self._IsMatchOver():
+            self._logger.debug("Match is over...")
             # Check to see whether the match was won/lost or whether it was a complete tie
             if self._IsMatchTie():
                 self.ssfGame._SetState(SettleTieGameState(self.ssfGame))
@@ -222,6 +240,8 @@ class RoundEndedGameState(GameState):
 class SettleTieGameState(GameState):
     def __init__(self, ssfGame):
         GameState.__init__(self, ssfGame)
+        self._logger.debug("Entering Settle Tie (Sudden Death!) Game State")
+        
         # Turn off chip damage, only delivered attacks count...
         self.ssfGame.chipDamageOn = False
         
@@ -252,15 +272,18 @@ class SettleTieGameState(GameState):
             # to win equally, so let's just ignore this and keep going
             self.ssfGame.player1.ResetHealth()
             self.ssfGame.player2.ResetHealth()
+            self._logger.debug("Players just hurt each other simultaneously?!")
             
         elif player1IsHurt:
             # Player 2 wins!!
             self.ssfGame.chipDamageOn = True
             self.ssfGame._SetState(MatchOverGameState(self.ssfGame, 2))
+            self._logger.debug("Player 1 was hurt first - player 2 wins!")
         elif player2IsHurt:
             # Player 1 wins!!
             self.ssfGame.chipDamageOn = True
             self.ssfGame._SetState(MatchOverGameState(self.ssfGame, 1))
+            self._logger.debug("Player 2 was hurt first - player 1 wins!")
 
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
@@ -285,6 +308,7 @@ class MatchOverGameState(GameState):
     def __init__(self, ssfGame, winnerPlayerNum):
         assert(winnerPlayerNum == 1 or winnerPlayerNum == 2)
         GameState.__init__(self, ssfGame)
+        self._logger.debug("Entering Match Over Game State, the winner is player " + str(winnerPlayerNum))
         self.winnerPlayerNum = winnerPlayerNum
         
     def Tick(self, dT):
@@ -302,6 +326,7 @@ class PausedGameState(GameState):
     def __init__(self, ssfGame, statePaused):
         assert(statePaused != None)
         GameState.__init__(self, ssfGame)
+        self._logger.debug("Entering Paused Game State")
         self._statePaused = statePaused
  
     def TogglePauseGame(self):

@@ -19,14 +19,6 @@ from ioserver.receiver_queue_mgr import ReceiverQueueMgr
 
 from gamemodel.ssf_game import SSFGame
 
-'''
-def KillEverything(threadList):
-    logging.warn("Killing all threads...")
-    for thread in threadList:
-        thread.ExitThread()
-        thread.join()
-'''
-
 if __name__ == '__main__':
 
     # IN_PORT="/dev/slave"
@@ -149,7 +141,6 @@ if __name__ == '__main__':
         logging.warn("Unexpected state! (Is everything turned on?)")
         traceback.print_exc()
 
-    #KillEverything([receiverThread])
     if receiverObj != None: receiverObj.Kill()
     #sender.Kill()
     print "Exiting..."

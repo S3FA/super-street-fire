@@ -121,29 +121,7 @@ class HeadsetData:
                            self.band4 / other, self.band5 / other, self.band6 / other, \
                            self.band7 / other, self.band8 / other, self.player)        
     
-# I DOUBT WE'LL ACTUALLY USE THE CLASSES BELOW SINCE WE'LL BE REACTING TO DATA    
-# AS IT COMES IN OVER THE PORT
-'''
-# High level encapsulation of a single player's input
-# data - holds all the incoming data from both gloves
-# and their headset
-class PlayerData:
-    def __init__(self):
-        self.leftGloveData  = GloveData()
-        self.rightGloveData = GloveData()
-        self.headsetData    = HeadsetData()
-    
 
-# The Highest level representation of the input for the entire
-# Super Street Fire game - contains all input from all
-# relevant player sensors for a given capture of all
-# received packets at some instance during game play.
-class GameData:
-    def __init__(self):
-        self.player1Data = PlayerData()
-        self.player2Data = PlayerData()
-        pass
-'''   
     
     
     
