@@ -288,7 +288,7 @@ class PlayerGestureState(GestureState):
         if (rightGloveData != None):
             self.right = rightGloveData
 
-        self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
+        self._logger.debug(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
         if (self.left != None and self.right != None):
             #print "got some data for both hands " % ( self.left, self.right )
             self._interpretState(self)
