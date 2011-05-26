@@ -247,5 +247,11 @@ def BuildLeftHookAttack(playerNum):
     return Attack(playerNum, Action.LEFT_SIDE, 2, 3.0, 5)
 def BuildRightHookAttack(playerNum):
     return Attack(playerNum, Action.RIGHT_SIDE, 2, 3.0, 5)
+def BuildLeftUppercutAttack(playerNum):
+    return Attack(playerNum, Action.LEFT_SIDE, 2, 4.0, 5)
+def BuildRightUppercutAttack(playerNum):
+    return Attack(playerNum, Action.RIGHT_SIDE, 2, 4.0, 5)
 def BuildHadoukenAttack(playerNum):
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5)
+def BuildSonicBoomAttack(playerNum):
     return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5)
