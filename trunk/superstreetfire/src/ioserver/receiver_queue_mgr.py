@@ -48,7 +48,7 @@ class ReceiverQueueMgr:
             self.p1['L'] = data
         self._PushQueueData(self.p1LeftGloveQueue, data - self.p1['L'])
         self.p1['newL'] = 1
-        self.p1LeftGlove = data
+        self.p1['L'] = data
         self.p1LeftGloveLock.release()
         
     def PushP1RightGloveData(self, data):
@@ -57,7 +57,7 @@ class ReceiverQueueMgr:
             self.p1['R'] = data
         self._PushQueueData(self.p1RightGloveQueue, data - self.p1['R'])
         self.p1['newR'] = 1
-        self.p1RightGlove = data
+        self.p1['R'] = data
         self.p1RightGloveLock.release()
                 
     def PushP1HeadsetData(self, data):
@@ -71,7 +71,7 @@ class ReceiverQueueMgr:
             self.p2['L'] = data
         self._PushQueueData(self.p2LeftGloveQueue, data - self.p2['L'])
         self.p2['newL'] = 1
-        self.p2LeftGlove = data
+        self.p2['L'] = data
         self.p2LeftGloveLock.release()
            
     def PushP2RightGloveData(self, data):
@@ -80,7 +80,7 @@ class ReceiverQueueMgr:
             self.p2['R'] = data
         self._PushQueueData(self.p2RightGloveQueue, data - self.p2['R'])
         self.p2['newR'] = 1
-        self.p2RightGlove = data
+        self.p2['R'] = data
         self.p2RightGloveLock.release()
                 
     def PushP2HeadsetData(self, data):
@@ -93,7 +93,7 @@ class ReceiverQueueMgr:
         self.p1LeftGloveLock.acquire()
         data = self._PopQueueData(self.p1LeftGloveQueue)
         self.p1LeftGloveLock.release()
-        self.p1['newL'] = 0
+        if (data != None): self.p1['newL'] = 0
         return data
         
     def PopP1RightGloveData(self):
@@ -101,7 +101,7 @@ class ReceiverQueueMgr:
         self.p1RightGloveLock.acquire()
         data = self._PopQueueData(self.p1RightGloveQueue)
         self.p1RightGloveLock.release()
-        self.p1['newR'] = 0
+        if (data != None): self.p1['newR'] = 0
         return data
                 
     def PopP1HeadsetData(self):
@@ -115,7 +115,7 @@ class ReceiverQueueMgr:
         self.p2LeftGloveLock.acquire()
         data = self._PopQueueData(self.p2LeftGloveQueue)
         self.p2LeftGloveLock.release()
-        self.p2['newL'] = 0
+        if (data != None): self.p2['newL'] = 0
         return data
            
     def PopP2RightGloveData(self):
@@ -123,7 +123,7 @@ class ReceiverQueueMgr:
         self.p2RightGloveLock.acquire()
         data = self._PopQueueData(self.p2RightGloveQueue)
         self.p2RightGloveLock.release()
-        self.p2['newR'] = 0
+        if (data != None): self.p2['newR'] = 0
         return data
                 
     def PopP2HeadsetData(self):
