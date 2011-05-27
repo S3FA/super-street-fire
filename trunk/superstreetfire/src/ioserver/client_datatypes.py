@@ -53,7 +53,8 @@ class GloveData:
         # don't use delta for heading - it doesn't make sense
         dR = tuple(map(operator.sub, self.rotation, other.rotation))
         dA = tuple(map(operator.sub, self.acceleration, other.acceleration))
-        return GloveData(dR, dA, self.heading, self.player, self.hand) 
+        heading =  round(self.heading[0],1), round(self.heading[1],1), round(self.heading[2],1)
+        return GloveData(dR, dA, heading, self.player, self.hand) 
     
     # add operator - A GloveData may only be added to another GloveData with the 
     # same player and hand
