@@ -12,7 +12,6 @@ Super Street Fire game.
 import time
 import logging
 from collections import deque
-from action import Action
 import attack
 import block
 from resources.sounds import sounds
@@ -25,8 +24,8 @@ PITCH = 1
 YAW = 2
 
 # testing the values
-JAB_FWDACC_L1 = 350
-JAB_FWDACC_L2 = 500
+JAB_FWDACC_L1 = 280
+JAB_FWDACC_L2 = 420
 
 HOOK_LATGYR    = 220
 HOOK_FWDACC_L1 = 280
@@ -38,6 +37,7 @@ BLOCK_VER_ANGLE = 70
 BLOCK_RELEASE_ANGLE = 50
 
 TIME_BETWEEN_MOVES = 0.1
+TIME_TO_CLEAR_MOVE = 0.4
 
 class GestureState: 
     LOGGER_NAME = 'gestures'
@@ -98,8 +98,11 @@ class GestureState:
                 self._logger.debug(str(prevMove) + ' Punch release ' + str(glove.acceleration[X]))
                 return GestureState.NO_GESTURE
 
-        # acc-Z seems to be upside-down
-        if ( glove.acceleration[Z] < 400 and abs(glove.rotation[X]) > 200 ):
+        # acc-Z is upside-down..
+        if ( glove.acceleration[Z] < -500 and abs(glove.rotation[X]) > 300 and \
+             abs(glove.acceleration[Y]) < 200  ):
+            if ( glove.acceleration[Z] < 650 ):
+                player.power = 2
             return GestureState.L_UPPERCUT + glove.hand
 
         if (glove.acceleration[X] > HOOK_FWDACC_L1 and abs(glove.rotation[X]) > HOOK_LATGYR):
@@ -110,7 +113,7 @@ class GestureState:
 
         # punch is straight - positive/negative accel during swing 
         if (glove.acceleration[X] > JAB_FWDACC_L1 and abs(glove.rotation[X]) < 100 and \
-            abs(glove.acceleration[Y]) < 100):
+            abs(glove.acceleration[Y]) < 130):
             # straight punch - less lateral movement
             if (glove.acceleration[X] > JAB_FWDACC_L2):
                 player.power = 2
@@ -119,7 +122,7 @@ class GestureState:
     # detecting a block is a combination of no acceleration and hand position
     # straight up     
     def _isHandBlocking(self, glove):
-        return abs(glove.acceleration[Y]) < 100 and abs(glove.acceleration[Z]) < 100 \
+        return abs(glove.acceleration[Y]) < 150 and abs(glove.acceleration[Z]) < 150 \
             and glove.heading[PITCH] > BLOCK_VER_ANGLE
     
     # figure out the move, looking for two-handed moves first, then by hand.
@@ -149,8 +152,7 @@ class GestureState:
             # sonic boom - two handed move - use accel + gyros rolling inward
             # fists sideways: roll is L:-80 R:80
             if (lGlove.heading[ROLL] < -70 and rGlove.heading[ROLL] > 70 and \
-                lGlove.rotation[X] < -280 and rGlove.rotation[X] < -280 and  \
-                lGlove.acceleration[X] > 120 and rGlove.acceleration[X] > 120 ):
+                lGlove.rotation[X] < -150 and rGlove.rotation[X] < -150  ):
                 newMove = GestureState.SONIC_BOOM
             if (newMove > -1): 
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
@@ -191,9 +193,12 @@ class GestureState:
     def _interpretState(self, playerState):
         
         self._determineMove(playerState)
+
+        #if (len(playerState.moves) > 0):
+        self._logger.info(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
         
-        for newMove in playerState.moves:
-            self._logger.info( 'Gesture state change; ' + str(playerState)) 
+        for newMove in playerState.moves:            
+            self._logger.debug( 'Gesture state change; ' + str(playerState) + " move=" + str(newMove)) 
             #return a block..
             if (newMove >= 100):
                 sounds.blockSound.play()
@@ -263,12 +268,15 @@ class PlayerGestureState(GestureState):
         # do we consider this a new/valid gesture?
         deltaMoveTime = time.time()-lastTs
         # same move, or not enough time elapsed.. do nothing
-        if (len(self.allMoves[type]) > 0 and move == self.allMoves[type][-1]):
-            self._logger.info( 'Same move; ' + str(move)) 
-            return 
         if (deltaMoveTime < TIME_BETWEEN_MOVES):
             self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime)) 
             return
+        if (len(self.allMoves[type]) > 0 and move == self.allMoves[type][-1]):
+            if (deltaMoveTime > TIME_TO_CLEAR_MOVE):
+                move = 0
+            else:
+                self._logger.info( 'Same move; ' + str(move)) 
+                return 
             
         # record the move value, and reset all the data
         self.moves.append(move)
@@ -288,7 +296,6 @@ class PlayerGestureState(GestureState):
         if (rightGloveData != None):
             self.right = rightGloveData
 
-        self._logger.debug(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
         if (self.left != None and self.right != None):
             #print "got some data for both hands " % ( self.left, self.right )
             self._interpretState(self)
