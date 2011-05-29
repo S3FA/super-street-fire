@@ -139,10 +139,10 @@ class RoundInPlayGameState(GameState):
         self._roundTime -= dT
         
         # Check to see if the current round is over...
-        # if self.IsRoundOver():
+        if self._IsRoundOver():
             # Switch states to the RoundEndedGameState
-            # self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
-            # return
+            self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
+            return
  
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
