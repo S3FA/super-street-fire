@@ -28,22 +28,18 @@
 
 == States ==
 
-*Off* : The fire emitter is turned off completely.
+*Idle* :
 
-*P1_ATK* : The fire emitter is turned on, only for an attack flame owned by player 1. 
+*Calibration* : 
 
-*P2_ATK* : The fire emitter is turned on, only for an attack flame owned by player 2.
+*RoundBegin* : 
 
-*P1_ATK_P2_ATK* : The fire emitter is turned on for attack flames owned by players 1 and 2.
+*RoundInPlay* : 
 
-*P1_BLK* : The fire emitter is turned on, only for a block flame owned by player 1. 
+*RoundEnded* : 
 
-*P2_BLK* : The fire emitter is turned on, only for a block flame owned by player 2. 
+*SettleTie* : 
 
-*P1_ATK_BLK* : The fire emitter is turned on for an attack and block flame owned by player 1.
+*MatchOver* : 
 
-*P2_ATK_BLK* : The fire emitter is turned on for an attack and block flame owned by player 2.
-
-*Blocked(nextState)* : A block occurred - this is a transitory state and currently it immediately transitions to the given nextState.
-
-NOTE: Blocks in italics are "perfect" blocks i.e., they existed before the attack got there and are therefore as effective as possible. The other blocks are subject to the game rules on block timing.
+*Paused(pausedState)* : 
