@@ -1,4 +1,4 @@
-#summary The game machine
+#summary The Game State Machine
 
 = Game State Machine =
 
