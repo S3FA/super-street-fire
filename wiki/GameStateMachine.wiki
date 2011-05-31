@@ -16,9 +16,9 @@
 
 *Calibrate* : A very particular event that changes the current state to be in the 'Calibration' state, this event only has an effect in vary particular states.
 
-*StartGame* :
+*StartGame* : An event used to trigger the beginning of a game - this is mainly used as an event that allows the game state to depart from being Idle and move into the various 'round' states.
 
-*TogglePauseGame* : 
+*TogglePauseGame* : Pauses or un-pauses the game based on the current state. The game can only be paused if it's currently in play, otherwise pause will be ignored (except in the special case where the game is already paused, in which case the game will be restored to its previous state before the pause).
 
 *StopGame* : 
 
