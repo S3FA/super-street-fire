@@ -163,7 +163,7 @@ class RoundInPlayGameState(GameState):
                                                            dT, timeStamp)
 
     def _IsRoundOver(self):
-        return (self.ssfGame.player1.IsKnockedOut() or self.ssfGame.player2.IsKnockedOut() or self.roundTime <= 0.0)
+        return (self.ssfGame.player1.IsKnockedOut() or self.ssfGame.player2.IsKnockedOut() or self._roundTime <= 0.0)
 
     # Get the enumeration for which player won the round (or whether there was a tie)
     def _GetRoundWinner(self):
