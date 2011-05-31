@@ -36,9 +36,9 @@
 
 *RoundInPlay* : This is a game play state where player actions are interpreted and carried out on the fire emitters. During this state the game is the most 'active', players attack and block - each round has an official timer and can end when that timer expires or when a player is KOed (i.e., their life goes to or below 0).
 
-*RoundEnded* : 
+*RoundEnded* : This is an extremely brief state that occurs at the end of every round - it has no game play in it, instead it contains the logic used to decide whether a) the game is over with a winner, b) there's a tie or c) more rounds are required.
 
-*SettleTie* : 
+*SettleTie* : This state occurs when, over the course of the rounds both players manage to tie one another (this happens very rarely). This state is a game play state that plays out similar to the RoundInPlay state. The major difference is that chip damage is turned off and the victor is decided based on whoever lands the first attack that isn't blocked. 
 
 *MatchOver* : 
 
