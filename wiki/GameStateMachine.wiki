@@ -28,9 +28,9 @@
 
 == States ==
 
-*Idle* :
+*Idle* : A state where the entire game is reset so that nothing is happening - all fire emitters should be turned off and no game or calibration is occurring.
 
-*Calibration* : 
+*Calibration* : A special state where players orient/position themselves in a particular way so that data can be collected from glove/headset sensors in order to give a 'zero' state that the game can use as a reference point when actual game play is taking place. This state lasts for a set amount of time.
 
 *RoundBegin* : 
 
