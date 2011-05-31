@@ -15,6 +15,8 @@ import serial
 import parser
 import os
 import logging
+import struct
+from binascii import hexlify
 
 # Since the xbee library requires a non-member function for its callbacks, we
 # need to make the variables available to that function non-members as well...
@@ -59,7 +61,7 @@ class Receiver:
     def _send(self):
         
         fireEmitterData = self.outputData
-        self._logger.debug('sending fire emitter data ' + fireEmitterData)
+        self._logger.debug('sending fire emitter data ' + hexlify(fireEmitterData))
         
         try:
             self.visualizer.write(fireEmitterData)
@@ -105,7 +107,16 @@ class Receiver:
             p2c[emitter.arcIndex] =  str(int(emitter.p2ColourIsOn))
                     
         #print 'fire=%s,p1c=%s,p2c=%s' % (fire, p1c, p2c)
-        dataset = ''.join(fire) + ':' + ''.join(p1c) + ':' + ''.join(p2c)
+        fire.reverse()
+        p1c.reverse()
+        p2c.reverse()
+        
+        fireInt = int(''.join(fire),2)
+        p1cInt  = int(''.join(fire),2)
+        p2cInt  = int(''.join(fire),2)
+        
+        dataset = struct.pack("HHH", fireInt, p1cInt, p2cInt)
+        
         if (self.outputData != dataset):
             self.outputData = dataset
             #print 'send wifire data=%s' % (dataset)
