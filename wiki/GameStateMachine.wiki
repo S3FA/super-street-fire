@@ -40,6 +40,6 @@
 
 *SettleTie* : This state occurs when, over the course of the rounds both players manage to tie one another (this happens very rarely). This state is a game play state that plays out similar to the RoundInPlay state. The major difference is that chip damage is turned off and the victor is decided based on whoever lands the first attack that isn't blocked. 
 
-*MatchOver* : 
+*MatchOver* : When a game is won by a particular player this state is entered - it is the definitive ending of a match (set of rounds) where either player 1 or player 2 is declared the winner.
 
-*Paused(pausedState)* : 
+*Paused(pausedState)* : This state is entered from various game play states when the game gets paused - this state does nothing except act as a 'stasis' for the current state of the game, which can be reinstated by un-pausing the game.
