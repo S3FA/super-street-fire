@@ -14,7 +14,7 @@
 == Events ==
 *Tick* : An event triggered every frame of the game simulation. When a tick occurs it updates the current state with the delta time that has occurred in the last frame and may result in a change of state based on the current state's internal values (e.g., timers, changes of condition, etc.)
 
-*Calibrate* : 
+*Calibrate* : A very particular event that changes the current state to be in the 'Calibration' state, this event only has an effect in vary particular states.
 
 *StartGame* :
 
