@@ -32,9 +32,9 @@
 
 *Calibration* : A special state where players orient/position themselves in a particular way so that data can be collected from glove/headset sensors in order to give a 'zero' state that the game can use as a reference point when actual game play is taking place. This state lasts for a set amount of time.
 
-*RoundBegin* : 
+*RoundBegin* : A brief state that takes place before each round is in play - during this state no player actions are considered and instead a countdown timer is presented (e.g., "3, 2, 1, FIGHT!"). This state is mainly for preparing the players for each round's game play.
 
-*RoundInPlay* : 
+*RoundInPlay* : This is a game play state where player actions are interpreted and carried out on the fire emitters. During this state the game is the most 'active', players attack and block - each round has an official timer and can end when that timer expires or when a player is KOed (i.e., their life goes to or below 0).
 
 *RoundEnded* : 
 
