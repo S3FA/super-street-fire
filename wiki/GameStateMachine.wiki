@@ -20,11 +20,11 @@
 
 *TogglePauseGame* : Pauses or un-pauses the game based on the current state. The game can only be paused if it's currently in play, otherwise pause will be ignored (except in the special case where the game is already paused, in which case the game will be restored to its previous state before the pause).
 
-*StopGame* : 
+*StopGame* : Causes the game to stop, immediately. Consider this event a type of 'kill' event - it will instantly cease all game play and terminate the current game state, bringing it back to being Idle.
 
-*UpdateWithHeadsetData* : 
+*UpdateWithHeadsetData* : Updates the current state with headset data - this never causes the state to change.
 
-*UpdateWithGloveData* : 
+*UpdateWithGloveData* : Updates the current state with glove data - this never causes the state to change.
 
 == States ==
 
