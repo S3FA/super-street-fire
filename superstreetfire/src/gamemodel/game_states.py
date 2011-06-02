@@ -167,12 +167,12 @@ class RoundInPlayGameState(GameState):
 
     # Get the enumeration for which player won the round (or whether there was a tie)
     def _GetRoundWinner(self):
-        if self.player1.IsKnockedOut():
-            if self.player2.IsKnockedOut():
+        if self.ssfGame.player1.IsKnockedOut():
+            if self.ssfGame.player2.IsKnockedOut():
                 return RoundEndedGameState.TIE_ROUND
             else:
                 return RoundEndedGameState.PLAYER_2_WON_ROUND
-        elif self.player2.IsKnockedOut():
+        elif self.ssfGame.player2.IsKnockedOut():
             return RoundEndedGameState.PLAYER_1_WON_ROUND
         else:
             # This should NEVER happen - this function should only be called
@@ -187,6 +187,8 @@ class RoundEndedGameState(GameState):
     PLAYER_2_WON_ROUND = 2
     
     def __init__(self, ssfGame, roundWinner):
+        GameState.__init__(self, ssfGame)
+        self._logger.info("Round Ended, Winner:" + str(roundWinner))
         assert(roundWinner == RoundEndedGameState.PLAYER_1_WON_ROUND or \
                roundWinner == RoundEndedGameState.PLAYER_2_WON_ROUND or \
                roundWinner == RoundEndedGameState.TIE_ROUND)
