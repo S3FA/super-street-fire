@@ -10,14 +10,14 @@ import player
 from game_states import IdleGameState
 from fire_emitter import FireEmitter
 from gesture_recognizer import GestureRecognizer
-
+from game_model_listener import GameModelListenerCmdr
 
 class SSFGame:
     SSF_GAME_LOGGER = 'ssf_game_logger'
     
     def __init__(self):
-        self._logger = logging.getLogger(SSFGame.SSF_GAME_LOGGER)
-        
+        self._logger           = logging.getLogger(SSFGame.SSF_GAME_LOGGER)
+        self._listenerCmdr     = GameModelListenerCmdr()
         self.gestureRecognizer = GestureRecognizer()
         
         # There are two players, facing off against each other
@@ -51,6 +51,9 @@ class SSFGame:
         for leftEmitter, rightEmitter in map(None, self.leftEmitters, self.rightEmitters):
             leftEmitter.Reset()
             rightEmitter.Reset()
+    
+    def RegisterListener(self, listener):
+        self._listenerCmdr.RegisterListener(listener)
     
     # These functions provide convenience, when accessing the fire emitter arc lists:
     # The emitters are, by default, layed out from player 1's perspective so 
@@ -115,6 +118,8 @@ class SSFGame:
     def _SetState(self, gameState):
         assert(gameState != None)
         self.state = gameState
+        # EVENT: Game state just changed
+        self._listenerCmdr.GameStateChanged(gameState)
     
     def _ExecuteGameActions(self, dT, actionsQueue):
         # Check for any newly recognized gestures, execute any that get found
