@@ -13,6 +13,15 @@ import logging
 from calibration_data import CalibrationData
 from player import Player
 
+IDLE_GAME_STATE          = 0
+CALIBRATION_GAME_STATE   = 1
+ROUND_BEGIN_GAME_STATE   = 2
+ROUND_IN_PLAY_GAME_STATE = 3
+ROUND_ENDED_GAME_STATE   = 4
+SETTLE_TIE_GAME_STATE    = 5
+MATCH_OVER_GAME_STATE    = 6
+PAUSED_GAME_STATE        = 7
+
 class GameState:
     GAME_STATE_LOGGER = 'game_state_logger'
     
@@ -33,6 +42,9 @@ class GameState:
     def UpdateWithGloveData(self, p1LGloveData, p1RGloveData, 
                             p2LGloveData, p2RGloveData, dT, timeStamp): pass
 
+    def GetStateType(self): assert(False)
+    
+
 # The idle state does nothing - just waits for a signal to start the game or to
 # calibrate inputs to the game
 class IdleGameState(GameState):
@@ -48,7 +60,9 @@ class IdleGameState(GameState):
     def Calibrate(self):
         self.ssfGame._SetState(CalibrationGameState(self.ssfGame))
     def StartGame(self):
-        self.ssfGame._SetState(RoundInPlayGameState(self.ssfGame))
+        self.ssfGame._SetState(RoundBeginGameState(self.ssfGame))
+    def GetStateType(self):
+        return IDLE_GAME_STATE
 
 # The Calibration state is a state where both players hold their gloves
 # still and point them at the opposing player - this allows us to collect
@@ -89,6 +103,8 @@ class CalibrationGameState(GameState):
         self.calibrationData.FinishSampling()
         self.ssfGame.gestureRecognizer.SetCalibrationData(self.calibrationData)
 
+    def GetStateType(self):
+        return CALIBRATION_GAME_STATE
 
 # We might want a countdown for each round (e.g., 3, 2, 1, FIGHT!) just
 # to get the players ready/prepared to start wailing on each other
@@ -118,6 +134,9 @@ class RoundBeginGameState(GameState):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
 
+    def GetStateType(self):
+        return ROUND_BEGIN_GAME_STATE
+        
 # The 'round in play' state is the state active while the game is actually
 # being played over the course of a single round (there are 3 rounds to a match)
 class RoundInPlayGameState(GameState):
@@ -161,9 +180,13 @@ class RoundInPlayGameState(GameState):
         self.ssfGame.gestureRecognizer.UpdateWithGloveData(p1LGloveData, p1RGloveData, \
                                                            p2LGloveData, p2RGloveData, \
                                                            dT, timeStamp)
+        
+    def GetStateType(self):
+        return ROUND_IN_PLAY_GAME_STATE
 
     def _IsRoundOver(self):
-        return (self.ssfGame.player1.IsKnockedOut() or self.ssfGame.player2.IsKnockedOut() or self._roundTime <= 0.0)
+        return (self.ssfGame.player1.IsKnockedOut() or self.ssfGame.player2.IsKnockedOut() or \
+                self._roundTime <= 0.0)
 
     # Get the enumeration for which player won the round (or whether there was a tie)
     def _GetRoundWinner(self):
@@ -228,11 +251,17 @@ class RoundEndedGameState(GameState):
                 self.ssfGame._SetState(MatchOverGameState(self.ssfGame, self._roundWinner))
         else:
             self.ssfGame._SetState(RoundBeginGameState(self.ssfGame))
+
+    def TogglePauseGame(self):
+        self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
             
     def StopGame(self):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
 
+    def GetStateType(self):
+        return ROUND_ENDED_GAME_STATE
+        
     def _IsMatchOver(self):
         return self.player1.numRoundWins == 2 or self.player2.numRoundWins == 2
     def _IsMatchTie(self):
@@ -306,6 +335,9 @@ class SettleTieGameState(GameState):
                                                            p2LGloveData, p2RGloveData, \
                                                            dT, timeStamp)
 
+    def GetStateType(self):
+        return SETTLE_TIE_GAME_STATE
+
 class MatchOverGameState(GameState):
     def __init__(self, ssfGame, winnerPlayerNum):
         assert(winnerPlayerNum == 1 or winnerPlayerNum == 2)
@@ -324,6 +356,9 @@ class MatchOverGameState(GameState):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
 
+    def GetStateType(self):
+        return MATCH_OVER_GAME_STATE
+
 class PausedGameState(GameState):
     def __init__(self, ssfGame, statePaused):
         assert(statePaused != None)
@@ -339,4 +374,6 @@ class PausedGameState(GameState):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
     
+    def GetStateType(self):
+        return PAUSED_GAME_STATE
     
