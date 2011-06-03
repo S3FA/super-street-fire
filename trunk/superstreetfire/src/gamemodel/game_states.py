@@ -23,12 +23,12 @@ MATCH_OVER_GAME_STATE    = 6
 PAUSED_GAME_STATE        = 7
 
 class GameState:
-    GAME_STATE_LOGGER = 'game_state_logger'
+    LOGGER_NAME = 'game_state_logger'
     
     def __init__(self, ssfGame):
         assert(ssfGame != None)
         self.ssfGame = ssfGame
-        self._logger = logging.getLogger(GameState.GAME_STATE_LOGGER)
+        self._logger = logging.getLogger(GameState.LOGGER_NAME)
     
     # Override these functions - they are the 'event' functions
     # that will cause state changes
@@ -211,7 +211,7 @@ class RoundEndedGameState(GameState):
     
     def __init__(self, ssfGame, roundWinner):
         GameState.__init__(self, ssfGame)
-        self._logger.info("Round Ended, Winner:" + str(roundWinner))
+        self._logger.info("Round Ended, Winner: " + str(roundWinner))
         assert(roundWinner == RoundEndedGameState.PLAYER_1_WON_ROUND or \
                roundWinner == RoundEndedGameState.PLAYER_2_WON_ROUND or \
                roundWinner == RoundEndedGameState.TIE_ROUND)
@@ -263,9 +263,9 @@ class RoundEndedGameState(GameState):
         return ROUND_ENDED_GAME_STATE
         
     def _IsMatchOver(self):
-        return self.player1.numRoundWins == 2 or self.player2.numRoundWins == 2
+        return self.ssfGame.player1.numRoundWins == 2 or self.ssfGame.player2.numRoundWins == 2
     def _IsMatchTie(self):
-        return self.player1.numRoundWins == 2 and self.player2.numRoundWins == 2
+        return self.ssfGame.player1.numRoundWins == 2 and self.ssfGame.player2.numRoundWins == 2
 
 # Ties are sudden death - the first player to deliver a hit wins
 class SettleTieGameState(GameState):

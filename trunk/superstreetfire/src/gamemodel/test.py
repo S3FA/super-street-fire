@@ -9,7 +9,9 @@ import logging
 from gesture_recognizer import *
 from ssf_game import *
 from fire_emitter_states import FireState
+from game_states import *
 from player import Player
+from action import Action
 
 import attack
 from attack import Attack
@@ -39,7 +41,25 @@ def RunActionLoop(game, actionList):
         else:
             print "Total time:", i._currBlockTime
 
+def SetupLoggers():
+    logger = logging.getLogger(FireState.LOGGER_NAME)
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+    
+    logger = logging.getLogger(Player.LOGGER_NAME)    
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+    
+    logger = logging.getLogger(GameState.LOGGER_NAME)
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+
+    logger = logging.getLogger(SSFGame.LOGGER_NAME)
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+
 if __name__ == "__main__":
+    SetupLoggers()
 
     game = SSFGame()
     
@@ -56,14 +76,12 @@ if __name__ == "__main__":
     p1Hadouken = attack.BuildHadoukenAttack(1)
     p2Hadouken = attack.BuildHadoukenAttack(2)
     
-    logger = logging.getLogger(FireState.LOGGER_NAME)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
+    p1LeftBlock = block.BuildLeftBasicBlock(1)
+    p2LeftBlock = block.BuildLeftBasicBlock(2)
     
-    logger = logging.getLogger(Player.LOGGER_NAME)    
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
-    
+    p1RightBlock = block.BuildRightBasicBlock(1)
+    p2RightBlock = block.BuildRightBasicBlock(2)
+
     # Standalone jabs
     #RunActionLoop(game, [p1LeftJab])
     #RunActionLoop(game, [p2LeftJab])
@@ -86,11 +104,6 @@ if __name__ == "__main__":
     #RunActionLoop(game, [p1RightJab, p2LeftHook])             # Same arc different attacks
     #RunActionLoop(game, [p1Hadouken, p2LeftHook, p2RightJab]) # Multi attack
     
-    p1LeftBlock = block.BuildLeftBasicBlock(1)
-    p2LeftBlock = block.BuildLeftBasicBlock(2)
-    
-    p1RightBlock = block.BuildRightBasicBlock(1)
-    p2RightBlock = block.BuildRightBasicBlock(2)
     
     # Simultaneous Blocks
     #RunActionLoop(game, [p1LeftBlock, p2LeftBlock])
@@ -139,7 +152,30 @@ if __name__ == "__main__":
     
     # Player 1 attacks on one arc and defends on the other, player 2 does the same
     # but on opposite arcs
-    RunActionLoop(game, [p1LeftBlock, p1RightJab, p2LeftBlock, p2RightJab])
+    #RunActionLoop(game, [p1LeftBlock, p1RightJab, p2LeftBlock, p2RightJab])
+    
+    # Idle -> RoundBegin
+    game.StartGame()
+    
+    # RoundBegin -> Pause
+    game.TogglePauseGame()
+    # Pause -> RoundBegin
+    game.TogglePauseGame()
+    
+    # Finish the RoundBegin state (countdown done) 
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # The game is now in play, make the players attack each other and stuff
+    # play the game until a player dies
+    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
+    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
+
+    # RoundInPlay -> RoundEnded
+    game.Tick(0.0)
+    # RoundEnded -> RoundInPlay
+    game.Tick(0.0)
     
     print "Finished."
     
