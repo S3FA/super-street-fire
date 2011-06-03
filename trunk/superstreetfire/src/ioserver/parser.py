@@ -25,7 +25,7 @@ def ParseWirelessData(xbeePacket, queueMgr):
     if (xbeePacket.has_key('rf_data') == False): return  
     #each frame starts with Node ID colon, ends with pipe.. e.g. 1L:x,x,x..|
     rfdata = xbeePacket['rf_data'].replace(' ','')
-    #print 'rfdata:%s' % (rfdata)
+    print 'rfdata:%s' % (rfdata)
     
     # try to find a device id based on source address
     source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
@@ -36,20 +36,34 @@ def ParseWirelessData(xbeePacket, queueMgr):
     # if we're just starting up, read each of the device ids into a map
     if (nodeId == '0'):
         # which device are we? is there a "[digit][char]:"
-        if (startDataPos >= 2 and rfdata[startDataPos-1:startDataPos].isalpha() ):
+        if (startDataPos >= 2 and ( rfdata[startDataPos-1:startDataPos].isalpha() or
+                                   rfdata[startDataPos-2:startDataPos-1].isalpha() ) ):
             nodeId = rfdata[startDataPos-2:startDataPos]
+            if (nodeId == 'ts'):
+                log.warn( 'Invalid ts node in rfdata ' )
+                return
             SOURCE_ADDRESS_MAP[source] = nodeId
-            print 'found a node %s for %s ' % (nodeId, source)
+            log.info( 'found a node %s for %s ' % (nodeId, source) )
         else:
-            print 'no node identifier in rf_data.' 
+            log.warn( 'No node in rfdata ' )
             return
     
     # when we have a full frame, pass it on
     func = PARSER_FUNCTION_DICT.get(nodeId);
-
-    # the data packet may be disjoint, frame it    
+    restartFrame = (startDataPos == 2)  
+    
+    if (nodeId.find('H') > -1):
+        func(rfdata[3], queueMgr)
+        return        
+        
+    fullFrame = rfdata[-1] == '|'
+    if (restartFrame and fullFrame):
+        log.debug( "rfdata:" + rfdata[3:-1] )
+        func(rfdata[3:-1], queueMgr)
+        return
+        
+    # the data packet may be disjoint, test it sequentially  
     frameData.append( HOLDING_FRAME[nodeId] )
-    restartFrame = (startDataPos == 3)
     for c in rfdata:
         if (restartFrame and c != ":"):
             continue
@@ -95,12 +109,13 @@ def ParseSerialData(serialDataStr, queueMgr):
 def GloveParser(player, hand, bodyStr):
     
     blocks = bodyStr.replace('|','').split("_")
-    #print 'parsing blocks %s ' % (blocks)
+    #print 'parsing glove player blocks %s ' % (blocks)
     
     # Get out of here immediately if there's a mismatch of the expected data
     # for the glove.
     if len(blocks) < 3:
         log.error( "Unexpected format in glove parser input, no match." )
+        #print "Failed block split"
         return None
     
     head = string.split(blocks[0],",")
@@ -118,55 +133,51 @@ def GloveParser(player, hand, bodyStr):
         return gloveData
     except: 
         log.error( "Glove data error " + str(blocks) )
-    
+
+    #print "Failed glove parse"
     return None
 
 def HeadsetParser(player, bodyStr):
-    matchResult = re.match(HeadsetData.HEADSET_DATA_REGEX_STR, bodyStr)
-    
-    # Get out of here immediately if there's a mismatch of the expected data
-    # for the head-set, this really should never happen unless the serial input
-    # is being garbled somehow
-    if matchResult == None:
-        print "Failed match result in headset parser, no match."
-        return None
-    elif len(matchResult.groups()) != HeadsetData.NUM_HEADSET_DATA:
-        print "Failed match result in headset parser: " + matchResult.group()
-        return None
-    
-    # Turn the parsed head-set data into an actual object
-    headsetData = HeadsetData(float(matchResult.group(1)), float(matchResult.group(2)),  \
-                              float(matchResult.group(3)), float(matchResult.group(4)),  \
-                              float(matchResult.group(5)), float(matchResult.group(6)),  \
-                              float(matchResult.group(7)), float(matchResult.group(8)),  \
-                              float(matchResult.group(9)), float(matchResult.group(10)), \
-                              float(matchResult.group(11)), player)
-    
-    return headsetData
+    data = string.split(bodyStr,",")
+    try:
+        # Turn the parsed glove data into an actual object
+        headsetData = HeadsetData(float(data[0]), float(data[1]), float(data[2]), player)
+        
+        #print 'HeadsetData setup %s ' % (str(headsetData))
+        return headsetData
+    except: 
+        log.error( "Headset data error " + str(data) )
+
+    #print "Failed glove parse"
+    return None
     
 
 def Player1LeftGloveParser(bodyStr, queueMgr):
-    #print "Player 1 left glove data received."
     gloveData = GloveParser(PLAYER_ONE, GloveData.LEFT_HAND_GLOVE, bodyStr)
     if gloveData != None:
+        #log.debug( "Player 1 left glove data received." )
         queueMgr.PushP1LeftGloveData(gloveData)
+    else:
+        log.warn( "Player 1 left glove BAD data received." )
     
 def Player1RightGloveParser(bodyStr, queueMgr):
-    #print "Player 1 right glove data received."
     gloveData = GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr)
     if gloveData != None:
+        #log.debug( "Player 1 right glove data received." )
         queueMgr.PushP1RightGloveData(gloveData)
+    else:
+        log.warn( "Player 1 right glove BAD data received." )
         
 def Player2LeftGloveParser(bodyStr, queueMgr):        
-    #print "Player 2 left glove data received."
     gloveData = GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr)
     if gloveData != None:
+        #log.debug( "Player 2 left glove data received." )
         queueMgr.PushP2LeftGloveData(gloveData)
     
 def Player2RightGloveParser(bodyStr, queueMgr):    
-    #print "Player 2 right glove data received."
     gloveData = GloveParser(PLAYER_TWO, GloveData.RIGHT_HAND_GLOVE, bodyStr)
     if gloveData != None:
+        #log.debug( "Player 2 right glove data received." )
         queueMgr.PushP2RightGloveData(gloveData)
         
 def Player1HeadsetSerialInputParser(bodyStr, queueMgr):
@@ -196,7 +207,7 @@ PARSER_FUNCTION_DICT = {
 HOLDING_FRAME = {
     '1L' : '',
     '1R' : '',
-    '1H' : '',
+    'H1' : '',
     '2L' : '',
     '2R' : '',
     '2H' : ''
