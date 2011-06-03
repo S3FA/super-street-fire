@@ -13,10 +13,10 @@ from gesture_recognizer import GestureRecognizer
 from game_model_listener import GameModelListenerCmdr
 
 class SSFGame:
-    SSF_GAME_LOGGER = 'ssf_game_logger'
+    LOGGER_NAME = 'ssf_game_logger'
     
     def __init__(self):
-        self._logger           = logging.getLogger(SSFGame.SSF_GAME_LOGGER)
+        self._logger           = logging.getLogger(SSFGame.LOGGER_NAME)
         self._listenerCmdr     = GameModelListenerCmdr()
         self.gestureRecognizer = GestureRecognizer()
         
@@ -38,7 +38,7 @@ class SSFGame:
         # Set the first state for the game
         # NOTE: Always be sure to set the state LAST in the constructor since
         # it might make use of members that belong to this object
-        self.state = IdleGameState(self)
+        self._SetState(IdleGameState(self))
 
     def Reset(self):
         self.chipDamageOn = True
@@ -89,6 +89,8 @@ class SSFGame:
         self.state.Tick(dT)
     def StartGame(self):
         self.state.StartGame()
+    def TogglePauseGame(self):
+        self.state.TogglePauseGame()
     def StopGame(self):
         self.state.StopGame()
     def UpdateWithHeadsetData(self, p1HeadsetData, 
@@ -98,6 +100,7 @@ class SSFGame:
                             p2LGloveData, p2RGloveData, dT, timeStamp):
         self.state.UpdateWithGloveData(p1LGloveData, p1RGloveData, p2LGloveData, \
                                        p2RGloveData, dT, timeStamp)
+    
     
     def Hurt(self, playerNum, dmgAmt, isChipDmg):
         assert(playerNum == 1 or playerNum == 2)
@@ -116,6 +119,7 @@ class SSFGame:
     # Private functions *****************************************    
 
     def _SetState(self, gameState):
+        self._logger.debug("Changing game state to " + str(gameState))
         assert(gameState != None)
         self.state = gameState
         # EVENT: Game state just changed
