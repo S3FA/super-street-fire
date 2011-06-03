@@ -116,8 +116,11 @@ class RoundBeginGameState(GameState):
         self._logger.debug("Entering Round Begin Game State")
         self.countdownTime = RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS
         
-        # TODO: Place player health back up to full
-        # TODO: Make sure all fire emitters are turned off 
+        # Place player health back up to full
+        # Make sure all fire emitters are turned off        
+        ssfGame.player1.ResetHealth()
+        ssfGame.player2.ResetHealth()
+        ssfGame.KillEmitters()
     
     def Tick(self, dT):
         if self.countdownTime <= 0.0:
@@ -159,6 +162,7 @@ class RoundInPlayGameState(GameState):
         
         # Check to see if the current round is over...
         if self._IsRoundOver():
+            self._logger.debug("Round is over.")
             # Switch states to the RoundEndedGameState
             self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
             return

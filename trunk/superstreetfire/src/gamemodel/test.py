@@ -174,8 +174,24 @@ if __name__ == "__main__":
 
     # RoundInPlay -> RoundEnded
     game.Tick(0.0)
-    # RoundEnded -> RoundInPlay
+    # RoundEnded -> RoundBegin
     game.Tick(0.0)
+    
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # Let player 2 win again... this should cause player 2 to win the match
+    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
+    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
+    
+    # RoundInPlay -> RoundEnded
+    game.Tick(0.0)
+    # RoundEnded -> MatchOver (player 2 wins!)
+    game.Tick(0.0)
+    # MatchOver -> Idle
+    game.Tick(0.0)
+    
     
     print "Finished."
     
