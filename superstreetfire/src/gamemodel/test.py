@@ -25,12 +25,14 @@ def RunActionLoop(game, actionList):
     deltaTime = 0.0
     lastTime  = time.time()
     finished = False
+    firstState = game.state.GetStateType()
     while not finished:
 
         finished = True
         for i in actionList:
             i.Tick(game, deltaTime)
-            finished = finished and i.IsFinished()
+            finished = finished and (i.IsFinished() or (firstState != game.state.GetStateType()))
+            
             
         deltaTime = time.time() - lastTime
         lastTime  = time.time()
@@ -40,6 +42,26 @@ def RunActionLoop(game, actionList):
             print "Total time:", i._currAttackTime
         else:
             print "Total time:", i._currBlockTime
+
+def TickGameActions(game, actionList):
+    for i in actionList:
+        i.Initialize(game)
+            
+    game.state._activeActions.extend(actionList)
+    deltaTime = 0.0
+    lastTime  = time.time()
+    finished = False
+    firstState = game.state.GetStateType()
+    while not finished:
+
+        finished = True
+        for i in actionList:
+            game.Tick(deltaTime)
+            finished = finished and (i.IsFinished() or (firstState != game.state.GetStateType()))
+            
+        deltaTime = time.time() - lastTime
+        lastTime  = time.time()
+
 
 def SetupLoggers():
     logger = logging.getLogger(FireState.LOGGER_NAME)
@@ -57,6 +79,86 @@ def SetupLoggers():
     logger = logging.getLogger(SSFGame.LOGGER_NAME)
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
+
+def Player2WinGame():
+    # Idle -> RoundBegin
+    game.StartGame()
+    
+    # RoundBegin -> Pause
+    game.TogglePauseGame()
+    # Pause -> RoundBegin
+    game.TogglePauseGame()
+    
+    # Finish the RoundBegin state (countdown done) 
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # The game is now in play, make the players attack each other and stuff
+    # play the game until a player dies
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
+
+    # RoundInPlay -> RoundEnded
+    game.Tick(0.0)
+    # RoundEnded -> RoundBegin
+    game.Tick(0.0)
+    
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # Let player 2 win again... this should cause player 2 to win the match
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
+    
+    # RoundInPlay -> RoundEnded
+    game.Tick(0.0)
+    # RoundEnded -> MatchOver (player 2 wins!)
+    game.Tick(0.0)
+    # MatchOver -> Idle
+    game.Tick(0.0)
+    
+def TieGame():
+    # Idle -> RoundBegin
+    game.StartGame()
+    
+    # RoundBegin -> Pause
+    game.TogglePauseGame()
+    # Pause -> RoundBegin
+    game.TogglePauseGame()
+    
+    # Finish the RoundBegin state (countdown done) 
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # Let the round tick down to nothing (no one wins)
+    game.Tick(RoundInPlayGameState.ROUND_TIME_IN_SECONDS)
+
+    # RoundInPlay -> RoundEnded
+    game.Tick(0.0)
+    # RoundEnded -> RoundBegin
+    game.Tick(0.0)
+    
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # Ticked down again (no one wins) - tie round!
+    game.Tick(RoundInPlayGameState.ROUND_TIME_IN_SECONDS)
+
+    # RoundInPlay -> RoundEnded
+    game.Tick(0.0)
+    # RoundEnded -> SettleTie
+    game.Tick(0.0)
+    
+    # Settle the tie! Player 1 will win by one hundredth of a second
+    # SettleTie -> MatchOver
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.24, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
+    
+    # MatchOver -> Idle
+    game.Tick(0.0)
 
 if __name__ == "__main__":
     SetupLoggers()
@@ -154,43 +256,7 @@ if __name__ == "__main__":
     # but on opposite arcs
     #RunActionLoop(game, [p1LeftBlock, p1RightJab, p2LeftBlock, p2RightJab])
     
-    # Idle -> RoundBegin
-    game.StartGame()
-    
-    # RoundBegin -> Pause
-    game.TogglePauseGame()
-    # Pause -> RoundBegin
-    game.TogglePauseGame()
-    
-    # Finish the RoundBegin state (countdown done) 
-    # RoundBegin -> RoundInPlay
-    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
-    game.Tick(0.0)
-    
-    # The game is now in play, make the players attack each other and stuff
-    # play the game until a player dies
-    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
-    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
-
-    # RoundInPlay -> RoundEnded
-    game.Tick(0.0)
-    # RoundEnded -> RoundBegin
-    game.Tick(0.0)
-    
-    # RoundBegin -> RoundInPlay
-    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
-    game.Tick(0.0)
-    
-    # Let player 2 win again... this should cause player 2 to win the match
-    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
-    RunActionLoop(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
-    
-    # RoundInPlay -> RoundEnded
-    game.Tick(0.0)
-    # RoundEnded -> MatchOver (player 2 wins!)
-    game.Tick(0.0)
-    # MatchOver -> Idle
-    game.Tick(0.0)
+    TieGame()
     
     
     print "Finished."

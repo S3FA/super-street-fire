@@ -157,15 +157,15 @@ class RoundInPlayGameState(GameState):
         # Execute the actions (attacks, blocks, etc.)
         self.ssfGame._ExecuteGameActions(dT, self._activeActions)
         
-        # Diminish the round timer
-        self._roundTime -= dT
-        
         # Check to see if the current round is over...
         if self._IsRoundOver():
             self._logger.debug("Round is over.")
             # Switch states to the RoundEndedGameState
             self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
             return
+        
+        # Diminish the round timer
+        self._roundTime -= dT       
  
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
@@ -194,6 +194,8 @@ class RoundInPlayGameState(GameState):
 
     # Get the enumeration for which player won the round (or whether there was a tie)
     def _GetRoundWinner(self):
+        assert(self._IsRoundOver() == True)
+        
         if self.ssfGame.player1.IsKnockedOut():
             if self.ssfGame.player2.IsKnockedOut():
                 return RoundEndedGameState.TIE_ROUND
@@ -202,9 +204,7 @@ class RoundInPlayGameState(GameState):
         elif self.ssfGame.player2.IsKnockedOut():
             return RoundEndedGameState.PLAYER_1_WON_ROUND
         else:
-            # This should NEVER happen - this function should only be called
-            # if the round is over! (i.e., self._IsRoundOver() == True)
-            return -1
+            return RoundEndedGameState.TIE_ROUND
 
 class RoundEndedGameState(GameState):
     NUM_ROUNDS_PER_MATCH = 3
