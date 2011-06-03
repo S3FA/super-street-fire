@@ -42,8 +42,7 @@ class SSFMoves:
     def getHandedMove(self, prevMove, glove):
         # uppercut - use accel + gyros twist, final position up
         ## this move will need to be sampled over a longer time period? 
-        if (glove.heading[PITCH] > 50 and glove.acceleration[Z] > 200 and \
-            glove.rotation[X] > 200 ):
+        if (glove.acceleration[Z] > 300 and glove.rotation[X] > 200 ):
             return "UPPERCUT"
 
         if (abs(glove.acceleration[X]) > HOOK_FWDACC_L1 and abs(glove.rotation[X]) > HOOK_LATGYR):
@@ -88,18 +87,19 @@ class SSFMoves:
             
         # sonic boom - two handed move - use accel + gyros rolling inward
         # fists sideways: roll is L:-80 R:80
-        if (lGlove.heading[ROLL] < -80 and lGlove.acceleration[X] > 150 and \
-            lGlove.rotation[X] < -300 and rGlove.rotation[X] < -300 and  \
-            rGlove.heading[ROLL] > 80 and rGlove.acceleration[X] > 150 ):
+        if (lGlove.heading[ROLL] < -80 and rGlove.heading[ROLL] > 80 and \
+            abs(lGlove.rotation[X]) > 300 and abs(rGlove.rotation[X]) > 300 and  \
+            lGlove.acceleration[X] > 150 and rGlove.acceleration[X] > 150 ):
             bothMove = "SONIC_BOOM"
-
                     
-        leftMove = self.getHandedMove(player.prevMove, lGlove)
-        rightMove = self.getHandedMove(player.prevMove, rGlove)
-        
-        if (leftMove != ''): print ' -- MOVE LEFT:' + leftMove
-        if (rightMove != ''): print ' -- MOVE RIGHT:' + rightMove
-        if (bothMove != ''): print ' -- MOVE BOTH:' + bothMove
+        if (bothMove != ''): 
+            print ' -- MOVE BOTH:' + bothMove
+        else:
+            leftMove = self.getHandedMove(player.prevMove, lGlove)
+            rightMove = self.getHandedMove(player.prevMove, rGlove)
+            
+            if (leftMove != ''): print ' -- MOVE LEFT:' + leftMove
+            if (rightMove != ''): print ' -- MOVE RIGHT:' + rightMove
 
        
 class SSFPlayer():

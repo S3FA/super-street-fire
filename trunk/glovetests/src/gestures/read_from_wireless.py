@@ -15,7 +15,7 @@ from ssf_moves import *
 
 grad2rad = 3.141592/180.0
 
-ports = ('COM5','COM6','COM3')
+ports = ('COM7','COM5','COM6','COM3','COM8')
 
 # Check your COM port and baud rate
 for port in ports:
@@ -122,7 +122,7 @@ i = 0
 
 # after x seconds, break
 # reset calibration takes ~5seconds
-while elapsed < 6: 
+while elapsed < 3: 
     now = time.time();
     elapsed = now-start;
 
@@ -136,7 +136,8 @@ while elapsed < 6:
     #put in the time elapsed & with the data
     clean = '{:.3f}_{}'.format(elapsed, rfdata);
     f.write(clean)                     # Write to the output log file
-
+    print clean
+    
     lines = rfdata.split('|')
     for line in lines:
         head = []
@@ -230,8 +231,6 @@ while elapsed < 6:
                     print "\n -- %s -- \n" % (move)
                     lastmovets = now;
                     
-            if (nodeId == '1L'):
-                continue
             # original sample code for the visualizer
             try:
                 roll = float(head[0])*grad2rad
