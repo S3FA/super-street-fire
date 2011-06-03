@@ -46,13 +46,11 @@ class GloveData:
     def __str__(self):
         return "A: " + str(self.acceleration) + ", H: " + str(self.heading) + ",R: " + str(self.rotation)
     
-    # delta/sub operator - GloveData must be from same player and hand
+    # delta/sub operator 
     def __sub__(self, other):
-        assert(self.player == other.player)
-        assert(self.hand == other.hand)
-        # don't use delta for heading - it doesn't make sense
         dR = tuple(map(operator.sub, self.rotation, other.rotation))
         dA = tuple(map(operator.sub, self.acceleration, other.acceleration))
+        # don't use delta for heading - it doesn't make sense
         heading =  round(self.heading[0],1), round(self.heading[1],1), round(self.heading[2],1)
         return GloveData(dR, dA, heading, self.player, self.hand) 
     
@@ -77,6 +75,28 @@ class GloveData:
     
 # Class for representing the head-set (EEG) data
 class HeadsetData:
+    NUM_HEADSET_DATA       = 11
+    
+    def __init__(self, link, atten, med, player):
+        self.link       = link
+        self.attention  = atten
+        self.meditation = med
+
+    def __str__(self):
+        result = "Link: " + str(self.link) + ", Attention: " + str(self.attention) + ", Mediation: " + str(self.meditation)
+        result = result + ")"
+        return result
+    
+    def __add__(self, other):
+        assert(self.player == other.player)
+        return HeadsetData(self.link + other.link, self.attention + other.attention, \
+                           self.meditation + other.meditation, self.player)
+    
+    def __div__(self, other):
+        return HeadsetData(self.link / other, self.attention / other, self.meditation / other, self.player)        
+
+
+class HeadsetDataComplex:
     NUM_HEADSET_DATA       = 11
     HEADSET_DATA_REGEX_STR = ""
     for i in range(NUM_HEADSET_DATA-1): HEADSET_DATA_REGEX_STR = HEADSET_DATA_REGEX_STR + '(-?\d+\.\d+),'
@@ -109,7 +129,7 @@ class HeadsetData:
     
     def __add__(self, other):
         assert(self.player == other.player)
-        return HeadsetData(self.link + other.link, self.attention + other.attention, \
+        return HeadsetDataComplex(self.link + other.link, self.attention + other.attention, \
                            self.meditation + other.meditation, self.band1 + other.band1, \
                            self.band2 + other.band2, self.band3 + other.band3, \
                            self.band4 + other.band4, self.band5 + other.band5, \
@@ -117,18 +137,8 @@ class HeadsetData:
                            self.band8 + other.band8, self.player)
     
     def __div__(self, other):
-        return HeadsetData(self.link / other, self.attention / other, self.meditation / other, \
+        return HeadsetDataComplex(self.link / other, self.attention / other, self.meditation / other, \
                            self.band1 / other, self.band2 / other, self.band3 / other, \
                            self.band4 / other, self.band5 / other, self.band6 / other, \
                            self.band7 / other, self.band8 / other, self.player)        
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
     
