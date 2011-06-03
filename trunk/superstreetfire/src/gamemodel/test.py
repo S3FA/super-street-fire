@@ -80,7 +80,13 @@ def SetupLoggers():
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
 
-def Player2WinGame():
+def PlayerXWinGame(playerNum):
+    loser = 1
+    if playerNum == 1:
+        loser = 2
+    
+    print("\n")
+    print("**************** BEGINNING PLAYER " + str(playerNum) + " WINS GAME SIMULATION ****************")
     # Idle -> RoundBegin
     game.StartGame()
     
@@ -96,8 +102,8 @@ def Player2WinGame():
     
     # The game is now in play, make the players attack each other and stuff
     # play the game until a player dies
-    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
-    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
+    TickGameActions(game, [Attack(loser, Action.LEFT_SIDE, 1, 0.25, 50), Attack(playerNum, Action.RIGHT_SIDE, 1, 0.25, 50)])
+    TickGameActions(game, [Attack(loser, Action.LEFT_SIDE, 1, 0.25, 25), Attack(playerNum, Action.LEFT_SIDE, 1, 0.25, 50)])
 
     # RoundInPlay -> RoundEnded
     game.Tick(0.0)
@@ -109,8 +115,8 @@ def Player2WinGame():
     game.Tick(0.0)
     
     # Let player 2 win again... this should cause player 2 to win the match
-    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 50), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 50)])
-    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 25), Attack(2, Action.LEFT_SIDE, 1, 0.25, 50)])
+    TickGameActions(game, [Attack(loser, Action.LEFT_SIDE, 1, 0.25, 50), Attack(playerNum, Action.RIGHT_SIDE, 1, 0.25, 50)])
+    TickGameActions(game, [Attack(loser, Action.LEFT_SIDE, 1, 0.25, 25), Attack(playerNum, Action.LEFT_SIDE, 1, 0.25, 50)])
     
     # RoundInPlay -> RoundEnded
     game.Tick(0.0)
@@ -119,14 +125,11 @@ def Player2WinGame():
     # MatchOver -> Idle
     game.Tick(0.0)
     
-def TieGame():
+def TimeoutTieGame():
+    print("\n")
+    print("**************** BEGINNING TIMEOUT TIE GAME SIMULATION ****************")
     # Idle -> RoundBegin
     game.StartGame()
-    
-    # RoundBegin -> Pause
-    game.TogglePauseGame()
-    # Pause -> RoundBegin
-    game.TogglePauseGame()
     
     # Finish the RoundBegin state (countdown done) 
     # RoundBegin -> RoundInPlay
@@ -159,6 +162,41 @@ def TieGame():
     
     # MatchOver -> Idle
     game.Tick(0.0)
+
+def HitForHitTieGame():
+    print("\n")
+    print("**************** BEGINNING HIT-FOR-HIT TIE GAME SIMULATION ****************")
+    
+    # Idle -> RoundBegin
+    game.StartGame()
+    
+    # Finish the RoundBegin state (countdown done) 
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # Make the players kill each other simultaneously 
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 100), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 100)])
+
+    # RoundInPlay -> RoundEnded
+    game.Tick(0.0)
+    # RoundEnded -> RoundBegin
+    game.Tick(0.0)
+
+    # RoundBegin -> RoundInPlay
+    game.Tick(RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS)
+    game.Tick(0.0)
+    
+    # Make players kill each other again - this will bring us into a settle tie state
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.25, 100), Attack(2, Action.RIGHT_SIDE, 1, 0.25, 100)])
+    game.Tick(0.0)
+    
+    # Settle the tie, let player 2 win
+    TickGameActions(game, [Attack(1, Action.LEFT_SIDE, 1, 0.2, 1), Attack(2, Action.RIGHT_SIDE, 1, 0.18, 1)])
+    # SettleTie -> MatchOver
+    game.Tick(0.0)
+    
+    
 
 if __name__ == "__main__":
     SetupLoggers()
@@ -256,7 +294,10 @@ if __name__ == "__main__":
     # but on opposite arcs
     #RunActionLoop(game, [p1LeftBlock, p1RightJab, p2LeftBlock, p2RightJab])
     
-    TieGame()
+    PlayerXWinGame(2)
+    PlayerXWinGame(1)
+    TimeoutTieGame()
+    HitForHitTieGame()
     
     
     print "Finished."
