@@ -25,6 +25,7 @@ class Player:
         self.isInvincible = False
     
     def ResetHealth(self):
+        self._logger.debug("Resetting player " + str(self.playerNum) + "'s health")
         self.hitPoints = Player.MAX_HIT_POINTS
     
     def IsKnockedOut(self):
