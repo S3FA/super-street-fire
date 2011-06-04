@@ -17,6 +17,7 @@ import os
 import logging
 import struct
 from binascii import hexlify
+from time import sleep
 
 # Since the xbee library requires a non-member function for its callbacks, we
 # need to make the variables available to that function non-members as well...
@@ -28,10 +29,7 @@ def XBeeCallback(xbeeDataFrame):
 
 class XBeeIO:
     LOGGER_NAME = 'xbee-tx'
-
-    #sample xbee address
-    p1leftAddrL = '\x00\x13\xa2\x00\x40\x69\x0a\x35'
-    p1leftAddrS = '\x00\x13'
+    DISCOVERY_TIMEOUT = 5
 
     def __init__(self, inputSerialPort, baudRate):
         self._logger = logging.getLogger(XBeeIO.LOGGER_NAME)
@@ -49,6 +47,12 @@ class XBeeIO:
             print "ERROR: Serial port " + inputSerialPort + " was invalid/not found."
             print "************ Killing XBee IO Thread ****************"
             exit(-1)    
+        
+        # send out node discovery -- responses will be added to ADDR_TABLE in the parser
+        self.xbee.at(command='ND')
+        sleep(self.DISCOVERY_TIMEOUT)
+        print "Found Devices:"
+        print parser.ADDR_TABLE
         
         try:
             port = '/dev/master'
@@ -78,10 +82,12 @@ class XBeeIO:
         try:
             # Write data to the xbee->wifire interpreter
             # TODO: dest address by table
-            self.xbee.send('tx', dest_addr=XBeeIO.p1leftAddrS, dest_addr_long=XBeeIO.p1leftAddrL, data=fireEmitterData);                   
+            self.xbee.send('tx', dest_addr=parser.GetAddrS('SSFFIRE'), dest_addr_long=parser.GetAddrL('SSFFIRE'), data=fireEmitterData)                   
         except TypeError:
             print 'Type error on xbee sender '
             #pass
+        except:
+            print "Something bad happened -- perhaps address not in ADDR_TABLE"
 
 
     def _sendTimer(self):
@@ -103,10 +109,24 @@ class XBeeIO:
         try:
             # Write data to the xbee: timer destination address
             # TODO: dest address by table
-            self.xbee.send('tx', dest_addr=XBeeIO.p1leftAddrS, dest_addr_long=XBeeIO.p1leftAddrL, data=timerData);                   
+            self.xbee.send('tx', dest_addr=parser.GetAddrS('SSFTIMER'), dest_addr_long=parser.GetAddrL('SSFTIMER'), data=timerData)                 
         except TypeError:
             print 'Type error on xbee sender '
-
+        except:
+            print "Something bad happened -- perhaps address not in ADDR_TABLE"
+            
+    def _sendND(self):
+        
+        self._logger.debug('sending node discovery message')
+        
+        # Make sure this object is in a proper state before running...
+        if self.xbee == None:
+            print "ERROR: Output port was invalid/not found, can not send."
+            print "************ Killing XBee IO Thread ****************"
+            return
+        
+        self.xbee.at(command='ND')                  
+        
 
     def SendTimerNum(self, value):
     
@@ -171,6 +191,9 @@ class XBeeIO:
             self.fireData = dataset
             #print 'send wifire data=%s' % (dataset)
             self._sendFire()
+            
+    def NodeDiscovery(self):
+        self._sendND()
         
     def Kill(self):
         if self.xbee != None:
