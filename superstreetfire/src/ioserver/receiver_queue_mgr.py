@@ -21,7 +21,7 @@ import threading
  *only* return an updated average when new data is added to the queues
 '''
 class ReceiverQueueMgr:
-    MAX_QUEUE_SIZE = 5
+    MAX_QUEUE_SIZE = 4
     
     def __init__(self):
         self.p1LeftGloveQueue  = collections.deque(list(),ReceiverQueueMgr.MAX_QUEUE_SIZE)
