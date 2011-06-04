@@ -10,7 +10,7 @@ from optparse import OptionParser
 
 import os
 import logging
-import ioserver.receiver 
+import ioserver.xbeeio
 #import ioserver.receive_direct_serial
 #import ioserver.receive_from_file
 import gamemodel.game_states
@@ -74,8 +74,8 @@ if __name__ == '__main__':
         receiverQueueMgr = ReceiverQueueMgr()
     
         # Spawn threads for listening and sending data over the serial port
-        ioserver.receiver.recieverQueueMgr = receiverQueueMgr
-        receiverObj = ioserver.receiver.Receiver(options.inputPort, DEFAULT_BAUDRATE)
+        ioserver.receiver_queue_mgr.recieverQueueMgr = receiverQueueMgr
+        receiverObj = ioserver.xbeeio.XBeeIO(options.inputPort, DEFAULT_BAUDRATE)
         
         #print "Running receiver with file input ..."
         #receiverObj = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
