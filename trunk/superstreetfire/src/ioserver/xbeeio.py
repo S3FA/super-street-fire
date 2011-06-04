@@ -20,11 +20,11 @@ from binascii import hexlify
 
 # Since the xbee library requires a non-member function for its callbacks, we
 # need to make the variables available to that function non-members as well...
-recieverQueueMgr = None
+receiverQueueMgr = None
 
 # Callback function for asynchronous receiving of data from the xbee library
 def XBeeCallback(xbeeDataFrame):
-    parser.ParseWirelessData(xbeeDataFrame, recieverQueueMgr)
+    parser.ParseWirelessData(xbeeDataFrame, receiverQueueMgr)
 
 class XBeeIO:
     LOGGER_NAME = 'xbee-tx'
