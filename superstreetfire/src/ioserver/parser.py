@@ -10,8 +10,6 @@ d) Store the high-level objects on the receiver queues of the ReceiverQueueMgr
 @author: Callum Hay
 '''
 import logging
-import re
-import sys
 import string
 import struct
 from collections import deque
@@ -31,7 +29,7 @@ def ParseWirelessData(xbeePacket, queueMgr):
     if (xbeePacket.has_key('rf_data') == False): return  
     #each frame starts with Node ID colon, ends with pipe.. e.g. 1L:x,x,x..|
     rfdata = xbeePacket['rf_data'].replace(' ','')
-    print 'rfdata:%s' % (rfdata)
+    #print 'rfdata:%s' % (rfdata)
     
     # try to find a device id based on source address
     source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
@@ -64,7 +62,7 @@ def ParseWirelessData(xbeePacket, queueMgr):
         
     fullFrame = rfdata[-1] == '|'
     if (restartFrame and fullFrame):
-        log.debug( "rfdata:" + rfdata[3:-1] )
+        # log.debug( "rfdata:" + rfdata[3:-1] )
         func(rfdata[3:-1], queueMgr)
         return
         
@@ -128,6 +126,10 @@ def GloveParser(player, hand, bodyStr):
     gyros = string.split(blocks[1],",")
     accel = string.split(blocks[2],",")
 
+    # gloves on the wrong hand fix :)
+    #if (hand == '0'): hand = '1'
+    #if (hand == '1'): hand = '0'
+
     try:
         headF = (float(head[0]), float(head[1]), float(head[2]))
         accF = (float(accel[0]), float(accel[1]), float(accel[2]))
@@ -146,10 +148,15 @@ def GloveParser(player, hand, bodyStr):
 def HeadsetParser(player, bodyStr):
     data = string.split(bodyStr,",")
     try:
-        # Turn the parsed glove data into an actual object
-        headsetData = HeadsetData(float(data[0]), float(data[1]), float(data[2]), player)
+        linkQuality = float(data[0])
+        if (linkQuality > 0):
+            print 'Headset has no link for player ' + str(player)
+            return None
         
-        #print 'HeadsetData setup %s ' % (str(headsetData))
+        # Turn the parsed glove data into an actual object
+        headsetData = HeadsetData(linkQuality, float(data[1]), float(data[2]), player)
+        
+        log.debug( 'HeadsetData setup %s ' + str(headsetData))
         return headsetData
     except: 
         log.error( "Headset data error " + str(data) )
