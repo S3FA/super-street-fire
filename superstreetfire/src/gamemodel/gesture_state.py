@@ -24,8 +24,8 @@ PITCH = 1
 YAW = 2
 
 # testing the values
-JAB_FWDACC_L1 = 280
-JAB_FWDACC_L2 = 420
+JAB_FWDACC_L1 = 160
+JAB_FWDACC_L2 = 200
 
 HOOK_LATGYR    = 220
 HOOK_FWDACC_L1 = 280
@@ -36,8 +36,8 @@ HOOK_LATACC_L2 = 300
 BLOCK_VER_ANGLE = 70
 BLOCK_RELEASE_ANGLE = 50
 
-TIME_BETWEEN_MOVES = 0.1
-TIME_TO_CLEAR_MOVE = 0.4
+TIME_BETWEEN_MOVES = 0.15
+TIME_TO_CLEAR_MOVE = 0.8
 
 class GestureState: 
     LOGGER_NAME = 'gestures'
@@ -55,6 +55,7 @@ class GestureState:
     R_UPPERCUT   = 6
 
     HADOUKEN     = 10
+    SONIC_SIDE   = 11
     SONIC_BOOM   = 12
     LEFT_BLOCK   = 100
     RIGHT_BLOCK  = 101
@@ -98,10 +99,9 @@ class GestureState:
                 self._logger.debug(str(prevMove) + ' Punch release ' + str(glove.acceleration[X]))
                 return GestureState.NO_GESTURE
 
-        # acc-Z is upside-down..
-        if ( glove.acceleration[Z] < -500 and abs(glove.rotation[X]) > 300 and \
-             abs(glove.acceleration[Y]) < 200  ):
-            if ( glove.acceleration[Z] < 650 ):
+        if ( abs(glove.acceleration[Z]) > 100 and abs(glove.rotation[X]) > 60 and  
+             glove.heading[ROLL] > 120 ):
+            if ( abs(glove.acceleration[Y]) > 200 ):
                 player.power = 2
             return GestureState.L_UPPERCUT + glove.hand
 
@@ -112,8 +112,8 @@ class GestureState:
             return GestureState.LEFT_HOOK + glove.hand
 
         # punch is straight - positive/negative accel during swing 
-        if (glove.acceleration[X] > JAB_FWDACC_L1 and abs(glove.rotation[X]) < 100 and \
-            abs(glove.acceleration[Y]) < 130):
+        if (abs(glove.heading[ROLL]) < 50 and 
+            glove.acceleration[X] > JAB_FWDACC_L1 and abs(glove.rotation[X]) < 50 ):
             # straight punch - less lateral movement
             if (glove.acceleration[X] > JAB_FWDACC_L2):
                 player.power = 2
@@ -122,8 +122,9 @@ class GestureState:
     # detecting a block is a combination of no acceleration and hand position
     # straight up     
     def _isHandBlocking(self, glove):
-        return abs(glove.acceleration[Y]) < 150 and abs(glove.acceleration[Z]) < 150 \
-            and glove.heading[PITCH] > BLOCK_VER_ANGLE
+        return abs(glove.acceleration[X]) < 110 and abs(glove.acceleration[Y]) < 110 and \
+            abs(glove.acceleration[Z]) < 110 and \
+            glove.heading[PITCH] > BLOCK_VER_ANGLE
     
     # figure out the move, looking for two-handed moves first, then by hand.
     def _determineMove(self, player):
@@ -139,7 +140,7 @@ class GestureState:
         # allow two-handed moves to be the final move in this tick
         if (lGlove != None and rGlove != None):
             # hadouken - has a well defined end position at the end of the move..
-            if (lGlove.heading[PITCH] > 40 and lGlove.heading[ROLL] > 40 and \
+            if (lGlove.heading[PITCH] > 30 and lGlove.heading[ROLL] < 100 and \
                 rGlove.heading[PITCH] < -40 and rGlove.heading[ROLL] < -40):
                 newMove = GestureState.HADOUKEN
             if (lGlove.heading[PITCH] < -40 and lGlove.heading[ROLL] < -40 and \
@@ -152,7 +153,14 @@ class GestureState:
             # sonic boom - two handed move - use accel + gyros rolling inward
             # fists sideways: roll is L:-80 R:80
             if (lGlove.heading[ROLL] < -70 and rGlove.heading[ROLL] > 70 and \
-                lGlove.rotation[X] < -150 and rGlove.rotation[X] < -150  ):
+                lGlove.heading[PITCH] < 30 and rGlove.heading[PITCH] < 30 ):
+                # both hands sideways, set "no move" because it's probably
+                # going to be a sonic boom when accel+gyros are higher
+                newMove = GestureState.SONIC_SIDE
+                #print "SONIC SIDE POSITION ______________"
+            if (prevMove == GestureState.SONIC_SIDE and \
+                abs(lGlove.rotation[X]) > 75 and abs(rGlove.rotation[X]) > 75 and \
+                abs(lGlove.acceleration[X]) > 90 and abs(rGlove.acceleration[X]) > 90 ):
                 newMove = GestureState.SONIC_BOOM
             if (newMove > -1): 
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
@@ -187,63 +195,8 @@ class GestureState:
                 #self._logger.debug( 'R:' + str(newMove)) 
                 self.recordMove(  GestureState.RIGHT, newMove, player.lastMoveTs )
 
-        return newMove
-            
-       
-    def _interpretState(self, playerState):
-        
-        self._determineMove(playerState)
+        return newMove        
 
-        #if (len(playerState.moves) > 0):
-        self._logger.info(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
-        
-        for newMove in playerState.moves:            
-            self._logger.debug( 'Gesture state change; ' + str(playerState) + " move=" + str(newMove)) 
-            #return a block..
-            if (newMove >= 100):
-                sounds.blockSound.play()
-                hand = newMove - 100
-                print ' --- BLOCK ! --- ' + str(hand)
-                playerState._changeStateFunc(block.Block(playerState.playerNum, hand, playerState.power, 5))
-            
-            # print some debug info on what kind of attack this was:
-            if (newMove == 10):
-                sounds.hadouken.play()
-                print ' *** ATTACK ! *** HADOUKEN '
-                playerState._changeStateFunc(attack.BuildHadoukenAttack(playerState.playerNum))
-
-            if (newMove == 12):
-                sounds.sonicBoom.play()
-                print ' *** ATTACK ! *** SONIC BOOM '
-                playerState._changeStateFunc(attack.BuildSonicBoomAttack(playerState.playerNum))            
-
-            if (newMove == 5 or newMove == 6):
-                sounds.uppercut.play()
-                print ' *** ATTACK ! *** UPPERCUT ' + str(newMove)
-                if (newMove == 5): 
-                    playerState._changeStateFunc(attack.BuildLeftUppercutAttack(playerState.playerNum))            
-                else: 
-                    playerState._changeStateFunc(attack.BuildRightUppercutAttack(playerState.playerNum))            
-
-            if (newMove == 3 or newMove == 4): 
-                sounds.punchFierceSound.play()
-                print ' *** ATTACK ! *** HOOK ' + str(newMove)
-                if (newMove == 3): 
-                    playerState._changeStateFunc(attack.BuildLeftHookAttack(playerState.playerNum))
-                else:
-                    playerState._changeStateFunc(attack.BuildRightHookAttack(playerState.playerNum))
-                
-            if (newMove == 1 or newMove == 2):
-                # standard jab punch attack
-                sounds.punchJabSound.play()
-                print ' *** ATTACK ! *** JAB ' + str(newMove)
-                if (newMove == 1): 
-                    playerState._changeStateFunc(attack.BuildLeftJabAttack(playerState.playerNum))
-                else:
-                    playerState._changeStateFunc(attack.BuildRightJabAttack(playerState.playerNum))
-
-        # done.. 
-        playerState.moves.clear()
 
 
 class PlayerGestureState(GestureState):
@@ -267,16 +220,17 @@ class PlayerGestureState(GestureState):
     def recordMove(self, type, move, lastTs):
         # do we consider this a new/valid gesture?
         deltaMoveTime = time.time()-lastTs
-        # same move, or not enough time elapsed.. do nothing
-        if (deltaMoveTime < TIME_BETWEEN_MOVES):
-            self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime)) 
-            return
-        if (len(self.allMoves[type]) > 0 and move == self.allMoves[type][-1]):
+        # clear the move after a certain time, so the same move can be executed.
+        if (move > 0 and len(self.allMoves[type]) > 0 and move == self.allMoves[type][-1]):
             if (deltaMoveTime > TIME_TO_CLEAR_MOVE):
                 move = 0
             else:
                 self._logger.info( 'Same move; ' + str(move)) 
                 return 
+        # same move, or not enough time elapsed.. do nothing
+        if (move > 0 and deltaMoveTime < TIME_BETWEEN_MOVES):
+            self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime)) 
+            return
             
         # record the move value, and reset all the data
         self.moves.append(move)
@@ -298,5 +252,58 @@ class PlayerGestureState(GestureState):
 
         if (self.left != None and self.right != None):
             #print "got some data for both hands " % ( self.left, self.right )
-            self._interpretState(self)
+            self._determineMove(self)
+            #if (len(playerState.moves) > 0):
+            self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
+            # send the attack/block whatever to the change state function
+            self._doMoves()
+
         
+    def _doMoves(self):
+        for newMove in self.moves:            
+            self._logger.debug( 'Gesture state change; ' + str(self) + " move=" + str(newMove)) 
+            #return a block..
+            if (newMove >= 100):
+                sounds.blockSound.play()
+                hand = newMove - 100
+                print ' --- BLOCK ! --- ' + str(hand)
+                self._changeStateFunc(block.Block(self.playerNum, hand, self.power, 5))
+            
+            # print some debug info on what kind of attack this was:
+            if (newMove == 10):
+                sounds.hadouken.play()
+                print ' *** ATTACK ! *** HADOUKEN '
+                self._changeStateFunc(attack.BuildHadoukenAttack(self.playerNum))
+
+            if (newMove == 12):
+                sounds.sonicBoom.play()
+                print ' *** ATTACK ! *** SONIC BOOM '
+                self._changeStateFunc(attack.BuildSonicBoomAttack(self.playerNum))            
+
+            if (newMove == 5 or newMove == 6):
+                sounds.uppercut.play()
+                print ' *** ATTACK ! *** UPPERCUT ' + str(newMove)
+                if (newMove == 5): 
+                    self._changeStateFunc(attack.BuildLeftUppercutAttack(self.playerNum))            
+                else: 
+                    self._changeStateFunc(attack.BuildRightUppercutAttack(self.playerNum))            
+
+            if (newMove == 3 or newMove == 4): 
+                sounds.punchFierceSound.play()
+                print ' *** ATTACK ! *** HOOK ' + str(newMove)
+                if (newMove == 3): 
+                    self._changeStateFunc(attack.BuildLeftHookAttack(self.playerNum))
+                else:
+                    self._changeStateFunc(attack.BuildRightHookAttack(self.playerNum))
+                
+            if (newMove == 1 or newMove == 2):
+                # standard jab punch attack
+                sounds.punchJabSound.play()
+                print ' *** ATTACK ! *** JAB ' + str(newMove)
+                if (newMove == 1): 
+                    self._changeStateFunc(attack.BuildLeftJabAttack(self.playerNum))
+                else:
+                    self._changeStateFunc(attack.BuildRightJabAttack(self.playerNum))
+
+        # done.. clear the newly aquired moves
+        self.moves.clear()
