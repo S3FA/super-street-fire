@@ -46,17 +46,21 @@ class GestureState:
     RIGHT=1
     BOTH=2
     # High-level attack/defend gesture enumeration values
-    NO_GESTURE   = 0
-    LEFT_JAB     = 1
-    RIGHT_JAB    = 2
-    LEFT_HOOK    = 3 
-    RIGHT_HOOK   = 4
-    L_UPPERCUT   = 5
-    R_UPPERCUT   = 6
+    NO_GESTURE    = 0
+    LEFT_JAB      = 1
+    RIGHT_JAB     = 2
+    LEFT_HOOK     = 3 
+    RIGHT_HOOK    = 4
+    L_UPPERCUT    = 5
+    R_UPPERCUT    = 6
+    L_DRAGONPUNCH = 7
+    R_DRAGONPUNCH = 8
 
     HADOUKEN     = 10
-    SONIC_SIDE   = 11
+    BOTH_FWD     = 110
     SONIC_BOOM   = 12
+    SONIC_SIDE   = 112
+    
     LEFT_BLOCK   = 100
     RIGHT_BLOCK  = 101
     FULL_BLOCK   = 102
@@ -103,6 +107,9 @@ class GestureState:
              glove.heading[ROLL] > 120 ):
             if ( abs(glove.acceleration[Y]) > 200 ):
                 player.power = 2
+            if ( abs(glove.rotation[Y]) > 90 ):
+                #test dragon punch
+                pass
             return GestureState.L_UPPERCUT + glove.hand
 
         if (glove.acceleration[X] > HOOK_FWDACC_L1 and abs(glove.rotation[X]) > HOOK_LATGYR):
@@ -122,8 +129,8 @@ class GestureState:
     # detecting a block is a combination of no acceleration and hand position
     # straight up     
     def _isHandBlocking(self, glove):
-        return abs(glove.acceleration[X]) < 110 and abs(glove.acceleration[Y]) < 110 and \
-            abs(glove.acceleration[Z]) < 110 and \
+        return abs(glove.acceleration[X]) < 90 and abs(glove.acceleration[Y]) < 90 and \
+            abs(glove.acceleration[Z]) < 90 and \
             glove.heading[PITCH] > BLOCK_VER_ANGLE
     
     # figure out the move, looking for two-handed moves first, then by hand.
@@ -139,12 +146,14 @@ class GestureState:
         # each line comes through at diff times  
         # allow two-handed moves to be the final move in this tick
         if (lGlove != None and rGlove != None):
+            # hadouken - check for forward accel - both hands
+            if (abs(lGlove.acceleration[X]) > 100 and abs(rGlove.acceleration[X]) > 100 ):
+                newMove = GestureState.BOTH_FWD
+                #print "BOTH FORWARD MOVE ______________"
             # hadouken - has a well defined end position at the end of the move..
-            if (lGlove.heading[PITCH] > 30 and lGlove.heading[ROLL] < 100 and \
-                rGlove.heading[PITCH] < -40 and rGlove.heading[ROLL] < -40):
-                newMove = GestureState.HADOUKEN
-            if (lGlove.heading[PITCH] < -40 and lGlove.heading[ROLL] < -40 and \
-                rGlove.heading[PITCH] > 40 and rGlove.heading[ROLL] > 40):
+            if (prevMove == GestureState.BOTH_FWD and \
+                abs(lGlove.heading[PITCH]) > 33 and abs(lGlove.heading[PITCH]) < 50 and \
+                abs(rGlove.heading[PITCH]) > 33 and abs(rGlove.heading[PITCH]) < 50):
                 newMove = GestureState.HADOUKEN
             if (newMove > -1): 
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
@@ -225,11 +234,11 @@ class PlayerGestureState(GestureState):
             if (deltaMoveTime > TIME_TO_CLEAR_MOVE):
                 move = 0
             else:
-                self._logger.info( 'Same move; ' + str(move)) 
+                if (move < 110): self._logger.info( 'Same move; ' + str(move)) 
                 return 
         # same move, or not enough time elapsed.. do nothing
         if (move > 0 and deltaMoveTime < TIME_BETWEEN_MOVES):
-            self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime)) 
+            self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime) + " move:" + str(move)) 
             return
             
         # record the move value, and reset all the data
@@ -263,7 +272,7 @@ class PlayerGestureState(GestureState):
         for newMove in self.moves:            
             self._logger.debug( 'Gesture state change; ' + str(self) + " move=" + str(newMove)) 
             #return a block..
-            if (newMove >= 100):
+            if (newMove >= 100 and newMove <= 102):
                 sounds.blockSound.play()
                 hand = newMove - 100
                 print ' --- BLOCK ! --- ' + str(hand)
