@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # IN_PORT="/dev/slave"
     IN_PORT = "/dev/tty.xbee"
     if (os.name.find("nt") > -1):
-        IN_PORT = "COM6"
+        IN_PORT = "COM10"
     
     # Parse options from the command line
     usageStr = "usage: %prog [options]"
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         receiverQueueMgr = ReceiverQueueMgr()
     
         # Spawn threads for listening and sending data over the serial port
-        ioserver.receiver_queue_mgr.recieverQueueMgr = receiverQueueMgr
+        ioserver.xbeeio.receiverQueueMgr = receiverQueueMgr
         receiverObj = ioserver.xbeeio.XBeeIO(options.inputPort, DEFAULT_BAUDRATE)
         
         #print "Running receiver with file input ..."
