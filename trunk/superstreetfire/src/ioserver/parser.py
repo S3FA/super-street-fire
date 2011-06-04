@@ -16,12 +16,18 @@ import string
 import struct
 from collections import deque
 from client_datatypes import GloveData, HeadsetData, PLAYER_ONE, PLAYER_TWO
+from binascii import hexlify
 
 log = logging.getLogger('parser')
     
 # look guys, no wires!
 def ParseWirelessData(xbeePacket, queueMgr):
-    #print xbeePacket  
+    #print xbeePacket 
+    
+    if xbeePacket['id'] == 'at_response':
+        UpdateAddrTable(xbeePacket)
+        return
+     
     if (xbeePacket.has_key('rf_data') == False): return  
     #each frame starts with Node ID colon, ends with pipe.. e.g. 1L:x,x,x..|
     rfdata = xbeePacket['rf_data'].replace(' ','')
@@ -215,6 +221,44 @@ HOLDING_FRAME = {
 
 # looks for nodes within the output data, and assigns a mapping 
 # device source address to player device.
+# TODO: we can probably get rid of this and use reverse lookups on ADDR_TABLE now
 SOURCE_ADDRESS_MAP = {
 }
 
+# Address table for all XBee devices on the network
+# Names are set on the XBee radios themselves, this is a complete list of devices
+# This gets populated by UpdateAddrTable() whenever a ND reply is seen
+ADDR_TABLE = {
+    'SSFP1L'    : ['',''],
+    'SSFP1R'    : ['',''],
+    'SSFP1H'    : ['',''],
+    'SSFP2L'    : ['',''],
+    'SSFP2R'    : ['',''],
+    'SSFP2H'    : ['',''],
+    'SSFFIRE'   : ['',''],
+    'SSFTIMER'  : ['',''],
+    'SSFP1LIFE' : ['',''],
+    'SSFP2LIFE' : ['',''],
+    'SSFLIGHTS' : ['',''],
+}
+
+def GetAddrL(device):
+    return ADDR_TABLE[device][0]
+
+def GetAddrS(device):
+    return ADDR_TABLE[device][1]
+
+def UpdateAddrTable(response):
+    if response['id'] == 'at_response':
+        if response['command'] == 'ND':
+            parameter = response['parameter']
+            destaddrS = parameter[0:2]
+            destaddr  = parameter[2:10]
+            destname  = parameter[10:]
+            index = destname.find('\x00')
+            destname = destname[:index]
+            ADDR_TABLE[destname] = [destaddr, destaddrS]
+            log.debug("received node reply for node %s short %s long %s" \
+                % (destname, hexlify(destaddrS), hexlify(destaddr)))
+            return 1
+    return 0
