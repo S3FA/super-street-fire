@@ -1,9 +1,0 @@
-#summary Dan's work list
-*Current Tasks*
-
-  * Writing database code.
-  * Greg has taken over work on the UI code.
-
-
-*Need to do's*
-  * Post the stub interface for the database handling code
