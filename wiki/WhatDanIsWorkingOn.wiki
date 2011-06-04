@@ -1,11 +1,9 @@
 #summary Dan's work list
 *Current Tasks*
 
-  *Currently working on a wireframe layout for the GUI - Add to wiki when done
-  *Creating stubs for all of the needed controls/commands
-  *Transpose use cases to Wiki
+  * Writing database code.
+  * Greg has taken over work on the UI code.
+
 
 *Need to do's*
-  *Will need to talk to Jason in regards to moving simulator into the GUI as the visual output of game state *-- Completed --* Jason will have a flame ring simulator sorted out hopefully for the weekend of May 6th.
-  *Finalize what information is required/wanted on the GUI.
-  *Put some ideas back to the game-play group that arose from writing use case stories.
+  * Post the stub interface for the database handling code
