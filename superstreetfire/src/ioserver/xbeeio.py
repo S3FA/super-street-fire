@@ -50,9 +50,9 @@ class XBeeIO:
         
         # send out node discovery -- responses will be added to ADDR_TABLE in the parser
         self.xbee.at(command='ND')
+        print "Searching for wireless nodes ... wait for it."
         sleep(self.DISCOVERY_TIMEOUT)
-        print "Found Devices:"
-        print parser.ADDR_TABLE
+        self._logger.info("Found Devices:" + str( parser.ADDR_TABLE ) )
         
         try:
             port = '/dev/master'
@@ -83,11 +83,8 @@ class XBeeIO:
             # Write data to the xbee->wifire interpreter
             # TODO: dest address by table
             self.xbee.send('tx', dest_addr=parser.GetAddrS('SSFFIRE'), dest_addr_long=parser.GetAddrL('SSFFIRE'), data=fireEmitterData)                   
-        except TypeError:
-            print 'Type error on xbee sender '
-            #pass
         except:
-            print "Something bad happened -- perhaps address not in ADDR_TABLE"
+            self._logger.warn("FIRE send error -- perhaps address not in ADDR_TABLE")
 
 
     def _sendTimer(self):
@@ -98,6 +95,7 @@ class XBeeIO:
         try:
             self.visualizer.write(timerData)
         except:
+            self._logger.debug("Visualizer TIMER send error")
             pass
         
         # Make sure this object is in a proper state before running...
@@ -110,11 +108,9 @@ class XBeeIO:
             # Write data to the xbee: timer destination address
             # TODO: dest address by table
             self.xbee.send('tx', dest_addr=parser.GetAddrS('SSFTIMER'), dest_addr_long=parser.GetAddrL('SSFTIMER'), data=timerData)                 
-        except TypeError:
-            print 'Type error on xbee sender '
         except:
-            print "Something bad happened -- perhaps address not in ADDR_TABLE"
-            
+            self._logger.warn("TIMER send error -- perhaps address not in ADDR_TABLE")
+
     def _sendND(self):
         
         self._logger.debug('sending node discovery message')
