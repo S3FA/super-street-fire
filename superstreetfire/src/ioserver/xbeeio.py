@@ -1,7 +1,7 @@
 '''
-receiver.py
+xbeeio.py
 
-The receiver contains the Receiver class, which runs as a separate thread
+The receiver contains the XBeeIO class, which runs as a separate thread
 in the super street fire server. This thread is responsible for
 receiving data from clients via a specified serial port on this machine,
 parsing that data and placing it onto the queues of its given
@@ -26,7 +26,7 @@ recieverQueueMgr = None
 def XBeeCallback(xbeeDataFrame):
     parser.ParseWirelessData(xbeeDataFrame, recieverQueueMgr)
 
-class Receiver:
+class XBeeIO:
     LOGGER_NAME = 'xbee-tx'
 
     #sample xbee address
@@ -34,7 +34,7 @@ class Receiver:
     p1leftAddrS = '\x00\x13'
 
     def __init__(self, inputSerialPort, baudRate):
-        self._logger = logging.getLogger(Receiver.LOGGER_NAME)
+        self._logger = logging.getLogger(XBeeIO.LOGGER_NAME)
         self.serialIn    = None
         self.xbee        = None
         self.visualizer  = None
@@ -76,11 +76,11 @@ class Receiver:
         
         try:
             # Write data to the xbee->wifire interpreter
-            self.xbee.send('tx', dest_addr=Receiver.p1leftAddrS, dest_addr_long=Receiver.p1leftAddrL, data=fireEmitterData);                   
+            self.xbee.send('tx', dest_addr=XBeeIO.p1leftAddrS, dest_addr_long=XBeeIO.p1leftAddrL, data=fireEmitterData);                   
         except TypeError:
             print 'Type error on xbee sender '
             #pass
-        
+
 
         
     def SendFireEmitterData(self, leftEmitters, rightEmitters):

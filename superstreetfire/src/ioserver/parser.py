@@ -214,7 +214,7 @@ HOLDING_FRAME = {
 }
 
 # looks for nodes within the output data, and assigns a mapping 
-# device soure address to player device.
+# device source address to player device.
 SOURCE_ADDRESS_MAP = {
 }
 

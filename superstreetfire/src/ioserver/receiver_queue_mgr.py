@@ -149,7 +149,7 @@ class ReceiverQueueMgr:
             count    = len(queue)
             avgSum = queue[0]
             for i in range(1, count):
-                avgSum += queue[0]
+                avgSum += queue[i]
                 
             assert(avgSum != None)
             assert(count > 0)
