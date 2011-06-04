@@ -70,7 +70,8 @@ class GloveData:
         rotDiv     = tuple(map(operator.div, self.rotation, (other, other, other)))
         accelDiv   = tuple(map(operator.floordiv, self.acceleration, (other, other, other)))
         headingDiv = tuple(map(operator.div, self.heading, (other, other, other)))
-        return GloveData(rotDiv, accelDiv, headingDiv, self.player, self.hand)
+        headingR = (round(headingDiv[0],2),round(headingDiv[1],2),round(headingDiv[2],2))
+        return GloveData(rotDiv, accelDiv, headingR, self.player, self.hand)
         
     
 # Class for representing the head-set (EEG) data
