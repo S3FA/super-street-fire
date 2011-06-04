@@ -38,7 +38,8 @@ class XBeeIO:
         self.serialIn    = None
         self.xbee        = None
         self.visualizer  = None
-        self.outputData  = None
+        self.fireData    = None
+        self.timerData   = None
         
         try:
             self.serialIn = serial.Serial(inputSerialPort, baudrate=baudRate)
@@ -58,9 +59,9 @@ class XBeeIO:
         except serial.SerialException:
             print 'ERROR: Serial'+port+' for visualizer was invalid/not found.'
         
-    def _send(self):
+    def _sendFire(self):
         
-        fireEmitterData = self.outputData
+        fireEmitterData = self.fireData
         self._logger.debug('sending fire emitter data ' + hexlify(fireEmitterData))
         
         try:
@@ -76,12 +77,61 @@ class XBeeIO:
         
         try:
             # Write data to the xbee->wifire interpreter
+            # TODO: dest address by table
             self.xbee.send('tx', dest_addr=XBeeIO.p1leftAddrS, dest_addr_long=XBeeIO.p1leftAddrL, data=fireEmitterData);                   
         except TypeError:
             print 'Type error on xbee sender '
             #pass
 
 
+    def _sendTimer(self):
+        
+        timerData = self.timerData
+        self._logger.debug('sending timer data ' + hexlify(timerData))
+        
+        try:
+            self.visualizer.write(timerData)
+        except:
+            pass
+        
+        # Make sure this object is in a proper state before running...
+        if self.xbee == None:
+            print "ERROR: Output port was invalid/not found, can not send."
+            print "************ Killing XBee IO Thread ****************"
+            return
+        
+        try:
+            # Write data to the xbee: timer destination address
+            # TODO: dest address by table
+            self.xbee.send('tx', dest_addr=XBeeIO.p1leftAddrS, dest_addr_long=XBeeIO.p1leftAddrL, data=timerData);                   
+        except TypeError:
+            print 'Type error on xbee sender '
+
+
+    def SendTimerNum(self, value):
+    
+    # based on the following digit map:
+    #
+    #   x0x          x8x
+    # x     x      x     x
+    # 5     1      d     9
+    # x     x      x     x
+    #   x6x          xex
+    # x     x      x     x
+    # 4     2      c     a
+    # x     x      x     x
+    #   x3x          xbx     
+        
+        if (value < 0) or (value > 99):
+            return
+        
+        digitMap = [0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F]
+        
+        timerData = (digitMap[value / 10] << 8) | digitMap[value % 10]
+        
+        self.timerData = timerData
+        self._sendTimer()
+        
         
     def SendFireEmitterData(self, leftEmitters, rightEmitters):
         
@@ -117,10 +167,10 @@ class XBeeIO:
         
         dataset = struct.pack("HHH", fireInt, p1cInt, p2cInt)
         
-        if (self.outputData != dataset):
-            self.outputData = dataset
+        if (self.fireData != dataset):
+            self.fireData = dataset
             #print 'send wifire data=%s' % (dataset)
-            self._send()
+            self._sendFire()
         
     def Kill(self):
         if self.xbee != None:
