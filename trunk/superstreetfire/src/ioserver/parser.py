@@ -150,7 +150,7 @@ def HeadsetParser(player, bodyStr):
     try:
         linkQuality = float(data[0])
         if (linkQuality > 0):
-            print 'Headset has no link for player ' + str(player)
+            log.debug( 'Headset has no link for player ' + str(player))
             return None
         
         # Turn the parsed glove data into an actual object
@@ -194,13 +194,13 @@ def Player2RightGloveParser(bodyStr, queueMgr):
         queueMgr.PushP2RightGloveData(gloveData)
         
 def Player1HeadsetSerialInputParser(bodyStr, queueMgr):
-    print "Player 1 headset data received."
+    #print "Player 1 headset data received."
     headsetData = HeadsetParser(PLAYER_ONE, bodyStr)
     if headsetData != None:
         queueMgr.PushP1HeadsetData(headsetData)
 
 def Player2HeadsetSerialInputParser(bodyStr, queueMgr):
-    print "Player 2 headset data received."
+    #print "Player 2 headset data received."
     headsetData = HeadsetParser(PLAYER_TWO, bodyStr)
     if headsetData != None:
         queueMgr.PushP2HeadsetData(headsetData)
