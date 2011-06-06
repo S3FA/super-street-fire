@@ -12,6 +12,7 @@ and when it's not being played (e.g., calibration, idle)
 import logging
 from calibration_data import CalibrationData
 from player import Player
+from resources.sounds import sounds
 
 IDLE_GAME_STATE          = 0
 CALIBRATION_GAME_STATE   = 1
@@ -126,6 +127,7 @@ class RoundBeginGameState(GameState):
     def Tick(self, dT):
         if self.countdownTime <= 0.0:
             # FIGHT!!!
+            sounds.announceFight.play()
             self.ssfGame._SetState(RoundInPlayGameState(self.ssfGame, self.roundNumber))
             return
         
@@ -239,6 +241,7 @@ class RoundEndedGameState(GameState):
         else:
             self.ssfGame.player2.numRoundWins += 1
         
+        sounds.announceRound.play()
         # Sanity: Players should NEVER have more than (half a match + 1) round wins
         assert(self.ssfGame.player1.numRoundWins <= (RoundEndedGameState.NUM_ROUNDS_PER_MATCH/2 + 1))
         assert(self.ssfGame.player2.numRoundWins <= (RoundEndedGameState.NUM_ROUNDS_PER_MATCH/2 + 1))
@@ -380,6 +383,7 @@ class PausedGameState(GameState):
         self.ssfGame._SetState(self._statePaused)
 
     def StopGame(self):
+        sounds.swipeSound.play()
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
     
