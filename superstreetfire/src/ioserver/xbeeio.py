@@ -164,26 +164,28 @@ class XBeeIO:
         for emitter in leftEmitters:
             #print 'left emitter: %s ' % (emitter)
             fire[emitter.arcIndex] = str(int(emitter.flameIsOn))
+            
             p1c[emitter.arcIndex] =  str(int(emitter.p1ColourIsOn))
             p2c[emitter.arcIndex+8] =  str(int(emitter.p2ColourIsOn))
         
         for emitter in rightEmitters:
-            fire[emitter.arcIndex+8] =  str(int(emitter.flameIsOn))
-            p1c[emitter.arcIndex+8] =  str(int(emitter.p1ColourIsOn))
+            fire[15-emitter.arcIndex] =  str(int(emitter.flameIsOn))
+            
+            p1c[15-emitter.arcIndex] =  str(int(emitter.p1ColourIsOn))
             p2c[emitter.arcIndex] =  str(int(emitter.p2ColourIsOn))
                     
-        #print 'fire=%s,p1c=%s,p2c=%s' % (fire, p1c, p2c)
         fire.reverse()
         p1c.reverse()
         p2c.reverse()
         
         fireInt = int(''.join(fire),2)
-        p1cInt  = int(''.join(fire),2)
-        p2cInt  = int(''.join(fire),2)
+        p1cInt  = int(''.join(p1c),2)
+        p2cInt  = int(''.join(p2c),2)
         
         dataset = struct.pack("HHH", fireInt, p1cInt, p2cInt)
         
         if (self.fireData != dataset):
+            self._logger.info('fire=%s, p1c=%s, p2c=%s' % (fire, p1c, p2c) )
             self.fireData = dataset
             #print 'send wifire data=%s' % (dataset)
             self._sendFire()
