@@ -17,98 +17,140 @@ from client_datatypes import GloveData, HeadsetData, PLAYER_ONE, PLAYER_TWO
 from binascii import hexlify
 
 log = logging.getLogger('parser')
-    
-# look guys, no wires!
-def ParseWirelessData(xbeePacket, queueMgr):
-    #print xbeePacket 
-    
-    if xbeePacket['id'] == 'at_response':
-        UpdateAddrTable(xbeePacket)
-        return
-     
-    if (xbeePacket.has_key('rf_data') == False): return  
-    #each frame starts with Node ID colon, ends with pipe.. e.g. 1L:x,x,x..|
-    rfdata = xbeePacket['rf_data'].replace(' ','')
-    #print 'rfdata:%s' % (rfdata)
-    
-    # try to find a device id based on source address
-    source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
-    nodeId = SOURCE_ADDRESS_MAP.get(source,'0')
-    frameData = deque()
 
-    startDataPos = rfdata.find(":")
-    # if we're just starting up, read each of the device ids into a map
-    if (nodeId == '0'):
-        # which device are we? is there a "[digit][char]:"
-        if (startDataPos >= 2 and ( rfdata[startDataPos-1:startDataPos].isalpha() or
-                                   rfdata[startDataPos-2:startDataPos-1].isalpha() ) ):
-            nodeId = rfdata[startDataPos-2:startDataPos]
-            if (nodeId == 'ts'):
-                log.warn( 'Invalid ts node in rfdata ' )
-                return
-            SOURCE_ADDRESS_MAP[source] = nodeId
-            log.info( 'found a node %s for %s ' % (nodeId, source) )
-        else:
-            log.warn( 'No node in rfdata ' )
+# responsible for reading in the xbee node discovery and device data.
+class Parser: 
+    
+    def __init__(self):
+        self._logger = logging.getLogger('wireless_parser')
+
+    def ParseWirelessData(self, xbeePacket, queueMgr):
+        #print xbeePacket 
+        if xbeePacket['id'] == 'at_response':
+            self.updateAddrTable(xbeePacket)
             return
-    
-    # when we have a full frame, pass it on
-    func = PARSER_FUNCTION_DICT.get(nodeId);
-    restartFrame = (startDataPos == 2)  
-    
-    if (nodeId.find('H') > -1):
-        func(rfdata[3], queueMgr)
-        return        
         
-    fullFrame = rfdata[-1] == '|'
-    if (restartFrame and fullFrame):
-        # log.debug( "rfdata:" + rfdata[3:-1] )
-        func(rfdata[3:-1], queueMgr)
-        return
+        # try to find a device id based on source address
+        nodeId = self.getDevice(xbeePacket['source_addr_long'])
+        # if we're just starting up, read each of the device ids into a map
+        if (nodeId == 0):
+            source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
+            log.debug( 'No node in address table for ' + source )
+            return
+
+        # good to go, look for the device data:
+        if (xbeePacket.has_key('rf_data') == False): return  
+    
+        rfdata = xbeePacket['rf_data'].replace(' ','')
+        #print 'rfdata:%s' % (rfdata)
         
-    # the data packet may be disjoint, test it sequentially  
-    frameData.append( HOLDING_FRAME[nodeId] )
-    for c in rfdata:
-        if (restartFrame and c != ":"):
-            continue
-        elif (restartFrame and c == ":"):
-            restartFrame = False
-            continue
-        frameData[-1] += c
-        if (c == "|"):
-            if (string.count(frameData[-1], ',') >= 8):
-                # data is a bit weird.. check for node headers
-                badNode = frameData[-1].find(':')
-                if (badNode > -1):
-                    frameData[-1] = frameData[-1][badNode+1:]
-                #print 'popping frame:%s' % (frameData)
-                func(frameData.pop(), queueMgr)
-            frameData.append('')
-            restartFrame = True
+        
+        # when we have a full frame, pass it on
+        func = PARSER_FUNCTION_DICT.get(nodeId);
+        
+        log.debug( nodeId + ' data: ' + rfdata)
+        
+        # headset data is differently framed .. assume its a full frame
+        # this is not always true.. 
+        if (nodeId.find('H') > -1):
+            if (rfdata.find(':') > 2):
+                func(rfdata[rfdata.find(':')+1:], queueMgr)
+            return        
             
-    badNode = frameData[-1].find(':')
-    if (badNode > -1):
-        HOLDING_FRAME[nodeId] = frameData[-1][badNode+1:]
-    else:
-        HOLDING_FRAME[nodeId] = frameData.pop()   
+        # IMU data is sometimes split over multiple reads
+        frameData = deque()
+        startDataPos = rfdata.find(":")
+        restartFrame = (startDataPos == 2)  
+        fullFrame = rfdata[-1] == '|'
+        if (restartFrame and fullFrame):
+            # log.debug( "rfdata:" + rfdata[3:-1] )
+            func(rfdata[3:-1], queueMgr)
+            return
+            
+        # the data packet may be disjoint, test it sequentially  
+        frameData.append( Parser.HOLDING_FRAME[nodeId] )
+        for c in rfdata:
+            if (restartFrame and c != ":"):
+                continue
+            elif (restartFrame and c == ":"):
+                restartFrame = False
+                continue
+            frameData[-1] += c
+            if (c == "|"):
+                if (string.count(frameData[-1], ',') >= 8):
+                    # data is a bit weird.. check for node headers
+                    badNode = frameData[-1].find(':')
+                    if (badNode > -1):
+                        frameData[-1] = frameData[-1][badNode+1:]
+                    #print 'popping frame:%s' % (frameData)
+                    func(frameData.pop(), queueMgr)
+                frameData.append('')
+                restartFrame = True
+                
+        badNode = frameData[-1].find(':')
+        if (badNode > -1):
+            Parser.HOLDING_FRAME[nodeId] = frameData[-1][badNode+1:]
+        else:
+            Parser.HOLDING_FRAME[nodeId] = frameData.pop()
+
+    def getAddrL(self, device):
+        return Parser.ADDR_TABLE[device][0]
     
+    def getAddrS(self, device):
+        return Parser.ADDR_TABLE[device][1]
+    
+    def getDevice(self, addrL):
+        try:
+            for k, v in Parser.ADDR_TABLE.iteritems():
+                if (v[0] == addrL):
+                    return k
+        except:
+            pass
+        return 0
+    
+    def updateAddrTable(self, response):
+        if response['id'] == 'at_response':
+            if response['command'] == 'ND':
+                parameter = response['parameter']
+                destaddrS = parameter[0:2]
+                destaddr  = parameter[2:10]
+                destname  = parameter[10:]
+                index = destname.find('\x00')
+                destname = destname[:index]
+                Parser.ADDR_TABLE[destname] = [destaddr, destaddrS]
+                log.debug("received node reply for node %s short %s long %s" \
+                    % (destname, hexlify(destaddrS), hexlify(destaddr)))
+                self.isAddressTableSetup = True
+                return 1
+            
+        return 0
 
-def ParseSerialData(serialDataStr, queueMgr):
-    # Break the serial input up based on the various known headers that
-    # designate our input sources...
-    splitNodeData  = string.split(serialDataStr, ":")
-    splitListLength = len(splitNodeData)
-    #print 'Player %s - Data: %s ' % (splitNodeData[0], splitNodeData[1])
-
-    # splitListLength should likely be 2 here, but just for robustness
-    # we pretend like it could be longer
-    for i in range(0, splitListLength-1):
-        func = PARSER_FUNCTION_DICT.get(splitNodeData[i]);
-        if func != None:
-            # We're dealing with an expected package type from a client, parse it
-            # and queue it for the game simulation to deal with
-            func(splitNodeData[i+1], queueMgr)
-
+    
+    # holds the current device line data, might be split over multiple reads.
+    HOLDING_FRAME = {
+        'SSFP1L' : '',
+        'SSFP1R' : '',
+        'SSFP2L' : '',
+        'SSFP2R' : '',
+    }
+    
+    # Address table for all XBee devices on the network
+    # Names are set on the XBee radios themselves, this is a complete list of devices
+    # This gets populated by UpdateAddrTable() whenever a ND reply is seen
+    ADDR_TABLE = {
+        'SSFP1L'    : ['',''],
+        'SSFP1R'    : ['',''],
+        'SSFP1H'    : ['',''],
+        'SSFP2L'    : ['',''],
+        'SSFP2R'    : ['',''],
+        'SSFP2H'    : ['',''],
+        'SSFFIRE'   : ['',''],
+        'SSFTIMER'  : ['',''],
+        'SSFP1LIFE' : ['',''],
+        'SSFP2LIFE' : ['',''],
+        'SSFLIGHTS' : ['',''],
+    }
+    
 
 def GloveParser(player, hand, bodyStr):
     
@@ -205,67 +247,14 @@ def Player2HeadsetSerialInputParser(bodyStr, queueMgr):
     if headsetData != None:
         queueMgr.PushP2HeadsetData(headsetData)
 
+
 # We try to make parsing as fast as possible by using a hash table with 1H,1L,1R,etc.
 # for keys and parse function references for values
 PARSER_FUNCTION_DICT = {
-    '1L' : Player1LeftGloveParser,
-    '1R' : Player1RightGloveParser,
-    '1H' : Player1HeadsetSerialInputParser,
-    '2L' : Player2LeftGloveParser,
-    '2R' : Player2RightGloveParser,
-    '2H' : Player2HeadsetSerialInputParser
+    'SSFP1L' : Player1LeftGloveParser,
+    'SSFP1R' : Player1RightGloveParser,
+    'SSFP1H' : Player1HeadsetSerialInputParser,
+    'SSFP2L' : Player2LeftGloveParser,
+    'SSFP2R' : Player2RightGloveParser,
+    'SSFP2H' : Player2HeadsetSerialInputParser
 }
-
-# holds the current device line data, might be split over multiple reads.
-HOLDING_FRAME = {
-    '1L' : '',
-    '1R' : '',
-    'H1' : '',
-    '2L' : '',
-    '2R' : '',
-    '2H' : ''
-}
-
-# looks for nodes within the output data, and assigns a mapping 
-# device source address to player device.
-# TODO: we can probably get rid of this and use reverse lookups on ADDR_TABLE now
-SOURCE_ADDRESS_MAP = {
-}
-
-# Address table for all XBee devices on the network
-# Names are set on the XBee radios themselves, this is a complete list of devices
-# This gets populated by UpdateAddrTable() whenever a ND reply is seen
-ADDR_TABLE = {
-    'SSFP1L'    : ['',''],
-    'SSFP1R'    : ['',''],
-    'SSFP1H'    : ['',''],
-    'SSFP2L'    : ['',''],
-    'SSFP2R'    : ['',''],
-    'SSFP2H'    : ['',''],
-    'SSFFIRE'   : ['',''],
-    'SSFTIMER'  : ['',''],
-    'SSFP1LIFE' : ['',''],
-    'SSFP2LIFE' : ['',''],
-    'SSFLIGHTS' : ['',''],
-}
-
-def GetAddrL(device):
-    return ADDR_TABLE[device][0]
-
-def GetAddrS(device):
-    return ADDR_TABLE[device][1]
-
-def UpdateAddrTable(response):
-    if response['id'] == 'at_response':
-        if response['command'] == 'ND':
-            parameter = response['parameter']
-            destaddrS = parameter[0:2]
-            destaddr  = parameter[2:10]
-            destname  = parameter[10:]
-            index = destname.find('\x00')
-            destname = destname[:index]
-            ADDR_TABLE[destname] = [destaddr, destaddrS]
-            log.debug("received node reply for node %s short %s long %s" \
-                % (destname, hexlify(destaddrS), hexlify(destaddr)))
-            return 1
-    return 0

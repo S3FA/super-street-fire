@@ -22,6 +22,7 @@ from time import sleep
 # Since the xbee library requires a non-member function for its callbacks, we
 # need to make the variables available to that function non-members as well...
 receiverQueueMgr = None
+parser = parser.Parser()
 
 # Callback function for asynchronous receiving of data from the xbee library
 def XBeeCallback(xbeeDataFrame):
@@ -185,7 +186,7 @@ class XBeeIO:
         dataset = struct.pack("HHH", fireInt, p1cInt, p2cInt)
         
         if (self.fireData != dataset):
-            self._logger.info('fire=%s, p1c=%s, p2c=%s' % (fire, p1c, p2c) )
+            #self._logger.debug('fire=%s, p1c=%s, p2c=%s' % (fire, p1c, p2c) )
             self.fireData = dataset
             #print 'send wifire data=%s' % (dataset)
             self._sendFire()
