@@ -27,11 +27,11 @@ YAW = 2
 JAB_FWDACC_L1 = 160
 JAB_FWDACC_L2 = 200
 
-HOOK_LATGYR    = 220
-HOOK_FWDACC_L1 = 280
-HOOK_FWDACC_L2 = 400
-HOOK_LATACC_L1 = 200
-HOOK_LATACC_L2 = 300
+HOOK_LATGYR    = 80
+HOOK_FWDACC_L1 = 120
+HOOK_FWDACC_L2 = 160
+HOOK_LATACC_L1 = 160
+HOOK_LATACC_L2 = 200
 
 BLOCK_VER_ANGLE = 70
 BLOCK_RELEASE_ANGLE = 50
@@ -147,9 +147,9 @@ class GestureState:
         # allow two-handed moves to be the final move in this tick
         if (lGlove != None and rGlove != None):
             # hadouken - check for forward accel - both hands
-            if (abs(lGlove.acceleration[X]) > 100 and abs(rGlove.acceleration[X]) > 100 ):
+            if (abs(lGlove.acceleration[X]) > 85 and abs(rGlove.acceleration[X]) > 85 ):
                 newMove = GestureState.BOTH_FWD
-                #print "BOTH FORWARD MOVE ______________"
+                print "BOTH FORWARD MOVE ______________"
             # hadouken - has a well defined end position at the end of the move..
             if (prevMove == GestureState.BOTH_FWD and \
                 abs(lGlove.heading[PITCH]) > 33 and abs(lGlove.heading[PITCH]) < 50 and \
@@ -166,9 +166,9 @@ class GestureState:
                 # both hands sideways, set "no move" because it's probably
                 # going to be a sonic boom when accel+gyros are higher
                 newMove = GestureState.SONIC_SIDE
-                #print "SONIC SIDE POSITION ______________"
+                print "SONIC SIDE POSITION ______________"
             if (prevMove == GestureState.SONIC_SIDE and \
-                abs(lGlove.rotation[X]) > 75 and abs(rGlove.rotation[X]) > 75 and \
+                abs(lGlove.rotation[X]) > 55 and abs(rGlove.rotation[X]) > 55 and \
                 abs(lGlove.acceleration[X]) > 90 and abs(rGlove.acceleration[X]) > 90 ):
                 newMove = GestureState.SONIC_BOOM
             if (newMove > -1): 
@@ -263,7 +263,7 @@ class PlayerGestureState(GestureState):
             #print "got some data for both hands " % ( self.left, self.right )
             self._determineMove(self)
             #if (len(playerState.moves) > 0):
-            self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
+            #self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
             # send the attack/block whatever to the change state function
             self._doMoves()
 
