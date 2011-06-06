@@ -56,7 +56,7 @@ p2colorstate = ''
 
 while True:
     if( s.inWaiting() >= 6 ):
-        firestate, p1colorstate, p2colorstate = unpack(">HHH", s.read(6))
+        firestate, p1colorstate, p2colorstate = unpack("<HHH", s.read(6))
         print firestate 
         for x in range(15,-1,-1):
             fireon = firestate & 1<<x
