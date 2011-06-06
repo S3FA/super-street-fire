@@ -108,7 +108,7 @@ if __name__ == '__main__':
         uiController = gui.UIController(ssfGame)
         
         # Jump straight to the round-in-play for testing
-        ssfGame._SetState(gamemodel.game_states.RoundInPlayGameState(ssfGame))
+        ssfGame._SetState(gamemodel.game_states.RoundInPlayGameState(ssfGame,1))
 
         while True:
             

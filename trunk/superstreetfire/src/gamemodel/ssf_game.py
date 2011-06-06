@@ -7,7 +7,7 @@ ssf_game.py
 
 import logging
 import player
-from game_states import IdleGameState
+import game_states
 from fire_emitter import FireEmitter
 from gesture_recognizer import GestureRecognizer
 from game_model_listener import GameModelListenerCmdr
@@ -38,7 +38,7 @@ class SSFGame:
         # Set the first state for the game
         # NOTE: Always be sure to set the state LAST in the constructor since
         # it might make use of members that belong to this object
-        self._SetState(IdleGameState(self))
+        self._SetState(game_states.IdleGameState(self))
 
     def Reset(self):
         self.chipDamageOn = True
@@ -87,6 +87,9 @@ class SSFGame:
     # set state machine (see game_states.py)
     def Tick(self, dT):
         self.state.Tick(dT)
+        if self.state.GetStateType() == game_states.ROUND_IN_PLAY_GAME_STATE:
+            self._listenerCmdr.TimerStateChanged(self.state.roundTime)
+    
     def StartGame(self):
         self.state.StartGame()
     def TogglePauseGame(self):
@@ -115,7 +118,10 @@ class SSFGame:
             self.player1.DoDamage(dmgAmt)
         else:
             self.player2.DoDamage(dmgAmt)    
-  
+        
+        self._listenerCmdr.OnPlayerHealtherChanged((self.player1,self.player2))
+        
+        
     # Private functions *****************************************    
 
     def _SetState(self, gameState):

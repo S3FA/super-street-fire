@@ -37,7 +37,10 @@ class Player:
         self.hitPoints -= hpDamage
         self._logger.debug("Player " + str(self.playerNum) + " has been damaged (damage amt = " + \
                            str(hpDamage) + ", life left = " + str(self.hitPoints) + ")")
-        
+    
+    def GetHealth(self):
+        return self.hitPoints
+    
 def GetOtherPlayerNum(playerNum):
     if playerNum == 1:
         return 2
