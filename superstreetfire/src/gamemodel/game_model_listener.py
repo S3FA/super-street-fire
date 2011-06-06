@@ -17,6 +17,12 @@ class GameModelListener:
     def OnGameStateChanged(self, newGameState):
         pass
     
+    def OnTimerStateChanged(self, timerValue):
+        pass
+    
+    def OnPlayerHealthChanged(self, players):
+        pass
+    
     # TODO: Place more listener event here
     
     
@@ -34,5 +40,10 @@ class GameModelListenerCmdr:
     def GameStateChanged(self, newGameState):
         for i in self._listenerList: i.OnGameStateChanged(newGameState)
     
+    # Tell all listeners that a TimerStateChange occurred
+    def TimerStateChanged(self, timerValue):
+        for i in self._listenerList: i.OnTimerStateChanged(timerValue)
     
+    def PlayerHealthChanged(self, players):
+        for i in self._listenerList: i.OnPlayerHealthChanged(players)
     

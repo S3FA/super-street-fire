@@ -60,7 +60,7 @@ class IdleGameState(GameState):
     def Calibrate(self):
         self.ssfGame._SetState(CalibrationGameState(self.ssfGame))
     def StartGame(self):
-        self.ssfGame._SetState(RoundBeginGameState(self.ssfGame))
+        self.ssfGame._SetState(RoundBeginGameState(self.ssfGame, 1))
     def GetStateType(self):
         return IDLE_GAME_STATE
 
@@ -111,10 +111,11 @@ class CalibrationGameState(GameState):
 class RoundBeginGameState(GameState):
     COUNT_DOWN_TIME_IN_SECONDS = 3.0
     
-    def __init__(self, ssfGame):
+    def __init__(self, ssfGame, roundNumber):
         GameState.__init__(self, ssfGame)
         self._logger.debug("Entering Round Begin Game State")
         self.countdownTime = RoundBeginGameState.COUNT_DOWN_TIME_IN_SECONDS
+        self.roundNumber = roundNumber
         
         # Place player health back up to full
         # Make sure all fire emitters are turned off        
@@ -125,7 +126,7 @@ class RoundBeginGameState(GameState):
     def Tick(self, dT):
         if self.countdownTime <= 0.0:
             # FIGHT!!!
-            self.ssfGame._SetState(RoundInPlayGameState(self.ssfGame))
+            self.ssfGame._SetState(RoundInPlayGameState(self.ssfGame, self.roundNumber))
             return
         
         self.countdownTime -= dT
@@ -145,13 +146,14 @@ class RoundBeginGameState(GameState):
 class RoundInPlayGameState(GameState):
     ROUND_TIME_IN_SECONDS = 60.0
     
-    def __init__(self, ssfGame):
+    def __init__(self, ssfGame, roundNumber):
         GameState.__init__(self, ssfGame)
         self._logger.debug("Entering Round In-Play Game State")
         # A list of all active actions during this round
         self._activeActions = []
         # There's always a game timer, which counts down throughout a match
-        self._roundTime = RoundInPlayGameState.ROUND_TIME_IN_SECONDS
+        self.roundTime = RoundInPlayGameState.ROUND_TIME_IN_SECONDS
+        self.roundNumber = roundNumber
         
     def Tick(self, dT):
         # Execute the actions (attacks, blocks, etc.)
@@ -161,11 +163,12 @@ class RoundInPlayGameState(GameState):
         if self._IsRoundOver():
             self._logger.debug("Round is over.")
             # Switch states to the RoundEndedGameState
-            self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner()))
+            self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner(), self.roundNumber))
             return
         
         # Diminish the round timer
-        self._roundTime -= dT       
+        self.roundTime -= dT
+        
  
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
@@ -190,7 +193,7 @@ class RoundInPlayGameState(GameState):
 
     def _IsRoundOver(self):
         return (self.ssfGame.player1.IsKnockedOut() or self.ssfGame.player2.IsKnockedOut() or \
-                self._roundTime <= 0.0)
+                self.roundTime <= 0.0)
 
     # Get the enumeration for which player won the round (or whether there was a tie)
     def _GetRoundWinner(self):
@@ -213,7 +216,7 @@ class RoundEndedGameState(GameState):
     PLAYER_1_WON_ROUND = 1
     PLAYER_2_WON_ROUND = 2
     
-    def __init__(self, ssfGame, roundWinner):
+    def __init__(self, ssfGame, roundWinner, roundNumber):
         GameState.__init__(self, ssfGame)
         self._logger.info("Round Ended, Winner: " + str(roundWinner))
         assert(roundWinner == RoundEndedGameState.PLAYER_1_WON_ROUND or \
@@ -224,6 +227,8 @@ class RoundEndedGameState(GameState):
         self._logger.debug("Entering Round Ended Game State")
         
         self._roundWinner = roundWinner
+        
+        self.roundNumber = roundNumber
         # Based on the round winner, increment the number of wins for the
         # corresponding player(s)
         if roundWinner == RoundEndedGameState.TIE_ROUND:
@@ -254,7 +259,7 @@ class RoundEndedGameState(GameState):
                 # won the match that brought us to this state
                 self.ssfGame._SetState(MatchOverGameState(self.ssfGame, self._roundWinner))
         else:
-            self.ssfGame._SetState(RoundBeginGameState(self.ssfGame))
+            self.ssfGame._SetState(RoundBeginGameState(self.ssfGame, self.roundNumber+1))
 
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
