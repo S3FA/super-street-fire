@@ -118,8 +118,8 @@ class SSFGame:
             self.player1.DoDamage(dmgAmt)
         else:
             self.player2.DoDamage(dmgAmt)    
-        
-        self._listenerCmdr.OnPlayerHealtherChanged((self.player1,self.player2))
+        #GameModelListenerCmdr instance has no attribute 'OnPlayerHealtherChanged'
+        self._listenerCmdr.OnPlayerHealthChanged((self.player1,self.player2))
         
         
     # Private functions *****************************************    
