@@ -59,29 +59,34 @@ class UIController(GameModelListener):
         buttonTable.spacing = 5
         buttonTable.topleft = (10, 10)
         
-        startBtn = Button ("Start Round")
-        startBtn.connect_signal(Constants.SIG_CLICKED, self.game.StartGame)
-        buttonTable.add_child(0,0,startBtn)
+        self.startBtn = Button ("Start Round")
+        self.startBtn.connect_signal(Constants.SIG_CLICKED, self.game.StartGame)
+        buttonTable.add_child(0,0,self.startBtn)
         
         self.pauseBtn = Button ("Pause")
         self.pauseBtn.connect_signal(Constants.SIG_CLICKED, self.game.TogglePauseGame)
         buttonTable.add_child(1,0,self.pauseBtn)
         
-        endRoundBtn = Button ("End Round")
-        buttonTable.add_child(2,0,endRoundBtn)
+        # is end round really necessary? not straightforward to implement with current state machine 
+        #self.endRoundBtn = Button ("End Round")
+        #self.endRoundBtn.connect_signal(Constants.SIG_CLICKED, self.game.TogglePauseGame)
+        #buttonTable.add_child(2,0,self.endRoundBtn)
         
-        cancelMatchBtn = Button("Cancel Match")
-        cancelMatchBtn.connect_signal(Constants.SIG_CLICKED, self.game.StopGame)
-        buttonTable.add_child(3,0,cancelMatchBtn)
+        self.cancelMatchBtn = Button("Cancel Match")
+        self.cancelMatchBtn.connect_signal(Constants.SIG_CLICKED, self.game.StopGame)
+        buttonTable.add_child(3,0,self.cancelMatchBtn)
         
-        detectBtn = Button("Detect Devices")
-        buttonTable.add_child(4,0,detectBtn)
+        self.detectBtn = Button("Detect Devices")
+        #self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.game.DetectDevices)
+        buttonTable.add_child(4,0,self.detectBtn)
         
-        calibrateBtn = Button("Calibrate")
-        buttonTable.add_child(5,0,calibrateBtn)
+        self.calibrateBtn = Button("Calibrate")
+        #self.calibrateBtn.connect_signal(Constants.SIG_CLICKED, self.game.Calibrate)
+        buttonTable.add_child(5,0,self.calibrateBtn)
         
-        estop = Button("ESTOP")
-        buttonTable.add_child(6,0,estop)
+        self.estop = Button("ESTOP")
+        #self.estop.connect_signal(Constants.SIG_CLICKED, OMGWTFBBQ)
+        buttonTable.add_child(6,0,self.estop)
         
         self.renderer.add_widget (buttonTable)
         
@@ -108,15 +113,31 @@ class UIController(GameModelListener):
         #       simulator, detected move, console log, p1/p2 att/med values, fire system armed status
         # btns: start round, pause round, end round, cancel match, detect devices, calibrate, ESTOP,
         #       move generation (e.g. trigger p1 hadouken), demo mode on/off
-        
+        #
+        # snb: 
+        # detected move
+        # cancel match, detect devices, calibrate, ESTOP,
+        # move generation (e.g. trigger p1 hadouken), demo mode on/off
 
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
         print 'state change: %s ' % str(state)
         
+        # update round # / timer
         if state.GetStateType() == game_states.ROUND_BEGIN_GAME_STATE:
             self.roundLabel.text = "Round %d" % state.roundNumber
+        elif state.GetStateType() == game_states.IDLE_GAME_STATE:
+            # everything reset
+            self.roundLabel.text = '-'
+            self.timerLabel.text = '-'
+        
+        
+        if state.GetStateType() == game_states.PAUSED_GAME_STATE:
+            self.pauseBtn.text = "Unpause"
+        else:
+            self.pauseBtn.text = "Pause"
+        
         
     def OnTimerStateChanged(self, newTime):
         self.timerLabel.text = '%.0f' % newTime
@@ -125,6 +146,3 @@ class UIController(GameModelListener):
         self.p1Health = players[0].GetHealth()
         self.p2Health = players[1].GetHealth()
     
-    
-    def print_sth(self):
-        print 'oh hai'
