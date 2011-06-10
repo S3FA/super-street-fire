@@ -143,6 +143,6 @@ class UIController(GameModelListener):
         self.timerLabel.text = '%.0f' % newTime
     
     def OnPlayerHealthChanged(self, players):
-        self.p1Health = players[0].GetHealth()
-        self.p2Health = players[1].GetHealth()
+        self.p1Health.value = players[0].GetHealth()
+        self.p2Health.value = players[1].GetHealth()
     
