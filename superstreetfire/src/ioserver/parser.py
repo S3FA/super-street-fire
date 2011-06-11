@@ -15,6 +15,7 @@ import struct
 from collections import deque
 from client_datatypes import GloveData, HeadsetData, PLAYER_ONE, PLAYER_TWO
 from binascii import hexlify
+from gamemodel.game_model_listener import GameModelListenerCmdr
 
 log = logging.getLogger('parser')
 
@@ -23,6 +24,7 @@ class Parser:
     
     def __init__(self):
         self._logger = logging.getLogger('wireless_parser')
+        self._listenerCmdr = GameModelListenerCmdr()
 
     def ParseWirelessData(self, xbeePacket, queueMgr):
         #print xbeePacket 
@@ -121,6 +123,7 @@ class Parser:
                 log.debug("received node reply for node %s short %s long %s" \
                     % (destname, hexlify(destaddrS), hexlify(destaddr)))
                 self.isAddressTableSetup = True
+                self._listenerCmdr.HWAddrChanged(Parser.ADDR_TABLE)
                 return 1
             
         return 0
