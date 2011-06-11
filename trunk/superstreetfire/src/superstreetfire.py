@@ -105,7 +105,7 @@ if __name__ == '__main__':
         
         # GUI
         pygame.init ()
-        uiController = gui.UIController(ssfGame)
+        uiController = gui.UIController(ssfGame, receiverObj)
         
         # Jump straight to the round-in-play for testing
         ssfGame._SetState(gamemodel.game_states.RoundBeginGameState(ssfGame, 1))

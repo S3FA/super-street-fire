@@ -15,9 +15,10 @@ from gamemodel.game_model_listener import GameModelListener
 from gamemodel import game_states
 
 class UIController(GameModelListener):
-    def __init__(self, ssfGame):
+    def __init__(self, ssfGame, receiverObj):
         GameModelListener.__init__(self)
         self.game = ssfGame
+        self.receiver = receiverObj
         self._initUI(ssfGame)
         self.game.RegisterListener(self)
     
@@ -77,7 +78,7 @@ class UIController(GameModelListener):
         buttonTable.add_child(3,0,self.cancelMatchBtn)
         
         self.detectBtn = Button("Detect Devices")
-        #self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.game.DetectDevices)
+        self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.receiver.NodeDiscovery)
         buttonTable.add_child(4,0,self.detectBtn)
         
         self.calibrateBtn = Button("Calibrate")
