@@ -13,6 +13,8 @@ from ocempgui.widgets import * # http://ocemp.sourceforge.net/guidown.html
 from ocempgui.draw import Image
 from gamemodel.game_model_listener import GameModelListener
 from gamemodel import game_states
+import ioserver
+from binascii import hexlify
 
 class UIController(GameModelListener):
     def __init__(self, ssfGame, receiverObj):
@@ -108,41 +110,102 @@ class UIController(GameModelListener):
         self.renderer.add_widget(healthTable)
         
         
-        hwTable = Table(7,1)
+        hwTable = Table(11,2)
+        hwTable.spacing = 5
         hwTable.add_child(0,0,Label('RSSI'))
+        hwTable.add_child(0,1,Label('Address'))
         
         self.p1LeftGloveRSSI = ProgressBar()
         self.p1LeftGloveRSSI.value = 0
         self.p1LeftGloveRSSI.text = 'P1 Left Glove'
         hwTable.add_child(1,0,self.p1LeftGloveRSSI)
         
+        self.p1LeftGloveAddr = Label("")
+        self.p1LeftGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP1L")
+        hwTable.add_child(1,1,self.p1LeftGloveAddr)
+        
         self.p1RightGloveRSSI = ProgressBar()
         self.p1RightGloveRSSI.value = 0
         self.p1RightGloveRSSI.text = 'P1 Right Glove'
         hwTable.add_child(2,0,self.p1RightGloveRSSI)
+        
+        self.p1RightGloveAddr = Label("")
+        self.p1RightGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP1R")
+        hwTable.add_child(2,1,self.p1RightGloveAddr)
         
         self.p1HeadsetRSSI = ProgressBar()
         self.p1HeadsetRSSI.value = 0
         self.p1HeadsetRSSI.text = 'P1 Headset'
         hwTable.add_child(3,0,self.p1HeadsetRSSI)
         
+        self.p1HeadsetAddr = Label("")
+        self.p1HeadsetAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP1H")
+        hwTable.add_child(3,1,self.p1HeadsetAddr)
         
         self.p2LeftGloveRSSI = ProgressBar()
         self.p2LeftGloveRSSI.value = 0
         self.p2LeftGloveRSSI.text = 'P2 Left Glove'
         hwTable.add_child(4,0,self.p2LeftGloveRSSI)
         
+        self.p2LeftGloveAddr = Label("")
+        self.p2LeftGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP2L")
+        hwTable.add_child(4,1,self.p2LeftGloveAddr)
+        
         self.p2RightGloveRSSI = ProgressBar()
         self.p2RightGloveRSSI.value = 0
         self.p2RightGloveRSSI.text = 'P2 Right Glove'
         hwTable.add_child(5,0,self.p2RightGloveRSSI)
+        
+        self.p2RightGloveAddr = Label("")
+        self.p2RightGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP2R")
+        hwTable.add_child(5,1,self.p2RightGloveAddr)
         
         self.p2HeadsetRSSI = ProgressBar()
         self.p2HeadsetRSSI.value = 0
         self.p2HeadsetRSSI.text = 'P2 Headset'
         hwTable.add_child(6,0,self.p2HeadsetRSSI)
         
-        hwTable.topleft = (600,350)
+        self.p2HeadsetAddr = Label("")
+        self.p2HeadsetAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP2H")
+        hwTable.add_child(6,1,self.p2HeadsetAddr)
+        
+        self.TimerRSSI = ProgressBar()
+        self.TimerRSSI.value = 0
+        self.TimerRSSI.text = 'Timer'
+        hwTable.add_child(7,0,self.TimerRSSI)
+        
+        self.TimerAddr = Label("")
+        self.TimerAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFTIMER"))
+        hwTable.add_child(7,1,self.TimerAddr)
+        
+        self.p1LifeRSSI = ProgressBar()
+        self.p1LifeRSSI.value = 0
+        self.p1LifeRSSI.text = 'P1 Life'
+        hwTable.add_child(8,0,self.p1LifeRSSI)
+        
+        self.p1LifeAddr = Label("")
+        self.p1LifeAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1LIFE"))
+        hwTable.add_child(8,1,self.p1LifeAddr)
+        
+        self.p2LifeRSSI = ProgressBar()
+        self.p2LifeRSSI.value = 0
+        self.p2LifeRSSI.text = 'P2 Life'
+        hwTable.add_child(9,0,self.p2LifeRSSI)
+        
+        self.p2LifeAddr = Label("")
+        self.p2LifeAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2LIFE"))
+        hwTable.add_child(9,1,self.p2LifeAddr)
+        
+        self.FireRSSI = ProgressBar()
+        self.FireRSSI.value = 0
+        self.FireRSSI.text = 'Fire Control'
+        hwTable.add_child(10,0,self.FireRSSI)
+        
+        self.FireAddr = Label("")
+        self.FireAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFFIRE"))
+        hwTable.add_child(10,1,self.FireAddr)
+        
+        hwTable.topleft = (600,250)
         self.renderer.add_widget(hwTable)
         
         # what we need:
