@@ -141,6 +141,8 @@ if __name__ == '__main__':
                                           receiverQueueMgr.PopP2HeadsetData(), \
                                           deltaFrameTime, lastFrameTime)
             
+            ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
+            
             ssfGame.Tick(deltaFrameTime)
             
             # looking at the emitter states from the P1 perspective

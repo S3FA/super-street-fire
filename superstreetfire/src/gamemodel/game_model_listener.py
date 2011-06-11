@@ -23,6 +23,9 @@ class GameModelListener:
     def OnPlayerHealthChanged(self, players):
         pass
     
+    def OnRSSIChanged(self,rssi_dict):
+        pass
+    
     # TODO: Place more listener event here
     
     
@@ -46,4 +49,8 @@ class GameModelListenerCmdr:
     
     def PlayerHealthChanged(self, players):
         for i in self._listenerList: i.OnPlayerHealthChanged(players)
+    
+    def ReceivedSignalStrengthIndicatorChanged(self, rssi_dict):
+        for i in self._listenerList: i.OnRSSIChanged(rssi_dict)
+    
     
