@@ -107,6 +107,42 @@ class UIController(GameModelListener):
         self.renderer.add_widget(healthTable)
         
         
+        hwTable = Table(7,1)
+        hwTable.add_child(0,0,Label('RSSI'))
+        
+        self.p1LeftGloveRSSI = ProgressBar()
+        self.p1LeftGloveRSSI.value = 0
+        self.p1LeftGloveRSSI.text = 'P1 Left Glove'
+        hwTable.add_child(1,0,self.p1LeftGloveRSSI)
+        
+        self.p1RightGloveRSSI = ProgressBar()
+        self.p1RightGloveRSSI.value = 0
+        self.p1RightGloveRSSI.text = 'P1 Right Glove'
+        hwTable.add_child(2,0,self.p1RightGloveRSSI)
+        
+        self.p1HeadsetRSSI = ProgressBar()
+        self.p1HeadsetRSSI.value = 0
+        self.p1HeadsetRSSI.text = 'P1 Headset'
+        hwTable.add_child(3,0,self.p1HeadsetRSSI)
+        
+        
+        self.p2LeftGloveRSSI = ProgressBar()
+        self.p2LeftGloveRSSI.value = 0
+        self.p2LeftGloveRSSI.text = 'P2 Left Glove'
+        hwTable.add_child(4,0,self.p2LeftGloveRSSI)
+        
+        self.p2RightGloveRSSI = ProgressBar()
+        self.p2RightGloveRSSI.value = 0
+        self.p2RightGloveRSSI.text = 'P2 Right Glove'
+        hwTable.add_child(5,0,self.p2RightGloveRSSI)
+        
+        self.p2HeadsetRSSI = ProgressBar()
+        self.p2HeadsetRSSI.value = 0
+        self.p2HeadsetRSSI.text = 'P2 Headset'
+        hwTable.add_child(6,0,self.p2HeadsetRSSI)
+        
+        hwTable.topleft = (600,350)
+        self.renderer.add_widget(hwTable)
         
         # what we need:
         # info: timer, round #, p1/p2 health, device status/link (RSSI)
@@ -124,16 +160,20 @@ class UIController(GameModelListener):
         GameModelListener.OnGameStateChanged(self, state)
         print 'state change: %s ' % str(state)
         
+        cur_state = state.GetStateType()
+        
         # update round # / timer
-        if state.GetStateType() == game_states.ROUND_BEGIN_GAME_STATE:
+        if cur_state == game_states.ROUND_BEGIN_GAME_STATE:
             self.roundLabel.text = "Round %d" % state.roundNumber
-        elif state.GetStateType() == game_states.IDLE_GAME_STATE:
+        elif cur_state == game_states.IDLE_GAME_STATE:
             # everything reset
             self.roundLabel.text = '-'
             self.timerLabel.text = '-'
         
+        self.startBtn.sensitive = cur_state == game_states.IDLE_GAME_STATE
+        self.cancelMatchBtn.sensitive = cur_state != game_states.IDLE_GAME_STATE
         
-        if state.GetStateType() == game_states.PAUSED_GAME_STATE:
+        if cur_state == game_states.PAUSED_GAME_STATE:
             self.pauseBtn.text = "Unpause"
         else:
             self.pauseBtn.text = "Pause"
@@ -145,4 +185,7 @@ class UIController(GameModelListener):
     def OnPlayerHealthChanged(self, players):
         self.p1Health.value = players[0].GetHealth()
         self.p2Health.value = players[1].GetHealth()
+
     
+    def OnRSSIChanged(self,rssi_dict):
+        pass

@@ -103,6 +103,8 @@ class SSFGame:
                             p2LGloveData, p2RGloveData, dT, timeStamp):
         self.state.UpdateWithGloveData(p1LGloveData, p1RGloveData, p2LGloveData, \
                                        p2RGloveData, dT, timeStamp)
+    def UpdateRSSI(self, rssi_dict):
+        self._listenerCmdr.ReceivedSignalStrengthIndicatorChanged(rssi_dict)
     
     
     def Hurt(self, playerNum, dmgAmt, isChipDmg):

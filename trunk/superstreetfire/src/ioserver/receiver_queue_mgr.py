@@ -23,6 +23,15 @@ import threading
 class ReceiverQueueMgr:
     MAX_QUEUE_SIZE = 4
     
+    # keys for rssi_info dict
+    P1_LEFT_RSSI = '1L'
+    P1_RIGHT_RSSI = '1R'
+    P1_HEADSET_RSSI = '1H'
+    P2_LEFT_RSSI = '2L'
+    P2_RIGHT_RSSI = '2R'
+    P2_HEADSET_RSSI = '2H'
+    
+    
     def __init__(self):
         self.p1LeftGloveQueue  = collections.deque(list(),ReceiverQueueMgr.MAX_QUEUE_SIZE)
         self.p1RightGloveQueue = collections.deque(list(),ReceiverQueueMgr.MAX_QUEUE_SIZE)
@@ -40,52 +49,62 @@ class ReceiverQueueMgr:
         
         self.p2LeftGloveLock  = threading.Semaphore()
         self.p2RightGloveLock = threading.Semaphore()
-        self.p2HeadsetLock    = threading.Semaphore()  
+        self.p2HeadsetLock    = threading.Semaphore()
+        
+        self.rssi_info = {ReceiverQueueMgr.P1_LEFT_RSSI: 0, ReceiverQueueMgr.P1_RIGHT_RSSI: 0, ReceiverQueueMgr.P1_HEADSET_RSSI: 0,
+                          ReceiverQueueMgr.P2_LEFT_RSSI: 0, ReceiverQueueMgr.P2_RIGHT_RSSI: 0, ReceiverQueueMgr.P2_HEADSET_RSSI: 0}
+        
     
-    def PushP1LeftGloveData(self, data):
+    def PushP1LeftGloveData(self, data, rssi=0):
         self.p1LeftGloveLock.acquire()
         if (self.p1['L'] == None):
             self.p1['L'] = data
         self._PushQueueData(self.p1LeftGloveQueue, data - self.p1['L'])
         self.p1['newL'] = 1
         self.p1['L'] = data
+        self.rssi_info[ReceiverQueueMgr.P1_LEFT_RSSI] = rssi
         self.p1LeftGloveLock.release()
         
-    def PushP1RightGloveData(self, data):
+    def PushP1RightGloveData(self, data, rssi=0):
         self.p1RightGloveLock.acquire()
         if (self.p1['R'] == None):
             self.p1['R'] = data
         self._PushQueueData(self.p1RightGloveQueue, data - self.p1['R'])
         self.p1['newR'] = 1
         self.p1['R'] = data
+        self.rssi_info[ReceiverQueueMgr.P1_RIGHT_RSSI] = rssi
         self.p1RightGloveLock.release()
                 
     def PushP1HeadsetData(self, data):
         self.p1HeadsetLock.acquire()
         self._PushQueueData(self.p1HeadsetQueue, data)
+        self.rssi_info[ReceiverQueueMgr.P1_HEADSET_RSSI] = data.link
         self.p1HeadsetLock.release()
         
-    def PushP2LeftGloveData(self, data):
+    def PushP2LeftGloveData(self, data, rssi=0):
         self.p2LeftGloveLock.acquire()
         if (self.p2['L'] == None):
             self.p2['L'] = data
         self._PushQueueData(self.p2LeftGloveQueue, data - self.p2['L'])
         self.p2['newL'] = 1
         self.p2['L'] = data
+        self.rssi_info[ReceiverQueueMgr.P2_LEFT_RSSI] = rssi
         self.p2LeftGloveLock.release()
            
-    def PushP2RightGloveData(self, data):
+    def PushP2RightGloveData(self, data, rssi=0):
         self.p2RightGloveLock.acquire()
         if (self.p2['R'] == None):
             self.p2['R'] = data
         self._PushQueueData(self.p2RightGloveQueue, data - self.p2['R'])
         self.p2['newR'] = 1
         self.p2['R'] = data
+        self.rssi_info[ReceiverQueueMgr.P2_RIGHT_RSSI] = rssi
         self.p2RightGloveLock.release()
                 
     def PushP2HeadsetData(self, data):
         self.p2HeadsetLock.acquire()
         self._PushQueueData(self.p2HeadsetQueue, data)
+        self.rssi_info[ReceiverQueueMgr.P2_HEADSET_RSSI] = data.link
         self.p2HeadsetLock.release()    
     
     def PopP1LeftGloveData(self):
@@ -131,6 +150,11 @@ class ReceiverQueueMgr:
         data = self._PopQueueData(self.p2HeadsetQueue)
         self.p2HeadsetLock.release()
         return data
+    
+    
+    def GetRSSIMap(self):
+        return self.rssi_info
+    
     
     def _PushQueueData(self, queue, data):
         # Don't push empty data
