@@ -26,6 +26,9 @@ class GameModelListener:
     def OnRSSIChanged(self,rssi_dict):
         pass
     
+    def OnHWAddrChanged(self, hwaddr):
+        pass
+    
     # TODO: Place more listener event here
     
     
@@ -52,5 +55,9 @@ class GameModelListenerCmdr:
     
     def ReceivedSignalStrengthIndicatorChanged(self, rssi_dict):
         for i in self._listenerList: i.OnRSSIChanged(rssi_dict)
+        
+    def HWAddrChanged(self, hwaddr):
+        for i in self._listenerList: i.OnHWAddrChanged(hwaddr)
+
     
     

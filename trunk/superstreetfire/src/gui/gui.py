@@ -110,7 +110,7 @@ class UIController(GameModelListener):
         self.renderer.add_widget(healthTable)
         
         
-        hwTable = Table(11,2)
+        hwTable = Table(12,2)
         hwTable.spacing = 5
         hwTable.add_child(0,0,Label('RSSI'))
         hwTable.add_child(0,1,Label('Address'))
@@ -121,7 +121,7 @@ class UIController(GameModelListener):
         hwTable.add_child(1,0,self.p1LeftGloveRSSI)
         
         self.p1LeftGloveAddr = Label("")
-        self.p1LeftGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP1L")
+        self.p1LeftGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1L"))
         hwTable.add_child(1,1,self.p1LeftGloveAddr)
         
         self.p1RightGloveRSSI = ProgressBar()
@@ -130,7 +130,7 @@ class UIController(GameModelListener):
         hwTable.add_child(2,0,self.p1RightGloveRSSI)
         
         self.p1RightGloveAddr = Label("")
-        self.p1RightGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP1R")
+        self.p1RightGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1R"))
         hwTable.add_child(2,1,self.p1RightGloveAddr)
         
         self.p1HeadsetRSSI = ProgressBar()
@@ -139,7 +139,7 @@ class UIController(GameModelListener):
         hwTable.add_child(3,0,self.p1HeadsetRSSI)
         
         self.p1HeadsetAddr = Label("")
-        self.p1HeadsetAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP1H")
+        self.p1HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1H"))
         hwTable.add_child(3,1,self.p1HeadsetAddr)
         
         self.p2LeftGloveRSSI = ProgressBar()
@@ -148,7 +148,7 @@ class UIController(GameModelListener):
         hwTable.add_child(4,0,self.p2LeftGloveRSSI)
         
         self.p2LeftGloveAddr = Label("")
-        self.p2LeftGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP2L")
+        self.p2LeftGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2L"))
         hwTable.add_child(4,1,self.p2LeftGloveAddr)
         
         self.p2RightGloveRSSI = ProgressBar()
@@ -157,7 +157,7 @@ class UIController(GameModelListener):
         hwTable.add_child(5,0,self.p2RightGloveRSSI)
         
         self.p2RightGloveAddr = Label("")
-        self.p2RightGloveAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP2R")
+        self.p2RightGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2R"))
         hwTable.add_child(5,1,self.p2RightGloveAddr)
         
         self.p2HeadsetRSSI = ProgressBar()
@@ -166,7 +166,7 @@ class UIController(GameModelListener):
         hwTable.add_child(6,0,self.p2HeadsetRSSI)
         
         self.p2HeadsetAddr = Label("")
-        self.p2HeadsetAddr.text = ioserver.xbeeio.parser.getAddrL("SSFP2H")
+        self.p2HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2H"))
         hwTable.add_child(6,1,self.p2HeadsetAddr)
         
         self.TimerRSSI = ProgressBar()
@@ -204,6 +204,15 @@ class UIController(GameModelListener):
         self.FireAddr = Label("")
         self.FireAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFFIRE"))
         hwTable.add_child(10,1,self.FireAddr)
+        
+        self.LightsRSSI = ProgressBar()
+        self.LightsRSSI.value = 0
+        self.LightsRSSI.text = 'Lighting'
+        hwTable.add_child(11,0,self.LightsRSSI)
+        
+        self.LightsAddr = Label("")
+        self.LightsAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFLIGHTS"))
+        hwTable.add_child(11,1,self.LightsAddr)
         
         hwTable.topleft = (600,250)
         self.renderer.add_widget(hwTable)
@@ -249,7 +258,18 @@ class UIController(GameModelListener):
     def OnPlayerHealthChanged(self, players):
         self.p1Health.value = players[0].GetHealth()
         self.p2Health.value = players[1].GetHealth()
-
+        
+    def OnHWAddrChanged(self, hwaddr):
+        self.p1LeftGloveAddr.text  = hexlify(hwaddr["SSFP1L"][1])
+        self.p1RightGloveAddr.text = hexlify(hwaddr["SSFP1R"][1])
+        self.p1HeadsetAddr.text    = hexlify(hwaddr["SSFP1H"][1])
+        self.p2LeftGloveAddr.text  = hexlify(hwaddr["SSFP2L"][1])
+        self.p2RightGloveAddr.text = hexlify(hwaddr["SSFP2R"][1])
+        self.p2HeadsetAddr.text    = hexlify(hwaddr["SSFP2H"][1])
+        self.TimerAddr.text        = hexlify(hwaddr["SSFTIMER"][1])
+        self.p1LifeAddr.text       = hexlify(hwaddr["SSFP1LIFE"][1])
+        self.p2LifeAddr.text       = hexlify(hwaddr["SSFP2LIFE"][1])
+        self.FireAddr.text         = hexlify(hwaddr["SSFFIRE"][1])
     
     def OnRSSIChanged(self,rssi_dict):
         pass
