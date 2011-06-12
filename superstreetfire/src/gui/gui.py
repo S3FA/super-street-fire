@@ -8,6 +8,7 @@ GUI (widgets and controllers) for super street fire
 
 from __future__ import division
 import os
+import sys
 import pygame
 from ocempgui.widgets import * # http://ocemp.sourceforge.net/guidown.html
 from ocempgui.draw import Image
@@ -317,8 +318,17 @@ class UIController(GameModelListener):
         self.timerLabel.text = '%.0f' % newTime
     
     def OnPlayerHealthChanged(self, players):
-        self.p1Health.value = players[0].GetHealth()
-        self.p2Health.value = players[1].GetHealth()
+        try:
+            if (players[0].GetHealth() < 0):
+                self.p1Health.value = 0
+            else:
+                self.p1Health.value = players[0].GetHealth()
+            if (players[1].GetHealth() < 0):
+                self.p2Health.value = 0
+            else:
+                self.p2Health.value = players[1].GetHealth()
+        except:
+            print "Health change progess bar error ", sys.exc_info()[0]
         
     def OnHWAddrChanged(self, hwaddr):
         self.p1LeftGloveAddr.text  = hexlify(hwaddr["SSFP1L"][1])
