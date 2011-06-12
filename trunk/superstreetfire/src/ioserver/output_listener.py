@@ -32,11 +32,11 @@ class SenderListener(GameModelListener):
         if (players[0].GetHealth() != self.p1Health):
             self.p1Health = players[0].GetHealth()
             #print 'send health p1: ' + str(players[0].GetHealth())
-            self.sender._sendLife( str(players[0].GetHealth()), str(players[1].GetHealth()) )
+            self.sender.SendLifeBarData( str(players[0].GetHealth()), str(players[1].GetHealth()) )
         if (players[1].GetHealth() != self.p2Health):
             self.p2Health = players[1].GetHealth()
             #print 'send health p2: ' + str(players[1].GetHealth())
-            self.sender._sendLife( str(players[0].GetHealth()), str(players[1].GetHealth()) )
+            self.sender.SendLifeBarData( str(players[0].GetHealth()), str(players[1].GetHealth()) )
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
