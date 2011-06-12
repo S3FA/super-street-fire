@@ -72,12 +72,12 @@ class Attack(Action):
         self._attackRWindowIdx  = -thickness
         self._leftAttackWindow  = None
         self._rightAttackWindow = None
-    
+
     def __str__(self):
         action = 'P' + str(self.playerNum)
-        if (self.thickness == 1): action += ' Jab'
-        if (self.thickness == 2): action += ' Hook'
-        if (self.thickness == 4): action += ' Boom/Hadouken'
+        if (self._thickness == 1): action += ' Jab'
+        if (self._thickness == 2): action += ' Hook'
+        if (self._thickness == 4): action += ' Boom/Hadouken'
         return action
         
     def Initialize(self, ssfGame):
