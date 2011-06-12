@@ -32,12 +32,18 @@ class Parser:
             self.updateAddrTable(xbeePacket)
             return
         
+        if 'source_addr_long' not in xbeePacket:
+            # what is this? packet
+            return
+        
         # try to find a device id based on source address
         nodeId = self.getDevice(xbeePacket['source_addr_long'])
         # if we're just starting up, read each of the device ids into a map
         if (nodeId == 0):
             source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
             log.debug( 'No node in address table for ' + source )
+            return
+        if (nodeId.find('LIFE') > 0 or nodeId.find('FIRE') > 0):
             return
 
         # good to go, look for the device data:
