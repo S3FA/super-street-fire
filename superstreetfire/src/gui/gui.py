@@ -48,7 +48,7 @@ class UIController(GameModelListener):
         logosize = (67,55)
         
         try:
-            logo_img = Image.load_image('/'.join((os.path.dirname(__file__),'logo.jpeg')))
+            logo_img = Image.load_image('/'.join((os.path.dirname(__file__),'logo.bmp')))
             logo = ImageLabel (logo_img)
             logo.topleft = (w/2 - logosize[0]/2, topmargin)
             self.renderer.add_widget(logo)
