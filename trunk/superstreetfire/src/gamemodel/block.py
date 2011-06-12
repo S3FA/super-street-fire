@@ -71,6 +71,8 @@ class Block(Action):
         if self._currBlockTime >= self._timeLength:
             self._KillEmitters()
         
+    def __str__(self):
+        return 'P' + str(self.playerNum) + ' Block'
     
     # Used to kill this block -
     # it will then be cleaned up during the next simulation tick
