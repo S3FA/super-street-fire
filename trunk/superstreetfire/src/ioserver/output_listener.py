@@ -16,6 +16,10 @@ class SenderListener(GameModelListener):
         self.p1Health = 100
         self.p2Health = 100
     
+    def Kill(self):
+        self.game = None
+        self.sender = None
+            
     def OnTimerStateChanged(self, newTime):
         timer = str(int(round(newTime)))
         if (timer != self.curTimer):

@@ -55,6 +55,7 @@ if __name__ == '__main__':
     logging.getLogger('').addHandler(ch)
     
     ioManager = None
+    sender = None
 
     # Error checking on the command line input parameters
     if options.frequency <= 0:
@@ -161,6 +162,7 @@ if __name__ == '__main__':
         logging.warn("Unexpected state! (Is everything turned on?)")
         traceback.print_exc()
 
+    if sender != None: sender.Kill()
     if ioManager != None: ioManager.Kill()
     #sender.Kill()
     print "Exiting..."
