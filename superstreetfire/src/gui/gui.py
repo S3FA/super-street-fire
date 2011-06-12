@@ -11,6 +11,7 @@ import os
 import pygame
 from ocempgui.widgets import * # http://ocemp.sourceforge.net/guidown.html
 from ocempgui.draw import Image
+from ocempgui.draw import String
 from ocempgui.widgets.components import *
 from ocempgui.widgets.Constants import *
 from ocempgui.object import BaseObject
@@ -34,6 +35,8 @@ class UIController(GameModelListener):
         h = 600
         screen = pygame.display.set_mode ((w, h));
         screen.fill ((255, 200, 100))
+
+        self.sans = String.create_system_font ("Sans", 10)
 
         self.renderer = Renderer ()
         self.renderer.screen = screen
@@ -61,15 +64,19 @@ class UIController(GameModelListener):
                                    self.roundLabel.topleft[1] + self.timerLabel.height + 5)
         self.renderer.add_widget(self.timerLabel)
         
+        gameControlFrame = HFrame (Label (" Game Control "))
+        gameControlFrame.topleft = (10, 10)
+
         buttonTable = Table(7,1)
         buttonTable.spacing = 5
-        buttonTable.topleft = (10, 10)
+        buttonTable.set_column_align (0, ALIGN_LEFT)
+
         
         self.startBtn = Button ("Start Round")
         self.startBtn.connect_signal(Constants.SIG_CLICKED, self.game.StartGame)
         buttonTable.add_child(0,0,self.startBtn)
         
-        self.pauseBtn = Button ("Pause")
+        self.pauseBtn = Button ("Pause Game")
         self.pauseBtn.connect_signal(Constants.SIG_CLICKED, self.game.TogglePauseGame)
         buttonTable.add_child(1,0,self.pauseBtn)
         
@@ -86,15 +93,17 @@ class UIController(GameModelListener):
         self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.receiver.NodeDiscovery)
         buttonTable.add_child(4,0,self.detectBtn)
         
-        self.calibrateBtn = Button("Calibrate")
+        self.calibrateBtn = Button("Calibrate Game")
         #self.calibrateBtn.connect_signal(Constants.SIG_CLICKED, self.game.Calibrate)
         buttonTable.add_child(5,0,self.calibrateBtn)
         
-        self.estop = Button("ESTOP")
+        self.estop = Button("STOP ALL")
         #self.estop.connect_signal(Constants.SIG_CLICKED, OMGWTFBBQ)
         buttonTable.add_child(6,0,self.estop)
-        
-        self.renderer.add_widget (buttonTable)
+
+        gameControlFrame.add_child(buttonTable)
+        gameControlFrame.set_align (ALIGN_LEFT)
+        self.renderer.add_widget (gameControlFrame)
         
         
         healthTable = Table(2,1)
@@ -122,10 +131,12 @@ class UIController(GameModelListener):
         self.renderer.add_widget(moveframe)        
         
         # table (rows, cols)
+        moveTestFrame = HFrame (Label ("Test Moves"))
+        moveTestFrame.minsize = 200, 70
+        moveTestFrame.topleft = (10, 220)
+        
         moveTable = Table(2,8)
         moveTable.spacing = 4
-        moveTable.minsize = 200, 70
-        moveTable.topleft = (10, 220)
         self.p1jab = Button("P1 Jab")
         self.p1jab.connect_signal(Constants.SIG_CLICKED, self.game.TestP1Jab )
         self.p2jab = Button("P2 Jab")
@@ -134,10 +145,14 @@ class UIController(GameModelListener):
         self.p1hok.connect_signal(Constants.SIG_CLICKED, self.game.TestP1Hook )
         self.p2hok = Button("P2 Hook")
         self.p2hok.connect_signal(Constants.SIG_CLICKED, self.game.TestP2Hook )
-        self.p1had = Button("P2 Hadouken")
+        self.p1had = Button("P1 Hadouken")
         self.p1had.connect_signal(Constants.SIG_CLICKED, self.game.TestP1Hadouken )
         self.p2had = Button("P2 Hadouken")
         self.p2had.connect_signal(Constants.SIG_CLICKED, self.game.TestP2Hadouken )
+        self.p1sbm = Button("P1 Sonic Boom")
+        self.p1sbm.connect_signal(Constants.SIG_CLICKED, self.game.TestP1Hadouken )
+        self.p2sbm = Button("P2 Sonic Boom")
+        self.p2sbm.connect_signal(Constants.SIG_CLICKED, self.game.TestP2Hadouken )
         self.p1blk = Button("P1 Block")
         self.p1blk.connect_signal(Constants.SIG_CLICKED, self.game.TestP1Block )
         self.p2blk = Button("P2 Block")
@@ -149,10 +164,13 @@ class UIController(GameModelListener):
         moveTable.add_child(1,1,self.p2hok)
         moveTable.add_child(0,2,self.p1had)
         moveTable.add_child(1,2,self.p2had)
-        moveTable.add_child(0,3,self.p1blk)
-        moveTable.add_child(1,3,self.p2blk)
+        moveTable.add_child(0,3,self.p1sbm)
+        moveTable.add_child(1,3,self.p2sbm)
+        moveTable.add_child(0,4,self.p1blk)
+        moveTable.add_child(1,4,self.p2blk)
 
-        self.renderer.add_widget(moveTable)
+        moveTestFrame.add_child(moveTable)
+        self.renderer.add_widget(moveTestFrame)
         
         hwTable = Table(12,2)
         hwTable.spacing = 5

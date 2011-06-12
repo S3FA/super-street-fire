@@ -76,8 +76,9 @@ class Attack(Action):
     def __str__(self):
         action = 'P' + str(self.playerNum)
         if (self._thickness == 1): action += ' Jab'
-        if (self._thickness == 2): action += ' Hook'
-        if (self._thickness == 4): action += ' Boom/Hadouken'
+        if (self._thickness == 2 and self._timeLength == 3.0): action += ' Hook'
+        if (self._thickness == 2 and self._timeLength == 3.5): action += ' Boom'
+        if (self._thickness == 2 and self._timeLength == 4.0): action += ' Hadouken'
         return action
         
     def Initialize(self, ssfGame):
@@ -255,7 +256,7 @@ def BuildLeftUppercutAttack(playerNum):
     return Attack(playerNum, Action.LEFT_SIDE, 2, 4.0, 5)
 def BuildRightUppercutAttack(playerNum):
     return Attack(playerNum, Action.RIGHT_SIDE, 2, 4.0, 5)
-def BuildHadoukenAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5)
 def BuildSonicBoomAttack(playerNum):
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 3.5, 5)
+def BuildHadoukenAttack(playerNum):
     return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5)
