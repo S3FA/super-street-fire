@@ -78,13 +78,13 @@ class XBeeIO:
         
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
-            print "ERROR: Output port was invalid/not found, can not send."
+            print "Send Fire ERROR: Output port was invalid/not found, can not send."
             print "************ Killing XBee IO Thread ****************"
             return
         
         try:
             # Write data to the xbee->wifire interpreter
-            print "sending %s to S %s L %s" % (hexlify(fireEmitterData),hexlify(parser.ADDR_TABLE['SSFFIRE'][1]), hexlify(parser.ADDR_TABLE['SSFFIRE'][0]))
+            # print "sending %s to S %s L %s" % (hexlify(fireEmitterData),hexlify(parser.ADDR_TABLE['SSFFIRE'][1]), hexlify(parser.ADDR_TABLE['SSFFIRE'][0]))
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFFIRE'][1], dest_addr_long=parser.ADDR_TABLE['SSFFIRE'][0], data=fireEmitterData)                   
         except:
             self._logger.warn("FIRE send error -- perhaps address not in ADDR_TABLE")
@@ -114,15 +114,12 @@ class XBeeIO:
         except:
             self._logger.warn("TIMER send error -- perhaps address not in ADDR_TABLE")
 
-    def _sendLife(self):
-        
-        p1LifeData = self.p1LifeData
-        p2LifeData = self.p2LifeData
-        self._logger.debug('sending timer data ' + hexlify(p1LifeData) + ' ' + hexlify(p2LifeData))
+    def _sendLife(self, p1LifeData, p2LifeData):
+        self._logger.debug('sending healthbar data ' + hexlify(p1LifeData) + ' ' + hexlify(p2LifeData))
         
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
-            print "ERROR: Output port was invalid/not found, can not send."
+            print "Send Life ERROR: Output port was invalid/not found, can not send."
             print "************ Killing XBee IO Thread ****************"
             return
         
@@ -145,7 +142,7 @@ class XBeeIO:
         
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
-            print "ERROR: Output port was invalid/not found, can not send."
+            print "Send ND ERROR: Output port was invalid/not found, can not send."
             print "************ Killing XBee IO Thread ****************"
             return
         
