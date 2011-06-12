@@ -75,9 +75,9 @@ class GestureState:
         
         # Set the state change function based on the player number...
         if playerNum == 1:
-            self._changeStateFunc = gestureRecognizer._ChangeP1State
+            self._changeStateFunc = gestureRecognizer.ChangeP1State
         elif playerNum == 2:
-            self._changeStateFunc = gestureRecognizer._ChangeP2State
+            self._changeStateFunc = gestureRecognizer.ChangeP2State
         else:
             assert(False)
     
@@ -228,6 +228,7 @@ class PlayerGestureState(GestureState):
     def recordMove(self, type, move, lastTs):
         # do we consider this a new/valid gesture?
         deltaMoveTime = time.time()-lastTs
+        
         # clear the move after a certain time, so the same move can be executed.
         if (move > 0 and len(self.allMoves[type]) > 0 and move == self.allMoves[type][-1]):
             if (deltaMoveTime > TIME_TO_CLEAR_MOVE):
@@ -235,11 +236,13 @@ class PlayerGestureState(GestureState):
             else:
                 if (move < 110): self._logger.info( 'Same move; ' + str(move)) 
                 return 
+        
         # same move, or not enough time elapsed.. do nothing
         if (move > 0 and deltaMoveTime < TIME_BETWEEN_MOVES):
             self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime) + " move:" + str(move)) 
             return
             
+        self._logger.warn( '---------------> Adding move; ' + str(move)) 
         # record the move value, and reset all the data
         self.moves.append(move)
         self.allMoves[type].append(move)
@@ -259,7 +262,7 @@ class PlayerGestureState(GestureState):
             self.right = rightGloveData
 
         if (self.left != None and self.right != None):
-            self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
+            #self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
             #print "got some data for both hands " % ( self.left, self.right )
             self._determineMove(self)
             #if (len(playerState.moves) > 0):

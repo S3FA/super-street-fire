@@ -56,10 +56,10 @@ class GestureRecognizer:
                         
 
     # doesn't really need to be two functions here, but i'll change it later.
-    def _ChangeP1State(self, newAction):
+    def ChangeP1State(self, newAction):
         self._lastUnconsumedActions.append(newAction);
     
-    def _ChangeP2State(self, newAction):
+    def ChangeP2State(self, newAction):
         self._lastUnconsumedActions.append(newAction);
         
     
