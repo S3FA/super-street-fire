@@ -167,6 +167,10 @@ class SSFGame:
         self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(1))
     def TestP2Hook(self):
         self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(2))
+    def TestP1SonicBoom(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildSonicBoomAttack(1))
+    def TestP2SonicBoom(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildSonicBoomAttack(2))
     def TestP1Hadouken(self):
         self.gestureRecognizer.ChangeP1State(attack.BuildHadoukenAttack(1))
     def TestP2Hadouken(self):
