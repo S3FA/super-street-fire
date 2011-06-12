@@ -228,7 +228,7 @@ class RoundEndedGameState(GameState):
         GameState.__init__(self, ssfGame)
         self._logger.debug("Entering Round Ended Game State")
         
-        self._roundWinner = roundWinner
+        self.roundWinner = roundWinner
         
         self.roundNumber = roundNumber
         # Based on the round winner, increment the number of wins for the
@@ -260,7 +260,7 @@ class RoundEndedGameState(GameState):
             else:
                 # In the case were a player won the match, it must be the player that
                 # won the match that brought us to this state
-                self.ssfGame._SetState(MatchOverGameState(self.ssfGame, self._roundWinner))
+                self.ssfGame._SetState(MatchOverGameState(self.ssfGame, self.roundWinner))
         else:
             self.ssfGame._SetState(RoundBeginGameState(self.ssfGame, self.roundNumber+1))
 

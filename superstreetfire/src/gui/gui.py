@@ -308,9 +308,9 @@ class UIController(GameModelListener):
         self.cancelMatchBtn.sensitive = cur_state != game_states.IDLE_GAME_STATE
 
         if cur_state == game_states.PAUSED_GAME_STATE:
-            self.pauseBtn.text = "Unpause"
+            self.pauseBtn.text = "Restart Game"
         else:
-            self.pauseBtn.text = "Pause"
+            self.pauseBtn.text = "Pause Game"
         
         
     def OnTimerStateChanged(self, newTime):
