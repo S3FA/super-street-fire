@@ -157,7 +157,7 @@ class XBeeIO:
         try:
             if (data != self.p1LifeData):
                 self.p2LifeData = data
-                data = struct.pack("i", out)
+                #self._logger.warn('p1 life send ' + hexlify(data))
                 # Write data to the xbee: SSFP1LIFE destination address
                 self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP1LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP1LIFE'][0], data=data)                   
         except:
@@ -175,6 +175,7 @@ class XBeeIO:
         try:
             if (data != self.p2LifeData):
                 self.p2LifeData = data
+                self._logger.warn('p2 life send ' + hexlify(data))
                 # Write data to the xbee: SSFP2LIFE destination address
                 self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP2LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP2LIFE'][0], data=data)                   
         except:
