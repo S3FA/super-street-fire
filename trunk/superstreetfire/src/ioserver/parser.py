@@ -113,7 +113,10 @@ class Parser:
     def updateAddrTable(self, response):
         if response['id'] == 'at_response':
             if response['command'] == 'ND':
-                parameter = response['parameter']
+                try:
+                    parameter = response['parameter']
+                except:
+                    return 0
                 destaddrS = parameter[0:2]
                 destaddr  = parameter[2:10]
                 destname  = parameter[10:]
