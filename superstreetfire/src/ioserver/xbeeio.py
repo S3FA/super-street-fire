@@ -91,9 +91,7 @@ class XBeeIO:
 
 
     def _sendTimer(self):
-        
         timerData = self.timerData
-        self._logger.debug('sending timer data ' + hexlify(timerData))
         
         try:
             self.visualizer.write(timerData)
@@ -107,10 +105,10 @@ class XBeeIO:
             print "************ Killing XBee IO Thread ****************"
             return
         
+        self._logger.debug('sending timer data ' + str(timerData))
+        data = struct.pack("H", timerData)
         try:
-            # Write data to the xbee: timer destination address
-            # TODO: dest address by table
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFTIMER'][1], dest_addr_long=parser.ADDR_TABLE['SSFTIMER'][0], data=timerData)                   
+            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFTIMER'][1], dest_addr_long=parser.ADDR_TABLE['SSFTIMER'][0], data=data)                   
         except:
             self._logger.warn("TIMER send error -- perhaps address not in ADDR_TABLE")
 
@@ -128,27 +126,22 @@ class XBeeIO:
         self.xbee.at(command='ND')                  
         
 
-    def SendTimerNum(self, value):
-    
-    # based on the following digit map:
-    #
-    #   x0x          x8x
-    # x     x      x     x
-    # 5     1      d     9
-    # x     x      x     x
-    #   x6x          xex
-    # x     x      x     x
-    # 4     2      c     a
-    # x     x      x     x
-    #   x3x          xbx     
-        
+    def SendTimerNum(self, value):    
+        # based on the following digit map:
+        #
+        #   x0x          x8x
+        # x     x      x     x
+        # 5     1      d     9
+        # x     x      x     x
+        #   x6x          xex
+        # x     x      x     x
+        # 4     2      c     a
+        # x     x      x     x
+        #   x3x          xbx     
         if (value < 0) or (value > 99):
-            return
-        
+            return   
         digitMap = [0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F]
-        
         timerData = (digitMap[value / 10] << 8) | digitMap[value % 10]
-        
         self.timerData = timerData
         self._sendTimer()
     
