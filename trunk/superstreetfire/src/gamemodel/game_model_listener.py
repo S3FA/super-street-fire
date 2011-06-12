@@ -29,6 +29,10 @@ class GameModelListener:
     def OnHWAddrChanged(self, hwaddr):
         pass
     
+
+    def OnPlayerMoves(self, actions):
+        pass
+    
     # TODO: Place more listener event here
     
     
@@ -45,6 +49,9 @@ class GameModelListenerCmdr:
     # Tell all listeners that a OnGameStateChanged event occurred
     def GameStateChanged(self, newGameState):
         for i in self._listenerList: i.OnGameStateChanged(newGameState)
+    
+    def PlayerMoves(self, actions):
+        for i in self._listenerList: i.OnPlayerMoves(actions)
     
     # Tell all listeners that a TimerStateChange occurred
     def TimerStateChanged(self, timerValue):

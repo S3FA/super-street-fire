@@ -11,6 +11,7 @@ import game_states
 from fire_emitter import FireEmitter
 from gesture_recognizer import GestureRecognizer
 from game_model_listener import GameModelListenerCmdr
+from gamemodel import *
 
 class SSFGame:
     LOGGER_NAME = 'ssf_game_logger'
@@ -106,7 +107,6 @@ class SSFGame:
     def UpdateRSSI(self, rssi_dict):
         self._listenerCmdr.ReceivedSignalStrengthIndicatorChanged(rssi_dict)
     
-    
     def Hurt(self, playerNum, dmgAmt, isChipDmg):
         assert(playerNum == 1 or playerNum == 2)
         
@@ -153,7 +153,27 @@ class SSFGame:
             else:
                 action.Tick(self, dT)
         
+        self._listenerCmdr.PlayerMoves(actionsToRemove)
         # Clear up all finished actions
         for action in actionsToRemove:
             actionsQueue.remove(action)
+
+    # Gui test methods *****************************************    
+    def TestP1Jab(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildLeftJabAttack(1))
+    def TestP2Jab(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildLeftJabAttack(2))
+    def TestP1Hook(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(1))
+    def TestP2Hook(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(2))
+    def TestP1Hadouken(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildHadoukenAttack(1))
+    def TestP2Hadouken(self):
+        self.gestureRecognizer.ChangeP1State(attack.BuildHadoukenAttack(2))
+    def TestP1Block(self):
+        self.gestureRecognizer.ChangeP1State(block.BuildLeftBasicBlock(1))
+    def TestP2Block(self):
+        self.gestureRecognizer.ChangeP1State(block.BuildLeftBasicBlock(2))
+        
     
