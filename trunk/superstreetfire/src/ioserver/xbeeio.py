@@ -114,27 +114,6 @@ class XBeeIO:
         except:
             self._logger.warn("TIMER send error -- perhaps address not in ADDR_TABLE")
 
-    def _sendLife(self, p1LifeData, p2LifeData):
-        self._logger.debug('sending healthbar data ' + hexlify(p1LifeData) + ' ' + hexlify(p2LifeData))
-        
-        # Make sure this object is in a proper state before running...
-        if self.xbee == None:
-            print "Send Life ERROR: Output port was invalid/not found, can not send."
-            print "************ Killing XBee IO Thread ****************"
-            return
-        
-        try:
-            # Write data to the xbee: SSFP1LIFE destination address
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP1LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP1LIFE'][0], data=p1LifeData)                   
-        except:
-            self._logger.warn("SSFP1LIFE send error -- perhaps address not in ADDR_TABLE")
-
-        try:
-            # Write data to the xbee: SSFP2LIFE destination address
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP2LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP2LIFE'][0], data=p2LifeData)                   
-        except:
-            self._logger.warn("SSFP2LIFE send error -- perhaps address not in ADDR_TABLE")
-
 
     def _sendND(self):
         
@@ -174,7 +153,6 @@ class XBeeIO:
         self._sendTimer()
     
     def SendLifeBarData(self, p1Life, p2Life): 
-    
         p1LifeBars = p1Life / 6.25 
         if p1LifeBars == 16:
             out = 0xffff
@@ -182,7 +160,16 @@ class XBeeIO:
             out = 0
         else:
             out = (1<<int(p1LifeBars) + 1) - 1
-        self.p1LifeData = out
+        data = struct.pack(">I", out)
+        try:
+            if (data != self.p1LifeData):
+                self.p2LifeData = data
+                data = struct.pack("i", out)
+                # Write data to the xbee: SSFP1LIFE destination address
+                self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP1LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP1LIFE'][0], data=data)                   
+        except:
+            self._logger.warn("SSFP1LIFE send error -- perhaps address not in ADDR_TABLE")
+            pass
         
         p2LifeBars = p2Life / 6.25 
         if p2LifeBars == 16:
@@ -191,10 +178,15 @@ class XBeeIO:
             out = 0
         else:
             out = (1<<int(p2LifeBars) + 1) - 1
-        self.p2LifeData = out
-        
-        self._sendLife()
-
+        data = struct.pack(">I", out)
+        try:
+            if (data != self.p2LifeData):
+                self.p2LifeData = data
+                # Write data to the xbee: SSFP2LIFE destination address
+                self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP2LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP2LIFE'][0], data=data)                   
+        except:
+            self._logger.warn("SSFP2LIFE send error -- perhaps address not in ADDR_TABLE ")
+            pass
         
     def SendFireEmitterData(self, leftEmitters, rightEmitters):
         
