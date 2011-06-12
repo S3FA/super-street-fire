@@ -49,6 +49,9 @@ class SenderListener(GameModelListener):
         GameModelListener.OnGameStateChanged(self, state)
         cur_state = state.GetStateType()
         # update round and match won, etc
+        if cur_state == ROUND_IN_PLAY_GAME_STATE:
+            self.sender.SendLifeBarData( 100, 100 )
+            
         if cur_state == ROUND_ENDED_GAME_STATE:
             print 'Sender ----- Round ' + str(state.roundNumber) + ' won by ' + str(state.roundWinner)
         if cur_state == MATCH_OVER_GAME_STATE:
