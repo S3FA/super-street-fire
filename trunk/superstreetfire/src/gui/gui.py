@@ -22,6 +22,7 @@ from gamemodel import *
 import ioserver
 from binascii import hexlify
 
+
 class UIController(GameModelListener):
     def __init__(self, ssfGame, receiverObj):
         GameModelListener.__init__(self)
@@ -280,6 +281,10 @@ class UIController(GameModelListener):
         hwTable.topleft = (600,250)
         self.renderer.add_widget(hwTable)
         
+        # fire emitter simulator
+        self.initEmitters()
+        
+        
         # what we need:
         # info: timer, round #, p1/p2 health, device status/link (RSSI)
         #       simulator, detected move, console log, p1/p2 att/med values, fire system armed status
@@ -290,6 +295,34 @@ class UIController(GameModelListener):
         # detected move
         # cancel match, detect devices, calibrate, ESTOP,
         # move generation (e.g. trigger p1 hadouken), demo mode on/off
+
+
+    def initEmitters(self):
+        self.leftEmitters = []
+        self.rightEmitters = []
+        startLeftX = 20
+        startLeftY = 350
+        startRightX = startLeftX
+        startRightY = startLeftY + 50
+        w = 16
+        h = 16
+        spacing = 8
+        
+        for i in range(0, fire_emitter.FireEmitter.NUM_FIRE_EMITTERS_PER_ARC):
+            # straight line left to right layout of emitter widgets
+            self.leftEmitters.append(EmitterWidget(w,h))
+            self.leftEmitters[i].topleft = ((startLeftX + i*(w+spacing)), startLeftY)
+            self.renderer.add_widget(self.leftEmitters[i])
+            self.rightEmitters.append(EmitterWidget(w,h))
+            self.rightEmitters[i].topleft = ((startRightX + i*(w+spacing)), startRightY)
+            self.renderer.add_widget(self.rightEmitters[i])
+    
+    def updateEmitters(self):
+        for emitter,widget in zip(self.game.GetLeftEmitterArc(1),self.leftEmitters):
+            widget.update_emitter(emitter)
+        for emitter,widget in zip(self.game.GetRightEmitterArc(1),self.rightEmitters):
+            widget.update_emitter(emitter)
+
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
@@ -316,6 +349,8 @@ class UIController(GameModelListener):
         
     def OnTimerStateChanged(self, newTime):
         self.timerLabel.text = '%.0f' % newTime
+        self.updateEmitters()
+        
     
     def OnPlayerHealthChanged(self, players):
         try:
@@ -348,3 +383,30 @@ class UIController(GameModelListener):
     def OnPlayerMoves(self, actions):
         for x in range(0,len(actions)):
             self.moves.insert (x, TextListItem (str(actions[x])) )
+
+
+
+class EmitterWidget(ImageLabel):
+    onColour = pygame.Color(200,200,200,128)
+    offColour = pygame.Color(0,0,0,0)
+    p1Colour = pygame.Color(200,0,0,128)
+    p2Colour = pygame.Color(0,200,200,128)
+    bothOnColour = pygame.Color(0,0,200,128)
+    
+    def __init__(self, w=16, h=16):
+        self.surface = pygame.Surface((w,h))
+        ImageLabel.__init__(self,self.surface)
+    
+    def update_emitter(self,emitter):
+        if emitter.flameIsOn:
+            if emitter.p1ColourIsOn and emitter.p2ColourIsOn:
+                self.surface.fill(EmitterWidget.bothOnColour)
+            if emitter.p1ColourIsOn:
+                self.surface.fill(EmitterWidget.p1Colour)
+            elif emitter.p2ColourIsOn:
+                self.surface.fill(EmitterWidget.p2Colour)
+            else:
+                self.surface.fill(EmitterWidget.onColour)
+        else:
+            self.surface.fill(EmitterWidget.offColour)
+        self.set_dirty(True,True)
