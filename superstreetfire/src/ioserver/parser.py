@@ -43,7 +43,7 @@ class Parser:
             source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
             log.debug( 'No node in address table for ' + source )
             return
-        if (nodeId.find('LIFE') > 0 or nodeId.find('FIRE') > 0):
+        if (nodeId.find('LIFE') > 0 or nodeId.find('FIRE') > 0 or nodeId.find('TIMER') > 0):
             return
 
         # good to go, look for the device data:
