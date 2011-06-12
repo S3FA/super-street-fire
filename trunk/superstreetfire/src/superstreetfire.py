@@ -16,6 +16,7 @@ import ioserver.xbeeio
 import gamemodel.game_states
 #from ioserver.client_emulator import ClientEmulator
 from ioserver.receiver_queue_mgr import ReceiverQueueMgr
+from ioserver.output_listener import SenderListener
 
 from gamemodel.ssf_game import SSFGame
 
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     
         # Spawn threads for listening and sending data over the serial port
         ioserver.xbeeio.receiverQueueMgr = receiverQueueMgr
-        receiverObj = ioserver.xbeeio.XBeeIO(options.inputPort, DEFAULT_BAUDRATE)
+        ioManager = ioserver.xbeeio.XBeeIO(options.inputPort, DEFAULT_BAUDRATE)
         
         #print "Running receiver with file input ..."
         #receiverObj = ioserver.receive_from_file.FileReceiver(receiverQueueMgr)
@@ -105,7 +106,8 @@ if __name__ == '__main__':
         
         # GUI
         pygame.init ()
-        uiController = gui.UIController(ssfGame, receiverObj)
+        uiController = gui.UIController(ssfGame, ioManager)
+        sender = SenderListener(ssfGame, ioManager)
         
         # Jump straight to the round-in-play for testing
         ssfGame._SetState(gamemodel.game_states.RoundBeginGameState(ssfGame, 1))
@@ -147,7 +149,7 @@ if __name__ == '__main__':
             
             # looking at the emitter states from the P1 perspective
             # send the full state to the wifire board
-            receiverObj.SendFireEmitterData(ssfGame.GetLeftEmitterArc(1), ssfGame.GetRightEmitterArc(1))
+            ioManager.SendFireEmitterData(ssfGame.GetLeftEmitterArc(1), ssfGame.GetRightEmitterArc(1))
             
             # Sync to the specified frequency
             if deltaFrameTime < FIXED_FRAME_TIME:
