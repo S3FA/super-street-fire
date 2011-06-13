@@ -31,6 +31,7 @@ def XBeeCallback(xbeeDataFrame):
 class XBeeIO:
     LOGGER_NAME = 'xbee-tx'
     DISCOVERY_TIMEOUT = 5
+    INPUT_PORTS = ['/dev/tty.xbee', 'COM10','COM3','COM5','COM6','COM8']
 
     def __init__(self, inputSerialPort, baudRate):
         self._logger = logging.getLogger(XBeeIO.LOGGER_NAME)
@@ -42,12 +43,17 @@ class XBeeIO:
         self.p1LifeData  = None
         self.p2LifeData  = None
         
-        try:
-            self.serialIn = serial.Serial(inputSerialPort, baudrate=baudRate)
-            self.xbee = ZigBee(self.serialIn, callback=XBeeCallback, escaped=True)
-            
-        except serial.SerialException:
-            print "ERROR: Serial port " + inputSerialPort + " was invalid/not found."
+        if (inputSerialPort != None): XBeeIO.INPUT_PORTS.insert(0, inputSerialPort)
+        for port in XBeeIO.INPUT_PORTS:
+            try:
+                self.serialIn = serial.Serial( port,baudrate=57600 )
+                self.xbee = ZigBee(self.serialIn, callback=XBeeCallback, escaped=True)
+                break
+            except serial.serialutil.SerialException:
+                pass
+        
+        if self.xbee == None: 
+            print "ERROR: Serial search failed " + str(XBeeIO.INPUT_PORTS)
             print "************ Killing XBee IO Thread ****************"
             exit(-1)    
         
