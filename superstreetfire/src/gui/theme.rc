@@ -1,0 +1,8 @@
+from ocempgui.widgets import Constants
+
+# http://ocemp.sourceforge.net/manual/manual.html#customizing_the_theme_files
+
+basic_font = { "name": "Tahoma", "size": 11, "alias": True }
+
+basewidget = {  "font" : basic_font }
+listitem = {  "font" : basic_font }

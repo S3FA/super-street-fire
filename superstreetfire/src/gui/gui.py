@@ -12,7 +12,6 @@ import sys
 import pygame
 from ocempgui.widgets import * # http://ocemp.sourceforge.net/guidown.html
 from ocempgui.draw import Image
-from ocempgui.draw import String
 from ocempgui.widgets.components import *
 from ocempgui.widgets.Constants import *
 from ocempgui.object import BaseObject
@@ -38,7 +37,7 @@ class UIController(GameModelListener):
         screen = pygame.display.set_mode ((w, h));
         screen.fill ((255, 200, 100))
 
-        self.sans = String.create_system_font ("Sans", 10)
+        base.GlobalStyle.load ('/'.join((os.path.dirname(__file__),'theme.rc')))
 
         self.renderer = Renderer ()
         self.renderer.screen = screen
