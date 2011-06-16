@@ -10,6 +10,7 @@ from __future__ import division
 import os
 import sys
 import pygame
+import logging
 from ocempgui.widgets import * # http://ocemp.sourceforge.net/guidown.html
 from ocempgui.draw import Image
 from ocempgui.widgets.components import *
@@ -18,6 +19,7 @@ from ocempgui.object import BaseObject
 from ocempgui.events import EventManager
 from gamemodel.game_model_listener import GameModelListener
 from gamemodel import *
+from ssf_widgets import EmitterWidget
 import ioserver
 from binascii import hexlify
 
@@ -44,7 +46,7 @@ class UIController(GameModelListener):
         self.renderer.title = "Super Street Fire"
         self.renderer.color = (250, 250, 250)
         
-        topmargin = 5
+        topmargin = 10
         logosize = (67,55)
         
         try:
@@ -53,22 +55,32 @@ class UIController(GameModelListener):
             logo.topleft = (w/2 - logosize[0]/2, topmargin)
             self.renderer.add_widget(logo)
         except pygame.error:
-            print "couldn't load logo. crappy version of python on a mac? (try 2.6)"
+            loggin.warn("couldn't load logo. crappy version of python on a mac? (try 2.6)")
         
         self.roundLabel = Label("Round %d" % self.game.roundNumber)
         self.roundLabel.topleft = (w/2 - logosize[0]/2, topmargin + logosize[1] + 5)
-        
+        self.roundLabel.get_style()["font"]["size"] = 24
+        self.roundLabel.minsize = (logosize[0], self.roundLabel.minsize[1])
         self.renderer.add_widget(self.roundLabel)
         
         self.timerLabel = Label("60")
         self.timerLabel.topleft = (self.roundLabel.topleft[0], 
                                    self.roundLabel.topleft[1] + self.timerLabel.height + 5)
+        self.timerLabel.get_style()["font"]["size"] = 32
+        self.timerLabel.minsize = (logosize[0], self.roundLabel.minsize[1])
         self.renderer.add_widget(self.timerLabel)
         
+        self.estop = Button("STOP ALL")
+        self.estop.topleft = (self.timerLabel.topleft[0],
+                              self.timerLabel.topleft[1] + self.roundLabel.height + 5)
+        self.estop.minsize = (logosize[0], self.estop.minsize[1])
+        #self.estop.connect_signal(Constants.SIG_CLICKED, OMGWTFBBQ)
+        self.renderer.add_widget(self.estop)
+        
+        
         gameControlFrame = HFrame (Label (" Game Control "))
-        gameControlFrame.topleft = (10, 10)
 
-        buttonTable = Table(7,1)
+        buttonTable = Table(1,4)
         buttonTable.spacing = 5
         buttonTable.set_column_align (0, ALIGN_LEFT)
 
@@ -79,7 +91,7 @@ class UIController(GameModelListener):
         
         self.pauseBtn = Button ("Pause Game")
         self.pauseBtn.connect_signal(Constants.SIG_CLICKED, self.game.TogglePauseGame)
-        buttonTable.add_child(1,0,self.pauseBtn)
+        buttonTable.add_child(0,1,self.pauseBtn)
         
         # is end round really necessary? not straightforward to implement with current state machine 
         #self.endRoundBtn = Button ("End Round")
@@ -88,23 +100,35 @@ class UIController(GameModelListener):
         
         self.cancelMatchBtn = Button("Cancel Match")
         self.cancelMatchBtn.connect_signal(Constants.SIG_CLICKED, self.game.StopGame)
-        buttonTable.add_child(3,0,self.cancelMatchBtn)
+        buttonTable.add_child(0,2,self.cancelMatchBtn)
         
-        self.detectBtn = Button("Detect Devices")
-        self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.receiver.NodeDiscovery)
-        buttonTable.add_child(4,0,self.detectBtn)
+        self.demoBtn = Button("Demo")
+        #self.cancelMatchBtn.connect_signal(Constants.SIG_CLICKED, SweetDemo)
+        buttonTable.add_child(0,3,self.demoBtn)
         
-        self.calibrateBtn = Button("Calibrate Game")
-        #self.calibrateBtn.connect_signal(Constants.SIG_CLICKED, self.game.Calibrate)
-        buttonTable.add_child(5,0,self.calibrateBtn)
-        
-        self.estop = Button("STOP ALL")
-        #self.estop.connect_signal(Constants.SIG_CLICKED, OMGWTFBBQ)
-        buttonTable.add_child(6,0,self.estop)
-
+        gameControlFrame.topleft = (10, topmargin)
         gameControlFrame.add_child(buttonTable)
         gameControlFrame.set_align (ALIGN_LEFT)
         self.renderer.add_widget (gameControlFrame)
+        
+        
+        hwFrame = HFrame (Label (" Hardware "))
+        hwFrame.topleft = (w/2 - logosize[0]/2 + logosize[0] + 48, topmargin)
+        hwBtnTable = Table(2,1)
+        
+        self.detectBtn = Button("Detect Devices")
+        self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.receiver.NodeDiscovery)
+        hwBtnTable.add_child(0,0,self.detectBtn)
+        
+        self.calibrateBtn = Button("Calibrate Game")
+        #self.calibrateBtn.connect_signal(Constants.SIG_CLICKED, self.game.Calibrate)
+        hwBtnTable.add_child(1,0,self.calibrateBtn)
+
+        hwFrame.add_child(hwBtnTable)
+        hwFrame.set_align(ALIGN_LEFT)
+        self.renderer.add_widget(hwFrame)
+        
+        
         
         
         healthTable = Table(2,1)
@@ -123,7 +147,7 @@ class UIController(GameModelListener):
         self.renderer.add_widget(healthTable)
         
         moveframe = HFrame (Label ("Recent moves"))
-        moveframe.topleft = (140, 20)
+        moveframe.topleft = (10, gameControlFrame.topleft[1]+gameControlFrame.height+8)
         moveInfo = ScrolledList(100, 100, ListItemCollection())
         self.moves = ListItemCollection()
         self.moves.append (TextListItem ('No moves yet') )
@@ -305,7 +329,7 @@ class UIController(GameModelListener):
         startRightY = startLeftY + 50
         w = 16
         h = 16
-        spacing = 8
+        spacing = 12
         
         for i in range(0, fire_emitter.FireEmitter.NUM_FIRE_EMITTERS_PER_ARC):
             # straight line left to right layout of emitter widgets
@@ -316,6 +340,12 @@ class UIController(GameModelListener):
             self.rightEmitters[i].topleft = ((startRightX + i*(w+spacing)), startRightY)
             self.renderer.add_widget(self.rightEmitters[i])
     
+    
+    
+    ##################
+    ## Updating
+    ##################
+    
     def updateEmitters(self):
         for emitter,widget in zip(self.game.GetLeftEmitterArc(1),self.leftEmitters):
             widget.update_emitter(emitter)
@@ -325,8 +355,6 @@ class UIController(GameModelListener):
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
-        print 'state change: %s ' % str(state)
-        
         cur_state = state.GetStateType()
         
         # update round # / timer
@@ -347,6 +375,7 @@ class UIController(GameModelListener):
         
         
     def OnTimerStateChanged(self, newTime):
+        if newTime < 0: newTime = 0
         self.timerLabel.text = '%.0f' % newTime
         self.updateEmitters()
         
@@ -383,29 +412,3 @@ class UIController(GameModelListener):
         for x in range(0,len(actions)):
             self.moves.insert (x, TextListItem (str(actions[x])) )
 
-
-
-class EmitterWidget(ImageLabel):
-    onColour = pygame.Color(200,200,200,128)
-    offColour = pygame.Color(0,0,0,0)
-    p1Colour = pygame.Color(200,0,0,128)
-    p2Colour = pygame.Color(0,200,200,128)
-    bothOnColour = pygame.Color(0,0,200,128)
-    
-    def __init__(self, w=16, h=16):
-        self.surface = pygame.Surface((w,h))
-        ImageLabel.__init__(self,self.surface)
-    
-    def update_emitter(self,emitter):
-        if emitter.flameIsOn:
-            if emitter.p1ColourIsOn and emitter.p2ColourIsOn:
-                self.surface.fill(EmitterWidget.bothOnColour)
-            if emitter.p1ColourIsOn:
-                self.surface.fill(EmitterWidget.p1Colour)
-            elif emitter.p2ColourIsOn:
-                self.surface.fill(EmitterWidget.p2Colour)
-            else:
-                self.surface.fill(EmitterWidget.onColour)
-        else:
-            self.surface.fill(EmitterWidget.offColour)
-        self.set_dirty(True,True)

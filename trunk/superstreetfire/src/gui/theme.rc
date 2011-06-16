@@ -2,7 +2,15 @@ from ocempgui.widgets import Constants
 
 # http://ocemp.sourceforge.net/manual/manual.html#customizing_the_theme_files
 
+_normal = Constants.STATE_NORMAL
+_entered = Constants.STATE_ENTERED
+_active = Constants.STATE_ACTIVE
+_insensitive = Constants.STATE_INSENSITIVE
+
+
 basic_font = { "name": "Tahoma", "size": 11, "alias": True }
+#widget_bgcolor =  { _normal: (250, 250, 250) }
+
 
 basewidget = {  "font" : basic_font }
 listitem = {  "font" : basic_font }

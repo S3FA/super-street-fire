@@ -159,14 +159,26 @@ class SSFGame:
             actionsQueue.remove(action)
 
     # Gui test methods *****************************************    
-    def TestP1Jab(self):
-        self.gestureRecognizer.ChangeP1State(attack.BuildLeftJabAttack(1))
-    def TestP2Jab(self):
-        self.gestureRecognizer.ChangeP1State(attack.BuildLeftJabAttack(2))
-    def TestP1Hook(self):
-        self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(1))
-    def TestP2Hook(self):
-        self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(2))
+    def TestP1Jab(self, side='l'):
+        if side.lower() == 'l':
+            self.gestureRecognizer.ChangeP1State(attack.BuildLeftJabAttack(1))
+        else:
+            self.gestureRecognizer.ChangeP1State(attack.BuildRightJabAttack(1))
+    def TestP2Jab(self, side='l'):
+        if side.lower() == 'l':
+            self.gestureRecognizer.ChangeP1State(attack.BuildLeftJabAttack(2))
+        else:
+            self.gestureRecognizer.ChangeP1State(attack.BuildRightJabAttack(2))
+    def TestP1Hook(self, side='l'):
+        if side.lower() == 'l':
+            self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(1))
+        else:
+            self.gestureRecognizer.ChangeP1State(attack.BuildRightHookAttack(1))
+    def TestP2Hook(self, side='l'):
+        if side.lower() == 'l':
+            self.gestureRecognizer.ChangeP1State(attack.BuildLeftHookAttack(2))
+        else:
+            self.gestureRecognizer.ChangeP1State(attack.BuildRightHookAttack(2))
     def TestP1SonicBoom(self):
         self.gestureRecognizer.ChangeP1State(attack.BuildSonicBoomAttack(1))
     def TestP2SonicBoom(self):
@@ -175,9 +187,15 @@ class SSFGame:
         self.gestureRecognizer.ChangeP1State(attack.BuildHadoukenAttack(1))
     def TestP2Hadouken(self):
         self.gestureRecognizer.ChangeP1State(attack.BuildHadoukenAttack(2))
-    def TestP1Block(self):
-        self.gestureRecognizer.ChangeP1State(block.BuildLeftBasicBlock(1))
-    def TestP2Block(self):
-        self.gestureRecognizer.ChangeP1State(block.BuildLeftBasicBlock(2))
+    def TestP1Block(self, side='l'):
+        if side.lower() == 'l':
+            self.gestureRecognizer.ChangeP1State(block.BuildLeftBasicBlock(1))
+        else:
+            self.gestureRecognizer.ChangeP1State(block.BuildRightBasicBlock(1))
+    def TestP2Block(self, side='l'):
+        if side.lower() == 'l':
+            self.gestureRecognizer.ChangeP1State(block.BuildLeftBasicBlock(2))
+        else:
+            self.gestureRecognizer.ChangeP1State(block.BuildRightBasicBlock(2))
         
     
