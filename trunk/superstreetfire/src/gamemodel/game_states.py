@@ -158,6 +158,8 @@ class RoundInPlayGameState(GameState):
         self.roundNumber = roundNumber
         
     def Tick(self, dT):
+        self.ssfGame._listenerCmdr.TimerStateChanged(self.roundTime)
+        
         # Execute the actions (attacks, blocks, etc.)
         self.ssfGame._ExecuteGameActions(dT, self._activeActions)
         

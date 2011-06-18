@@ -33,7 +33,7 @@ class GameModelListener:
     def OnPlayerMoves(self, actions):
         pass
     
-    # TODO: Place more listener event here
+    # TODO: Place more listener events here
     
     
 class GameModelListenerCmdr:

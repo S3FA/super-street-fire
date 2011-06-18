@@ -88,8 +88,6 @@ class SSFGame:
     # set state machine (see game_states.py)
     def Tick(self, dT):
         self.state.Tick(dT)
-        if self.state.GetStateType() == game_states.ROUND_IN_PLAY_GAME_STATE:
-            self._listenerCmdr.TimerStateChanged(self.state.roundTime)
     
     def StartGame(self):
         self.state.StartGame()
