@@ -23,8 +23,13 @@ from gamemodel.ssf_game import SSFGame
 import pygame
 from gui import gui
 
+from gamemodel.fire_emitter_states import FireState
 
 if __name__ == '__main__':
+
+    logger = logging.getLogger(FireState.LOGGER_NAME)
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
 
     # IN_PORT="/dev/slave"
     IN_PORT = "/dev/tty.xbee"

@@ -29,11 +29,12 @@ class Attack(Action):
     # timeLength: The total time that the attack will take to travel
     #             from one side to the other of the arc.
     # dmgPerFlame: The total damage per flame that hits the other player, in percent 
-    def __init__(self, playerNum, sideEnum, thickness, timeLength, dmgPerFlame):
+    def __init__(self, playerNum, sideEnum, thickness, timeLength, dmgPerFlame, name):
         Action.__init__(self, playerNum, sideEnum, thickness, timeLength)
 
         # The total damage each flame of the attack does to the player it hits, when it hits        
         self._dmgPerFlame = dmgPerFlame
+        self._name = name
         
         # The time per emitter is calculated using the total number of fire emitters AND
         # the thickness of the attack - the thicker the attack the more emitters will actually
@@ -74,11 +75,7 @@ class Attack(Action):
         self._rightAttackWindow = None
 
     def __str__(self):
-        action = 'P' + str(self.playerNum)
-        if (self._thickness == 1): action += ' Jab'
-        if (self._thickness == 2 and self._timeLength == 3.0): action += ' Hook'
-        if (self._thickness == 2 and self._timeLength == 3.5): action += ' Boom'
-        if (self._thickness == 2 and self._timeLength == 4.0): action += ' Hadouken'
+        action = 'P' + str(self.playerNum) + ' ' + self._name
         return action
         
     def Initialize(self, ssfGame):
@@ -110,8 +107,11 @@ class Attack(Action):
         if self._isKilled or self.IsFinished():
             return
         
+        # Make sure the delta time never exceeds the time per emitter
+        dT = min(self._timePerEmitter * 0.999, dT)
+        
         # Increment the time tracker(s)...
-        self._currAttackTime        += dT
+        self._currAttackTime += dT
         
         # NOTE: For now the delta emitter times for the left and right arcs are the same
         self._currDeltaLEmitterTime += dT
@@ -183,7 +183,7 @@ class Attack(Action):
                     attackWindow[i] = Attack.INACTIVE_ATTACK_PART
         
         # Shift the attack window if we've exceeded the emitter time
-        if deltaEmitterTime >= self._timePerEmitter:
+        while deltaEmitterTime >= self._timePerEmitter:
             #print attackWindowIdx, attackWindow[0]
             #print self._currAttackTime
             
@@ -245,18 +245,18 @@ class Attack(Action):
 
 # Factory/Builder Methods for various Super Street Fire Attacks 
 def BuildLeftJabAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_SIDE, 1, 2.0, 5)
+    return Attack(playerNum, Action.LEFT_SIDE, 1, 2.0, 5, "Left Jab")
 def BuildRightJabAttack(playerNum):
-    return Attack(playerNum, Action.RIGHT_SIDE, 1, 2.0, 5)
+    return Attack(playerNum, Action.RIGHT_SIDE, 1, 2.0, 5, "Right Jab")
 def BuildLeftHookAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_SIDE, 2, 3.0, 5)
+    return Attack(playerNum, Action.LEFT_SIDE, 2, 3.0, 5, "Left Hook")
 def BuildRightHookAttack(playerNum):
-    return Attack(playerNum, Action.RIGHT_SIDE, 2, 3.0, 5)
+    return Attack(playerNum, Action.RIGHT_SIDE, 2, 3.0, 5, "Right Hook")
 def BuildLeftUppercutAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_SIDE, 2, 4.0, 5)
+    return Attack(playerNum, Action.LEFT_SIDE, 2, 4.0, 5, "Left Uppercut")
 def BuildRightUppercutAttack(playerNum):
-    return Attack(playerNum, Action.RIGHT_SIDE, 2, 4.0, 5)
+    return Attack(playerNum, Action.RIGHT_SIDE, 2, 4.0, 5, "Right Uppercut")
 def BuildSonicBoomAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 3.5, 5)
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 3.5, 5, "Sonic Boom")
 def BuildHadoukenAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5)
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5, "Hadouken")

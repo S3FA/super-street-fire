@@ -25,8 +25,11 @@ from binascii import hexlify
 
 
 class UIController(GameModelListener):
+    LOGGER_NAME = 'gui_logger'
+    
     def __init__(self, ssfGame, receiverObj):
         GameModelListener.__init__(self)
+        self._logger = logging.getLogger(UIController.LOGGER_NAME)
         self.game = ssfGame
         self.receiver = receiverObj
         self._initUI(ssfGame)
@@ -50,12 +53,15 @@ class UIController(GameModelListener):
         logosize = (67,55)
         
         try:
+            self._logger.debug("Loading logo from " + "/".join((os.path.dirname(__file__),'logo.bmp')))
+
             logo_img = Image.load_image('/'.join((os.path.dirname(__file__),'logo.bmp')))
             logo = ImageLabel (logo_img)
             logo.topleft = (w/2 - logosize[0]/2, topmargin)
             self.renderer.add_widget(logo)
+            
         except pygame.error:
-            loggin.warn("couldn't load logo. crappy version of python on a mac? (try 2.6)")
+            self._logger.warning("Couldn't load logo. crappy version of python on a mac? (try 2.6)")
         
         self.roundLabel = Label("Round %d" % self.game.roundNumber)
         self.roundLabel.topleft = (w/2 - logosize[0]/2, topmargin + logosize[1] + 5)
@@ -347,7 +353,7 @@ class UIController(GameModelListener):
     ##################
     
     def updateEmitters(self):
-        for emitter,widget in zip(self.game.GetLeftEmitterArc(1),self.leftEmitters):
+        for emitter,widget in zip(self.game.GetLeftEmitterArc(1), self.leftEmitters):
             widget.update_emitter(emitter)
         for emitter,widget in zip(self.game.GetRightEmitterArc(1),self.rightEmitters):
             widget.update_emitter(emitter)
@@ -369,13 +375,15 @@ class UIController(GameModelListener):
         self.cancelMatchBtn.sensitive = cur_state != game_states.IDLE_GAME_STATE
 
         if cur_state == game_states.PAUSED_GAME_STATE:
-            self.pauseBtn.text = "Restart Game"
+            self.pauseBtn.text = "Unpause Game"
         else:
             self.pauseBtn.text = "Pause Game"
         
         
     def OnTimerStateChanged(self, newTime):
-        if newTime < 0: newTime = 0
+        if newTime < 0:
+            newTime = 0
+            
         self.timerLabel.text = '%.0f' % newTime
         self.updateEmitters()
         
