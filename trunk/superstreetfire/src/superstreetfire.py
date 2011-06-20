@@ -131,10 +131,9 @@ if __name__ == '__main__':
             # check for pygame (GUI) events and pass to renderer
             events = pygame.event.get ()
             if pygame.QUIT in [ev.type for ev in events]:
-                print "got pygame.QUIT event"
+                logger.info("got pygame.QUIT event")
                 break
             uiController.renderer.distribute_events(*events)
-            uiController.renderer.refresh()
             
             # The receiver has been asynchronously receiving data and dumping it
             # onto the receiverQueueMgr, we need to grab that data and apply it to the simulation...

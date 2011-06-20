@@ -26,5 +26,5 @@ class EmitterWidget(ImageLabel):
         else:
             self.surface.fill(EmitterWidget.offColour)
         
-        self.set_dirty(True,False)
+        self.set_dirty(True,True)
     
