@@ -353,11 +353,16 @@ class UIController(GameModelListener):
     ##################
     
     def updateEmitters(self):
+        something_changed = False
         for emitter,widget in zip(self.game.GetLeftEmitterArc(1), self.leftEmitters):
-            widget.update_emitter(emitter)
+            if widget.update_emitter(emitter):
+                something_changed = True
         for emitter,widget in zip(self.game.GetRightEmitterArc(1),self.rightEmitters):
-            widget.update_emitter(emitter)
-
+            if widget.update_emitter(emitter):
+                something_changed = True
+        
+        if something_changed:
+            self.renderer.refresh()
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)

@@ -11,20 +11,30 @@ class EmitterWidget(ImageLabel):
     
     def __init__(self, w=16, h=16):
         self.surface = pygame.Surface((w,h))
+        self._prevColour = None
         ImageLabel.__init__(self,self.surface)
     
     def update_emitter(self,emitter):
+        """Fills this widget with a colour based on the emitter state.
+        Returns True if the colour changed, False otherwise.
+        """
+        newColour = None
         if emitter.flameIsOn:
             if emitter.p1ColourIsOn and emitter.p2ColourIsOn:
-                self.surface.fill(EmitterWidget.bothOnColour)
-            if emitter.p1ColourIsOn:
-                self.surface.fill(EmitterWidget.p1Colour)
+                newColour = EmitterWidget.bothOnColour
+            elif emitter.p1ColourIsOn:
+                newColour = EmitterWidget.p1Colour
             elif emitter.p2ColourIsOn:
-                self.surface.fill(EmitterWidget.p2Colour)
+                newColour = EmitterWidget.p2Colour
             else:
-                self.surface.fill(EmitterWidget.onColour)
+                newColour = EmitterWidget.onColour
         else:
-            self.surface.fill(EmitterWidget.offColour)
+            newColour = EmitterWidget.offColour
         
-        self.set_dirty(True,True)
-    
+        if newColour != self._prevColour:
+            self.surface.fill(newColour)
+            self.set_dirty(True, False) # set dirty but don't force immediate redraw
+            self._prevColour = newColour
+            return True
+        
+        return False
