@@ -41,6 +41,10 @@ class SSFGame:
         # it might make use of members that belong to this object
         self._SetState(game_states.IdleGameState(self))
 
+    def StopAll(self):
+        self.Reset()
+        self.StopGame()
+    
     def Reset(self):
         self.chipDamageOn = True
         self.player1.Reset()
