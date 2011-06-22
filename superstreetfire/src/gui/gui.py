@@ -80,7 +80,7 @@ class UIController(GameModelListener):
         self.estop.topleft = (self.timerLabel.topleft[0],
                               self.timerLabel.topleft[1] + self.roundLabel.height + 5)
         self.estop.minsize = (logosize[0], self.estop.minsize[1])
-        #self.estop.connect_signal(Constants.SIG_CLICKED, OMGWTFBBQ)
+        self.estop.connect_signal(Constants.SIG_CLICKED, self.game.StopAll)
         self.renderer.add_widget(self.estop)
         
         
@@ -371,6 +371,7 @@ class UIController(GameModelListener):
         # update round # / timer
         if cur_state == game_states.ROUND_BEGIN_GAME_STATE:
             self.roundLabel.text = "Round %d" % state.roundNumber
+            self.OnPlayerHealthChanged((self.game.player1,self.game.player2))
         elif cur_state == game_states.IDLE_GAME_STATE:
             # everything reset
             self.roundLabel.text = '-'
