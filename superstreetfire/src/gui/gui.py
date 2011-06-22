@@ -203,7 +203,11 @@ class UIController(GameModelListener):
         moveTestFrame.add_child(moveTable)
         self.renderer.add_widget(moveTestFrame)
         
-        hwTable = Table(12,2)
+        
+        peripheralFrame = HFrame (Label (" Peripherals "))
+        peripheralFrame.topleft = (575, 175)
+        
+        hwTable = Table(13,2)
         hwTable.spacing = 5
         hwTable.add_child(0,0,Label('RSSI'))
         hwTable.add_child(0,1,Label('Address'))
@@ -289,26 +293,36 @@ class UIController(GameModelListener):
         self.p2LifeAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2LIFE"))
         hwTable.add_child(9,1,self.p2LifeAddr)
         
+        self.koRSSI = ProgressBar()
+        self.koRSSI.value = 0
+        self.koRSSI.text = 'KO Box'
+        hwTable.add_child(10,0,self.koRSSI)
+                
+        self.koAddr = Label("")
+        self.koAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFKO"))
+        hwTable.add_child(10,1,self.koAddr)
+        
         self.FireRSSI = ProgressBar()
         self.FireRSSI.value = 0
         self.FireRSSI.text = 'Fire Control'
-        hwTable.add_child(10,0,self.FireRSSI)
+        hwTable.add_child(11,0,self.FireRSSI)
         
         self.FireAddr = Label("")
         self.FireAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFFIRE"))
-        hwTable.add_child(10,1,self.FireAddr)
+        hwTable.add_child(11,1,self.FireAddr)
         
         self.LightsRSSI = ProgressBar()
         self.LightsRSSI.value = 0
         self.LightsRSSI.text = 'Lighting'
-        hwTable.add_child(11,0,self.LightsRSSI)
+        hwTable.add_child(12,0,self.LightsRSSI)
         
         self.LightsAddr = Label("")
         self.LightsAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFLIGHTS"))
-        hwTable.add_child(11,1,self.LightsAddr)
+        hwTable.add_child(12,1,self.LightsAddr)
         
-        hwTable.topleft = (600,250)
-        self.renderer.add_widget(hwTable)
+        hwTable.topleft = (600,200)
+        peripheralFrame.add_child(hwTable)
+        self.renderer.add_widget(peripheralFrame)
         
         # fire emitter simulator
         self.initEmitters()
