@@ -42,6 +42,7 @@ class XBeeIO:
         self.timerData   = None
         self.p1LifeData  = None
         self.p2LifeData  = None
+        self.koData      = None
         
         if (inputSerialPort != None): XBeeIO.INPUT_PORTS.insert(0, inputSerialPort)
         for port in XBeeIO.INPUT_PORTS:
@@ -99,12 +100,6 @@ class XBeeIO:
     def _sendTimer(self):
         timerData = self.timerData
         
-        try:
-            self.visualizer.write(timerData)
-        except:
-            self._logger.debug("Visualizer TIMER send error")
-            pass
-        
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
             print "ERROR: Output port was invalid/not found, can not send."
@@ -118,6 +113,22 @@ class XBeeIO:
         except:
             self._logger.warn("TIMER send error -- perhaps address not in ADDR_TABLE")
 
+    def _sendKO(self):
+        koData = self.koData
+        
+        # Make sure this object is in a proper state before running...
+        if self.xbee == None:
+            print "ERROR: Output port was invalid/not found, can not send."
+            print "************ Killing XBee IO Thread ****************"
+            return
+        
+        self._logger.debug('sending ko data ' + str(koData))
+        data = struct.pack("H", koData)
+        try:
+            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFKO'][1], dest_addr_long=parser.ADDR_TABLE['SSFKO'][0], data=data)                   
+        except:
+            self._logger.warn("KO send error -- perhaps address not in ADDR_TABLE")
+
 
     def _sendND(self):
         
@@ -130,7 +141,6 @@ class XBeeIO:
             return
         
         self.xbee.at(command='ND')                  
-        
 
     def SendTimerNum(self, value):    
         # based on the following digit map:
@@ -228,7 +238,15 @@ class XBeeIO:
             self.fireData = dataset
             #print 'send wifire data=%s' % (dataset)
             self._sendFire()
-            
+
+    def sendKO(self,state):
+        if(state):
+            out = 0xff
+        else:
+            out = 0x00
+        self.koData = struct.pack("H", out)
+        self._sendKO()
+
     def NodeDiscovery(self):
         self._sendND()
         

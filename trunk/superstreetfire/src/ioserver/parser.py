@@ -161,6 +161,7 @@ class Parser:
         'SSFP1LIFE' : ['',''],
         'SSFP2LIFE' : ['',''],
         'SSFLIGHTS' : ['',''],
+        'SSFKO'     : ['',''],
     }
     
 
