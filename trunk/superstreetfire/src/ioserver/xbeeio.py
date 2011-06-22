@@ -37,12 +37,10 @@ class XBeeIO:
         self._logger = logging.getLogger(XBeeIO.LOGGER_NAME)
         self.serialIn    = None
         self.xbee        = None
-        self.visualizer  = None
         self.fireData    = None
         self.timerData   = None
         self.p1LifeData  = None
         self.p2LifeData  = None
-        self.koData      = None
         
         if (inputSerialPort != None): XBeeIO.INPUT_PORTS.insert(0, inputSerialPort)
         for port in XBeeIO.INPUT_PORTS:
@@ -64,25 +62,11 @@ class XBeeIO:
         sleep(self.DISCOVERY_TIMEOUT)
         self._logger.info("Found Devices:" + str( parser.ADDR_TABLE ) )
         
-        try:
-            port = '/dev/master'
-            if (os.name.find("nt") > -1):
-                port = "COM1" # using virtual serial port driver for windows
-            self.visualizer = serial.Serial(port, baudrate=57600)
-        
-        except serial.SerialException:
-            print 'ERROR: Serial'+port+' for visualizer was invalid/not found.'
-        
     def _sendFire(self):
         
         fireEmitterData = self.fireData
         self._logger.debug('sending fire emitter data ' + hexlify(fireEmitterData))
-        
-        try:
-            self.visualizer.write(fireEmitterData)
-        except:
-            pass
-        
+         
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
             print "Send Fire ERROR: Output port was invalid/not found, can not send."
@@ -99,7 +83,6 @@ class XBeeIO:
 
     def _sendTimer(self):
         timerData = self.timerData
-        
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
             print "ERROR: Output port was invalid/not found, can not send."
@@ -248,6 +231,7 @@ class XBeeIO:
         self._sendKO()
 
     def NodeDiscovery(self):
+        self._logger.info('Looking for hardware ...')
         self._sendND()
         
     def Kill(self):

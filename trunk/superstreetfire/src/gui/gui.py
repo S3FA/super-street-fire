@@ -27,11 +27,11 @@ from binascii import hexlify
 class UIController(GameModelListener):
     LOGGER_NAME = 'gui_logger'
     
-    def __init__(self, ssfGame, receiverObj):
+    def __init__(self, ssfGame, ioListener):
         GameModelListener.__init__(self)
         self._logger = logging.getLogger(UIController.LOGGER_NAME)
         self.game = ssfGame
-        self.receiver = receiverObj
+        self.ioListener = ioListener
         self._initUI(ssfGame)
         self.game.RegisterListener(self)
     
@@ -123,7 +123,7 @@ class UIController(GameModelListener):
         hwBtnTable = Table(2,1)
         
         self.detectBtn = Button("Detect Devices")
-        self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.receiver.NodeDiscovery)
+        self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.ioListener.DetectDevices)
         hwBtnTable.add_child(0,0,self.detectBtn)
         
         self.calibrateBtn = Button("Calibrate Game")

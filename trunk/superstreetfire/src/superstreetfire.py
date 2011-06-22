@@ -110,13 +110,14 @@ if __name__ == '__main__':
         # TODO: What the heck is our calibration data and where does it come from?
         ssfGame = SSFGame()
         
+        sender = SenderListener(ssfGame, ioManager)
+
         # GUI
         pygame.init ()
-        uiController = gui.UIController(ssfGame, ioManager)
-        sender = SenderListener(ssfGame, ioManager)
+        uiController = gui.UIController(ssfGame, sender)
         
         # Jump straight to the round-in-play for testing
-        ssfGame._SetState(gamemodel.game_states.RoundBeginGameState(ssfGame, 1))
+        #ssfGame._SetState(gamemodel.game_states.RoundBeginGameState(ssfGame, 1))
 
         while True:
             
