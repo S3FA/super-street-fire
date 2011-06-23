@@ -11,6 +11,7 @@ import parser
 class SenderListener(GameModelListener):
     def __init__(self, ssfGame, ioManager):
         GameModelListener.__init__(self)
+        self._logger           = logging.getLogger("sender")
         self.game = ssfGame
         self.xbeeio = ioManager
         self.game.RegisterListener(self)
@@ -61,9 +62,9 @@ class SenderListener(GameModelListener):
             self.xbeeio.SendP2LifeBar( 100 )
             
         if cur_state == ROUND_ENDED_GAME_STATE:
-            print 'Sender ----- Round ' + str(state.roundNumber) + ' won by ' + str(state.roundWinner)
+            self._logger.info('Sender ----- Round ' + str(state.roundNumber) + ' won by player ' + str(state.roundWinner+1))
         if cur_state == MATCH_OVER_GAME_STATE:
-            print 'Sender ----- Match won by ' + str(state.winnerPlayerNum)
+            self._logger.info('Sender ----- Match won by ' + str(state.winnerPlayerNum+1))
                 
     def OnHWAddrChanged(self, hwaddr):
         pass
