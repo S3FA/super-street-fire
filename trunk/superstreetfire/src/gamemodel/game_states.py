@@ -170,6 +170,8 @@ class RoundInPlayGameState(GameState):
             self.ssfGame.KillEmitters()
             # Switch states to the RoundEndedGameState
             self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner(), self.roundNumber))
+            # clear the gesture queue
+            self.ssfGame.gestureRecognizer.PopActions()
             return
         
         # Diminish the round timer
