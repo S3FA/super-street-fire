@@ -160,6 +160,14 @@ class UIController(GameModelListener):
         moveInfo.set_items( self.moves )
         moveframe.add_child(moveInfo)
         self.renderer.add_widget(moveframe)        
+
+        self.statusLabel = Label("Status")
+        self.statusLabel.topleft = (moveframe.topleft[0] + 130, 
+                                   moveframe.topleft[1])
+        self.statusLabel.get_style()["font"]["size"] = 26
+        self.statusLabel.minsize = (logosize[0], self.estop.minsize[1])
+        self.renderer.add_widget(self.statusLabel)
+        
         
         # table (rows, cols)
         moveTestFrame = HFrame (Label ("Test Moves"))
@@ -392,6 +400,9 @@ class UIController(GameModelListener):
             self.timerLabel.text = '-'
         elif cur_state == game_states.ROUND_ENDED_GAME_STATE:
             self.timerLabel.text = '0'
+            self.statusLabel.text = 'Round ' + str(state.roundNumber) + ': Winner ' + str(state.roundWinner)
+        elif cur_state == game_states.MATCH_OVER_GAME_STATE:
+            self.statusLabel.text = 'Match Won by Player ' + str(state.winnerPlayerNum)
         
         self.startBtn.sensitive = cur_state == game_states.IDLE_GAME_STATE or cur_state == game_states.ROUND_ENDED_GAME_STATE
         self.cancelMatchBtn.sensitive = cur_state != game_states.IDLE_GAME_STATE
