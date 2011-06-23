@@ -36,7 +36,7 @@ HOOK_LATACC_L2 = 200
 BLOCK_VER_ANGLE = 70
 BLOCK_RELEASE_ANGLE = 50
 
-TIME_BETWEEN_MOVES = 0.15
+TIME_BETWEEN_MOVES = 0.3
 TIME_TO_CLEAR_MOVE = 0.8
 
 class GestureState: 
@@ -103,7 +103,7 @@ class GestureState:
                 self._logger.debug(str(prevMove) + ' Punch release ' + str(glove.acceleration[X]))
                 return GestureState.NO_GESTURE
 
-        if ( abs(glove.acceleration[X]) > 100 and abs(glove.rotation[X]) > 60 and  
+        if ( abs(glove.acceleration[X]) > 110 and abs(glove.rotation[X]) > 60 and  
              glove.heading[ROLL] > 94 ):
             if ( abs(glove.acceleration[Y]) > 200 ):
                 player.power = 2
@@ -146,31 +146,38 @@ class GestureState:
         # each line comes through at diff times  
         # allow two-handed moves to be the final move in this tick
         if (lGlove != None and rGlove != None):
+            totalx = (abs(lGlove.acceleration[X]) + abs(rGlove.acceleration[X]))
+            totaly = (abs(lGlove.acceleration[Y]) + abs(rGlove.acceleration[Y]))
             # sonic boom - two handed move - use accel + gyros rolling inward
             # fists sideways: roll is L:-80 R:80
-            if (lGlove.heading[ROLL] < -70 and rGlove.heading[ROLL] > 70 and \
-                lGlove.heading[PITCH] < 30 and rGlove.heading[PITCH] < 30 ):
+            if (lGlove.heading[ROLL] > -100 and lGlove.heading[ROLL] < -80 \
+                and rGlove.heading[ROLL] < 100 and rGlove.heading[ROLL] > 80 and \
+                lGlove.heading[PITCH] < 20 and rGlove.heading[PITCH] < 20 and \
+                totaly < 120):
                 # both hands sideways, set "no move" because it's probably
                 # going to be a sonic boom when accel+gyros are higher
                 newMove = GestureState.SONIC_SIDE
                 print "SONIC SIDE POSITION ______________"
+                self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
             if (prevMove == GestureState.SONIC_SIDE and \
-                abs(lGlove.acceleration[X]) > 120 and abs(rGlove.acceleration[X]) > 120 ):
+                totalx > 210 ):
                 newMove = GestureState.SONIC_BOOM
-            if (newMove > -1): 
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
                 return
 
             # hadouken - check for forward accel - both hands
-            if ( lGlove.acceleration[X] > 95 and rGlove.acceleration[X] > 95 ):
+            if ( abs(lGlove.acceleration[X]) > 90 and abs(rGlove.acceleration[X]) > 90 ):
                 newMove = GestureState.BOTH_FWD
                 print "BOTH FORWARD MOVE ______________"
+                self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
             # hadouken - has a well defined end position at the end of the move..
+            # the problem with these values is that they are relative to the 
+            # initial calibration.. 
+            # right handed hadouken
             if (prevMove == GestureState.BOTH_FWD and \
-                abs(lGlove.heading[PITCH]) > 31 and abs(lGlove.heading[PITCH]) < 50 and \
-                abs(rGlove.heading[PITCH]) > 31 and abs(rGlove.heading[PITCH]) < 50):
+                lGlove.heading[ROLL] < -100 and lGlove.heading[PITCH] < -20 and \
+                rGlove.heading[ROLL] > 80 and rGlove.heading[PITCH] > 50 ):
                 newMove = GestureState.HADOUKEN
-            if (newMove > -1): 
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
                 return
 
@@ -242,7 +249,7 @@ class PlayerGestureState(GestureState):
             self._logger.warn( 'Not enough time between moves:' + str(deltaMoveTime) + " move:" + str(move)) 
             return
             
-        self._logger.warn( '---------------> Adding move; ' + str(move)) 
+        if (move > 0): self._logger.warn( '--======-> Adding move; ' + str(move)) 
         # record the move value, and reset all the data
         self.moves.append(move)
         self.allMoves[type].append(move)
@@ -262,7 +269,7 @@ class PlayerGestureState(GestureState):
             self.right = rightGloveData
 
         if (self.left != None and self.right != None):
-            #self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
+            self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
             #print "got some data for both hands " % ( self.left, self.right )
             self._determineMove(self)
             #if (len(playerState.moves) > 0):
