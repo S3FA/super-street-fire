@@ -41,7 +41,7 @@ class SenderListener(GameModelListener):
                 self.p1Health = 0
                 # person is dead.. send KO
             #print 'send health p1: ' + str(self.p1Health) )
-            self.xbeeio.SendLifeBarData( self.p1Health, self.p2Health )
+            self.xbeeio.SendP1LifeBar( self.p1Health )
         
         if (players[1].GetHealth() != self.p2Health):
             self.p2Health = players[1].GetHealth()
@@ -49,14 +49,16 @@ class SenderListener(GameModelListener):
                 self.p2Health = 0
                 # person is dead.. send KO
             #print 'send health p2: ' + str(self.p2Health)
-            self.xbeeio.SendLifeBarData( self.p1Health, self.p2Health )
+            self.xbeeio.SendP2LifeBar( self.p2Health )
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
         cur_state = state.GetStateType()
         # update round and match won, etc
+        
         if cur_state == ROUND_IN_PLAY_GAME_STATE:
-            self.xbeeio.SendLifeBarData( 100, 100 )
+            self.xbeeio.SendP1LifeBar( 100 )
+            self.xbeeio.SendP2LifeBar( 100 )
             
         if cur_state == ROUND_ENDED_GAME_STATE:
             print 'Sender ----- Round ' + str(state.roundNumber) + ' won by ' + str(state.roundWinner)
