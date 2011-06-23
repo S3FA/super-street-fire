@@ -166,6 +166,8 @@ class RoundInPlayGameState(GameState):
         # Check to see if the current round is over...
         if self._IsRoundOver():
             self._logger.debug("Round is over.")
+            # turn off the fire..
+            self.ssfGame.KillEmitters()
             # Switch states to the RoundEndedGameState
             self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner(), self.roundNumber))
             return
@@ -263,8 +265,9 @@ class RoundEndedGameState(GameState):
                 # In the case were a player won the match, it must be the player that
                 # won the match that brought us to this state
                 self.ssfGame._SetState(MatchOverGameState(self.ssfGame, self.roundWinner))
-        else:
-            self.ssfGame._SetState(RoundBeginGameState(self.ssfGame, self.roundNumber+1))
+        
+        #else:
+        #    self.ssfGame._SetState(RoundBeginGameState(self.ssfGame, self.roundNumber+1))
 
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
