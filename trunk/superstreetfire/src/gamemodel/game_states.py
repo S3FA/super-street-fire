@@ -271,7 +271,10 @@ class RoundEndedGameState(GameState):
 
     def TogglePauseGame(self):
         self.ssfGame._SetState(PausedGameState(self.ssfGame, self))
-            
+    
+    def StartGame(self):
+        self.ssfGame._SetState(RoundBeginGameState(self.ssfGame, self.roundNumber+1))
+       
     def StopGame(self):
         # Immediately end the game by going to the idle state...
         self.ssfGame._SetState(IdleGameState(self.ssfGame))
