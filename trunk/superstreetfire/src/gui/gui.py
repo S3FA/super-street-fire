@@ -390,8 +390,10 @@ class UIController(GameModelListener):
             # everything reset
             self.roundLabel.text = '-'
             self.timerLabel.text = '-'
+        elif cur_state == game_states.ROUND_ENDED_GAME_STATE:
+            self.timerLabel.text = '0'
         
-        #self.startBtn.sensitive = cur_state == game_states.IDLE_GAME_STATE
+        self.startBtn.sensitive = cur_state == game_states.IDLE_GAME_STATE or cur_state == game_states.ROUND_ENDED_GAME_STATE
         self.cancelMatchBtn.sensitive = cur_state != game_states.IDLE_GAME_STATE
 
         if cur_state == game_states.PAUSED_GAME_STATE:
