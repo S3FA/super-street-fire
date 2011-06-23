@@ -391,8 +391,8 @@ class UIController(GameModelListener):
             self.roundLabel.text = '-'
             self.timerLabel.text = '-'
         
-        self.startBtn.sensitive = cur_state == game_states.IDLE_GAME_STATE
-        #self.cancelMatchBtn.sensitive = cur_state != game_states.IDLE_GAME_STATE
+        #self.startBtn.sensitive = cur_state == game_states.IDLE_GAME_STATE
+        self.cancelMatchBtn.sensitive = cur_state != game_states.IDLE_GAME_STATE
 
         if cur_state == game_states.PAUSED_GAME_STATE:
             self.pauseBtn.text = "Unpause Game"
