@@ -37,16 +37,16 @@ class UIController(GameModelListener):
     
     def _initUI(self,ssfGame):
         # Initialize the drawing window.
-        w = 800
-        h = 600
-        screen = pygame.display.set_mode ((w, h));
+        self.framewidth = 800
+        self.frameheight = 650
+        screen = pygame.display.set_mode ((self.framewidth, self.frameheight));
         screen.fill ((255, 200, 100))
 
         base.GlobalStyle.load ('/'.join((os.path.dirname(__file__),'theme.rc')))
 
         self.renderer = Renderer ()
         self.renderer.screen = screen
-        self.renderer.title = "Super Street Fire"
+        self.renderer.title = "SUPER STREET FIRE: TURBO CHAMPIONSHIP EDITION"
         self.renderer.color = (250, 250, 250)
         
         topmargin = 10
@@ -57,14 +57,14 @@ class UIController(GameModelListener):
 
             logo_img = Image.load_image('/'.join((os.path.dirname(__file__),'logo.bmp')))
             logo = ImageLabel (logo_img)
-            logo.topleft = (w/2 - logosize[0]/2, topmargin)
+            logo.topleft = (self.framewidth/2 - logosize[0]/2, topmargin)
             self.renderer.add_widget(logo)
             
         except pygame.error:
             self._logger.warning("Couldn't load logo. crappy version of python on a mac? (try 2.6)")
         
         self.roundLabel = Label("Round %d" % self.game.roundNumber)
-        self.roundLabel.topleft = (w/2 - logosize[0]/2, topmargin + logosize[1] + 5)
+        self.roundLabel.topleft = (self.framewidth/2 - logosize[0]/2, topmargin + logosize[1] + 5)
         self.roundLabel.get_style()["font"]["size"] = 24
         self.roundLabel.minsize = (logosize[0], self.roundLabel.minsize[1])
         self.renderer.add_widget(self.roundLabel)
@@ -83,7 +83,8 @@ class UIController(GameModelListener):
         self.estop.connect_signal(Constants.SIG_CLICKED, self.game.StopAll)
         self.renderer.add_widget(self.estop)
         
-        
+        ###################
+        # Game Control
         gameControlFrame = HFrame (Label (" Game Control "))
 
         buttonTable = Table(1,4)
@@ -118,61 +119,87 @@ class UIController(GameModelListener):
         self.renderer.add_widget (gameControlFrame)
         
         
-        hwFrame = HFrame (Label (" Hardware "))
-        hwFrame.topleft = (w/2 - logosize[0]/2 + logosize[0] + 48, topmargin)
-        hwBtnTable = Table(2,1)
+        fpsFrame = HFrame(Label(' FPS '))
+        self.fps = 0
+        self.fpsLabel = Label('0 fps')
+        fpsFrame.add_child(self.fpsLabel)
+        fpsFrame.topleft = (10, gameControlFrame.topleft[1]+gameControlFrame.height+8)
+        self.renderer.add_widget(fpsFrame)
         
-        self.detectBtn = Button("Detect Devices")
-        self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.ioListener.DetectDevices)
-        hwBtnTable.add_child(0,0,self.detectBtn)
+        ##################
+        # Simulator
+        self.leftEmitters = Label("  ".join('O'*8))
+        self.leftEmitters.get_style()["font"]["name"] = "Consolas"
+        self.leftEmitters.get_style()["font"]["size"] = 40
+        self.leftEmitters.topleft = (self.framewidth/2.0 - self.leftEmitters.width/2.,160)
         
-        self.calibrateBtn = Button("Calibrate Game")
-        #self.calibrateBtn.connect_signal(Constants.SIG_CLICKED, self.game.Calibrate)
-        hwBtnTable.add_child(1,0,self.calibrateBtn)
-
-        hwFrame.add_child(hwBtnTable)
-        hwFrame.set_align(ALIGN_LEFT)
-        self.renderer.add_widget(hwFrame)
+        self.rightEmitters = Label("  ".join('O'*8))
+        self.rightEmitters.get_style()["font"]["name"] = "Consolas"
+        self.rightEmitters.get_style()["font"]["size"] = 40
+        self.rightEmitters.topleft = (self.framewidth/2.0 - self.leftEmitters.width/2.,264)
+        
+        self.renderer.add_widget(self.leftEmitters)
+        self.renderer.add_widget(self.rightEmitters)
         
         
-        
-        
-        healthTable = Table(2,1)
-        healthTable.spacing = 5
-        healthTable.topleft = (600, topmargin)
-        
+        ##################
+        # Health
+        p1HealthFrame = HFrame(Label(" Player 1 Health "))
         self.p1Health = ProgressBar()
-        self.p1Health.text = "Player 1"
         self.p1Health.value = 100.0
-        healthTable.add_child(0,0,self.p1Health)
+        p1HealthFrame.add_child(self.p1Health)
+        p1HealthFrame.topleft = (self.leftEmitters.topleft[0], 210)
+        self.renderer.add_widget(p1HealthFrame)
         
+        p2HealthFrame = HFrame(Label(" Player 2 Health "))
         self.p2Health = ProgressBar()
-        self.p2Health.text = "Player 2"
         self.p2Health.value = 100.0
-        healthTable.add_child(1,0,self.p2Health)
-        self.renderer.add_widget(healthTable)
-        
-        moveframe = HFrame (Label ("Recent moves"))
-        moveframe.topleft = (10, gameControlFrame.topleft[1]+gameControlFrame.height+8)
-        moveInfo = ScrolledList(100, 100, ListItemCollection())
-        self.moves = ListItemCollection()
-        self.moves.append (TextListItem ('No moves yet') )
-        moveInfo.set_items( self.moves )
-        moveframe.add_child(moveInfo)
-        self.renderer.add_widget(moveframe)        
+        p2HealthFrame.add_child(self.p2Health)
+        p2HealthFrame.topleft = (self.leftEmitters.topleft[0]+self.leftEmitters.width - p2HealthFrame.width, 210)
+        self.renderer.add_widget(p2HealthFrame)
 
+        
+        ###############
+        # Status        
         self.statusLabel = Label("Status")
-        self.statusLabel.topleft = (moveframe.topleft[0] + 130, 
-                                   moveframe.topleft[1])
+        self.statusLabel.topleft = (100, 80)
         self.statusLabel.get_style()["font"]["size"] = 26
         self.statusLabel.minsize = (logosize[0], self.estop.minsize[1])
         self.renderer.add_widget(self.statusLabel)
+
         
+        
+        ###############
+        # Move Logs
+        p1moveframe = HFrame (Label ("Player 1 Moves"))
+        p1moveframe.topleft = (10, fpsFrame.topleft[1]+fpsFrame.height+8)
+        p1moveInfo = ScrolledList(100, 100, ListItemCollection())
+        self.p1moves = ListItemCollection()
+        self.p1moves.append (TextListItem ('No moves yet') )
+        p1moveInfo.set_items( self.p1moves )
+        p1moveframe.add_child(p1moveInfo)
+        p1moveframe.topleft = (p1HealthFrame.topleft[0], 412)
+        self.renderer.add_widget(p1moveframe)        
+        
+        p2moveframe = HFrame (Label ("Player 2 Moves"))
+        p2moveframe.topleft = (10, fpsFrame.topleft[1]+fpsFrame.height+8)
+        p2moveInfo = ScrolledList(100, 100, ListItemCollection())
+        self.p2moves = ListItemCollection()
+        self.p2moves.append (TextListItem ('No moves yet') )
+        p2moveInfo.set_items( self.p2moves )
+        p2moveframe.add_child(p2moveInfo)
+        p2moveframe.topleft = (p2HealthFrame.topleft[0], 412)
+        self.renderer.add_widget(p2moveframe)        
+        
+        
+        
+        #################
+        # Test Moves
         
         # table (rows, cols)
         moveTestFrame = HFrame (Label ("Test Moves"))
         moveTestFrame.minsize = 200, 70
-        moveTestFrame.topleft = (10, 220)
+        moveTestFrame.topleft = (p1HealthFrame.topleft[0], 320)
         
         moveTable = Table(2,8)
         moveTable.spacing = 4
@@ -212,136 +239,160 @@ class UIController(GameModelListener):
         self.renderer.add_widget(moveTestFrame)
         
         
-        peripheralFrame = HFrame (Label (" Peripherals "))
-        peripheralFrame.topleft = (575, 175)
+        #################
+        # Hardware
+        hwFrame = HFrame (Label (" Hardware "))
+        hwFrame.topleft = (10, 550)
+        hwBtnTable = Table(2,1)
         
-        hwTable = Table(13,2)
+        self.detectBtn = Button("Detect Devices")
+        self.detectBtn.connect_signal(Constants.SIG_CLICKED, self.ioListener.DetectDevices)
+        hwBtnTable.add_child(0,0,self.detectBtn)
+        
+        self.calibrateBtn = Button("Calibrate Game")
+        #self.calibrateBtn.connect_signal(Constants.SIG_CLICKED, self.game.Calibrate)
+        hwBtnTable.add_child(1,0,self.calibrateBtn)
+
+        hwFrame.add_child(hwBtnTable)
+        hwFrame.set_align(ALIGN_LEFT)
+        self.renderer.add_widget(hwFrame)
+        
+        
+        #################
+        # Peripherals
+        peripheralFrame = HFrame (Label (" Peripherals "))
+        
+        hwTable = Table(2,12)
         hwTable.spacing = 5
-        hwTable.add_child(0,0,Label('RSSI'))
-        hwTable.add_child(0,1,Label('Address'))
+        
+        maxw = 70
+        maxh = 24
         
         self.p1LeftGloveRSSI = ProgressBar()
+        self.p1LeftGloveRSSI.set_minimum_size(maxw,maxh)
         self.p1LeftGloveRSSI.value = 0
-        self.p1LeftGloveRSSI.text = 'P1 Left Glove'
-        hwTable.add_child(1,0,self.p1LeftGloveRSSI)
+        self.p1LeftGloveRSSI.text = 'P1 Left'
+        hwTable.add_child(0,0,self.p1LeftGloveRSSI)
         
         self.p1LeftGloveAddr = Label("")
         self.p1LeftGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1L"))
-        hwTable.add_child(1,1,self.p1LeftGloveAddr)
+        hwTable.add_child(0,1,self.p1LeftGloveAddr)
         
         self.p1RightGloveRSSI = ProgressBar()
+        self.p1RightGloveRSSI.set_minimum_size(maxw,maxh)
         self.p1RightGloveRSSI.value = 0
-        self.p1RightGloveRSSI.text = 'P1 Right Glove'
-        hwTable.add_child(2,0,self.p1RightGloveRSSI)
+        self.p1RightGloveRSSI.text = 'P1 Right'
+        hwTable.add_child(1,0,self.p1RightGloveRSSI)
         
         self.p1RightGloveAddr = Label("")
         self.p1RightGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1R"))
-        hwTable.add_child(2,1,self.p1RightGloveAddr)
+        hwTable.add_child(1,1,self.p1RightGloveAddr)
         
-        self.p1HeadsetRSSI = ProgressBar()
-        self.p1HeadsetRSSI.value = 0
-        self.p1HeadsetRSSI.text = 'P1 Headset'
-        hwTable.add_child(3,0,self.p1HeadsetRSSI)
-        
-        self.p1HeadsetAddr = Label("")
-        self.p1HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1H"))
-        hwTable.add_child(3,1,self.p1HeadsetAddr)
         
         self.p2LeftGloveRSSI = ProgressBar()
+        self.p2LeftGloveRSSI.set_minimum_size(maxw,maxh)
         self.p2LeftGloveRSSI.value = 0
-        self.p2LeftGloveRSSI.text = 'P2 Left Glove'
-        hwTable.add_child(4,0,self.p2LeftGloveRSSI)
+        self.p2LeftGloveRSSI.text = 'P2 Left'
+        hwTable.add_child(0,2,self.p2LeftGloveRSSI)
         
         self.p2LeftGloveAddr = Label("")
         self.p2LeftGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2L"))
-        hwTable.add_child(4,1,self.p2LeftGloveAddr)
+        hwTable.add_child(0,3,self.p2LeftGloveAddr)
         
         self.p2RightGloveRSSI = ProgressBar()
+        self.p2RightGloveRSSI.set_minimum_size(maxw,maxh)
         self.p2RightGloveRSSI.value = 0
-        self.p2RightGloveRSSI.text = 'P2 Right Glove'
-        hwTable.add_child(5,0,self.p2RightGloveRSSI)
+        self.p2RightGloveRSSI.text = 'P2 Right'
+        hwTable.add_child(1,2,self.p2RightGloveRSSI)
         
         self.p2RightGloveAddr = Label("")
         self.p2RightGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2R"))
-        hwTable.add_child(5,1,self.p2RightGloveAddr)
+        hwTable.add_child(1,3,self.p2RightGloveAddr)
+        
+        
+        self.p1HeadsetRSSI = ProgressBar()
+        self.p1HeadsetRSSI.set_minimum_size(maxw,maxh)
+        self.p1HeadsetRSSI.value = 0
+        self.p1HeadsetRSSI.text = 'P1 Headset'
+        hwTable.add_child(0,4,self.p1HeadsetRSSI)
+        
+        self.p1HeadsetAddr = Label("")
+        self.p1HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1H"))
+        hwTable.add_child(0,5,self.p1HeadsetAddr)
         
         self.p2HeadsetRSSI = ProgressBar()
+        self.p2HeadsetRSSI.set_minimum_size(maxw,maxh)
         self.p2HeadsetRSSI.value = 0
         self.p2HeadsetRSSI.text = 'P2 Headset'
-        hwTable.add_child(6,0,self.p2HeadsetRSSI)
+        hwTable.add_child(1,4,self.p2HeadsetRSSI)
         
         self.p2HeadsetAddr = Label("")
         self.p2HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2H"))
-        hwTable.add_child(6,1,self.p2HeadsetAddr)
+        hwTable.add_child(1,5,self.p2HeadsetAddr)
         
         self.TimerRSSI = ProgressBar()
+        self.TimerRSSI.set_minimum_size(maxw,maxh)
         self.TimerRSSI.value = 0
         self.TimerRSSI.text = 'Timer'
-        hwTable.add_child(7,0,self.TimerRSSI)
+        hwTable.add_child(0,6,self.TimerRSSI)
         
         self.TimerAddr = Label("")
         self.TimerAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFTIMER"))
-        hwTable.add_child(7,1,self.TimerAddr)
+        hwTable.add_child(0,7,self.TimerAddr)
         
         self.p1LifeRSSI = ProgressBar()
+        self.p1LifeRSSI.set_minimum_size(maxw,maxh)
         self.p1LifeRSSI.value = 0
         self.p1LifeRSSI.text = 'P1 Life'
-        hwTable.add_child(8,0,self.p1LifeRSSI)
+        hwTable.add_child(1,6,self.p1LifeRSSI)
         
         self.p1LifeAddr = Label("")
         self.p1LifeAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1LIFE"))
-        hwTable.add_child(8,1,self.p1LifeAddr)
+        hwTable.add_child(1,7,self.p1LifeAddr)
         
         self.p2LifeRSSI = ProgressBar()
+        self.p2LifeRSSI.set_minimum_size(maxw,maxh)
         self.p2LifeRSSI.value = 0
         self.p2LifeRSSI.text = 'P2 Life'
-        hwTable.add_child(9,0,self.p2LifeRSSI)
+        hwTable.add_child(0,8,self.p2LifeRSSI)
         
         self.p2LifeAddr = Label("")
         self.p2LifeAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2LIFE"))
-        hwTable.add_child(9,1,self.p2LifeAddr)
+        hwTable.add_child(0,9,self.p2LifeAddr)
         
         self.koRSSI = ProgressBar()
+        self.koRSSI.set_minimum_size(maxw,maxh)
         self.koRSSI.value = 0
         self.koRSSI.text = 'KO Box'
-        hwTable.add_child(10,0,self.koRSSI)
+        hwTable.add_child(1,8,self.koRSSI)
                 
         self.koAddr = Label("")
         self.koAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFKO"))
-        hwTable.add_child(10,1,self.koAddr)
+        hwTable.add_child(1,9,self.koAddr)
         
         self.FireRSSI = ProgressBar()
+        self.FireRSSI.set_minimum_size(maxw,maxh)
         self.FireRSSI.value = 0
         self.FireRSSI.text = 'Fire Control'
-        hwTable.add_child(11,0,self.FireRSSI)
+        hwTable.add_child(0,10,self.FireRSSI)
         
         self.FireAddr = Label("")
         self.FireAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFFIRE"))
-        hwTable.add_child(11,1,self.FireAddr)
+        hwTable.add_child(0,11,self.FireAddr)
         
         self.LightsRSSI = ProgressBar()
+        self.LightsRSSI.set_minimum_size(maxw,maxh)
         self.LightsRSSI.value = 0
         self.LightsRSSI.text = 'Lighting'
-        hwTable.add_child(12,0,self.LightsRSSI)
+        hwTable.add_child(1,10,self.LightsRSSI)
         
         self.LightsAddr = Label("")
         self.LightsAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFLIGHTS"))
-        hwTable.add_child(12,1,self.LightsAddr)
+        hwTable.add_child(1,11,self.LightsAddr)
         
-        hwTable.topleft = (600,200)
+        peripheralFrame.topleft = (hwFrame.topleft[0] + hwFrame.width + 4, hwFrame.topleft[1])
         peripheralFrame.add_child(hwTable)
         self.renderer.add_widget(peripheralFrame)
-        
-        # fire emitter simulator
-        self.initEmitters()
-        
-        
-        fpsFrame = HFrame(Label('FPS'))
-        self.fps = 0
-        self.fpsLabel = Label('0 fps')
-        fpsFrame.add_child(self.fpsLabel)
-        fpsFrame.topleft = (20,500)
-        self.renderer.add_widget(fpsFrame)
         
         
         # what we need:
@@ -359,22 +410,6 @@ class UIController(GameModelListener):
         self.fps = fps
         self.fpsLabel.text = '%.2f fps' % fps
 
-
-
-    def initEmitters(self):
-        self.leftEmitters = Label("  ".join('O'*8))
-        self.leftEmitters.get_style()["font"]["name"] = "Consolas"
-        self.leftEmitters.get_style()["font"]["size"] = 40
-        self.leftEmitters.topleft = (20,350)
-        
-        self.rightEmitters = Label("  ".join('O'*8))
-        self.rightEmitters.get_style()["font"]["name"] = "Consolas"
-        self.rightEmitters.get_style()["font"]["size"] = 40
-        self.rightEmitters.topleft = (20,400)
-        
-        self.renderer.add_widget(self.leftEmitters)
-        self.renderer.add_widget(self.rightEmitters)
-    
     
     
     ##################
@@ -448,11 +483,14 @@ class UIController(GameModelListener):
 
     def OnRSSIChanged(self,rssi_dict):
         pass
-        
+    
+    
     def OnPlayerMoves(self, actions):
         for x in range(0,len(actions)):
-            self.moves.insert (x, TextListItem (str(actions[x])) )
-
+            if actions[x].playerNum == 1:
+                self.p1moves.insert (x, TextListItem (str(actions[x])) )
+            else:
+                self.p2moves.insert (x, TextListItem (str(actions[x])) )
 
 
 
