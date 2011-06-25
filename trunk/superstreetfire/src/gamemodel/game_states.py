@@ -146,7 +146,7 @@ class RoundBeginGameState(GameState):
 # The 'round in play' state is the state active while the game is actually
 # being played over the course of a single round (there are 3 rounds to a match)
 class RoundInPlayGameState(GameState):
-    ROUND_TIME_IN_SECONDS = 60.0
+    ROUND_TIME_IN_SECONDS = 99.0
     
     def __init__(self, ssfGame, roundNumber):
         GameState.__init__(self, ssfGame)
