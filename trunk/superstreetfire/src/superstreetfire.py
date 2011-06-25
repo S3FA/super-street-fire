@@ -115,6 +115,7 @@ if __name__ == '__main__':
         # GUI
         pygame.init ()
         uiController = gui.UIController(ssfGame, sender)
+        lastFpsUpdate = time.time()
         
         # Jump straight to the round-in-play for testing
         #ssfGame._SetState(gamemodel.game_states.RoundBeginGameState(ssfGame, 1))
@@ -136,7 +137,11 @@ if __name__ == '__main__':
             if pygame.QUIT in [ev.type for ev in events]:
                 logger.info("got pygame.QUIT event")
                 break
+            
             uiController.renderer.distribute_events(*events)
+            if currTime - lastFpsUpdate > 1:
+                lastFpsUpdate = currTime
+                uiController.set_fps(1./deltaFrameTime) 
             
             # The receiver has been asynchronously receiving data and dumping it
             # onto the receiverQueueMgr, we need to grab that data and apply it to the simulation...
@@ -152,7 +157,6 @@ if __name__ == '__main__':
                                           deltaFrameTime, lastFrameTime)
             
             ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
-            
             ssfGame.Tick(deltaFrameTime)
             
             if(lastState == gamemodel.game_states.ROUND_IN_PLAY_GAME_STATE 
