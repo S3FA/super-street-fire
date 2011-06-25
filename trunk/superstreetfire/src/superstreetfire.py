@@ -118,6 +118,8 @@ if __name__ == '__main__':
         
         # Jump straight to the round-in-play for testing
         #ssfGame._SetState(gamemodel.game_states.RoundBeginGameState(ssfGame, 1))
+        
+        lastState = ssfGame.state
 
         while True:
             
@@ -152,6 +154,11 @@ if __name__ == '__main__':
             ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
             
             ssfGame.Tick(deltaFrameTime)
+            
+            if(lastState == gamemodel.game_states.ROUND_IN_PLAY_GAME_STATE 
+               and ssfGame.state != gamemodel.game_states.ROUND_IN_PLAY_GAME_STATE):
+                ioManager.GoTheFuckToSleep()
+            lastState = ssfGame.state
             
             # looking at the emitter states from the P1 perspective
             # send the full state to the wifire board
