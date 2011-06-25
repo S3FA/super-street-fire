@@ -214,6 +214,10 @@ class RoundInPlayGameState(GameState):
                 return RoundEndedGameState.PLAYER_2_WON_ROUND
         elif self.ssfGame.player2.IsKnockedOut():
             return RoundEndedGameState.PLAYER_1_WON_ROUND
+        elif self.ssfGame.player1.GetHealth() > self.ssfGame.player2.GetHealth():
+            return RoundEndedGameState.PLAYER_1_WON_ROUND
+        elif self.ssfGame.player1.GetHealth() < self.ssfGame.player2.GetHealth():
+            return RoundEndedGameState.PLAYER_2_WON_ROUND
         else:
             return RoundEndedGameState.TIE_ROUND
 
