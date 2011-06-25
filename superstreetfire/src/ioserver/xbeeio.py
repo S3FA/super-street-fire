@@ -214,10 +214,7 @@ class XBeeIO:
             self._sendFire()
             
     def GoTheFuckToSleep(self):
-        fire = 0 * 16
-        p1c = 0 * 16
-        p2c = 0 * 16
-        self.fireData =  struct.pack("HHH", fire, p1c, p2c)
+        self.fireData =  struct.pack("HHH", 0, 0, 0)
         self._sendFire()
 
     def sendKO(self,state):
