@@ -63,7 +63,7 @@ class XBeeIO:
     def _sendFire(self):
         
         fireEmitterData = self.fireData
-        self._logger.debug('sending fire emitter data ' + hexlify(fireEmitterData))
+        self._logger.info('sending SSFFIRE ' + hexlify(fireEmitterData))
          
         # Make sure this object is in a proper state before running...
         if self.xbee == None:
@@ -88,7 +88,7 @@ class XBeeIO:
             return
         
         self._logger.debug('sending timer data ' + str(timerData))
-        data = struct.pack(">H", timerData)
+        data = struct.pack("H", timerData)
         try:
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFTIMER'][1], dest_addr_long=parser.ADDR_TABLE['SSFTIMER'][0], data=data)                   
         except:
