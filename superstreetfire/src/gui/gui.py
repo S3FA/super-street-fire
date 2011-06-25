@@ -336,6 +336,14 @@ class UIController(GameModelListener):
         self.initEmitters()
         
         
+        fpsFrame = HFrame(Label('FPS'))
+        self.fps = 0
+        self.fpsLabel = Label('0 fps')
+        fpsFrame.add_child(self.fpsLabel)
+        fpsFrame.topleft = (20,500)
+        self.renderer.add_widget(fpsFrame)
+        
+        
         # what we need:
         # info: timer, round #, p1/p2 health, device status/link (RSSI)
         #       simulator, detected move, console log, p1/p2 att/med values, fire system armed status
@@ -347,26 +355,25 @@ class UIController(GameModelListener):
         # cancel match, detect devices, calibrate, ESTOP,
         # move generation (e.g. trigger p1 hadouken), demo mode on/off
 
+    def set_fps(self,fps):
+        self.fps = fps
+        self.fpsLabel.text = '%.2f fps' % fps
+
+
 
     def initEmitters(self):
-        self.leftEmitters = []
-        self.rightEmitters = []
-        startLeftX = 20
-        startLeftY = 350
-        startRightX = startLeftX
-        startRightY = startLeftY + 50
-        w = 16
-        h = 16
-        spacing = 12
+        self.leftEmitters = Label("  ".join('O'*8))
+        self.leftEmitters.get_style()["font"]["name"] = "Consolas"
+        self.leftEmitters.get_style()["font"]["size"] = 40
+        self.leftEmitters.topleft = (20,350)
         
-        for i in range(0, fire_emitter.FireEmitter.NUM_FIRE_EMITTERS_PER_ARC):
-            # straight line left to right layout of emitter widgets
-            self.leftEmitters.append(EmitterWidget(w,h))
-            self.leftEmitters[i].topleft = ((startLeftX + i*(w+spacing)), startLeftY)
-            self.renderer.add_widget(self.leftEmitters[i])
-            self.rightEmitters.append(EmitterWidget(w,h))
-            self.rightEmitters[i].topleft = ((startRightX + i*(w+spacing)), startRightY)
-            self.renderer.add_widget(self.rightEmitters[i])
+        self.rightEmitters = Label("  ".join('O'*8))
+        self.rightEmitters.get_style()["font"]["name"] = "Consolas"
+        self.rightEmitters.get_style()["font"]["size"] = 40
+        self.rightEmitters.topleft = (20,400)
+        
+        self.renderer.add_widget(self.leftEmitters)
+        self.renderer.add_widget(self.rightEmitters)
     
     
     
@@ -375,16 +382,9 @@ class UIController(GameModelListener):
     ##################
     
     def updateEmitters(self):
-        something_changed = False
-        for emitter,widget in zip(self.game.GetLeftEmitterArc(1), self.leftEmitters):
-            if widget.update_emitter(emitter):
-                something_changed = True
-        for emitter,widget in zip(self.game.GetRightEmitterArc(1),self.rightEmitters):
-            if widget.update_emitter(emitter):
-                something_changed = True
-        
-        if something_changed:
-            self.renderer.refresh()
+        self.leftEmitters.text = "  ".join([char_for_state(state) for state in self.game.GetLeftEmitterArc(1)])
+        self.rightEmitters.text = "  ".join([char_for_state(state) for state in self.game.GetRightEmitterArc(1)])
+    
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
@@ -453,3 +453,18 @@ class UIController(GameModelListener):
         for x in range(0,len(actions)):
             self.moves.insert (x, TextListItem (str(actions[x])) )
 
+
+
+
+def char_for_state(emitter_state):
+    if emitter_state.flameIsOn:
+        if emitter_state.p1ColourIsOn and emitter_state.p2ColourIsOn:
+            return "B"
+        elif emitter_state.p1ColourIsOn:
+            return "1"
+        elif emitter_state.p2ColourIsOn:
+            return "2"
+        else:
+            return "X"
+    else:
+        return "O"
