@@ -24,13 +24,13 @@ PITCH = 1
 YAW = 2
 
 # testing the values
-JAB_FWDACC_L1 = 160
-JAB_FWDACC_L2 = 200
+JAB_FWDACC_L1 = 94
+JAB_FWDACC_L2 = 110
 
 HOOK_LATGYR    = 80
-HOOK_FWDACC_L1 = 120
-HOOK_FWDACC_L2 = 160
-HOOK_LATACC_L1 = 160
+HOOK_FWDACC_L1 = 90
+HOOK_FWDACC_L2 = 110
+HOOK_LATACC_L1 = 130
 HOOK_LATACC_L2 = 200
 
 BLOCK_VER_ANGLE = 70
@@ -102,14 +102,13 @@ class GestureState:
             if (glove.acceleration[X] < 0):
                 self._logger.debug(str(prevMove) + ' Punch release ' + str(glove.acceleration[X]))
                 return GestureState.NO_GESTURE
+## 1-L:A: (1.0, -9.0, -3.0), H: (-15.9, 55.15, 104.0),R: (3.0, -6.75, 4.5)-R:A: (3.0, -3.0, 24.0), H: (-60.72, 81.23, -28.28),R: (4.25, -1.0, -6.75)
 
-        if ( abs(glove.acceleration[X]) > 110 and abs(glove.rotation[X]) > 60 and  
-             glove.heading[ROLL] > 94 ):
-            if ( abs(glove.acceleration[Y]) > 200 ):
+        # uppercut .. 
+        if ( abs(glove.acceleration[X]) > 85 and abs(glove.rotation[X]) > 40 and \
+             abs(glove.heading[PITCH]) > 50 ):
+            if ( abs(glove.acceleration[Y]) > 100 ):
                 player.power = 2
-            if ( abs(glove.rotation[Y]) > 90 ):
-                #test dragon punch
-                pass
             return GestureState.L_UPPERCUT + glove.hand
 
         if (glove.acceleration[X] > HOOK_FWDACC_L1 and abs(glove.rotation[X]) > HOOK_LATGYR):
@@ -120,17 +119,17 @@ class GestureState:
 
         # punch is straight - positive/negative accel during swing 
         if (abs(glove.heading[ROLL]) < 50 and 
-            glove.acceleration[X] > JAB_FWDACC_L1 and abs(glove.rotation[X]) < 50 ):
+            abs(glove.acceleration[X]) > JAB_FWDACC_L1 and abs(glove.rotation[X]) < 50 ):
             # straight punch - less lateral movement
-            if (glove.acceleration[X] > JAB_FWDACC_L2):
+            if (abs(glove.acceleration[X]) > JAB_FWDACC_L2):
                 player.power = 2
             return GestureState.LEFT_JAB + glove.hand
 
     # detecting a block is a combination of no acceleration and hand position
     # straight up     
     def _isHandBlocking(self, glove):
-        return abs(glove.acceleration[X]) < 40 and abs(glove.acceleration[Y]) < 40 and \
-            abs(glove.acceleration[Z]) < 40 and \
+        return abs(glove.acceleration[X]) < 40 and abs(glove.acceleration[Y]) < 50 and \
+            abs(glove.acceleration[Z]) < 50 and \
             glove.heading[PITCH] > BLOCK_VER_ANGLE
     
     # figure out the move, looking for two-handed moves first, then by hand.
@@ -150,9 +149,9 @@ class GestureState:
             totaly = (abs(lGlove.acceleration[Y]) + abs(rGlove.acceleration[Y]))
             # sonic boom - two handed move - use accel + gyros rolling inward
             # fists sideways: roll is L:-80 R:80
-            if (lGlove.heading[ROLL] > -100 and lGlove.heading[ROLL] < -80 \
-                and rGlove.heading[ROLL] < 100 and rGlove.heading[ROLL] > 80 and \
-                lGlove.heading[PITCH] < 20 and rGlove.heading[PITCH] < 20 and \
+            if (lGlove.heading[ROLL] > -105 and lGlove.heading[ROLL] < -72 and \
+                rGlove.heading[ROLL] < 105 and rGlove.heading[ROLL] > 72 and \
+                lGlove.heading[PITCH] < 28 and rGlove.heading[PITCH] < 28 and \
                 totaly < 120):
                 # both hands sideways, set "no move" because it's probably
                 # going to be a sonic boom when accel+gyros are higher
@@ -160,13 +159,13 @@ class GestureState:
                 print "SONIC SIDE POSITION ______________"
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
             if (prevMove == GestureState.SONIC_SIDE and \
-                totalx > 210 ):
+                totalx > 200 ):
                 newMove = GestureState.SONIC_BOOM
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
                 return
 
             # hadouken - check for forward accel - both hands
-            if ( abs(lGlove.acceleration[X]) > 90 and abs(rGlove.acceleration[X]) > 90 ):
+            if ( totalx > 120 ):
                 newMove = GestureState.BOTH_FWD
                 print "BOTH FORWARD MOVE ______________"
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
@@ -174,22 +173,23 @@ class GestureState:
             # the problem with these values is that they are relative to the 
             # initial calibration.. 
             # right handed hadouken
-            if (prevMove == GestureState.BOTH_FWD and \
-                lGlove.heading[ROLL] < -100 and lGlove.heading[PITCH] < -20 and \
-                rGlove.heading[ROLL] > 80 and rGlove.heading[PITCH] > 50 ):
-                newMove = GestureState.HADOUKEN
-                self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
-                return
+            if (prevMove == GestureState.BOTH_FWD):
+                diffYaw = lGlove.heading[YAW] - rGlove.heading[YAW]
+                diffRoll = lGlove.heading[ROLL] - rGlove.heading[ROLL]
+                #print 'diffYaw ' + str(diffYaw) + ' diffRoll ' + str(diffRoll)
+                if (abs(diffYaw) > 110 and abs(diffRoll) > 160):
+                    newMove = GestureState.HADOUKEN
+                    self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
+                    return
 
             # must release from block to read next move
             if (prevMove == 102 and lGlove.heading[PITCH] < BLOCK_RELEASE_ANGLE and \
                 rGlove.heading[PITCH] < BLOCK_RELEASE_ANGLE):
                 newMove = GestureState.NO_GESTURE 
+                self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
             elif (self._isHandBlocking(lGlove) and self._isHandBlocking(rGlove)):
                 # keep these threshold values spaced out to avoid "bounce"
                 newMove = GestureState.FULL_BLOCK 
-            # allow this to be the final move in this tick
-            if (newMove > -1): 
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
                 return
             
