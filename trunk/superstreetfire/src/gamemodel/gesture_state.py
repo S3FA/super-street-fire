@@ -149,8 +149,8 @@ class GestureState:
             totaly = (abs(lGlove.acceleration[Y]) + abs(rGlove.acceleration[Y]))
             # sonic boom - two handed move - use accel + gyros rolling inward
             # fists sideways: roll is L:-80 R:80
-            if (lGlove.heading[ROLL] > -105 and lGlove.heading[ROLL] < -72 and \
-                rGlove.heading[ROLL] < 105 and rGlove.heading[ROLL] > 72 and \
+            if (lGlove.heading[ROLL] > -105 and lGlove.heading[ROLL] < -65 and \
+                rGlove.heading[ROLL] < 105 and rGlove.heading[ROLL] > 65 and \
                 lGlove.heading[PITCH] < 28 and rGlove.heading[PITCH] < 28 and \
                 totaly < 120):
                 # both hands sideways, set "no move" because it's probably
@@ -159,7 +159,7 @@ class GestureState:
                 print "SONIC SIDE POSITION ______________"
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
             if (prevMove == GestureState.SONIC_SIDE and \
-                totalx > 200 ):
+                totalx > 190 ):
                 newMove = GestureState.SONIC_BOOM
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
                 return
