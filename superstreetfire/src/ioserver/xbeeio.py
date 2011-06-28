@@ -184,18 +184,16 @@ class XBeeIO:
         #  2 bytes for player 1 color: 16[x x x x x x x x][x x x x x x x x]1
         #  2 bytes for player 2 color: 16[x x x x x x x x][x x x x x x x x]1
         
-        for emitter in leftEmitters:
+        for i in range(len(leftEmitters)):
             #print 'left emitter: %s ' % (emitter)
-            fire[emitter.arcIndex] = str(int(emitter.flameIsOn))
-            
-            p1c[emitter.arcIndex] =  str(int(emitter.p1ColourIsOn))
-            p2c[emitter.arcIndex+8] =  str(int(emitter.p2ColourIsOn))
+            fire[i] = str(int(leftEmitters[i].flameIsOn))
+            p1c[i] =  str(int(leftEmitters[i].p1ColourIsOn))
+            p2c[i+8] =  str(int(leftEmitters[i].p2ColourIsOn))
         
-        for emitter in rightEmitters:
-            fire[15-emitter.arcIndex] =  str(int(emitter.flameIsOn))
-            
-            p1c[15-emitter.arcIndex] =  str(int(emitter.p1ColourIsOn))
-            p2c[emitter.arcIndex] =  str(int(emitter.p2ColourIsOn))
+        for i in range(len(rightEmitters)):
+            fire[15-i] =  str(int(rightEmitters[i].flameIsOn))            
+            p1c[15-i] =  str(int(rightEmitters[i].p1ColourIsOn))
+            p2c[i] =  str(int(rightEmitters[i].p2ColourIsOn))
                     
         fire.reverse()
         p1c.reverse()

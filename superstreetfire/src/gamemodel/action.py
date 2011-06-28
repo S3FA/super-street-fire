@@ -7,6 +7,7 @@ in the Super Street Fire Game.
 @author: Callum Hay
 '''
 
+import logging
 from fire_emitter import FireEmitter 
 
 class Action:
@@ -27,6 +28,7 @@ class Action:
         self._thickness  = thickness
         self._timeLength = timeLength
         self._isKilled   = False
+        self.logger = logging.getLogger("action")
         
     # Functions for getting the emitter from the given arc emitter list and the given
     # zero-based index, depending on which player this action is executed by.

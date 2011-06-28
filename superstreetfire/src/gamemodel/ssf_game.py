@@ -63,16 +63,37 @@ class SSFGame:
     # These functions provide convenience, when accessing the fire emitter arc lists:
     # The emitters are, by default, layed out from player 1's perspective so 
     # we need to reverse them for player 2...
+    # 20110627 snb: trick the fire output into burning for half the time by pretending
+    # there are twice as many emitters (but let the game tick through all)
+    def GetLeftEmitters(self, playerNum, isFireRead):
+        left = list()
+        step = 1
+        if (isFireRead): step = 2
+        if playerNum == 1:
+            for i in range(0, len(self.leftEmitters), step):
+                left.append( self.leftEmitters[i] )
+        else:
+            for i in range(0, len(self.rightEmitters), step):
+                left.append( self.rightEmitters[i] )
+        return left
+    
     def GetLeftEmitterArc(self, playerNum):
+        return self.GetLeftEmitters(playerNum, False)
+    
+    def GetRightEmitters(self, playerNum, isFireRead):
+        right = list()
+        step = 1
+        if (isFireRead): step = 2
         if playerNum == 1:
-            return self.leftEmitters
+            for i in range(0, len(self.rightEmitters), step):
+                right.append( self.rightEmitters[i] )
         else:
-            return self.rightEmitters
+            for i in range(0, len(self.leftEmitters), step):
+                right.append( self.leftEmitters[i] )
+        return right
+
     def GetRightEmitterArc(self, playerNum):
-        if playerNum == 1:
-            return self.rightEmitters
-        else:
-            return self.leftEmitters
+        return self.GetRightEmitters(playerNum, False)
 
     # Gets the winner of the game - if there is no winner -1 is returned,
     # if the game is a tie then 0 is returned.

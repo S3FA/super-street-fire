@@ -12,7 +12,7 @@ import player
 from fire_emitter_states import FireOffState 
 
 class FireEmitter:
-    NUM_FIRE_EMITTERS_PER_ARC = 8
+    NUM_FIRE_EMITTERS_PER_ARC = 16
     TOTAL_NUM_FIRE_EMITTERS   = 2 * NUM_FIRE_EMITTERS_PER_ARC    
     
     RIGHT_ARC = "Right Arc"
