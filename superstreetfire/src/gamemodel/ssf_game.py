@@ -16,10 +16,11 @@ from gamemodel import *
 class SSFGame:
     LOGGER_NAME = 'ssf_game_logger'
     
-    def __init__(self):
+    def __init__(self, ioManager):
         self._logger           = logging.getLogger(SSFGame.LOGGER_NAME)
         self._listenerCmdr     = GameModelListenerCmdr()
         self.gestureRecognizer = GestureRecognizer()
+        self.ioManager         = ioManager
         
         # There are two players, facing off against each other
         self.player1 = player.Player(1)
@@ -40,12 +41,16 @@ class SSFGame:
         # NOTE: Always be sure to set the state LAST in the constructor since
         # it might make use of members that belong to this object
         self._SetState(game_states.IdleGameState(self))
-
+    
+    def RegisterListener(self, listener):
+        self._listenerCmdr.RegisterListener(listener)
+    
     def StopAll(self):
         self.Reset()
         self.StopGame()
     
     def Reset(self):
+        self.ioManager.GoTheFuckToSleep()
         self.chipDamageOn = True
         self.player1.Reset()
         self.player2.Reset()
@@ -53,12 +58,10 @@ class SSFGame:
     
     def KillEmitters(self):
         self._logger.debug("Killing fire emitters")
+        self.ioManager.GoTheFuckToSleep()
         for leftEmitter, rightEmitter in map(None, self.leftEmitters, self.rightEmitters):
             leftEmitter.Reset()
             rightEmitter.Reset()
-    
-    def RegisterListener(self, listener):
-        self._listenerCmdr.RegisterListener(listener)
     
     # These functions provide convenience, when accessing the fire emitter arc lists:
     # The emitters are, by default, layed out from player 1's perspective so 

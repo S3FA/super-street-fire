@@ -62,9 +62,9 @@ class SenderListener(GameModelListener):
             self.xbeeio.SendP2LifeBar( 100 )
             
         if cur_state == ROUND_ENDED_GAME_STATE:
-            self._logger.info('Sender ----- Round ' + str(state.roundNumber) + ' won by player ' + str(state.roundWinner+1))
+            self._logger.info('Sender ----- Round ' + str(state.roundNumber) + ' won by player ' + str(state.roundWinner))
         if cur_state == MATCH_OVER_GAME_STATE:
-            self._logger.info('Sender ----- Match won by ' + str(state.winnerPlayerNum+1))
+            self._logger.info('Sender ----- Match won by ' + str(state.winnerPlayerNum))
                 
     def OnHWAddrChanged(self, hwaddr):
         pass

@@ -159,14 +159,22 @@ class RoundInPlayGameState(GameState):
         
     def Tick(self, dT):
         self.ssfGame._listenerCmdr.TimerStateChanged(self.roundTime)
+        self.ssfGame.ioManager.SendFireEmitterData(self.ssfGame.GetLeftEmitters(1, True), \
+                                                   self.ssfGame.GetRightEmitters(1, True))
         
         # Execute the actions (attacks, blocks, etc.)
         self.ssfGame._ExecuteGameActions(dT, self._activeActions)
         
+        # round in play is the only state that requires "send fire"
+        # looking at the emitter states from the P1 perspective
+        # send the full state to the wifire board
+        self.ssfGame.ioManager.SendFireEmitterData(self.ssfGame.GetLeftEmitters(1, True), \
+                                                   self.ssfGame.GetRightEmitters(1, True))
+
         # Check to see if the current round is over...
         if self._IsRoundOver():
             self._logger.debug("Round is over.")
-            # turn off the fire..
+            # turn off the fire.. also calls GoTheFuckToSleep
             self.ssfGame.KillEmitters()
             # Switch states to the RoundEndedGameState
             self.ssfGame._SetState(RoundEndedGameState(self.ssfGame, self._GetRoundWinner(), self.roundNumber))
@@ -239,7 +247,6 @@ class RoundEndedGameState(GameState):
         self._logger.debug("Entering Round Ended Game State")
         
         self.roundWinner = roundWinner
-        
         self.roundNumber = roundNumber
         # Based on the round winner, increment the number of wins for the
         # corresponding player(s)
@@ -248,8 +255,12 @@ class RoundEndedGameState(GameState):
             self.ssfGame.player2.numRoundWins += 1
         elif roundWinner == RoundEndedGameState.PLAYER_1_WON_ROUND:
             self.ssfGame.player1.numRoundWins += 1
+            if self.ssfGame.player2.IsKnockedOut():
+                self.ssfGame.ioManager.sendKO(True)
         else:
             self.ssfGame.player2.numRoundWins += 1
+            if self.ssfGame.player1.IsKnockedOut():
+                self.ssfGame.ioManager.sendKO(True)
         
         sounds.announceRound.play()
         # Sanity: Players should NEVER have more than (half a match + 1) round wins
@@ -257,9 +268,6 @@ class RoundEndedGameState(GameState):
         assert(self.ssfGame.player2.numRoundWins <= (RoundEndedGameState.NUM_ROUNDS_PER_MATCH/2 + 1))
         
     def Tick(self, dT):
-        # TODO: Currently we just go directly back to the beginning of the round
-        # without any activity in this state, we can change this if need be...
-        
         # Check to see whether the match is over via tie or a win/loss condition and if
         # not start up the next round of this match
         if self._IsMatchOver():

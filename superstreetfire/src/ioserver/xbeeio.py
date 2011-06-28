@@ -93,24 +93,7 @@ class XBeeIO:
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFTIMER'][1], dest_addr_long=parser.ADDR_TABLE['SSFTIMER'][0], data=data)                   
         except:
             self._logger.warn("TIMER send error -- perhaps address not in ADDR_TABLE")
-
-    def _sendKO(self):
-        koData = self.koData
         
-        # Make sure this object is in a proper state before running...
-        if self.xbee == None:
-            print "ERROR: Output port was invalid/not found, can not send."
-            print "************ Killing XBee IO Thread ****************"
-            return
-        
-        self._logger.debug('sending ko data ' + str(koData))
-        data = struct.pack("H", koData)
-        try:
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFKO'][1], dest_addr_long=parser.ADDR_TABLE['SSFKO'][0], data=data)                   
-        except:
-            self._logger.warn("KO send error -- perhaps address not in ADDR_TABLE")
-
-
     def _sendND(self):
         
         self._logger.debug('sending node discovery message')
@@ -122,6 +105,18 @@ class XBeeIO:
             return
         
         self.xbee.at(command='ND')                  
+
+    def sendKO(self,state):
+        if(state):
+            out = 0xff
+        else:
+            out = 0x00
+        self._logger.debug('sending ko data ' + str(out))
+        data = struct.pack("H", out)
+        try:
+            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFKO'][1], dest_addr_long=parser.ADDR_TABLE['SSFKO'][0], data=data)
+        except:
+            self._logger.warn("KO send error -- perhaps address not in ADDR_TABLE")
 
     def SendTimerNum(self, value):    
         # based on the following digit map:
@@ -214,14 +209,6 @@ class XBeeIO:
     def GoTheFuckToSleep(self):
         self.fireData =  struct.pack("HHH", 0, 0, 0)
         self._sendFire()
-
-    def sendKO(self,state):
-        if(state):
-            out = 0xff
-        else:
-            out = 0x00
-        self.koData = struct.pack("H", out)
-        self._sendKO()
 
     def NodeDiscovery(self):
         self._logger.info('Looking for hardware ...')

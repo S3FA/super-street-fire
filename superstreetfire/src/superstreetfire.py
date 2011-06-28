@@ -107,8 +107,7 @@ if __name__ == '__main__':
         SIMULATION_START_TIME = currTime # Don't change this value!
         
         # Game model and gesture recognition system initialization
-        # TODO: What the heck is our calibration data and where does it come from?
-        ssfGame = SSFGame()
+        ssfGame = SSFGame(ioManager)
         
         sender = SenderListener(ssfGame, ioManager)
 
@@ -158,16 +157,6 @@ if __name__ == '__main__':
             
             ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
             ssfGame.Tick(deltaFrameTime)
-            
-            if (lastState == gamemodel.game_states.ROUND_IN_PLAY_GAME_STATE and \
-                ssfGame.state.GetStateType() != gamemodel.game_states.ROUND_IN_PLAY_GAME_STATE):
-                ioManager.GoTheFuckToSleep()
-
-            lastState = ssfGame.state.GetStateType()
-            
-            # looking at the emitter states from the P1 perspective
-            # send the full state to the wifire board
-            ioManager.SendFireEmitterData(ssfGame.GetLeftEmitters(1, True), ssfGame.GetRightEmitters(1, True))
             
             # Sync to the specified frequency
             if deltaFrameTime < FIXED_FRAME_TIME:
