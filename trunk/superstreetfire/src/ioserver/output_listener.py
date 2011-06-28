@@ -11,7 +11,7 @@ import parser
 class SenderListener(GameModelListener):
     def __init__(self, ssfGame, ioManager):
         GameModelListener.__init__(self)
-        self._logger           = logging.getLogger("sender")
+        self._logger = logging.getLogger("sender")
         self.game = ssfGame
         self.xbeeio = ioManager
         self.game.RegisterListener(self)
@@ -28,6 +28,12 @@ class SenderListener(GameModelListener):
         self.game._listenerCmdr.HWAddrChanged(parser.Parser.ADDR_TABLE)
 
 
+    def AllFireOn(self):
+        self.xbeeio.SendFire(1)
+
+    def AllFireOff(self):
+        self.xbeeio.SendFire(0)
+
     def OnTimerStateChanged(self, newTime):
         timer = int(round(newTime))
         if (timer != self.curTimer):
@@ -42,7 +48,7 @@ class SenderListener(GameModelListener):
                 self.p1Health = 0
                 # person is dead.. send KO
             #print 'send health p1: ' + str(self.p1Health) )
-            self.xbeeio.SendP1LifeBar( self.p1Health )
+            self.xbeeio.SendP1LifeBar(self.p1Health)
         
         if (players[1].GetHealth() != self.p2Health):
             self.p2Health = players[1].GetHealth()
@@ -50,7 +56,7 @@ class SenderListener(GameModelListener):
                 self.p2Health = 0
                 # person is dead.. send KO
             #print 'send health p2: ' + str(self.p2Health)
-            self.xbeeio.SendP2LifeBar( self.p2Health )
+            self.xbeeio.SendP2LifeBar(self.p2Health)
 
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
@@ -58,8 +64,8 @@ class SenderListener(GameModelListener):
         # update round and match won, etc
         
         if cur_state == ROUND_IN_PLAY_GAME_STATE:
-            self.xbeeio.SendP1LifeBar( 100 )
-            self.xbeeio.SendP2LifeBar( 100 )
+            self.xbeeio.SendP1LifeBar(100)
+            self.xbeeio.SendP2LifeBar(100)
             
         if cur_state == ROUND_ENDED_GAME_STATE:
             self._logger.info('Sender ----- Round ' + str(state.roundNumber) + ' won by player ' + str(state.roundWinner))
@@ -69,7 +75,7 @@ class SenderListener(GameModelListener):
     def OnHWAddrChanged(self, hwaddr):
         pass
     
-    def OnRSSIChanged(self,rssi_dict):
+    def OnRSSIChanged(self, rssi_dict):
         pass
         
     def OnPlayerMoves(self, actions):
