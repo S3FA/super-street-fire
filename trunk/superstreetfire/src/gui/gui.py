@@ -394,17 +394,25 @@ class UIController(GameModelListener):
         peripheralFrame.add_child(hwTable)
         self.renderer.add_widget(peripheralFrame)
         
+        #################
+        # Fire Test
+        ftFrame = HFrame (Label (" Fire Test "))
+        ftFrame.topleft = (650, 550)
+        ftBtnTable = Table(2,1)
         
-        # what we need:
-        # info: timer, round #, p1/p2 health, device status/link (RSSI)
-        #       simulator, detected move, console log, p1/p2 att/med values, fire system armed status
-        # btns: start round, pause round, end round, cancel match, detect devices, calibrate, ESTOP,
-        #       move generation (e.g. trigger p1 hadouken), demo mode on/off
-        #
-        # snb: 
-        # detected move
-        # cancel match, detect devices, calibrate, ESTOP,
-        # move generation (e.g. trigger p1 hadouken), demo mode on/off
+        self.allOnBtn = Button(" Fire All ")
+        self.allOnBtn.connect_signal(Constants.SIG_CLICKED, self.ioListener.AllFireOn)
+        ftBtnTable.add_child(0,0,self.allOnBtn)
+        
+        self.allOffBtn = Button(" Fire Off ")
+        self.allOffBtn.connect_signal(Constants.SIG_CLICKED, self.ioListener.AllFireOff)
+        ftBtnTable.add_child(1,0,self.allOffBtn)
+
+        ftFrame.add_child(ftBtnTable)
+        ftFrame.set_align(ALIGN_LEFT)
+        self.renderer.add_widget(ftFrame)
+        
+        
 
     def set_fps(self,fps):
         self.fps = fps

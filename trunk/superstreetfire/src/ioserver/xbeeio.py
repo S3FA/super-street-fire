@@ -205,6 +205,15 @@ class XBeeIO:
             self.fireData = dataset
             #print 'send wifire data=%s' % (dataset)
             self._sendFire()
+
+    def SendFire(self, isOnOff):
+        if (isOnOff == 0):
+            self.fireData = struct.pack("HHH", 0, 0, 0)
+        elif (isOnOff == 1):
+            self.fireData = struct.pack("HHH", int('1111111111111111',2), 0, 0)
+        else:
+            return # invalid  
+        self._sendFire()
             
     def GoTheFuckToSleep(self):
         self.fireData =  struct.pack("HHH", 0, 0, 0)
