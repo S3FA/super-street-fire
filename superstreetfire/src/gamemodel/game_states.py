@@ -159,18 +159,10 @@ class RoundInPlayGameState(GameState):
         
     def Tick(self, dT):
         self.ssfGame._listenerCmdr.TimerStateChanged(self.roundTime)
-        self.ssfGame.ioManager.SendFireEmitterData(self.ssfGame.GetLeftEmitters(1, True), \
-                                                   self.ssfGame.GetRightEmitters(1, True))
-        
+
         # Execute the actions (attacks, blocks, etc.)
         self.ssfGame._ExecuteGameActions(dT, self._activeActions)
         
-        # round in play is the only state that requires "send fire"
-        # looking at the emitter states from the P1 perspective
-        # send the full state to the wifire board
-        self.ssfGame.ioManager.SendFireEmitterData(self.ssfGame.GetLeftEmitters(1, True), \
-                                                   self.ssfGame.GetRightEmitters(1, True))
-
         # Check to see if the current round is over...
         if self._IsRoundOver():
             self._logger.debug("Round is over.")

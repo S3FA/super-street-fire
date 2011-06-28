@@ -169,6 +169,7 @@ class SSFGame:
             for action in newActions:
                 action.Initialize(self)
             actionsQueue.extend(newActions)
+            self._listenerCmdr.PlayerMoves(newActions)
             
         # Tick any actions (e.g., attacks, blocks) that are currently active within the game
         # This will update the state of the fire emitters and the game in general
@@ -178,8 +179,10 @@ class SSFGame:
                 actionsToRemove.append(action)
             else:
                 action.Tick(self, dT)
+            #TODO-- check if this updates better/faster..
+            self.ioManager.SendFireEmitterData(self.GetLeftEmitters(1, True), \
+                                               self.GetRightEmitters(1, True))
         
-        self._listenerCmdr.PlayerMoves(actionsToRemove)
         # Clear up all finished actions
         for action in actionsToRemove:
             actionsQueue.remove(action)
