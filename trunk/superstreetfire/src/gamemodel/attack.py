@@ -10,6 +10,12 @@ from action import Action
 from fire_emitter import FireEmitter
 import player
 
+JAB_LENGTH=2.0
+HOOK_LENGTH=1.5
+UPPERCUT_LENGTH=2
+SONICBOOM_LENGTH=3
+HADOUKEN_LENGTH=3.5
+
 class Attack(Action):
 
     # Enumeration constants for active/inactive attack parts - an attack part
@@ -88,7 +94,7 @@ class Attack(Action):
         self._attackLWindowIdx      = -self._thickness
         self._attackRWindowIdx      = -self._thickness
         
-        print "Time per emitter: ", self._timePerEmitter
+        print "Time per emitter: ", self._timePerEmitter, " thickness ", str(self._thickness)
         
         if self._sideEnum == Action.LEFT_SIDE:
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
@@ -179,7 +185,7 @@ class Attack(Action):
                 # If the emitter in the arc no longer holds an attack flame for self.playerNum
                 # then it must have been extinguished by a block from the other player...
                 if currEmitter != None and not currEmitter.HasAttackFlameOwnedByPlayer(self.playerNum):
-                    print "CANCELLED BY BLOCK"
+                    self.logger(str(self.playerNum) + " ?? extinguished BY BLOCK " )
                     attackWindow[i] = Attack.INACTIVE_ATTACK_PART
         
         # Shift the attack window if we've exceeded the emitter time
@@ -245,18 +251,18 @@ class Attack(Action):
 
 # Factory/Builder Methods for various Super Street Fire Attacks 
 def BuildLeftJabAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_SIDE, 1, 2.0, 5, "Left Jab")
+    return Attack(playerNum, Action.LEFT_SIDE, 1, JAB_LENGTH, 5, "Left Jab")
 def BuildRightJabAttack(playerNum):
-    return Attack(playerNum, Action.RIGHT_SIDE, 1, 2.0, 5, "Right Jab")
+    return Attack(playerNum, Action.RIGHT_SIDE, 1, JAB_LENGTH, 5, "Right Jab")
 def BuildLeftHookAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_SIDE, 2, 3.0, 5, "Left Hook")
+    return Attack(playerNum, Action.LEFT_SIDE, 2, HOOK_LENGTH, 5, "Left Hook")
 def BuildRightHookAttack(playerNum):
-    return Attack(playerNum, Action.RIGHT_SIDE, 2, 3.0, 5, "Right Hook")
+    return Attack(playerNum, Action.RIGHT_SIDE, 2, HOOK_LENGTH, 5, "Right Hook")
 def BuildLeftUppercutAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_SIDE, 2, 4.0, 5, "Left Uppercut")
+    return Attack(playerNum, Action.LEFT_SIDE, 2, UPPERCUT_LENGTH, 5, "Left Uppercut")
 def BuildRightUppercutAttack(playerNum):
-    return Attack(playerNum, Action.RIGHT_SIDE, 2, 4.0, 5, "Right Uppercut")
+    return Attack(playerNum, Action.RIGHT_SIDE, 2, UPPERCUT_LENGTH, 5, "Right Uppercut")
 def BuildSonicBoomAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 3.5, 5, "Sonic Boom")
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, SONICBOOM_LENGTH, 5, "Sonic Boom")
 def BuildHadoukenAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, 4.0, 5, "Hadouken")
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, HADOUKEN_LENGTH, 5, "Hadouken")

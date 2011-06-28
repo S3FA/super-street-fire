@@ -167,7 +167,7 @@ if __name__ == '__main__':
             
             # looking at the emitter states from the P1 perspective
             # send the full state to the wifire board
-            ioManager.SendFireEmitterData(ssfGame.GetLeftEmitterArc(1), ssfGame.GetRightEmitterArc(1))
+            ioManager.SendFireEmitterData(ssfGame.GetLeftEmitters(1, True), ssfGame.GetRightEmitters(1, True))
             
             # Sync to the specified frequency
             if deltaFrameTime < FIXED_FRAME_TIME:
