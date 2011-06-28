@@ -12,8 +12,8 @@ import player
 
 JAB_LENGTH=2.0
 HOOK_LENGTH=1.5
-UPPERCUT_LENGTH=2
-SONICBOOM_LENGTH=3
+UPPERCUT_LENGTH=2.0
+SONICBOOM_LENGTH=3.0
 HADOUKEN_LENGTH=3.5
 
 class Attack(Action):
@@ -185,7 +185,7 @@ class Attack(Action):
                 # If the emitter in the arc no longer holds an attack flame for self.playerNum
                 # then it must have been extinguished by a block from the other player...
                 if currEmitter != None and not currEmitter.HasAttackFlameOwnedByPlayer(self.playerNum):
-                    self.logger(str(self.playerNum) + " ?? extinguished BY BLOCK " )
+                    self.logger.info(str(self.playerNum) + " ?? extinguished BY BLOCK " )
                     attackWindow[i] = Attack.INACTIVE_ATTACK_PART
         
         # Shift the attack window if we've exceeded the emitter time
@@ -259,10 +259,10 @@ def BuildLeftHookAttack(playerNum):
 def BuildRightHookAttack(playerNum):
     return Attack(playerNum, Action.RIGHT_SIDE, 2, HOOK_LENGTH, 5, "Right Hook")
 def BuildLeftUppercutAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_SIDE, 2, UPPERCUT_LENGTH, 5, "Left Uppercut")
+    return Attack(playerNum, Action.LEFT_SIDE, 3, UPPERCUT_LENGTH, 5, "Left Uppercut")
 def BuildRightUppercutAttack(playerNum):
-    return Attack(playerNum, Action.RIGHT_SIDE, 2, UPPERCUT_LENGTH, 5, "Right Uppercut")
+    return Attack(playerNum, Action.RIGHT_SIDE, 3, UPPERCUT_LENGTH, 5, "Right Uppercut")
 def BuildSonicBoomAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, SONICBOOM_LENGTH, 5, "Sonic Boom")
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 4, SONICBOOM_LENGTH, 5, "Sonic Boom")
 def BuildHadoukenAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 2, HADOUKEN_LENGTH, 5, "Hadouken")
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 4, HADOUKEN_LENGTH, 5, "Hadouken")
