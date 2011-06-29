@@ -20,6 +20,9 @@ class GameModelListener:
     def OnTimerStateChanged(self, timerValue):
         pass
     
+    def OnEmitterStateChanged(self):
+        pass
+    
     def OnPlayerHealthChanged(self, players):
         pass
     
@@ -29,7 +32,6 @@ class GameModelListener:
     def OnHWAddrChanged(self, hwaddr):
         pass
     
-
     def OnPlayerMoves(self, actions):
         pass
     
@@ -56,6 +58,9 @@ class GameModelListenerCmdr:
     # Tell all listeners that a TimerStateChange occurred
     def TimerStateChanged(self, timerValue):
         for i in self._listenerList: i.OnTimerStateChanged(timerValue)
+    
+    def EmitterStateChanged(self):
+        for i in self._listenerList: i.OnEmitterStateChanged()
     
     def PlayerHealthChanged(self, players):
         for i in self._listenerList: i.OnPlayerHealthChanged(players)
