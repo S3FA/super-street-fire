@@ -165,7 +165,7 @@ class GestureState:
                 return
 
             # hadouken - check for forward accel - both hands
-            if ( totalx > 120 ):
+            if ( totalx > 140 ):
                 newMove = GestureState.BOTH_FWD
                 print "BOTH FORWARD MOVE ______________"
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )

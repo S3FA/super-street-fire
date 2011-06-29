@@ -110,7 +110,8 @@ class CalibrationGameState(GameState):
 # We might want a countdown for each round (e.g., 3, 2, 1, FIGHT!) just
 # to get the players ready/prepared to start wailing on each other
 class RoundBeginGameState(GameState):
-    COUNT_DOWN_TIME_IN_SECONDS = 3.0
+    # since there is no countdown.. reduce the wait to 2 seconds
+    COUNT_DOWN_TIME_IN_SECONDS = 2.0
     
     def __init__(self, ssfGame, roundNumber):
         GameState.__init__(self, ssfGame)
@@ -175,7 +176,8 @@ class RoundInPlayGameState(GameState):
             return
         
         # Diminish the round timer
-        self.roundTime -= dT
+        if self.ssfGame.demoMode == False:
+            self.roundTime -= dT
         
  
     def TogglePauseGame(self):
