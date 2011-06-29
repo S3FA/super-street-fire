@@ -58,7 +58,8 @@ class XBeeIO:
         self.xbee.at(command='ND')
         print "Searching for wireless nodes ... wait for it."
         sleep(self.DISCOVERY_TIMEOUT)
-        self._logger.info("Found Devices:" + str( parser.ADDR_TABLE ) )
+        self._logger.info("Found Devices:" + str(parser.ADDR_TABLE))
+        
         
     def _sendFire(self):
         

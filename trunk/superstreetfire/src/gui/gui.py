@@ -425,10 +425,16 @@ class UIController(GameModelListener):
     ##################
     
     def updateEmitters(self):
-        self.leftEmitters.text = "  ".join([char_for_state(state) for state in self.game.GetLeftEmitters(1,True)])
-        self.rightEmitters.text = "  ".join([char_for_state(state) for state in self.game.GetRightEmitters(1,True)])
-    
+        leftEmitterStr  = "  ".join([char_for_state(state) for state in self.game.GetLeftEmitters(1,True)])
+        rightEmitterStr = "  ".join([char_for_state(state) for state in self.game.GetRightEmitters(1,True)])
+        
+        # Only update the emitter text when we need to
+        if leftEmitterStr != self.leftEmitters.text:
+            self.leftEmitters.text = leftEmitterStr
+        if rightEmitterStr != self.rightEmitters.text:
+            self.rightEmitters.text = rightEmitterStr
 
+    
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
         cur_state = state.GetStateType()
@@ -459,10 +465,14 @@ class UIController(GameModelListener):
     def OnTimerStateChanged(self, newTime):
         if newTime < 0:
             newTime = 0
-            
-        self.timerLabel.text = '%.0f' % newTime
-        self.updateEmitters()
         
+        # Only update the timer when we need to
+        timeStr = '%.0f' % newTime
+        if self.timerLabel.text != timeStr:
+            self.timerLabel.text = timeStr
+    
+    def OnEmitterStateChanged(self):
+        self.updateEmitters()
     
     def OnPlayerHealthChanged(self, players):
         try:
@@ -499,7 +509,6 @@ class UIController(GameModelListener):
                 self.p1moves.insert (x, TextListItem (str(actions[x])) )
             else:
                 self.p2moves.insert (x, TextListItem (str(actions[x])) )
-
 
 
 def char_for_state(emitter_state):

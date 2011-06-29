@@ -26,10 +26,13 @@ from gui import gui
 from gamemodel.fire_emitter_states import FireState
 
 if __name__ == '__main__':
+    mainLogger = logging.getLogger("ssf_main_logger")
+    mainLogger.setLevel(logging.INFO)
+    mainLogger.addHandler(logging.StreamHandler())
 
-    logger = logging.getLogger(FireState.LOGGER_NAME)
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
+    #fireStateLogger = logging.getLogger(FireState.LOGGER_NAME)
+    #fireStateLogger.setLevel(logging.DEBUG)
+    #fireStateLogger.addHandler(logging.StreamHandler())
 
     # IN_PORT="/dev/slave"
     IN_PORT = "/dev/tty.xbee"
@@ -111,8 +114,11 @@ if __name__ == '__main__':
         
         sender = SenderListener(ssfGame, ioManager)
 
-        # GUI
+        # GUI initialization
         pygame.init ()
+        # Make sure we only allow quit events to get on the queue - this keeps the queue
+        # mostly empty and saves time in the main loop
+        pygame.event.set_allowed(pygame.QUIT)
         uiController = gui.UIController(ssfGame, sender)
         lastFpsUpdate = time.time()
         
@@ -134,7 +140,7 @@ if __name__ == '__main__':
             # check for pygame (GUI) events and pass to renderer
             events = pygame.event.get ()
             if pygame.QUIT in [ev.type for ev in events]:
-                logger.info("got pygame.QUIT event")
+                mainLogger.info("got pygame.QUIT event")
                 break
             
             uiController.renderer.distribute_events(*events)
@@ -167,7 +173,7 @@ if __name__ == '__main__':
     except:
         logging.warn("Unexpected state! (Is everything turned on?)")
         traceback.print_exc()
-
+    
     if sender != None: sender.Kill()
     if ioManager != None: ioManager.Kill()
     #sender.Kill()

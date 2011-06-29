@@ -23,9 +23,12 @@ class FireEmitter:
     ATTACK_FLAME = 1
     BLOCK_FLAME  = 2
     
-    def __init__(self, idx, arc):
+    def __init__(self, idx, arc, listenerCmdr):
+        assert(listenerCmdr != None)
         assert(idx >= 0 and idx < FireEmitter.NUM_FIRE_EMITTERS_PER_ARC)
         assert(arc == FireEmitter.RIGHT_ARC or arc == FireEmitter.LEFT_ARC)
+        
+        self._listenerCmdr = listenerCmdr
         
         # Keep this emitter's index within its arc of emitters (starting at zero)
         self.arcIndex     = idx
@@ -99,6 +102,8 @@ class FireEmitter:
         # End the previous state, set the new state and start it
         self.state = newState
         self.state.StartState()
+        
+        self._listenerCmdr.EmitterStateChanged()
         
     # This function will ACTUALLY turn the fire on, should only be called from
     # the fire emitter state machine

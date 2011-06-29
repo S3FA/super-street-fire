@@ -34,8 +34,8 @@ class SSFGame:
         self.leftEmitters  = []
         self.rightEmitters = []
         for i in range(0, FireEmitter.NUM_FIRE_EMITTERS_PER_ARC):
-            self.leftEmitters.append(FireEmitter(i, FireEmitter.LEFT_ARC))
-            self.rightEmitters.append(FireEmitter(i, FireEmitter.RIGHT_ARC))
+            self.leftEmitters.append(FireEmitter(i, FireEmitter.LEFT_ARC, self._listenerCmdr))
+            self.rightEmitters.append(FireEmitter(i, FireEmitter.RIGHT_ARC, self._listenerCmdr))
 
         # Set the first state for the game
         # NOTE: Always be sure to set the state LAST in the constructor since
