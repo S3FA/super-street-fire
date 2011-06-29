@@ -110,7 +110,7 @@ class UIController(GameModelListener):
         buttonTable.add_child(0,2,self.cancelMatchBtn)
         
         self.demoBtn = Button("Demo")
-        #self.cancelMatchBtn.connect_signal(Constants.SIG_CLICKED, SweetDemo)
+        self.demoBtn.connect_signal(Constants.SIG_CLICKED, self.game.DemoGame)
         buttonTable.add_child(0,3,self.demoBtn)
         
         gameControlFrame.topleft = (10, topmargin)

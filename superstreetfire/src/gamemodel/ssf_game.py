@@ -26,8 +26,8 @@ class SSFGame:
         self.player1 = player.Player(1)
         self.player2 = player.Player(2)
         self.chipDamageOn = True
-
-        self.roundNumber = 1
+        self.demoMode     = False
+        self.roundNumber  = 1
         
         # There are two arcs of fire emitters (one on the left and one on the right
         # of player 1) each with eight emitters
@@ -116,6 +116,12 @@ class SSFGame:
     # set state machine (see game_states.py)
     def Tick(self, dT):
         self.state.Tick(dT)
+    
+    def DemoGame(self):
+        self.player1.isInvincible = True
+        self.player2.isInvincible = True
+        self.demoMode = True
+        self.state.StartGame()
     
     def StartGame(self):
         self.state.StartGame()
