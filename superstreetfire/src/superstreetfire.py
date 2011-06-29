@@ -47,7 +47,8 @@ if __name__ == '__main__':
                          help="The serial port name/number that provides input from clients. [%default]", \
                          default=IN_PORT)
     argParser.add_option("-f", "--frequency", action="store", type="int", dest="frequency", \
-                         help="The simulation tick frequency. [%default]", default=50)    
+                         help="The simulation tick frequency. WARNING: This is more of a guideline and " + \
+                        "it may not be possible to sync to it. [%default]", default=50)    
 
     (options, args) = argParser.parse_args()
     
@@ -144,9 +145,11 @@ if __name__ == '__main__':
                 break
             
             uiController.renderer.distribute_events(*events)
-            if currTime - lastFpsUpdate > 1:
+            if currTime - lastFpsUpdate > 1.0:
                 lastFpsUpdate = currTime
-                uiController.set_fps(1./deltaFrameTime) 
+                uiController.set_fps(1.0/deltaFrameTime) 
+                #print "actual frame time: " + str(deltaFrameTime)
+                #print "fixed frame time:  " + str(FIXED_FRAME_TIME)
             
             # The receiver has been asynchronously receiving data and dumping it
             # onto the receiverQueueMgr, we need to grab that data and apply it to the simulation...
@@ -164,9 +167,12 @@ if __name__ == '__main__':
             ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
             ssfGame.Tick(deltaFrameTime)
             
-            # Sync to the specified frequency
+            # Sync to the specified frequency - this doesn't appear to be
+            # having any affect, something to do with time.sleep()
+            # accuracy, doesn't really do anything when the sleep time is around 0.01
             if deltaFrameTime < FIXED_FRAME_TIME:
-                time.sleep(FIXED_FRAME_TIME - deltaFrameTime)
+                sleepTime = FIXED_FRAME_TIME - deltaFrameTime
+                time.sleep(sleepTime)
             
     except KeyboardInterrupt:
         print "Ctrl+c Issued..."
