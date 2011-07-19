@@ -425,8 +425,8 @@ class UIController(GameModelListener):
     ##################
     
     def updateEmitters(self):
-        leftEmitterStr  = "  ".join([char_for_state(state) for state in self.game.GetLeftEmitters(1,True)])
-        rightEmitterStr = "  ".join([char_for_state(state) for state in self.game.GetRightEmitters(1,True)])
+        leftEmitterStr  = "  ".join([char_for_state(state) for state in self.game.GetLeftEmitterArc(1)])
+        rightEmitterStr = "  ".join([char_for_state(state) for state in self.game.GetRightEmitterArc(1)])
         
         # Only update the emitter text when we need to
         if leftEmitterStr != self.leftEmitters.text:
