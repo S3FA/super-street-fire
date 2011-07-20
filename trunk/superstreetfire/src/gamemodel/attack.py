@@ -188,6 +188,17 @@ class Attack(Action):
                     self.logger.info(str(self.playerNum) + " ?? extinguished BY BLOCK " )
                     attackWindow[i] = Attack.INACTIVE_ATTACK_PART
         
+        # Special way to turn the fire off before it's officially done - this
+        # helps add to the effect of the fire (if the fire only lasts a half of
+        # it's actual time window, it gives the effect of smoother movement)
+        
+        halfTimePerEmitter = self._timePerEmitter / 2.0
+        if deltaEmitterTime >= halfTimePerEmitter:
+            currEmitter = self._GetEmitter(arcEmitters, attackWindowIdx)
+            if currEmitter != None and attackWindow[0] == Attack.ACTIVE_ATTACK_PART:
+                currEmitter.FireOffNoStateChange()
+        
+        
         # Shift the attack window if we've exceeded the emitter time
         while deltaEmitterTime >= self._timePerEmitter:
             #print attackWindowIdx, attackWindow[0]
