@@ -88,6 +88,9 @@ class FireEmitter:
             else:
                 self.state.TurnOffP2Block()        
 
+    def FireOffNoStateChange(self):
+        self._TurnFireOff()        
+
     # Kill the emitter, and do it NOW!!
     def Kill(self):
         self._SetState(FireOffState(self))
