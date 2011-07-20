@@ -7,6 +7,8 @@ block.py
 from action import Action
 from fire_emitter import FireEmitter
 
+BLOCK_LENGTH = 1.0
+
 class Block(Action):
 
     def __init__(self, playerNum, sideEnum, thickness, timeLimit):
@@ -95,7 +97,7 @@ class Block(Action):
 
 # Factory/Builder Methods for various Super Street Fire Blocks 
 def BuildLeftBasicBlock(playerNum):
-    return Block(playerNum, Action.LEFT_SIDE, 1, 4.0)
+    return Block(playerNum, Action.LEFT_SIDE, 1, BLOCK_LENGTH)
 def BuildRightBasicBlock(playerNum):
-    return Block(playerNum, Action.RIGHT_SIDE, 1, 4.0)
+    return Block(playerNum, Action.RIGHT_SIDE, 1, BLOCK_LENGTH)
 
