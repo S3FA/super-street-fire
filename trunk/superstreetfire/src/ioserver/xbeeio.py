@@ -32,6 +32,7 @@ class XBeeIO:
     LOGGER_NAME = 'xbee-tx'
     DISCOVERY_TIMEOUT = 5
     INPUT_PORTS = ['/dev/tty.xbee', 'COM10','COM3','COM5','COM6','COM8']
+    FIRE_OFF = struct.pack("HHH", 0, 0, 0)
 
     def __init__(self, inputSerialPort, baudRate):
         self._logger = logging.getLogger(XBeeIO.LOGGER_NAME)
@@ -82,29 +83,16 @@ class XBeeIO:
 
     def _sendTimer(self):
         timerData = self.timerData
-        # Make sure this object is in a proper state before running...
-        if self.xbee == None:
-            print "ERROR: Output port was invalid/not found, can not send."
-            print "************ Killing XBee IO Thread ****************"
-            return
-        
-        self._logger.debug('sending timer data ' + str(timerData))
+        #self._logger.debug('sending timer data ' + str(timerData))
         data = struct.pack("H", timerData)
         try:
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFTIMER'][1], dest_addr_long=parser.ADDR_TABLE['SSFTIMER'][0], data=data)                   
         except:
-            self._logger.warn("TIMER send error -- perhaps address not in ADDR_TABLE")
+            #self._logger.debug("TIMER send error -- perhaps address not in ADDR_TABLE")
+            pass
         
-    def _sendND(self):
-        
+    def _sendND(self):        
         self._logger.debug('sending node discovery message')
-        
-        # Make sure this object is in a proper state before running...
-        if self.xbee == None:
-            print "Send ND ERROR: Output port was invalid/not found, can not send."
-            print "************ Killing XBee IO Thread ****************"
-            return
-        
         self.xbee.at(command='ND')                  
 
     def sendKO(self,state):
@@ -143,10 +131,9 @@ class XBeeIO:
         try:
             out = self._getLifeData(p1Life)
             data = struct.pack(">I", out)
-            self._logger.info("Send SSFP1LIFE:" + hexlify(data) )
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP1LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP1LIFE'][0], data=data)                   
         except:
-            self._logger.warn("SSFP1LIFE send error -- perhaps address not in ADDR_TABLE")
+            #self._logger.debug("SSFP1LIFE send error -- perhaps address not in ADDR_TABLE")
             pass
         
     def SendP2LifeBar(self, p2Life): 
@@ -154,11 +141,10 @@ class XBeeIO:
         try:
             out = self._getLifeData(p2Life)
             data = struct.pack(">I", out)
-            self._logger.info("Send SSFP2LIFE:" + hexlify(data) )
             # Write data to the xbee: SSFP2LIFE destination address
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP2LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP2LIFE'][0], data=data)                   
         except:
-            self._logger.warn("SSFP2LIFE send error -- perhaps address not in ADDR_TABLE ")
+            #self._logger.debug("SSFP2LIFE send error -- perhaps address not in ADDR_TABLE ")
             pass
 
     def _getLifeData(self, healthIn):
@@ -175,41 +161,40 @@ class XBeeIO:
         p1c = ['0'] * 16
         p2c = ['0'] * 16
         
+        #for i in range(len(leftEmitters)):
+        #    if (leftEmitters[i].flameIsOn):
+        #        print 'left',i,' ',leftEmitters[i]
+        #    if (rightEmitters[i].flameIsOn):
+        #        print 'right',i,' ',leftEmitters[i]
+        
         # Fire and color control:
         #  2 bytes for fire control:   16[x x x x x x x x][x x x x x x x x]1
         #  2 bytes for player 1 color: 16[x x x x x x x x][x x x x x x x x]1
         #  2 bytes for player 2 color: 16[x x x x x x x x][x x x x x x x x]1
-        
-        for i in range(len(leftEmitters)):
-            #print 'left emitter: %s ' % (emitter)
+        for i in range(7, -1, -1):
             fire[i] = str(int(leftEmitters[i].flameIsOn))
-            p1c[i] =  str(int(leftEmitters[i].p1ColourIsOn))
-            p2c[i+8] =  str(int(leftEmitters[i].p2ColourIsOn))
-        
-        for i in range(len(rightEmitters)):
-            fire[15-i] =  str(int(rightEmitters[i].flameIsOn))            
+            fire[15-i] =  str(int(rightEmitters[i].flameIsOn))
+            
+            p1c[i] =  str(int(leftEmitters[i].p1ColourIsOn))            
             p1c[15-i] =  str(int(rightEmitters[i].p1ColourIsOn))
-            p2c[i] =  str(int(rightEmitters[i].p2ColourIsOn))
-                    
-        fire.reverse()
-        p1c.reverse()
-        p2c.reverse()
+            
+            p2c[7-i] =  str(int(leftEmitters[i].p2ColourIsOn))
+            p2c[15-i] =  str(int(rightEmitters[i].p2ColourIsOn))
         
         fireInt = int(''.join(fire),2)
         p1cInt  = int(''.join(p1c),2)
         p2cInt  = int(''.join(p2c),2)
         
-        dataset = struct.pack("HHH", fireInt, p1cInt, p2cInt)
-        
-        if (self.fireData != dataset):
-            #self._logger.debug('fire=%s, p1c=%s, p2c=%s' % (fire, p1c, p2c) )
+        dataset = struct.pack("HHH", fireInt, p1cInt, p2cInt)        
+        if ( self.fireData != dataset ):
+            #self._logger.debug('fire=%s, p1c=%s, p2c=%s' % ( fireInt, p1cInt, p2cInt) )
             self.fireData = dataset
             #print 'send wifire data=%s' % (dataset)
             self._sendFire()
 
     def SendFire(self, isOnOff):
         if (isOnOff == 0):
-            self.fireData = struct.pack("HHH", 0, 0, 0)
+            self.fireData = XBeeIO.FIRE_OFF
         elif (isOnOff == 1):
             self.fireData = struct.pack("HHH", int('1111111111111111',2), 0, 0)
         else:
@@ -217,7 +202,7 @@ class XBeeIO:
         self._sendFire()
             
     def GoTheFuckToSleep(self):
-        self.fireData =  struct.pack("HHH", 0, 0, 0)
+        self.fireData =  XBeeIO.FIRE_OFF
         self._sendFire()
 
     def NodeDiscovery(self):
