@@ -9,7 +9,7 @@ import time
 
 # This is the 'abstract' superclass for all fire emitter states
 class FireState:
-    LOGGER_NAME = 'fire_state_logger'
+    LOGGER_NAME = 'fire_state'
     
     def __init__(self, fireEmitter):
         assert(fireEmitter != None)
@@ -87,10 +87,9 @@ class BlockedFireState(FireState):
         return 'BlockedFireState' 
 
     def StartState(self):
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering Blocking State (Emitter: " + \
+        self._logger.debug("Entering Blocking State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
-            self._logger.debug("Elapsed attack time before this block: " + str(self._elapsedAtkTimeBeforeBlk))
+        self._logger.debug("Elapsed attack time before this block: " + str(self._elapsedAtkTimeBeforeBlk))
         self._fireEmitter._SetState(self._nextState)
         
     def TurnOnP1Attack(self): assert(False)
@@ -120,8 +119,8 @@ class P1AttackFireOnState(FireState):
 
     def StartState(self):
         self._stateStartTime = time.time()
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering P1 Attack Fire On State (Emitter: " + \
+
+        self._logger.debug("Entering P1 Attack Fire On State (Emitter: " + \
                                self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOnWithColour(1)
         self._fireEmitter._TurnP2ColourOff()
@@ -168,8 +167,7 @@ class P2AttackFireOnState(FireState):
 
     def StartState(self):
         self._stateStartTime = time.time()
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering Player 2 Attack Fire On State (Emitter: " + \
+        self._logger.debug("Entering Player 2 Attack Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOnWithColour(2)
         self._fireEmitter._TurnP1ColourOff()
@@ -219,8 +217,7 @@ class P1AndP2AttackFireOnState(FireState):
 
     def StartState(self):
         self._stateStartTime = time.time()
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering Player 1 and Player 2 Attack Fire On State (Emitter: " + \
+        self._logger.debug("Entering Player 1 and Player 2 Attack Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOn()
         self._fireEmitter._TurnP1ColourOn()
@@ -268,8 +265,7 @@ class P1BlockFireOnState(FireState):
         return 'P1BlockFireOnState' 
 
     def StartState(self):
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering Player 1 Block Fire On State (Emitter: " + \
+        self._logger.debug("Entering Player 1 Block Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOnWithColour(1)
         self._fireEmitter._TurnP2ColourOff()
@@ -301,10 +297,8 @@ class P2BlockFireOnState(FireState):
         return 'P2BlockFireOnState' 
 
     def StartState(self):
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering Player 2 Block Fire On State (Emitter: " + \
+        self._logger.debug("Entering Player 2 Block Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
-                           
         self._fireEmitter._TurnFireOnWithColour(2)
         self._fireEmitter._TurnP1ColourOff()
 
@@ -343,8 +337,7 @@ class P1AttackAndBlockFireOnState(FireState):
 
     def StartState(self):
         self._stateStartTime = time.time()
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering Player 1 Attack and Block Fire On State (Emitter: " + \
+        self._logger.debug("Entering Player 1 Attack and Block Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOnWithColour(1)
         self._fireEmitter._TurnP2ColourOff()
@@ -391,8 +384,7 @@ class P2AttackAndBlockFireOnState(FireState):
 
     def StartState(self):
         self._stateStartTime = time.time()
-        if (self._fireEmitter.arcIndex%2 == 0):
-            self._logger.debug("Entering Player 2 Attack and Block Fire On State (Emitter: " + \
+        self._logger.debug("Entering Player 2 Attack and Block Fire On State (Emitter: " + \
                            self._fireEmitter.arc + " #" + str(self._fireEmitter.arcIndex) + ")")
         self._fireEmitter._TurnFireOnWithColour(2)
         self._fireEmitter._TurnP1ColourOff()
@@ -423,7 +415,7 @@ class P2AttackAndBlockFireOnState(FireState):
 if __name__ == "__main__":
     from fire_emitter import FireEmitter
     
-    logger = logging.getLogger('fire_state_logger')
+    logger = logging.getLogger('fire_state')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
     
