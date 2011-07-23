@@ -164,7 +164,7 @@ if __name__ == '__main__':
                                           receiverQueueMgr.PopP2HeadsetData(), \
                                           deltaFrameTime, lastFrameTime)
             
-            ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
+            #ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
             ssfGame.Tick(deltaFrameTime)
             
             # Sync to the specified frequency - this doesn't appear to be
