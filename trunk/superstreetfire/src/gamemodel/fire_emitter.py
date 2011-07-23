@@ -122,6 +122,7 @@ class FireEmitter:
             self._TurnP1ColourOn()
         else:
             self._TurnP2ColourOn()
+        #print "turn on ",self.arcIndex," color " , playerNum
     
     # This function will ACTUALLY turn the fire off, should only be called from
     # the fire emitter state machine
