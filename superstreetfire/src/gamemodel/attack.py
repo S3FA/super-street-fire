@@ -11,10 +11,10 @@ from fire_emitter import FireEmitter
 import player
 
 JAB_LENGTH=2.0
-HOOK_LENGTH=1.5
-UPPERCUT_LENGTH=2.0
-SONICBOOM_LENGTH=3.0
-HADOUKEN_LENGTH=3.5
+HOOK_LENGTH=2.0
+UPPERCUT_LENGTH=2.5
+SONICBOOM_LENGTH=3.5
+HADOUKEN_LENGTH=4.0
 
 JAB_DMG=2
 HOOK_DMG=3
@@ -100,7 +100,7 @@ class Attack(Action):
         self._attackLWindowIdx      = -self._thickness
         self._attackRWindowIdx      = -self._thickness
         
-        print "Time per emitter: ", self._timePerEmitter, " thickness ", str(self._thickness)
+        #print "Time per emitter: ", self._timePerEmitter, " thickness ", str(self._thickness)
         
         if self._sideEnum == Action.LEFT_SIDE:
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
@@ -280,6 +280,6 @@ def BuildLeftUppercutAttack(playerNum):
 def BuildRightUppercutAttack(playerNum):
     return Attack(playerNum, Action.RIGHT_SIDE, 3, UPPERCUT_LENGTH, UPPERCUT_DMG, "Right Uppercut")
 def BuildSonicBoomAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 4, SONICBOOM_LENGTH, SONICBOOM_DMG, "Sonic Boom")
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 3, SONICBOOM_LENGTH, SONICBOOM_DMG, "Sonic Boom")
 def BuildHadoukenAttack(playerNum):
-    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 4, HADOUKEN_LENGTH, HADOUKEN_DMG, "Hadouken")
+    return Attack(playerNum, Action.LEFT_AND_RIGHT_SIDES, 3, HADOUKEN_LENGTH, HADOUKEN_DMG, "Hadouken")
