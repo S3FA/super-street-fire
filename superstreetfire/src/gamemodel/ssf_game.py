@@ -50,7 +50,6 @@ class SSFGame:
         self.StopGame()
     
     def Reset(self):
-        self.ioManager.GoTheFuckToSleep()
         self.chipDamageOn = True
         self.player1.Reset()
         self.player2.Reset()
@@ -158,14 +157,13 @@ class SSFGame:
         # Tick any actions (e.g., attacks, blocks) that are currently active within the game
         # This will update the state of the fire emitters and the game in general
         actionsToRemove = []
-        for action in actionsQueue:
+        for action in actionsQueue:        
             if action.IsFinished():
                 actionsToRemove.append(action)
             else:
-                action.Tick(self, dT)
-            #TODO-- check if this updates better/faster..
-            self.ioManager.SendFireEmitterData(self.GetLeftEmitterArc(1), \
-                                               self.GetRightEmitterArc(1))
+                action.Tick(self, dT)            
+                self.ioManager.SendFireEmitterData(self.GetLeftEmitterArc(1), \
+                       self.GetRightEmitterArc(1))
         
         # Clear up all finished actions
         for action in actionsToRemove:
