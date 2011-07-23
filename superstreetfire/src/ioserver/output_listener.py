@@ -34,6 +34,12 @@ class SenderListener(GameModelListener):
     def AllFireOff(self):
         self.xbeeio.SendFire(0)
 
+    def OnEmitterStateChanged(self):
+        #TODO-- the state of emitters has already changed when this runs
+        #self.xbeeio.SendFireEmitterData(self.game.GetLeftEmitterArc(1), \
+        #                                self.game.GetRightEmitterArc(1))
+        pass
+            
     def OnTimerStateChanged(self, newTime):
         timer = int(round(newTime))
         if (timer != self.curTimer):
@@ -57,13 +63,15 @@ class SenderListener(GameModelListener):
                 # person is dead.. send KO
             #print 'send health p2: ' + str(self.p2Health)
             self.xbeeio.SendP2LifeBar(self.p2Health)
-
+            
+        self.xbeeio.SendFire(0)
+        
     def OnGameStateChanged(self, state):
         GameModelListener.OnGameStateChanged(self, state)
         cur_state = state.GetStateType()
         # update round and match won, etc
         
-        if cur_state == ROUND_IN_PLAY_GAME_STATE:
+        if cur_state == ROUND_BEGIN_GAME_STATE:
             self.xbeeio.SendP1LifeBar(100)
             self.xbeeio.SendP2LifeBar(100)
             
