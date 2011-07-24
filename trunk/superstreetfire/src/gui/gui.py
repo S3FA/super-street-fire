@@ -65,14 +65,14 @@ class UIController(GameModelListener):
         
         self.roundLabel = Label("Round %d" % self.game.roundNumber)
         self.roundLabel.topleft = (self.framewidth/2 - logosize[0]/2, topmargin + logosize[1] + 5)
-        self.roundLabel.get_style()["font"]["size"] = 24
+        self.roundLabel.create_style()["font"]["size"] = 24
         self.roundLabel.minsize = (logosize[0], self.roundLabel.minsize[1])
         self.renderer.add_widget(self.roundLabel)
         
         self.timerLabel = Label("99")
         self.timerLabel.topleft = (self.roundLabel.topleft[0], 
                                    self.roundLabel.topleft[1] + self.timerLabel.height + 5)
-        self.timerLabel.get_style()["font"]["size"] = 32
+        self.timerLabel.create_style()["font"]["size"] = 32
         self.timerLabel.minsize = (logosize[0], self.roundLabel.minsize[1])
         self.renderer.add_widget(self.timerLabel)
         
@@ -129,13 +129,13 @@ class UIController(GameModelListener):
         ##################
         # Simulator
         self.leftEmitters = Label("  ".join('O'*8))
-        self.leftEmitters.get_style()["font"]["name"] = "Consolas"
-        self.leftEmitters.get_style()["font"]["size"] = 40
+        self.leftEmitters.create_style()["font"]["name"] = "Consolas"
+        self.leftEmitters.create_style()["font"]["size"] = 40
         self.leftEmitters.topleft = (self.framewidth/2.0 - self.leftEmitters.width/2.,160)
         
         self.rightEmitters = Label("  ".join('O'*8))
-        self.rightEmitters.get_style()["font"]["name"] = "Consolas"
-        self.rightEmitters.get_style()["font"]["size"] = 40
+        self.rightEmitters.create_style()["font"]["name"] = "Consolas"
+        self.rightEmitters.create_style()["font"]["size"] = 40
         self.rightEmitters.topleft = (self.framewidth/2.0 - self.leftEmitters.width/2.,264)
         
         self.renderer.add_widget(self.leftEmitters)
@@ -163,7 +163,7 @@ class UIController(GameModelListener):
         # Status        
         self.statusLabel = Label("Status")
         self.statusLabel.topleft = (100, 80)
-        self.statusLabel.get_style()["font"]["size"] = 26
+        self.statusLabel.create_style()["font"]["size"] = 26
         self.statusLabel.minsize = (logosize[0], self.estop.minsize[1])
         self.renderer.add_widget(self.statusLabel)
 
