@@ -52,6 +52,10 @@ class Attack(Action):
         # the thickness of the attack - the thicker the attack the more emitters will actually
         # go off...
         self._timePerEmitter = timeLength / float(FireEmitter.NUM_FIRE_EMITTERS_PER_ARC + thickness - 1)
+        self._halfTimePerEmitter = self._timePerEmitter / 2.0
+        
+        self.logger.debug("Time per emitter:      " + str(self._timePerEmitter))
+        self.logger.debug("Half time per emitter: " + str(self._halfTimePerEmitter))
         
         # Track the amount of time that the attack has been active for
         self._currAttackTime = 0.0
@@ -104,12 +108,16 @@ class Attack(Action):
         
         if self._sideEnum == Action.LEFT_SIDE:
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
+            self._leftAttackTimeWindow = [0.0] * self._thickness
         elif self._sideEnum == Action.RIGHT_SIDE:
             self._rightAttackWindow = [Attack.ACTIVE_ATTACK_PART] * self._thickness
+            self._rightAttackTimeWindow = [0.0] * self._thickness
         else:
             assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
             self._leftAttackWindow  = [Attack.ACTIVE_ATTACK_PART] * self._thickness
             self._rightAttackWindow = [Attack.ACTIVE_ATTACK_PART] * self._thickness
+            self._leftAttackTimeWindow  = [0.0] * self._thickness
+            self._rightAttackTimeWindow = [0.0] * self._thickness
     
     def IsFinished(self):
         return self._currAttackTime >= self._timeLength or self._isKilled
@@ -120,7 +128,7 @@ class Attack(Action):
             return
         
         # Make sure the delta time never exceeds the time per emitter
-        dT = min(self._timePerEmitter * 0.999, dT)
+        dT = min(self._timePerEmitter * 0.5, dT)
         
         # Increment the time tracker(s)...
         self._currAttackTime += dT
@@ -131,49 +139,52 @@ class Attack(Action):
         
         if self._sideEnum == Action.LEFT_SIDE:
             assert(self._leftAttackWindow  != None)
-            self._TickLeftAttack(ssfGame)
+            self._TickLeftAttack(ssfGame, dT)
             
         elif self._sideEnum == Action.RIGHT_SIDE:
             assert(self._rightAttackWindow != None)
-            self._TickRightAttack(ssfGame)
+            self._TickRightAttack(ssfGame, dT)
             
         else:
             assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
             assert(self._leftAttackWindow  != None)
-            self._TickLeftAttack(ssfGame)
+            self._TickLeftAttack(ssfGame, dT)
             assert(self._rightAttackWindow != None)
-            self._TickRightAttack(ssfGame)
+            self._TickRightAttack(ssfGame, dT)
     
     def Kill(self, ssfGame):
         Action.Kill(self)
         # Make sure all the emitters that the attack is currently taking
         # place on are turned off immediately
         if self._sideEnum == Action.LEFT_SIDE:
-            self._KillEmitters(self._leftAttackWindow, self._attackLWindowIdx, ssfGame.GetLeftEmitterArc(self.playerNum))
+            self._KillEmitters(self._leftAttackWindow, self._attackLWindowIdx, ssfGame.GetLeftEmitterArc(self.playerNum), self._leftAttackTimeWindow)
         elif self._sideEnum == Action.RIGHT_SIDE:
-            self._KillEmitters(self._rightAttackWindow, self._attackRWindowIdx, ssfGame.GetRightEmitterArc(self.playerNum))
+            self._KillEmitters(self._rightAttackWindow, self._attackRWindowIdx, ssfGame.GetRightEmitterArc(self.playerNum), self._rightAttackTimeWindow)
         else:
             assert(self._sideEnum == Action.LEFT_AND_RIGHT_SIDES)
-            self._KillEmitters(self._leftAttackWindow, self._attackLWindowIdx, ssfGame.GetLeftEmitterArc(self.playerNum))
-            self._KillEmitters(self._rightAttackWindow, self._attackRWindowIdx, ssfGame.GetRightEmitterArc(self.playerNum))
+            self._KillEmitters(self._leftAttackWindow, self._attackLWindowIdx, ssfGame.GetLeftEmitterArc(self.playerNum), self._leftAttackTimeWindow)
+            self._KillEmitters(self._rightAttackWindow, self._attackRWindowIdx, ssfGame.GetRightEmitterArc(self.playerNum), self._rightAttackTimeWindow)
     
     # Private Functions for Attack ********************************* 
-    def _TickLeftAttack(self, ssfGame):
+    def _TickLeftAttack(self, ssfGame, dT):
         # Simulate the attack
         (self._attackLWindowIdx, self._currDeltaLEmitterTime) = \
         self._SimulateAttack(ssfGame, self._leftAttackWindow, self._attackLWindowIdx, \
-                             ssfGame.GetLeftEmitterArc(self.playerNum), self._currDeltaLEmitterTime)
+                             ssfGame.GetLeftEmitterArc(self.playerNum), self._currDeltaLEmitterTime, \
+                             self._leftAttackTimeWindow, dT)
 
-    def _TickRightAttack(self, ssfGame):
+    def _TickRightAttack(self, ssfGame, dT):
         # Simulate the attack
         (self._attackRWindowIdx, self._currDeltaREmitterTime) = \
         self._SimulateAttack(ssfGame, self._rightAttackWindow, self._attackRWindowIdx, \
-                             ssfGame.GetRightEmitterArc(self.playerNum), self._currDeltaREmitterTime)
+                             ssfGame.GetRightEmitterArc(self.playerNum), self._currDeltaREmitterTime, \
+                             self._rightAttackTimeWindow, dT)
     
     # Generalized Attack simulation function - used to update the state of the attack whenever
     # it is being executed/ticked.
     # Returns: A tuple of the (updated attack window index, current delta emitter time)
-    def _SimulateAttack(self, ssfGame, attackWindow, attackWindowIdx, arcEmitters, deltaEmitterTime):
+    def _SimulateAttack(self, ssfGame, attackWindow, attackWindowIdx, arcEmitters, \
+                        deltaEmitterTime, attackTimeWindow, dT):
         assert(attackWindow != None)
         assert(arcEmitters  != None)
         
@@ -189,35 +200,26 @@ class Attack(Action):
             if attackWindow[i] == Attack.ACTIVE_ATTACK_PART:
                 currEmitter = self._GetEmitter(arcEmitters, j)
                 # If the emitter in the arc no longer holds an attack flame for self.playerNum
-                # then it must have been extinguished by a block from the other player...
-                if currEmitter != None and not currEmitter.HasAttackFlameOwnedByPlayer(self.playerNum):
-                    self.logger.info(str(self.playerNum) + " ?? extinguished BY BLOCK " )
-                    attackWindow[i] = Attack.INACTIVE_ATTACK_PART
+                # then it must have been extinguished by a block from the other player...    
+                if currEmitter != None:                    
+                    if not currEmitter.HasAttackFlameOwnedByPlayer(self.playerNum):
+                        self.logger.info(str(self.playerNum) + " ?? extinguished BY BLOCK " )
+                        attackWindow[i] = Attack.INACTIVE_ATTACK_PART
+                        attackTimeWindow[i] = 0.0        
         
-        # Special way to turn the fire off before it's officially done - this
-        # helps add to the effect of the fire (if the fire only lasts a half of
-        # it's actual time window, it gives the effect of smoother movement)
-        
-        halfTimePerEmitter = self._timePerEmitter / 2.0
-        if deltaEmitterTime >= halfTimePerEmitter:
-            currEmitter = self._GetEmitter(arcEmitters, attackWindowIdx)
-            if currEmitter != None and attackWindow[0] == Attack.ACTIVE_ATTACK_PART:
-                currEmitter.FireOffNoStateChange()
-        
+        self.logger.debug(attackTimeWindow)
         
         # Shift the attack window if we've exceeded the emitter time
         while deltaEmitterTime >= self._timePerEmitter:
-            #print attackWindowIdx, attackWindow[0]
-            #print self._currAttackTime
-            
-            # We'll first need to turn off the emitter that we're about to pass
-            passedEmitter = self._GetEmitter(arcEmitters, attackWindowIdx)
-            # We only need to turn it off if the attack is still active on that part
-            # and the emitter is actually inside the arc (it may be the case that the attack
-            # is still starting up and has a thickness > 1)
-            if passedEmitter != None and attackWindow[0] == Attack.ACTIVE_ATTACK_PART:
-                passedEmitter.FireOff(self.playerNum, FireEmitter.ATTACK_FLAME)
-            
+
+            # Turn all the emitters off - this helps contribute to the
+            # phi phenomenon (i.e., blinking flames moving across the arc)
+            for i, j in zip(range(self._thickness), range(attackWindowIdx, windowLastIdx)):
+                currEmitter = self._GetEmitter(arcEmitters, j)
+                if currEmitter != None:
+                    currEmitter.FireOff(self.playerNum, FireEmitter.ATTACK_FLAME)
+                    attackTimeWindow[i] = 0.0
+
             # Shift the attack window
             attackWindowIdx += 1
             windowLastIdx   += 1
@@ -233,6 +235,7 @@ class Attack(Action):
                         # A new attack was just landed
                         ssfGame.Hurt(player.GetOtherPlayerNum(self.playerNum), self._dmgPerFlame, False)
                         attackWindow[i] = Attack.INACTIVE_ATTACK_PART
+                        attackTimeWindow[i] = 0.0
             
             # If the attack window just shifted completely off the end the of the emitter arc
             # then the attack is finished and we get out immediately
@@ -250,13 +253,38 @@ class Attack(Action):
             if attackWindow[i] == Attack.ACTIVE_ATTACK_PART:
                 currEmitter = self._GetEmitter(arcEmitters, j)
                 if currEmitter != None:
-                    
+                    self.logger.debug("Turning emitter #" + str(j) + " on")
                     isOnFire = currEmitter.FireOn(self.playerNum, FireEmitter.ATTACK_FLAME)
-                    attackWindow[i] = isOnFire
+                    
+                    if isOnFire:
+                        attackWindow[i] = Attack.ACTIVE_ATTACK_PART
+                        attackTimeWindow[i] += dT
+                    else:
+                        attackWindow[i] = Attack.INACTIVE_ATTACK_PART
+                        attackTimeWindow[i] = 0.0
+            else:
+                attackTimeWindow[i] = 0.0
+          
+          
+        for i, j in zip(range(self._thickness), range(attackWindowIdx, windowLastIdx)):
+            # i is the index in the attack window
+            # j is the index of the emitter
+            if attackWindow[i] == Attack.ACTIVE_ATTACK_PART:
+                currEmitter = self._GetEmitter(arcEmitters, j)
+                # If the emitter in the arc no longer holds an attack flame for self.playerNum
+                # then it must have been extinguished by a block from the other player...    
+                if currEmitter != None:
+                    # Special way to turn the fire off before it's officially done - this
+                    # helps add to the effect of the fire (if the fire only lasts a half of
+                    # it's actual time window, it gives the effect of smoother movement)
+                    if currEmitter.flameIsOn and attackTimeWindow[i] > self._halfTimePerEmitter:
+                        self.logger.debug("Time: (" + str(attackTimeWindow[i]) + ") Half time passed on emitter " + \
+                                          str(currEmitter.arcIndex) + " emitter is off, no state change")
+                        currEmitter.FireOffNoStateChange()
                     
         return (attackWindowIdx, deltaEmitterTime)
     
-    def _KillEmitters(self, attackWindow, attackWindowIdx, arcEmitters):
+    def _KillEmitters(self, attackWindow, attackWindowIdx, arcEmitters, attackTimeWindow):
         windowLastIdx  = attackWindowIdx + self._thickness
         for i, j in zip(range(self._thickness), range(attackWindowIdx, windowLastIdx)):
             # i is the index in the attack window
@@ -265,6 +293,7 @@ class Attack(Action):
                 currEmitter = self._GetEmitter(arcEmitters, j)
                 currEmitter.FireOff(self.playerNum, FireEmitter.ATTACK_FLAME)
                 attackWindow[i] = Attack.INACTIVE_ATTACK_PART
+                attackTimeWindow[i] = 0.0
 
 # Factory/Builder Methods for various Super Street Fire Attacks 
 def BuildLeftJabAttack(playerNum):
