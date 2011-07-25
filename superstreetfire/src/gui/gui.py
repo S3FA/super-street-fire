@@ -309,26 +309,46 @@ class UIController(GameModelListener):
         self.p2RightGloveAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2R"))
         hwTable.add_child(1,3,self.p2RightGloveAddr)
         
+        self.FireRSSI = ProgressBar()
+        self.FireRSSI.set_minimum_size(maxw,maxh)
+        self.FireRSSI.value = 0
+        self.FireRSSI.text = 'Fire Control'
+        hwTable.add_child(0,4,self.FireRSSI)
         
-        self.p1HeadsetRSSI = ProgressBar()
-        self.p1HeadsetRSSI.set_minimum_size(maxw,maxh)
-        self.p1HeadsetRSSI.value = 0
-        self.p1HeadsetRSSI.text = 'P1 Headset'
-        hwTable.add_child(0,4,self.p1HeadsetRSSI)
+        self.FireAddr = Label("")
+        self.FireAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFFIRE"))
+        hwTable.add_child(0,5,self.FireAddr)
         
-        self.p1HeadsetAddr = Label("")
-        self.p1HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1H"))
-        hwTable.add_child(0,5,self.p1HeadsetAddr)
+        self.LightsRSSI = ProgressBar()
+        self.LightsRSSI.set_minimum_size(maxw,maxh)
+        self.LightsRSSI.value = 0
+        self.LightsRSSI.text = 'Lighting'
+        hwTable.add_child(1,4,self.LightsRSSI)
         
-        self.p2HeadsetRSSI = ProgressBar()
-        self.p2HeadsetRSSI.set_minimum_size(maxw,maxh)
-        self.p2HeadsetRSSI.value = 0
-        self.p2HeadsetRSSI.text = 'P2 Headset'
-        hwTable.add_child(1,4,self.p2HeadsetRSSI)
+        self.LightsAddr = Label("")
+        self.LightsAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFLIGHTS"))
+        hwTable.add_child(1,5,self.LightsAddr)
         
-        self.p2HeadsetAddr = Label("")
-        self.p2HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2H"))
-        hwTable.add_child(1,5,self.p2HeadsetAddr)
+        
+        #self.p1HeadsetRSSI = ProgressBar()
+        #self.p1HeadsetRSSI.set_minimum_size(maxw,maxh)
+        #self.p1HeadsetRSSI.value = 0
+        #self.p1HeadsetRSSI.text = 'P1 Headset'
+        #hwTable.add_child(0,4,self.p1HeadsetRSSI)
+        
+        #self.p1HeadsetAddr = Label("")
+        #self.p1HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP1H"))
+        #hwTable.add_child(0,5,self.p1HeadsetAddr)
+        
+        #self.p2HeadsetRSSI = ProgressBar()
+        #self.p2HeadsetRSSI.set_minimum_size(maxw,maxh)
+        #self.p2HeadsetRSSI.value = 0
+        #self.p2HeadsetRSSI.text = 'P2 Headset'
+        #hwTable.add_child(1,4,self.p2HeadsetRSSI)
+        
+        #self.p2HeadsetAddr = Label("")
+        #self.p2HeadsetAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFP2H"))
+        #hwTable.add_child(1,5,self.p2HeadsetAddr)
         
         self.TimerRSSI = ProgressBar()
         self.TimerRSSI.set_minimum_size(maxw,maxh)
@@ -369,26 +389,6 @@ class UIController(GameModelListener):
         self.koAddr = Label("")
         self.koAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFKO"))
         hwTable.add_child(1,9,self.koAddr)
-        
-        self.FireRSSI = ProgressBar()
-        self.FireRSSI.set_minimum_size(maxw,maxh)
-        self.FireRSSI.value = 0
-        self.FireRSSI.text = 'Fire Control'
-        hwTable.add_child(0,10,self.FireRSSI)
-        
-        self.FireAddr = Label("")
-        self.FireAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFFIRE"))
-        hwTable.add_child(0,11,self.FireAddr)
-        
-        self.LightsRSSI = ProgressBar()
-        self.LightsRSSI.set_minimum_size(maxw,maxh)
-        self.LightsRSSI.value = 0
-        self.LightsRSSI.text = 'Lighting'
-        hwTable.add_child(1,10,self.LightsRSSI)
-        
-        self.LightsAddr = Label("")
-        self.LightsAddr.text = hexlify(ioserver.xbeeio.parser.getAddrS("SSFLIGHTS"))
-        hwTable.add_child(1,11,self.LightsAddr)
         
         peripheralFrame.topleft = (hwFrame.topleft[0] + hwFrame.width + 4, hwFrame.topleft[1])
         peripheralFrame.add_child(hwTable)
@@ -490,10 +490,10 @@ class UIController(GameModelListener):
     def OnHWAddrChanged(self, hwaddr):
         self.p1LeftGloveAddr.text  = hexlify(hwaddr["SSFP1L"][1])
         self.p1RightGloveAddr.text = hexlify(hwaddr["SSFP1R"][1])
-        self.p1HeadsetAddr.text    = hexlify(hwaddr["SSFP1H"][1])
+        #self.p1HeadsetAddr.text    = hexlify(hwaddr["SSFP1H"][1])
         self.p2LeftGloveAddr.text  = hexlify(hwaddr["SSFP2L"][1])
         self.p2RightGloveAddr.text = hexlify(hwaddr["SSFP2R"][1])
-        self.p2HeadsetAddr.text    = hexlify(hwaddr["SSFP2H"][1])
+        #self.p2HeadsetAddr.text    = hexlify(hwaddr["SSFP2H"][1])
         self.TimerAddr.text        = hexlify(hwaddr["SSFTIMER"][1])
         self.p1LifeAddr.text       = hexlify(hwaddr["SSFP1LIFE"][1])
         self.p2LifeAddr.text       = hexlify(hwaddr["SSFP2LIFE"][1])
