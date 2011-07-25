@@ -34,19 +34,21 @@ class Parser:
             # what is this? packet
             return
         
+        # good to go, look for the device data:
+        if (xbeePacket.has_key('rf_data') == False): return  
+
         # try to find a device id based on source address
         nodeId = self.getDevice(xbeePacket['source_addr_long'])
         # if we're just starting up, read each of the device ids into a map
         if (nodeId == 0):
-            source = str(struct.unpack(">q", xbeePacket['source_addr_long'])[0])
-            log.debug( 'No node in address table for ' + source )
+            #log.debug( 'No node in address table for ' + hexlify( xbeePacket['source_addr_long'])[0] ) 
             return
-        if (nodeId.find('LIFE') > 0 or nodeId.find('FIRE') > 0 or nodeId.find('TIMER') > 0):
+        if (nodeId.find('FIRE') > 0):
+            log.debug(' Fire returned ' + xbeePacket['rf_data'] )
             return
-
-        # good to go, look for the device data:
-        if (xbeePacket.has_key('rf_data') == False): return  
-    
+        if (nodeId.find('LIFE') > 0 or nodeId.find('TIMER') > 0):
+            return
+  
         rfdata = xbeePacket['rf_data'].replace(' ','')
         #print 'rfdata:%s' % (rfdata)
         
@@ -67,11 +69,6 @@ class Parser:
         frameData = deque()
         startDataPos = rfdata.find(":")
         restartFrame = (startDataPos == 2)  
-        fullFrame = rfdata[-1] == '|'
-        if (restartFrame and fullFrame):
-            # log.debug( "rfdata:" + rfdata[3:-1] )
-            func(rfdata[3:-1], queueMgr)
-            return
             
         # the data packet may be disjoint, test it sequentially  
         frameData.append( Parser.HOLDING_FRAME[nodeId] )
@@ -83,7 +80,7 @@ class Parser:
                 continue
             frameData[-1] += c
             if (c == "|"):
-                if (string.count(frameData[-1], ',') >= 8):
+                if (string.count(frameData[-1], ',') >= 6):
                     # data is a bit weird.. check for node headers
                     badNode = frameData[-1].find(':')
                     if (badNode > -1):
@@ -170,7 +167,7 @@ def GloveParser(player, hand, bodyStr):
     # Get out of here immediately if there's a mismatch of the expected data
     # for the glove.
     if len(blocks) < 3:
-        log.error( "Unexpected format in glove parser input, no match." )
+        log.error( "Unexpected input in glove parser, not enough blocks." )
         #print "Failed block split"
         return None
     
@@ -181,7 +178,6 @@ def GloveParser(player, hand, bodyStr):
     # gloves on the wrong hand fix :)
     #if (hand == '0'): hand = '1'
     #if (hand == '1'): hand = '0'
-
     try:
         headF = (float(head[0]), float(head[1]), float(head[2]))
         accF = (float(accel[0]), float(accel[1]), float(accel[2]))
@@ -192,7 +188,7 @@ def GloveParser(player, hand, bodyStr):
         #print 'GloveData setup %s ' % (str(gloveData))
         return gloveData
     except: 
-        log.error( "Glove data error " + str(blocks) )
+        log.error( str(hand) + " Glove data error " + str(blocks) )
 
     #print "Failed glove parse"
     return None
@@ -223,7 +219,8 @@ def Player1LeftGloveParser(bodyStr, queueMgr):
         #log.debug( "Player 1 left glove data received." )
         queueMgr.PushP1LeftGloveData(gloveData)
     else:
-        log.warn( "Player 1 left glove BAD data received." )
+        #log.warn( "Player 1 left glove BAD data received." )
+        pass
     
 def Player1RightGloveParser(bodyStr, queueMgr):
     gloveData = GloveParser(PLAYER_ONE, GloveData.RIGHT_HAND_GLOVE, bodyStr)
@@ -231,7 +228,8 @@ def Player1RightGloveParser(bodyStr, queueMgr):
         #log.debug( "Player 1 right glove data received." )
         queueMgr.PushP1RightGloveData(gloveData)
     else:
-        log.warn( "Player 1 right glove BAD data received." )
+        #log.warn( "Player 1 right glove BAD data received." )
+        pass
         
 def Player2LeftGloveParser(bodyStr, queueMgr):        
     gloveData = GloveParser(PLAYER_TWO, GloveData.LEFT_HAND_GLOVE, bodyStr)
