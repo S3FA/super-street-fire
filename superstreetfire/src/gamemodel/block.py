@@ -7,7 +7,7 @@ block.py
 from action import Action
 from fire_emitter import FireEmitter
 
-BLOCK_LENGTH = 1.0
+BLOCK_LENGTH = 3.5
 
 class Block(Action):
 
@@ -30,11 +30,11 @@ class Block(Action):
         # for this when specifying which emitters will be activated by this block
         rangeList = None
         if self.playerNum == 1:
-            rangeList = range(self._thickness)
+            rangeList = range(0, self._thickness)
         else:
             rangeList = range(FireEmitter.NUM_FIRE_EMITTERS_PER_ARC - 1, \
                               FireEmitter.NUM_FIRE_EMITTERS_PER_ARC - self._thickness - 1, -1)
-            
+                    
         # Setup the emitter list(s) for the block - blocks always stay on the
         # same emitters that they are initialized with until they are killed/expire
         if self._sideEnum == Action.LEFT_SIDE:
