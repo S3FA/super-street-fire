@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # IN_PORT="/dev/slave"
     IN_PORT = "/dev/tty.xbee"
     if (os.name.find("nt") > -1):
-        IN_PORT = "COM10"
+        IN_PORT = "COM11"
     
     # Parse options from the command line
     usageStr = "usage: %prog [options]"
@@ -60,8 +60,9 @@ if __name__ == '__main__':
                     filemode='w')
     # create console handler with a higher log level, add it to the root logger
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.WARN)
     logging.getLogger('').addHandler(ch)
+    
     
     ioManager = None
     sender = None
@@ -122,9 +123,7 @@ if __name__ == '__main__':
         pygame.event.set_allowed(pygame.QUIT)
         uiController = gui.UIController(ssfGame, sender)
         lastFpsUpdate = time.time()
-        
-        # Jump straight to the round-in-play for testing
-        #ssfGame._SetState(gamemodel.game_states.RoundBeginGameState(ssfGame, 1))
+        lastFireUpdate = time.time()
         
         lastState = ssfGame.state
 
@@ -166,6 +165,10 @@ if __name__ == '__main__':
             
             #ssfGame.UpdateRSSI(receiverQueueMgr.GetRSSIMap())
             ssfGame.Tick(deltaFrameTime)
+            
+            
+            if currTime - lastFireUpdate > 0.25:
+                ioManager.SendFireUpdate(currTimeStamp)
             
             # Sync to the specified frequency - this doesn't appear to be
             # having any affect, something to do with time.sleep()

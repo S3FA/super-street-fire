@@ -36,7 +36,7 @@ class SenderListener(GameModelListener):
 
     def OnEmitterStateChanged(self):
         #TODO-- the state of emitters has already changed when this runs
-        #self.xbeeio.SendFireEmitterData(self.game.GetLeftEmitterArc(1), \
+        #self.xbeeio.AddFireEmitterData(self.game.GetLeftEmitterArc(1), \
         #                                self.game.GetRightEmitterArc(1))
         pass
             

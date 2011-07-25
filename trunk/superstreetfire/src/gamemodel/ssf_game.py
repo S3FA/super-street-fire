@@ -57,10 +57,11 @@ class SSFGame:
     
     def KillEmitters(self):
         self._logger.debug("Killing fire emitters")
-        self.ioManager.GoTheFuckToSleep()
         for leftEmitter, rightEmitter in map(None, self.leftEmitters, self.rightEmitters):
             leftEmitter.Reset()
             rightEmitter.Reset()
+        # turn off the wifire outputs
+        self.ioManager.SendFire(0)
     
     
     def GetLeftEmitterArc(self, playerNum):
@@ -162,7 +163,7 @@ class SSFGame:
                 actionsToRemove.append(action)
             else:
                 action.Tick(self, dT)            
-                self.ioManager.SendFireEmitterData(self.GetLeftEmitterArc(1), \
+                self.ioManager.AddFireEmitterData(self.GetLeftEmitterArc(1), \
                        self.GetRightEmitterArc(1))
         
         # Clear up all finished actions

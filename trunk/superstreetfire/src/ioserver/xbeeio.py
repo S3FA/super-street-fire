@@ -18,6 +18,7 @@ import logging
 import struct
 from binascii import hexlify
 from time import sleep
+import collections
 
 # Since the xbee library requires a non-member function for its callbacks, we
 # need to make the variables available to that function non-members as well...
@@ -32,14 +33,16 @@ class XBeeIO:
     LOGGER_NAME = 'xbee-tx'
     DISCOVERY_TIMEOUT = 5
     INPUT_PORTS = ['/dev/tty.xbee', 'COM10','COM3','COM5','COM6','COM8']
-    FIRE_OFF = struct.pack("HHH", 0, 0, 0)
+    FIRE_OFF = struct.pack("H", 0)
+    MAX_FIRE_QUEUE = 6
 
     def __init__(self, inputSerialPort, baudRate):
         self._logger = logging.getLogger(XBeeIO.LOGGER_NAME)
         self.serialIn    = None
         self.xbee        = None
-        self.fireData    = None
         self.timerData   = None
+        self.fireQueue   = collections.deque(list(),XBeeIO.MAX_FIRE_QUEUE)
+        self.fireData    = None
         
         if (inputSerialPort != None): XBeeIO.INPUT_PORTS.insert(0, inputSerialPort)
         for port in XBeeIO.INPUT_PORTS:
@@ -62,25 +65,6 @@ class XBeeIO:
         self._logger.info("Found Devices:" + str(parser.ADDR_TABLE))
         
         
-    def _sendFire(self):
-        
-        fireEmitterData = self.fireData
-        self._logger.info('sending SSFFIRE ' + hexlify(fireEmitterData))
-         
-        # Make sure this object is in a proper state before running...
-        if self.xbee == None:
-            print "Send Fire ERROR: Output port was invalid/not found, can not send."
-            print "************ Killing XBee IO Thread ****************"
-            return
-        
-        try:
-            # Write data to the xbee->wifire interpreter
-            # print "sending %s to S %s L %s" % (hexlify(fireEmitterData),hexlify(parser.ADDR_TABLE['SSFFIRE'][1]), hexlify(parser.ADDR_TABLE['SSFFIRE'][0]))
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFFIRE'][1], dest_addr_long=parser.ADDR_TABLE['SSFFIRE'][0], data=fireEmitterData)                   
-        except:
-            self._logger.warn("FIRE send error -- perhaps address not in ADDR_TABLE")
-
-
     def _sendTimer(self):
         timerData = self.timerData
         #self._logger.debug('sending timer data ' + str(timerData))
@@ -154,12 +138,25 @@ class XBeeIO:
             return 0
         return (1<<int( healthIn / 6.25 ) + 1) - 1
         
-    def SendFireEmitterData(self, leftEmitters, rightEmitters):
-        
-        # assemble and send all data at once
+    def _sendFire(self, timestamp, fireEmitterData):
+        self._logger.warn(str(round(timestamp,3)) + ' sending SSFFIRE ' + hexlify(fireEmitterData))
+        try:
+            # Write data to the xbee->wifire interpreter
+            # print "sending %s to S %s L %s" % (hexlify(fireEmitterData),hexlify(parser.ADDR_TABLE['SSFFIRE'][1]), hexlify(parser.ADDR_TABLE['SSFFIRE'][0]))
+            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFFIRE'][1], dest_addr_long=parser.ADDR_TABLE['SSFFIRE'][0], data=fireEmitterData)                   
+        except:
+            self._logger.warn("FIRE send error -- perhaps address not in ADDR_TABLE")
+            pass
+
+    def SendFireUpdate(self, timestamp):
+        if len(self.fireQueue) == 0: return
+        self._sendFire(timestamp, self.fireQueue.popleft())
+
+    def AddFireEmitterData(self, leftEmitters, rightEmitters):   
+        # assemble all emitter states at once
         fire = ['0'] * 16
-        p1c = ['0'] * 16
-        p2c = ['0'] * 16
+        #p1c = ['0'] * 16
+        #sp2c = ['0'] * 16
         
         #for i in range(len(leftEmitters)):
         #    if (leftEmitters[i].flameIsOn):
@@ -175,36 +172,33 @@ class XBeeIO:
             fire[i] = str(int(leftEmitters[i].flameIsOn))
             fire[15-i] =  str(int(rightEmitters[i].flameIsOn))
             
-            p1c[i] =  str(int(leftEmitters[i].p1ColourIsOn))            
-            p1c[15-i] =  str(int(rightEmitters[i].p1ColourIsOn))
+            #p1c[i] =  str(int(leftEmitters[i].p1ColourIsOn))            
+            #p1c[15-i] =  str(int(rightEmitters[i].p1ColourIsOn))
             
-            p2c[7-i] =  str(int(leftEmitters[i].p2ColourIsOn))
-            p2c[15-i] =  str(int(rightEmitters[i].p2ColourIsOn))
+            #p2c[7-i] =  str(int(leftEmitters[i].p2ColourIsOn))
+            #p2c[15-i] =  str(int(rightEmitters[i].p2ColourIsOn))
         
         fireInt = int(''.join(fire),2)
-        p1cInt  = int(''.join(p1c),2)
-        p2cInt  = int(''.join(p2c),2)
+        #p1cInt  = int(''.join(p1c),2)
+        #p2cInt  = int(''.join(p2c),2)
         
-        dataset = struct.pack("HHH", fireInt, p1cInt, p2cInt)        
-        if ( self.fireData != dataset ):
-            #self._logger.debug('fire=%s, p1c=%s, p2c=%s' % ( fireInt, p1cInt, p2cInt) )
-            self.fireData = dataset
-            #print 'send wifire data=%s' % (dataset)
-            self._sendFire()
+        dataset = struct.pack("H", fireInt)
+        # check for changed state and add to queue
+        if ( self.fireData != dataset ): #
+            self.AddToFireQueue(dataset)
+
+    def AddToFireQueue(self, dataset):
+        #self._logger.warn('fire=%s' % (hexlify( dataset)) )
+        self.fireData = dataset
+        self.fireQueue.append( dataset )
 
     def SendFire(self, isOnOff):
-        if (isOnOff == 0):
-            self.fireData = XBeeIO.FIRE_OFF
-        elif (isOnOff == 1):
-            self.fireData = struct.pack("HHH", int('1111111111111111',2), 0, 0)
-        else:
-            return # invalid  
-        self._sendFire()
+        self.fireData = XBeeIO.FIRE_OFF
+        if (isOnOff == 1):
+            self.fireData = struct.pack("H", int('1111',2))
+        # add this to the queue whether its a duplicate or not..
+        self.AddToFireQueue(self.fireData)
             
-    def GoTheFuckToSleep(self):
-        self.fireData =  XBeeIO.FIRE_OFF
-        self._sendFire()
-
     def NodeDiscovery(self):
         self._logger.info('Looking for hardware ...')
         self._sendND()
