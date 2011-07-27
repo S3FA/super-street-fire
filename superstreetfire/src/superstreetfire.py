@@ -123,7 +123,7 @@ if __name__ == '__main__':
         pygame.event.set_allowed(pygame.QUIT)
         uiController = gui.UIController(ssfGame, sender)
         lastFpsUpdate = time.time()
-        lastFireUpdate = time.time()
+        lastXbeeUpdate = time.time()
         
         lastState = ssfGame.state
 
@@ -167,8 +167,9 @@ if __name__ == '__main__':
             ssfGame.Tick(deltaFrameTime)
             
             
-            if currTime - lastFireUpdate > 0.25:
-                ioManager.SendFireUpdate(currTimeStamp)
+            if (currTime - lastXbeeUpdate > 0.2):
+                lastXbeeUpdate = time.time()
+                ioManager.SendXbeeUpdate(currTimeStamp)
             
             # Sync to the specified frequency - this doesn't appear to be
             # having any affect, something to do with time.sleep()
