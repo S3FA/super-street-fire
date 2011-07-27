@@ -34,15 +34,15 @@ class XBeeIO:
     DISCOVERY_TIMEOUT = 5
     INPUT_PORTS = ['/dev/tty.xbee', 'COM10','COM3','COM5','COM6','COM8']
     FIRE_OFF = struct.pack("H", 0)
-    MAX_FIRE_QUEUE = 6
+    MAX_XBEE_QUEUE = 6
 
     def __init__(self, inputSerialPort, baudRate):
         self._logger = logging.getLogger(XBeeIO.LOGGER_NAME)
         self.serialIn    = None
         self.xbee        = None
-        self.timerData   = None
-        self.fireQueue   = collections.deque(list(),XBeeIO.MAX_FIRE_QUEUE)
+        self.xbeeQueue   = collections.deque(list(),XBeeIO.MAX_XBEE_QUEUE)
         self.fireData    = None
+        self.timerData   = None
         
         if (inputSerialPort != None): XBeeIO.INPUT_PORTS.insert(0, inputSerialPort)
         for port in XBeeIO.INPUT_PORTS:
@@ -64,20 +64,17 @@ class XBeeIO:
         sleep(self.DISCOVERY_TIMEOUT)
         self._logger.info("Found Devices:" + str(parser.ADDR_TABLE))
         
+    def NodeDiscovery(self):
+        self._logger.info('Looking for hardware ...')
+        self._sendND()
         
-    def _sendTimer(self):
-        timerData = self.timerData
-        #self._logger.debug('sending timer data ' + str(timerData))
-        data = struct.pack("H", timerData)
-        try:
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFTIMER'][1], dest_addr_long=parser.ADDR_TABLE['SSFTIMER'][0], data=data)                   
-        except:
-            #self._logger.debug("TIMER send error -- perhaps address not in ADDR_TABLE")
-            pass
-        
-    def _sendND(self):        
-        self._logger.debug('sending node discovery message')
-        self.xbee.at(command='ND')                  
+    def SendXbeeUpdate(self, timestamp):
+        if len(self.xbeeQueue) == 0: return
+        packet = self.xbeeQueue.popleft()
+        if (packet[0] == 'fire'):
+            self._sendFire(timestamp, packet[1])
+        if (packet[0] == 'timer'):
+            self._sendTimer(timestamp, packet[1])
 
     def sendKO(self,state):
         if(state):
@@ -90,6 +87,11 @@ class XBeeIO:
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFKO'][1], dest_addr_long=parser.ADDR_TABLE['SSFKO'][0], data=data)
         except:
             self._logger.warn("KO send error -- perhaps address not in ADDR_TABLE")
+
+    def AddFireToQueue(self, dataset):
+        #self._logger.warn('fire=%s' % (hexlify( dataset)) )
+        self.fireData = dataset
+        self.xbeeQueue.append( ('fire', dataset) )
 
     def SendTimerNum(self, value):    
         # based on the following digit map:
@@ -107,8 +109,8 @@ class XBeeIO:
             return   
         digitMap = [0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F]
         timerData = (digitMap[value / 10] << 8) | digitMap[value % 10]
-        self.timerData = timerData
-        self._sendTimer()
+        self.timerData = struct.pack("H", timerData)
+        self.xbeeQueue.append( ('timer', self.timerData) )
     
     def SendP1LifeBar(self, p1Life): 
         self._logger.info("SendLifeBarData p1:" + str(p1Life))
@@ -130,27 +132,6 @@ class XBeeIO:
         except:
             #self._logger.debug("SSFP2LIFE send error -- perhaps address not in ADDR_TABLE ")
             pass
-
-    def _getLifeData(self, healthIn):
-        if healthIn == 100:
-            return 0xffff
-        if healthIn == 0:
-            return 0
-        return (1<<int( healthIn / 6.25 ) + 1) - 1
-        
-    def _sendFire(self, timestamp, fireEmitterData):
-        self._logger.warn(str(round(timestamp,3)) + ' sending SSFFIRE ' + hexlify(fireEmitterData))
-        try:
-            # Write data to the xbee->wifire interpreter
-            # print "sending %s to S %s L %s" % (hexlify(fireEmitterData),hexlify(parser.ADDR_TABLE['SSFFIRE'][1]), hexlify(parser.ADDR_TABLE['SSFFIRE'][0]))
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFFIRE'][1], dest_addr_long=parser.ADDR_TABLE['SSFFIRE'][0], data=fireEmitterData)                   
-        except:
-            self._logger.warn("FIRE send error -- perhaps address not in ADDR_TABLE")
-            pass
-
-    def SendFireUpdate(self, timestamp):
-        if len(self.fireQueue) == 0: return
-        self._sendFire(timestamp, self.fireQueue.popleft())
 
     def AddFireEmitterData(self, leftEmitters, rightEmitters):   
         # assemble all emitter states at once
@@ -185,23 +166,44 @@ class XBeeIO:
         dataset = struct.pack("H", fireInt)
         # check for changed state and add to queue
         if ( self.fireData != dataset ): #
-            self.AddToFireQueue(dataset)
+            self.AddFireToQueue(dataset)
 
-    def AddToFireQueue(self, dataset):
-        #self._logger.warn('fire=%s' % (hexlify( dataset)) )
-        self.fireData = dataset
-        self.fireQueue.append( dataset )
+    def _getLifeData(self, healthIn):
+        if healthIn == 100:
+            return 0xffff
+        if healthIn == 0:
+            return 0
+        return (1<<int( healthIn / 6.25 ) + 1) - 1
+        
+    def _sendFire(self, timestamp, fireEmitterData):
+        self._logger.warn(str(round(timestamp,3)) + ' sending SSFFIRE ' + hexlify(fireEmitterData))
+        try:
+            # Write data to the xbee->wifire interpreter
+            # print "sending %s to S %s L %s" % (hexlify(fireEmitterData),hexlify(parser.ADDR_TABLE['SSFFIRE'][1]), hexlify(parser.ADDR_TABLE['SSFFIRE'][0]))
+            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFFIRE'][1], dest_addr_long=parser.ADDR_TABLE['SSFFIRE'][0], data=fireEmitterData)                   
+        except:
+            self._logger.warn("FIRE send error -- perhaps address not in ADDR_TABLE")
+            pass
+
 
     def SendFire(self, isOnOff):
         self.fireData = XBeeIO.FIRE_OFF
         if (isOnOff == 1):
-            self.fireData = struct.pack("H", int('1111',2))
+            self.fireData = struct.pack("H", int('1111111111111111',2) )
         # add this to the queue whether its a duplicate or not..
-        self.AddToFireQueue(self.fireData)
+        self.AddFireToQueue(self.fireData)
             
-    def NodeDiscovery(self):
-        self._logger.info('Looking for hardware ...')
-        self._sendND()
+    def _sendTimer(self, timestamp, timerData):
+        #self._logger.debug('sending timer data ' + hexlify(timerData))
+        try:
+            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFTIMER'][1], dest_addr_long=parser.ADDR_TABLE['SSFTIMER'][0], data=timerData)  
+        except:
+            #self._logger.debug("TIMER send error -- perhaps address not in ADDR_TABLE")
+            pass
+        
+    def _sendND(self):        
+        self._logger.debug('sending node discovery message')
+        self.xbee.at(command='ND')                  
         
     def Kill(self):
         if self.xbee != None:
