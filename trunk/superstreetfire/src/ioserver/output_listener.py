@@ -74,7 +74,7 @@ class SenderListener(GameModelListener):
         if cur_state == ROUND_BEGIN_GAME_STATE:
             self.xbeeio.SendP1LifeBar(100)
             self.xbeeio.SendP2LifeBar(100)
-            self.xbeeio.SendTimerNum(99)
+            self.xbeeio.SendTimerNum(60)
             
         if cur_state == ROUND_ENDED_GAME_STATE:
             self._logger.info('Sender ----- Round ' + str(state.roundNumber) + ' won by player ' + str(state.roundWinner))

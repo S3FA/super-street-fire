@@ -69,7 +69,7 @@ class UIController(GameModelListener):
         self.roundLabel.minsize = (logosize[0], self.roundLabel.minsize[1])
         self.renderer.add_widget(self.roundLabel)
         
-        self.timerLabel = Label("99")
+        self.timerLabel = Label("60")
         self.timerLabel.topleft = (self.roundLabel.topleft[0], 
                                    self.roundLabel.topleft[1] + self.timerLabel.height + 5)
         self.timerLabel.create_style()["font"]["size"] = 32
