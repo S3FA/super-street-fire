@@ -167,9 +167,7 @@ if __name__ == '__main__':
             ssfGame.Tick(deltaFrameTime)
             
             
-            if (currTime - lastXbeeUpdate > 0.2):
-                lastXbeeUpdate = time.time()
-                ioManager.SendXbeeUpdate(currTimeStamp)
+            ioManager.SendXbeeUpdate(currTimeStamp)
             
             # Sync to the specified frequency - this doesn't appear to be
             # having any affect, something to do with time.sleep()

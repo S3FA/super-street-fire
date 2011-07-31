@@ -77,17 +77,8 @@ class XBeeIO:
             self._sendTimer(timestamp, packet[1])
 
     def sendKO(self,state):
-        if(state):
-            out = 0xff
-        else:
-            out = 0x00
-        self._logger.debug('sending ko data ' + str(out))
-        data = struct.pack("H", out)
-        try:
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFKO'][1], dest_addr_long=parser.ADDR_TABLE['SSFKO'][0], data=data)
-        except:
-            self._logger.warn("KO send error -- perhaps address not in ADDR_TABLE")
-
+        return
+        
     def AddFireToQueue(self, dataset):
         #self._logger.warn('fire=%s' % (hexlify( dataset)) )
         self.fireData = dataset
@@ -117,7 +108,9 @@ class XBeeIO:
         try:
             out = self._getLifeData(p1Life)
             data = struct.pack(">I", out)
-            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP1LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP1LIFE'][0], data=data)                   
+
+            self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP1LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP1LIFE'][0], data=data)
+
         except:
             #self._logger.debug("SSFP1LIFE send error -- perhaps address not in ADDR_TABLE")
             pass
@@ -128,7 +121,9 @@ class XBeeIO:
             out = self._getLifeData(p2Life)
             data = struct.pack(">I", out)
             # Write data to the xbee: SSFP2LIFE destination address
+
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFP2LIFE'][1], dest_addr_long=parser.ADDR_TABLE['SSFP2LIFE'][0], data=data)                   
+
         except:
             #self._logger.debug("SSFP2LIFE send error -- perhaps address not in ADDR_TABLE ")
             pass
@@ -181,6 +176,7 @@ class XBeeIO:
             # Write data to the xbee->wifire interpreter
             # print "sending %s to S %s L %s" % (hexlify(fireEmitterData),hexlify(parser.ADDR_TABLE['SSFFIRE'][1]), hexlify(parser.ADDR_TABLE['SSFFIRE'][0]))
             self.xbee.send('tx', dest_addr=parser.ADDR_TABLE['SSFFIRE'][1], dest_addr_long=parser.ADDR_TABLE['SSFFIRE'][0], data=fireEmitterData)                   
+        
         except:
             self._logger.warn("FIRE send error -- perhaps address not in ADDR_TABLE")
             pass

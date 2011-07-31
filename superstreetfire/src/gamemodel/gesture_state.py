@@ -24,19 +24,19 @@ PITCH = 1
 YAW = 2
 
 # testing the values
-JAB_FWDACC_L1 = 94
-JAB_FWDACC_L2 = 110
+JAB_FWDACC_L1 = 40
+JAB_FWDACC_L2 = 90
 
-HOOK_LATGYR    = 80
-HOOK_FWDACC_L1 = 90
-HOOK_FWDACC_L2 = 110
-HOOK_LATACC_L1 = 130
+HOOK_LATGYR    = 30
+HOOK_FWDACC_L1 = 40
+HOOK_FWDACC_L2 = 90
+HOOK_LATACC_L1 = 30
 HOOK_LATACC_L2 = 200
 
 BLOCK_VER_ANGLE = 70
 BLOCK_RELEASE_ANGLE = 50
 
-TIME_BETWEEN_MOVES = 1.0
+TIME_BETWEEN_MOVES = 0.8
 TIME_TO_CLEAR_MOVE = 0.8
 
 class GestureState: 
@@ -105,8 +105,8 @@ class GestureState:
 ## 1-L:A: (1.0, -9.0, -3.0), H: (-15.9, 55.15, 104.0),R: (3.0, -6.75, 4.5)-R:A: (3.0, -3.0, 24.0), H: (-60.72, 81.23, -28.28),R: (4.25, -1.0, -6.75)
 
         # uppercut .. 
-        if ( abs(glove.acceleration[X]) > 85 and abs(glove.rotation[X]) > 40 and \
-             abs(glove.heading[PITCH]) > 50 ):
+        if ( abs(glove.acceleration[X]) > 45 and abs(glove.rotation[X]) > 20 and \
+             abs(glove.heading[PITCH]) > 45 ):
             if ( abs(glove.acceleration[Y]) > 100 ):
                 player.power = 2
             return GestureState.L_UPPERCUT + glove.hand
@@ -159,13 +159,13 @@ class GestureState:
                 print "SONIC SIDE POSITION ______________"
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
             if (prevMove == GestureState.SONIC_SIDE and \
-                totalx > 190 ):
+                totalx > 120 ):
                 newMove = GestureState.SONIC_BOOM
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
                 return
 
             # hadouken - check for forward accel - both hands
-            if ( totalx > 140 ):
+            if ( totalx > 110 ):
                 newMove = GestureState.BOTH_FWD
                 print "BOTH FORWARD MOVE ______________"
                 self.recordMove( GestureState.BOTH, newMove, player.lastMoveTs )
@@ -269,7 +269,7 @@ class PlayerGestureState(GestureState):
             self.right = rightGloveData
 
         if (self.left != None and self.right != None):
-            self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
+            #self._logger.warn(str(self.playerNum)+"-L:" + str(self.left) + "-R:" + str(self.right) )
             #print "got some data for both hands " % ( self.left, self.right )
             self._determineMove(self)
             #if (len(playerState.moves) > 0):
