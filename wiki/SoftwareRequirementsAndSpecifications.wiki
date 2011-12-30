@@ -4,11 +4,17 @@
 
   * There are two sequential sets of flame effects hardware:
     ** Each set has eight flame effects (for a total of 16 flame effects)
-    ** The number of flame effects on each set will always be consistent but code should accommodate a flexible number.
+    ** The number of flame effects on each set will always be consistent but that number is flexible and should therefore be adjustable.
     ** Each flame effect also has two associated colour sprays (each corresponding to a player)
     ** Flames and colour sprays need to be turned on/off by software
 
-  * 
+  * There are two players at any given time:
+    ** Each player is wearing two gloves (one on each hand), which capture inertial measurements (velocity, gravitational forces, orientation)
+    ** Each player is wearing a headset that records brain activity via Electroencephalography
+    ** The gloves and headset for each player will wirelessly transmit data
+
+
+
 
 
 = Specifications =
