@@ -17,12 +17,12 @@
   * There may be other 'peripherals' (score boards, lights, ?) <-- needs elucidation!!
   * The game must run in real-time (i.e., updates should occur at or above 60 Hz)
 
-  * A (polished, user-friendly) Graphical User Interface (GUI) is required
+  * A (polished, user-friendly) Graphical User Interface (GUI) is required:
     ** The interface must be able to operate on an Android tablet/device (mobile?)  and will communicate wirelessly via WiFi
     ** The GUI should display information pertaining to the current state of the simulation and game state (this requires elucidation)
     ** The GUI should refresh information as soon as possible, in real-time (i.e., updates occur at or above 60 Hz)
     ** The GUI should be easy to use and understandable to a non-developer
-
+    ** Only one network GUI can be actively supported at any given time (?)
 
 
 = Specifications =
@@ -35,6 +35,26 @@
 
 == High-level Software Modules ==
 
+Think Model-View-Controller paradigm, where the model is the "Game Module", the views are the 
+
 === Server Receiver/Sender ===
   * Receives incoming packages from peripherals and interprets the packages into application level objects that can be used by other modules (e.g., glove data is parsed/'unbinarized' and turned into a 'GloveData' object so that it can be passed to the gesture recognition module)
+  * Sends packages to peripherals from the ongoing simulation when certain game events occur (e.g., Player 1's life changes from 100% to 80% which raises a life changed event from the game module, the sever module is a listener for such events, it takes the event and builds the appropriate outgoing packages for sending to peripherals such as the score board client).
+  * Sends GUI protocol packages over the network via TCP/IP port TBA when events occur in the simulation
+  * Receives GUI protocol packages from networked GUI
+
+=== Game (Model and Logic) Module ===
+  * Tracks information and holds data structures for representing players (e.g., life percentages, names, character type)
+  * Tracks state of the game, each state tracks its corresponding game information (e.g., "RoundInPlayState" would track which round it is, how much time is left in that round, how many rounds have been won/lost by what players)
+  * Contains data structures for representing attacks, damage of attacks, routines/functions for executing attacks and dealing with player damage
+  * Contains code to signify when certain game events occur and execute event callbacks on all listeners to the game model
+
+
+
+
+
+
+
+
+
   
