@@ -7,18 +7,34 @@
     ** The number of flame effects on each set will always be consistent but that number is flexible and should therefore be adjustable.
     ** Each flame effect also has two associated colour sprays (each corresponding to a player)
     ** Flames and colour sprays need to be turned on/off by software
+    ** All flame and colour control will be done wirelessly
 
   * There are two players at any given time:
     ** Each player is wearing two gloves (one on each hand), which capture inertial measurements (velocity, gravitational forces, orientation)
     ** Each player is wearing a headset that records brain activity via Electroencephalography
     ** The gloves and headset for each player will wirelessly transmit data
 
+  * There may be other 'peripherals' (score boards, lights, ?) <-- needs elucidation!!
+  * The game must run in real-time (i.e., updates should occur at or above 60 Hz)
 
+  * A (polished, user-friendly) Graphical User Interface (GUI) is required
+    ** The interface must be able to operate on an Android tablet/device (mobile?)  and will communicate wirelessly via WiFi
+    ** The GUI should display information pertaining to the current state of the simulation and game state (this requires elucidation)
+    ** The GUI should refresh information as soon as possible, in real-time (i.e., updates occur at or above 60 Hz)
+    ** The GUI should be easy to use and understandable to a non-developer
 
 
 
 = Specifications =
 
+  * Protocol for Server-Glove and Server-Headset Communication (One-way communication from gloves/headsets to server)
+  * Protocol for Server-GUI Communication
+  * Other protocols for data to any other peripherals ...
+  * Android program for GUI that can run on a tablet
+  
+
 == High-level Software Modules ==
 
-TODO
+=== Server Receiver/Sender ===
+  * Receives incoming packages from peripherals and interprets the packages into application level objects that can be used by other modules (e.g., glove data is parsed/'unbinarized' and turned into a 'GloveData' object so that it can be passed to the gesture recognition module)
+  
