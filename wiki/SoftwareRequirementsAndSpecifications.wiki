@@ -1,0 +1,18 @@
+#summary The requirements and specifications for the software-side of the Super Street Fire project.
+
+= Requirements =
+
+  * There are two sequential sets of flame effects hardware:
+    ** Each set has eight flame effects (for a total of 16 flame effects)
+    ** The number of flame effects on each set will always be consistent but code should accommodate a flexible number.
+    ** Each flame effect also has two associated colour sprays (each corresponding to a player)
+    ** Flames and colour sprays need to be turned on/off by software
+
+  * 
+
+
+= Specifications =
+
+== High-level Software Modules ==
+
+TODO
