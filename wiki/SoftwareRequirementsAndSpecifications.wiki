@@ -1,4 +1,5 @@
 #summary The requirements and specifications for the software-side of the Super Street Fire project.
+#labels Requirements,Specifications,Phase-Requirements,Phase-Design
 
 = Requirements =
 
@@ -53,6 +54,7 @@ Think Model-View-Controller paradigm:
   * Sends packages to peripherals from the ongoing simulation when certain game events occur (e.g., Player 1's life changes from 100% to 80% which raises a life changed event from the game module, the sever module is a listener for such events, it takes the event and builds the appropriate outgoing packages for sending to peripherals such as the score board client).
   * Sends GUI protocol packages over the network via TCP/IP (port TBA)  when events occur in the simulation
   * Receives GUI protocol packages from networked GUI, which can change the state of the simulation (we need to enumerate all of the actions that can take place in the protocol...)
+  * This module (or the network communication portion of it, at the very least), should live on a separate thread and all communication should take place asynchronously
 
 === Game (Model and Logic) Module ===
   * Tracks information and holds data structures for representing players (e.g., life percentages, names, character type)
@@ -61,10 +63,22 @@ Think Model-View-Controller paradigm:
   * Contains code to signify when certain game events occur and execute the appropriate event callbacks on all listeners to the game model
   * Coordinates blocks and attacks with the flame effect simulation module to ensure the correct flame effects are turning on/off based on the gestures being registered while the game is being played
   
-
 === Flame Effect Simulation Module ===
+  * Holds the state machine for each of the flame effects, simulated in software so that events arise properly that will turn on/off the hardware flame effects corresponding to attacks and blocks that are raised by the Game Module
+  * The state machine details whether the effect is on or off and, when the effect is turned on, whether it is 'owned' by player 1 and/or player 2 (for knowing what colour spray(s) should be active)
 
 === Gesture Recognition Module ===
+  * Should be a _very_ simple interface: 
+    ** Input is an ongoing stream of data from both gloves of a given player (i.e., 2x glove data and associated player number)
+    ** Output is a in-game move/action (e.g., an attack or a block type object) and an associated player number for the player who executed that move/action, the output should only occur _once_ at the end of a particular, discrete action and not repeatedly as the action takes place
+
+=== Gesture Recognition Recording Module ===
+  * Can be written in any language we choose
+  * Records data from the finalized gloves and saves plain-text training files from _lots_ of different people performing each of the actions/moves in the game
+  * 
+
+== Gesture Recognition Training Module ===
+
 
 
 === Android GUI Module ===
