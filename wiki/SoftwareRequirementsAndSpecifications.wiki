@@ -67,24 +67,34 @@ Think Model-View-Controller paradigm:
   * Holds the state machine for each of the flame effects, simulated in software so that events arise properly that will turn on/off the hardware flame effects corresponding to attacks and blocks that are raised by the Game Module
   * The state machine details whether the effect is on or off and, when the effect is turned on, whether it is 'owned' by player 1 and/or player 2 (for knowing what colour spray(s) should be active)
 
-=== Gesture Recognition Module ===
+=== Gesture Recognition Core Module ===
   * Should be a _very_ simple interface: 
     ** Input is an ongoing stream of data from both gloves of a given player (i.e., 2x glove data and associated player number)
     ** Output is a in-game move/action (e.g., an attack or a block type object) and an associated player number for the player who executed that move/action, the output should only occur _once_ at the end of a particular, discrete action and not repeatedly as the action takes place
 
+=== Gesture Recognition Training Data File Reader/Writer Module ===
+  * Responsible for serializing and de-serializing the training data for both the recording and training modules
+  * Responsible for serializing and de-serializing the weights/description of the AI network that is developed to recognize gestures and will therefore be used by the training module and the core module
+
 === Gesture Recognition Recording Module ===
-  * Can be written in any language we choose
-  * Records data from the finalized gloves and saves plain-text training files from _lots_ of different people performing each of the actions/moves in the game
-  * 
+  * Provides a simple interface (text or GUI based?) for recording the various moves/actions in the game from active glove hardware (record button, stop button, display of data that was recorded?)
+  * Records data from the finalized glove hardware and saves plain-text training files from _lots_ of different people performing each of the actions/moves in the game
 
 == Gesture Recognition Training Module ===
+  * Aggregates the data accumulated from the Recording Module via the Reader/Writer Module and turns it into a properly weighted network (Bayesian, Neural, Other)?
+  * Serializes the 'compiled' network as a plain-text file using the Reader/Writer Module so that it may be read by the Gesture Recognition Core Module when the game software is executed
 
-
+=== GUI Protocol Module ===
+  * Since the Server Module needs to send/receive GUI events via a centralized protocol and the Android GUI Module needs to do the same all of the objects used in the protocol for serialization and representation of data should be in this single centralized java package
+  * Holds classes for the various GUI events and the routines for serialization of those classes
+  * Holds enumerations of all actions and procedures in the protocol
 
 === Android GUI Module ===
-
+  * Receives and sends GUI action protocol from/to the Server Module over a network connection
+  * What elements are in this GUI?? ... What information is displayed, what controls are available, look and feel, user flow, etc. needs to be elucidated
 
 === Debugging/Developer GUI Module ===
-
+  * This is up to the developers, it should make use of the event system provided by the game model and respond to it as well as be able to modify it
+  * The GUI should sit on the same machine and be part of the same process as the core software (i.e., server, game model)
 
   
