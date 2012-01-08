@@ -22,14 +22,14 @@
     ** Each round is 60 seconds long (round time limit should be adjustable)
     ** Blocking cancels an incoming attack, if chip damage is turned on then the attack still does a minor (small percentage of the attack?) amount of damage to the blocking player; if chip damage is turned off then the attack is cancelled without doing any damage to the blocking player
     ** Players can deliver simultaneous attacks to each other. Ties may be possible. Could break tie based on first attack landed, flip a coin, ... (this is liable to change)
-    ** Gesture recognition should be more robust for core moves
     ** INSERT OTHER RULES TO AVOID PLAYERS SPAMMING ATTACKS/BLOCKS
 
 
   * Gesture Recognition
     ** Gestures must be identified with at least 80% accuracy (false negatives are preferred over false positives for the remaining 20%)
+    ** Gesture recognition should be more robust for core moves (hook / jab / uppercut)
     ** Gesture recognition must suit all real-time requirements
-    ** Gestures must be made in the direction of the opposing player in order for them to register ?
+    ** Gestures must be made in the direction of the opposing player in order for them to register ? (Ignore for now)
     ** MORE STUFF HERE?
 
   * Game states i.e., what is the flow of the game...
