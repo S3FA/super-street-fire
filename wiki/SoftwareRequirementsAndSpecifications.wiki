@@ -47,6 +47,7 @@
   * Chip damage can be turned on or off
 
   * There are two general types of player actions: attacks and blocks
+  * Combos are possible (modify actions caused by gestures based on previous actions in a particular timeframe, or the current game state)
   * When a round is being played, flames represent either a block action or an attack action
   * Types of Attacks:
     ** Jab (one-handed punch motion) damage?
