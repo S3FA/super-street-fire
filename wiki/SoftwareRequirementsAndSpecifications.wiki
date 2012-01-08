@@ -107,9 +107,10 @@ Think Model-View-Controller paradigm:
   * Contains code to signify when certain game events occur and execute the appropriate event callbacks on all listeners to the game model
   * Coordinates blocks and attacks with the flame effect simulation module to ensure the correct flame effects are turning on/off based on the gestures being registered while the game is being played
   
-=== Flame Effect Simulation Module ===
+=== Flame Effect Module ===
   * Holds the state machine for each of the flame effects, simulated in software so that events arise properly that will turn on/off the hardware flame effects corresponding to attacks and blocks that are raised by the Game Module
   * The state machine details whether the effect is on or off and, when the effect is turned on, whether it is 'owned' by player 1 and/or player 2 (for knowing what colour spray(s) should be active)
+  * Models the hardware state
 
 === Gesture Recognition Core Module ===
   * Should be a _very_ simple interface: 
