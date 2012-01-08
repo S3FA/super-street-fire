@@ -11,11 +11,19 @@
     ** All flame and colour control will be done wirelessly
 
   * Rules of the game
+    ** There are two players
     ** Each match consists of a maximum of 3 rounds (not including a possible tie-breaker/sudden-death round), number of rounds should be adjustable
     ** Each round is 60 seconds long (round time limit should be adjustable)
     ** Blocking cancels an incoming attack, if chip damage is turned on then the attack still does a minor (small percentage of the attack?) amount of damage to the blocking player; if chip damage is turned off then the attack is cancelled without doing any damage to the blocking player
     ** Players can deliver simultaneous attacks to each other (important for allowing ties)
     ** INSERT OTHER RULES TO AVOID PLAYERS SPAMMING ATTACKS/BLOCKS
+
+
+  * Gesture Recognition
+    ** Gestures must be identified with at least 80% accuracy (false negatives are preferred over false positives for the remaining 20%)
+    ** Gesture recognition must suit all real-time requirements
+    ** Gestures must be made in the direction of the opposing player in order for them to register ?
+    ** MORE STUFF HERE?
 
   * Game states i.e., what is the flow of the game...
     ** Idle State (no game play, waiting for a game to start)
@@ -38,10 +46,10 @@
   * Types of Blocks:
     ** One-handed Block (...?)
 
-  * There are two players at any given time:
-    ** Each player is wearing two gloves (one on each hand), which capture inertial measurements (velocity, gravitational forces, orientation)
-    ** Each player is wearing a headset that records brain activity via Electroencephalography
-    ** The gloves and headset for each player will wirelessly transmit data
+
+  * Each player is wearing two gloves (one on each hand), which capture inertial measurements (velocity, gravitational forces, orientation)
+  * Each player is wearing a headset that records brain activity via Electroencephalography
+  * The gloves and headset for each player will wirelessly transmit data
 
   * There may be other 'peripherals' (score boards, lights, ?) <-- needs elucidation!!
   * The game must run in real-time (i.e., updates should occur at or above 60 Hz)
