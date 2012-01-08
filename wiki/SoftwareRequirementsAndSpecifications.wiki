@@ -30,6 +30,7 @@
     ** Gesture recognition should be more robust for core moves (hook / jab / uppercut)
     ** Gesture recognition must suit all real-time requirements
     ** Gestures must be made in the direction of the opposing player in order for them to register ? (Ignore for now)
+    ** Must be able to distinguish between ringmaster and player gestures
     ** MORE STUFF HERE?
 
   * Game states i.e., what is the flow of the game...
