@@ -74,6 +74,7 @@
     ** The GUI should be easy to use and understandable to a non-developer
     ** Only one network GUI can be actively supported at any given time (?)
 
+ * All communication must be encrypted
 
 = Specifications =
 
