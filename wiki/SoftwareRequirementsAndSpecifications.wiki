@@ -16,6 +16,7 @@
 
   * Rules of the game
     ** There are two players
+    ** There is a ringmaster who can influence / control flames at certain points in the game (e.g. pre/post game to rile up the crowd)
     ** Each match consists of a maximum of 3 rounds (not including a possible tie-breaker/sudden-death round), number of rounds should be adjustable
     ** Each round is 60 seconds long (round time limit should be adjustable)
     ** Blocking cancels an incoming attack, if chip damage is turned on then the attack still does a minor (small percentage of the attack?) amount of damage to the blocking player; if chip damage is turned off then the attack is cancelled without doing any damage to the blocking player
