@@ -42,6 +42,8 @@
     ** Match-Over State (A player has officially won the match, victory flames?)
     ** Paused Game State (The game is paused... what does this mean for flame effects that were on before the pause? - all flames go out)
 
+  * Able to end a round OR end a match via GUI
+
   * Chip damage can be turned on or off
 
   * There are two general types of player actions: attacks and blocks
