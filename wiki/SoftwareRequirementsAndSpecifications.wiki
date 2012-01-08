@@ -12,6 +12,7 @@
     ** Intensity will be mapped to appropriate values for PWM or whatever 
     ** All flame and colour control will be done wired (RS485)
     ** Design should account for arbitrary number of flames for inner and outer
+    ** RS485-based serial communication. Hardware may also be queried for data
 
   * Rules of the game
     ** There are two players
