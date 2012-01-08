@@ -79,7 +79,7 @@
   * Protocol for Server-GUI Communication
   * Other protocols for data to any other peripherals ...
   * Android program for GUI that can run on a tablet
-  
+  * Server: need to be able to send actions to game engine from GUI and listen to game state events  
 
 == High-level Software Modules ==
 
