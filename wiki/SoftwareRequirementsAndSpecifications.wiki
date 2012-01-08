@@ -35,9 +35,9 @@
 
   * Game states i.e., what is the flow of the game...
     ** Idle State (no game play, waiting for a game to start)
-    ** Round Beginning State (Start up the timers, special flame effects?, 3-2-1 FIGHT etc.)
+    ** Round Beginning State (Initiated by ringmaster. Start up the timers, special flame effects?, 3-2-1 FIGHT etc.)
     ** Round In-Play State (Players are attacking/blocking, trying to defeat the other)
-    ** Round Ended State (A player won the round, special flame effects? flashing timer? etc.)
+    ** Round Ended State (A player won the round, special flame effects? flashing timer? etc.) Effectively a paused state until ringmaster starts a new Round Beginning State
     ** Settle Tie State (The players have tied across 3 rounds, this state settles a game, where players play similar to the In-Play state, but the round doesn't end until one of the players is officially KOed - this round cannot end until a player delivers a non-reciprocated-KO-attack that KOs the other player)
     ** Match-Over State (A player has officially won the match, victory flames?)
     ** Paused Game State (The game is paused... what does this mean for flame effects that were on before the pause?)
