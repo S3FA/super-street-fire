@@ -22,6 +22,7 @@
     ** Each round is 60 seconds long (round time limit should be adjustable)
     ** Blocking cancels an incoming attack, if chip damage is turned on then the attack still does a minor (small percentage of the attack?) amount of damage to the blocking player; if chip damage is turned off then the attack is cancelled without doing any damage to the blocking player
     ** Players can deliver simultaneous attacks to each other. Ties may be possible. Could break tie based on first attack landed, flip a coin, ... (this is liable to change)
+    ** Gesture recognition should be more robust for core moves
     ** INSERT OTHER RULES TO AVOID PLAYERS SPAMMING ATTACKS/BLOCKS
 
 
