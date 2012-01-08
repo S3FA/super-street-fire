@@ -3,12 +3,14 @@
 
 = Requirements =
 
-  * There are two sequential sets of flame effects hardware:
+  * There are two sequential sets ("rails") of flame effects hardware plus an outer ring:
     ** Each set has eight flame effects (for a total of 16 flame effects)
     ** The number of flame effects on each set will always be consistent but that number is flexible and should therefore be adjustable.
     ** Each flame effect also has two associated colour sprays (each corresponding to a player)
     ** Flames and colour sprays need to be turned on/off by software
     ** All flame and colour control will be done wirelessly
+    ** The ring is another 16 flames
+    ** Design should account for arbitrary number of flames for inner and outer
 
   * Rules of the game
     ** There are two players
