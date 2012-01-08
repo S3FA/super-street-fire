@@ -47,6 +47,7 @@
   * Chip damage can be turned on or off
 
   * There are two general types of player actions: attacks and blocks
+  * There are also ringmaster actions (turn on all flames, patterns, ...)
   * Combos are possible (modify actions caused by gestures based on previous actions in a particular timeframe, or the current game state)
   * When a round is being played, flames represent either a block action or an attack action
   * Types of Attacks:
@@ -55,7 +56,7 @@
     ** Hadouken (two-handed special attack) damage?
 
   * Types of Blocks:
-    ** One-handed Block (...?)
+    ** Two-handed block
 
 
   * Each player is wearing two gloves (one on each hand), which capture inertial measurements (velocity, gravitational forces, orientation)
