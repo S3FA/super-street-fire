@@ -10,8 +10,31 @@
     ** Flames and colour sprays need to be turned on/off by software
     ** All flame and colour control will be done wirelessly
 
-  * WHAT ARE THE GAME STATES? (e.g., RoundStartState, RoundInPlayState, CalibrationState?)
+  * Rules of the game
+    ** Each match consists of a maximum of 3 rounds (not including a possible tie-breaker/sudden-death round)
+    ** Each round is 60 seconds long
+    ** 
+
+  * Game states i.e., what is the flow of the game...
+    ** Idle State (no game play, waiting for a game to start)
+    ** Round Beginning State (Start up the timers, special flame effects?, etc.)
+    ** Round In-Play State (Players are attacking/blocking, trying to defeat the other)
+    ** Round Ended State (A player won the round, special flame effects? flashing timer? etc.)
+    ** Settle Tie State (The players have tied across 3 rounds, this state settles a game, where players play similar to the In-Play state, but the round doesn't end until one of the players is officially KOed - this round cannot end until a player delivers a non-reciprocated-KO-attack that KOs the other player)
+    ** Match-Over State (A player has officially won the match, victory flames?)
+    ** Paused Game State (The game is paused... what does this mean for flame effects that were on before the pause?)
+
   * There are two general types of player actions: attacks and blocks
+  * Types of Attacks:
+    ** Jab (one-handed punch motion) damage?
+    ** Hook (one-handed sweeping punch) damage?
+    ** Hadouken (two-handed special attack) damage?
+
+  * Types of Blocks:
+    ** One-handed Block (...?)
+
+  * Chip damage can be turned on or off
+
   * When a round is being played, flames represent either a block action or an attack action
   * 
 
