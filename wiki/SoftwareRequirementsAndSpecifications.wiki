@@ -56,6 +56,7 @@
   * Each player is wearing two gloves (one on each hand), which capture inertial measurements (velocity, gravitational forces, orientation)
   * Each player is wearing a headset that records brain activity via Electroencephalography
   * The gloves and headset for each player will wirelessly transmit data
+  * Results of attacks have lots of factors that should be configurable. Time between attacks can be arbitrary. Damage multiplier, speed multiplier, "combo mode" (previous attacks/moves may factor in to current attack, whether other player is currently being hit, ...). 
 
   * There may be other 'peripherals' (score boards, lights, ?) <-- needs elucidation!!
   * The game must run in real-time (i.e., updates should occur at or above 60 Hz)
