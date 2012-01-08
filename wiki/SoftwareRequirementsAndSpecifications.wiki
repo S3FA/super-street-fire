@@ -142,4 +142,4 @@ Think Model-View-Controller paradigm:
   * This is up to the developers, it should make use of the event system provided by the game model and respond to it as well as be able to modify it
   * The GUI should sit on the same machine and be part of the same process as the core software (i.e., server, game model)
   * Logging?
-  
+  * All functionality in the Android GUI should also be available here
