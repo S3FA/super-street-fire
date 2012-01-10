@@ -116,10 +116,16 @@ Think Model-View-Controller paradigm:
     ** void KillGame() - Kills the game entirely (i.e., clears it to an Idle state)
 
   
-=== Flame Effect Module ===
+=== Fire Emitter Module ===
   * Holds the state machine for each of the flame effects, simulated in software so that events arise properly that will turn on/off the hardware flame effects corresponding to attacks and blocks that are raised by the Game Module
-  * The state machine details whether the effect is on or off and, when the effect is turned on, whether it is 'owned' by player 1 and/or player 2 (for knowing what colour spray(s) should be active)
+  * The state machine details whether the effect is on (percentage) and, when the effect is turned on, whether it is 'owned' by player 1 and/or player 2 (for knowing what colour spray(s) should be active)
   * Models the hardware state
+  * Provides an event interface with the following callbacks/handlers:
+    ** void OnFireEmitterChanged(FireEmitter emitter) - Whenever any part of a fire emitter's state changes this event will be called
+  * Provides a command interface to other modules with the following commands:
+    ** SetEmitterFlame(FireEmitterID id, float amount) - Sets the flame output for a given emitter, the amount is a number in [0,1] representing a percentage with 0 as no flame and 1 as full flame
+    ** AddEmitterColour(FireEmitterID id, ColourType colourType) - Adds the colour output for a particular flame emitter, ignores duplicate additions of the same colour for the same emitter
+    ** RemoveEmitterColour(FireEmitterID id, ColourType colourType) - Removes the colour output for a particular flame emitter, ignores the call if the emitter already has the given colour removed from it
 
 === Gesture Recognition Core Module ===
   * Should be a _very_ simple interface: 
