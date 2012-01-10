@@ -60,9 +60,13 @@
 
 
   * Each player is wearing two gloves (one on each hand), which capture inertial measurements (velocity, gravitational forces, orientation)
-  * Each player is wearing a headset that records brain activity via Electroencephalography - numbers between 1 and 100 for "attention" and "meditation" values
+  * Each player is wearing a headset that records brain activity via Electroencephalography - numbers between 1 and 100 for "attention" and "meditation" values, 0 for no signal
   * The gloves and headset for each player will wirelessly transmit data
-  * Results of attacks have lots of factors that should be configurable. Time between attacks can be arbitrary. Damage multiplier, speed multiplier, "combo mode" (previous attacks/moves may factor in to current attack, whether other player is currently being hit, ...). 
+  * Results of attacks have lots of factors that should be configurable:
+    ** Time between attacks
+    ** Damage multiplier
+    ** Speed multiplier
+    ** "combo mode" (previous attacks/moves may factor in to current attack, whether other player is currently being hit, ...). 
 
   * There may be other 'peripherals' (score boards/life bars, lights, timer, compressed air hits players when hit, ...)
   * The game must run in real-time (i.e., updates should occur at or above 60 Hz)
@@ -77,12 +81,6 @@
  * All communication must be encrypted
 
 = Specifications =
-
-  * Protocol for Server-Glove and Server-Headset Communication (One-way communication from gloves/headsets to server)
-  * Protocol for Server-GUI Communication
-  * Other protocols for data to any other peripherals ...
-  * Android program for GUI that can run on a tablet
-  * Server: need to be able to send actions to game engine from GUI and listen to game state events  
 
 == High-level Software Modules ==
 
@@ -106,6 +104,17 @@ Think Model-View-Controller paradigm:
   * Contains data structures for representing blocks, attacks, damage of attacks, routines/functions for executing attacks and dealing with player damage
   * Contains code to signify when certain game events occur and execute the appropriate event callbacks on all listeners to the game model
   * Coordinates blocks and attacks with the flame effect simulation module to ensure the correct flame effects are turning on/off based on the gestures being registered while the game is being played
+  * Provides an event interface with the following callbacks/handlers:
+    ** void OnPlayerHealthChanged(int playerNum, int prevLifePercentage, int newLifePercentage) - When a player's health changes during the game
+    ** void OnRoundTimeChanged(int newCountdownTimeInSecs) - When the round countdown timer changes during the game
+    ** void OnGameStateChanged(GameStateType stateType) - When the game state changes
+    ** void OnPlayerMoveExecuted(GameMoveType moveType, move quality specifiers ?) - When a player executes a particular move in the game
+  * Provides a command interface to other modules with the following commands:
+    ** void InitiateNextMatchRound() - Used to start the first round of a new match or begin the next round of the current match
+    ** void ExecutePlayerMove(int playerNum, GameMoveType moveType, ... move quality specifiers ?) - Executes a move for a player in the game
+    ** bool TogglePauseGame() - Pauses the game that is currently in-play
+    ** void KillGame() - Kills the game entirely (i.e., clears it to an Idle state)
+
   
 === Flame Effect Module ===
   * Holds the state machine for each of the flame effects, simulated in software so that events arise properly that will turn on/off the hardware flame effects corresponding to attacks and blocks that are raised by the Game Module
