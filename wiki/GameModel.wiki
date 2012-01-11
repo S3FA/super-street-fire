@@ -35,4 +35,4 @@ The IOServer will both listen to and execute commands on the GameModel. When var
 As an outgoing dependancy, the GameModel is responsible for driving the FireEmitterModel though its simulation of the various moves that get executed on it over the course of a game. For example, once an attack (e.g., a jab) is executed on the GameModel while the game is in play, the GameModel will execute that attack for some length of time by changing the states of the appropriate fire emitters within the FireEmitterModel, which will emulate the "attack flame(s)" traveling towards the opposing player.
 
 === GameModel depends on Utils ===
-Similar to all other packages, the GameModel will require logging and possibly some other basic, low-level objects and functions.
+Similar to all other packages, the GameModel will require logging and possibly some other basic, low-level objects and functions, which will be available to it via the Utils package.
