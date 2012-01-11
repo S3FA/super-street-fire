@@ -1,0 +1,18 @@
+#summary High-level overview of the GameModel software package.
+
+= Purpose =
+
+The GameModel package contains all of the logic for executing and progressing the state of the game as dictated by its various gameplay rules and mechanics. It will contain representations for the players, player moves (attacks, block(s)), and game states (e.g., round start, round in-play, round end, pause). Internally, the GameModel is a state machine that reacts to its input based on its current state. For example, when the GameModel is told that a player has executed a particular gesture, the model will only react if it is in a "RoundInPlay" state. Within the context of the state it will then carry out the logic to incorporate the input into the current frame/tick of the game simulation and possibly change the game state based off of that input. 
+
+Since the model has to be constantly updating in real-time correspondence with the outside world, it will require a constant heartbeat in order to keep it aware of the amount of time elapsing over the course of a game. This simulation 'tick' or delta time frame will allow the model to keep track of various time-sensitive information including (e.g., round-time, time between player moves). 
+
+
+
+
+= Interface =
+
+void Tick(double dT)
+
+
+
+= Interactions and Dependancies =
