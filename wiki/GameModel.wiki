@@ -10,17 +10,17 @@ Since the model has to be constantly updating with real-time correspondence to t
 = Interface =
 
 === Events ===
-* A player's health changes during the game
-* The round countdown timer changes during the game
-* The game state changes
-* A player executes a particular move in the game
+  * A player's health changes during the game
+  * The round countdown timer changes during the game
+  * The game state changes
+  * A player executes a particular move in the game
 
 === Commands ===
-* Tell the GameModel to tick its simulation by some delta time
-* Start the first round of a new match or begin the next round of the current match
-* Execute a move for a player in the game
-* Pause any game that is currently in-play
-* Kill the game entirely (i.e., clears it to an Idle state)
+  * Tell the GameModel to tick its simulation by some delta time
+  * Start the first round of a new match or begin the next round of the current match
+  * Execute a move for a player in the game
+  * Pause any game that is currently in-play
+  * Kill the game entirely (i.e., clears it to an Idle state)
 
 
 = Interactions and Dependancies =
