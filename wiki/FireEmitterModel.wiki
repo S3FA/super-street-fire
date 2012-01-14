@@ -1,0 +1,7 @@
+#summary High-level overview of the FireEmitterModel software package.
+
+= Purpose and Description =
+
+= Interface =
+
+= Interactions and Dependencies =
