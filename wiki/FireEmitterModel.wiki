@@ -33,3 +33,18 @@ void RemoveEmitterColour(FireEmitterID id, ColourType colourType)
 }}}
 
 = Interactions and Dependencies =
+
+=== GameModel depends on FireEmitterModel ===
+
+The GameModel will be performing the game simulation/logic which will drive the changes in the FireEmitterModel. Therefore, the GameModel will be using the command interface of the FireEmitterModel to change the state of the emitters.
+
+=== IOServer depends on FireEmitterModel ===
+
+The IOServer will be listening to the FireEmitterModel's event interface and reacting to the events it raises by sending out its own data packets to the flame effect hardware as well as send updates to the AndroidGUI via the GUIProtocol module.
+
+=== DeveloperGUI depends on FireEmitterModel ===
+
+The DeveloperGUI will be listening to the FireEmitterModel's event interface so that it can update itself to illustrate the current state of the fire emitters in its graphical user interface.
+
+
+ 
