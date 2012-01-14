@@ -23,7 +23,7 @@ Since the model has to be constantly updating with real-time correspondence to t
   * Kill the game entirely (i.e., clears it to an Idle state)
 
 
-= Interactions and Dependancies =
+= Interactions and Dependencies =
 
 === GestureRecognizer depends on GameModel ===
 The GestureRecognizer package will be responsible for driving the various moves executed by the two players during play. Once the GestureRecognizer has recognized a particular gesture it will forward that gesture to the GameModel, which will then update its current state based off of the gesture that was executed.
