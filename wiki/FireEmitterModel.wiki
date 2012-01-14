@@ -2,6 +2,14 @@
 
 = Purpose and Description =
 
+The FireEmitterModel package contains the software representation of the hardware flame effects ("fire emitters") that make up the player feedback mechanism in the Super Street Fire arena. The representation for each of the fire emitters will hold information concerning its
+
+  * Current colour (or mix of colours), which represent the player(s) that the flame belongs to
+  * The percentage of flame intensity currently active on the emitter
+  * Its ID/position in the arena, also whether its a rail emitter (i.e., its one of the emitters on the interior of the arena, between the two players) or a ring emitter (i.e., its in the arena's outer ring of fire emitters)  
+
 = Interface =
+
+
 
 = Interactions and Dependencies =
