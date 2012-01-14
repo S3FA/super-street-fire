@@ -21,9 +21,9 @@ void OnFireEmitterChanged(FireEmitter emitter)
 
 === Commands ===
 
-* Set the flame output for a given emitter, the amount is a percentage or number in [0,1] with 0% as no flame and 100% as the full flame
-* Add a colour output for a particular flame emitter that ignores duplicate additions of the same colour for the same emitter
-* Remove a colour output for a particular flame emitter, ignores the call if the emitter already has the given colour removed from it
+  * Set the flame output for a given emitter, the amount is a percentage or number in [0,1] with 0% as no flame and 100% as the full flame
+  * Add a colour output for a particular flame emitter that ignores duplicate additions of the same colour for the same emitter
+  * Remove a colour output for a particular flame emitter, ignores the call if the emitter already has the given colour removed from it
 
 Example interface functions:
 {{{
