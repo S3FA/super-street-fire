@@ -8,6 +8,12 @@ In order to train the machine learning data structure in the GestureRecognizer p
 
 = Interface =
 
+The interface to the GestureRecognizer will consist of a single-purpose method or set of methods for inputting data obtained from player and ring master gloves. The interface will distinguish whether the data came from a player or a ring master, which player it came from (if it came from a player), and also the nature of the data i.e., which hand it came from on the player/ring master.
 
+For example:
+{{{
+void AddPlayerGloveData(int playerNum, int leftOrRightHand, GloveData data)
+void AddRingMasterGloveData(int leftOrRightHand, GloveData data)
+}}}
 
 = Interactions and Dependencies =
