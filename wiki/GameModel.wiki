@@ -32,6 +32,7 @@ void OnPlayerMoveExecuted(GameMoveType moveType, MoveQualities qualities)
 
 Example interface functions:
 {{{
+void Tick(double dT)
 void InitiateNextMatchRound()
 void ExecutePlayerMove(int playerNum, GameMoveType moveType, MoveQualities qualities)
 bool TogglePauseGame()
