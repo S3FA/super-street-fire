@@ -15,6 +15,14 @@ Since the model has to be constantly updating with real-time correspondence to t
   * The game state changes
   * A player executes a particular move in the game
 
+Example interface functions:
+{{{
+void OnPlayerHealthChanged(int playerNum, int prevLifePercentage, int newLifePercentage)
+void OnRoundTimeChanged(int newCountdownTimeInSecs)
+void OnGameStateChanged(GameStateType stateType)
+void OnPlayerMoveExecuted(GameMoveType moveType, MoveQualities qualities)
+}}}
+
 === Commands ===
   * Tell the GameModel to tick its simulation by some delta time
   * Start the first round of a new match or begin the next round of the current match
@@ -22,6 +30,13 @@ Since the model has to be constantly updating with real-time correspondence to t
   * Pause any game that is currently in-play
   * Kill the game entirely (i.e., clears it to an Idle state)
 
+Example interface functions:
+{{{
+void InitiateNextMatchRound()
+void ExecutePlayerMove(int playerNum, GameMoveType moveType, MoveQualities qualities)
+bool TogglePauseGame()
+void KillGame()
+}}}
 
 = Interactions and Dependencies =
 
