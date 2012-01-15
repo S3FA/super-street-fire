@@ -1,0 +1,13 @@
+#summary High-level overview of the Utils software package.
+
+= Purpose and Description =
+
+
+
+= Interface =
+
+
+= Interactions and Dependencies =
+
+=== All packages depend on Utils ===
+The Utils package is intended to provide general-use utilities to all of the other software packages in the Super Street Fire project. For example, most packages will need to log their activity in some way, either for debugging purposes or general introspection; the Utils package will contain a logger class for such purposes. Furthermore, any mathematical (trigonomic, algebraic, etc.) functionality and objects (vectors, points, etc.) that may be required by other modules will reside in the Utils package. 
