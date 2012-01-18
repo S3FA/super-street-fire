@@ -13,14 +13,12 @@ Since the model has to be constantly updating with real-time correspondence to t
   * A player's health changes during the game
   * The round countdown timer changes during the game
   * The game state changes
-  * A player executes a particular move in the game
 
 Example interface functions:
 {{{
 void OnPlayerHealthChanged(int playerNum, int prevLifePercentage, int newLifePercentage)
 void OnRoundTimeChanged(int newCountdownTimeInSecs)
 void OnGameStateChanged(GameStateType stateType)
-void OnPlayerMoveExecuted(GameMoveType moveType, MoveQualities qualities)
 }}}
 
 === Commands ===
