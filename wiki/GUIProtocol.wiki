@@ -1,0 +1,10 @@
+#summary High-level overview of the GUIProtocol software package.
+
+= Purpose and Description =
+
+
+= Interface =
+
+
+= Interactions and Dependencies =
+
