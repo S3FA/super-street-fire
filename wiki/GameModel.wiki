@@ -39,11 +39,11 @@ void KillGame()
 
 = Interactions and Dependencies =
 
-=== GestureRecognizer depends on GameModel ===
-The GestureRecognizer package will be responsible for driving the various moves executed by the two players during play. Once the GestureRecognizer has recognized a particular gesture it will forward that gesture to the GameModel, which will then update its current state based off of the gesture that was executed.
-
 === IOServer depends on GameModel ===
 The IOServer will both listen to and execute commands on the GameModel. When various events occur in the GameModel, the IOServer will be notified (via an event listener) of the changes and then ensure that the relevant clients/peripherals are notified of those changes. Contrariwise, when clients/peripherals of the IOServer have updates that are relevant to the GameModel, the IOServer will forward those updates to the GameModel via its interface.
+
+=== GameModel depends on GestureRecognizer ===
+The GestureRecognizer package will be responsible for issuing events when it detects the various moves executed by the two players and ring master over the course of a match. The GameModel, upon receiving an event from the GestureRecognizer, will then update its current state based off of the gesture that was received.
 
 === GameModel depends on FireEmitterModel ===
 As an outgoing dependancy, the GameModel is responsible for driving the FireEmitterModel though its simulation of the various moves that get executed on it over the course of a game. For example, once an attack (e.g., a jab) is executed on the GameModel while the game is in play, the GameModel will execute that attack for some length of time by changing the states of the appropriate fire emitters within the FireEmitterModel, which will emulate the "attack flame(s)" traveling towards the opposing player.
