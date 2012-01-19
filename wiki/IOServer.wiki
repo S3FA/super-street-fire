@@ -4,7 +4,7 @@
 
 The IOServer is responsible for bridging the GameModel with input and output devices. Separate threads are responsible for listening for network events from data sources (e.g. gloves, headsets, GUI) and passing them to the GameModel or other interested components, as well as listening for game events and forwarding them to the relevant output devices.
 
-The IOServer contains is the entry point of the app, and is responsible for initializing and managing the GameModel, network communication, etc.
+The IOServer is the entry point of the app, and is responsible for initializing and managing the GameModel, network communication, DeveloperGUI etc.
 
 = Details =
 
