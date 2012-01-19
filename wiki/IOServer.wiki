@@ -17,17 +17,17 @@ The IOServer contains is the entry point of the app, and is responsible for init
 
 = Interactions and Dependencies =
 
-== IOServer depends on GameModel ==
+=== IOServer depends on GameModel ===
 See note at GameModel
 
-== IOServer depends on FireEmitterModel ==
+=== IOServer depends on FireEmitterModel ===
 See note at FireEmitterModel
 
-== IOServer depends on GUIProtocol ==
+=== IOServer depends on GUIProtocol ===
 See note at GUIProtocol
 
-== IOServer depends on GestureRecognizer ==
+=== IOServer depends on GestureRecognizer ===
 See note at GestureRecognizer!
 
-== IOServer depends on DeveloperGUI ==
+=== IOServer depends on DeveloperGUI ===
 But only to kick it off and apply the glue. As a general rule these packages should only communicate via GUIProtocol.
