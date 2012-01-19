@@ -23,8 +23,8 @@ See note at GameModel
 === IOServer depends on FireEmitterModel ===
 See note at FireEmitterModel
 
-=== IOServer depends on GUIProtocol ===
-See note at GUIProtocol
+=== IOServer depends on [GUIProtocol] ===
+See note at [GUIProtocol]
 
 === IOServer depends on GestureRecognizer ===
 See note at GestureRecognizer!
