@@ -1,13 +1,10 @@
 package ca.site3.ssf.gamemodel;
 
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ca.site3.ssf.gamemodel.IGameModelListener.GameStateChangeFlag;
 
 /**
  * Default implementation of GameModel
@@ -16,10 +13,13 @@ import ca.site3.ssf.gamemodel.IGameModelListener.GameStateChangeFlag;
  * @author Greg
  *
  */
-public class GameModel implements IGameModel {
+class GameModel implements IGameModel {
 
 	private GameState currState = null;
 	private GameState nextState = null;
+	
+	private Player player1 = null;
+	private Player player2 = null;
 	
 	private Collection<IGameModelListener> listeners = new HashSet<IGameModelListener>();
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -29,6 +29,11 @@ public class GameModel implements IGameModel {
 	public GameModel(GameConfig config) {
 		this.config = config;
 		assert(this.config != null);
+		
+		this.player1 = new Player();
+		this.player2 = new Player();
+		
+		this.currState = new IdleGameState(this);
 	}
 	
 	public void tick(double dT) {
@@ -36,6 +41,7 @@ public class GameModel implements IGameModel {
 		// Check to see whether a new state has been set during the previous tick...
 		if (this.nextState != null) {
 			
+			// There is a new/next state that we need to switch to, change to it
 			GameState oldState = this.currState;
 			this.currState = this.nextState;
 			
@@ -46,16 +52,23 @@ public class GameModel implements IGameModel {
 			this.nextState = null;
 		}
 	
+		// Tick the current state to simulate the game...
 		this.currState.tick(dT);
 	}
 
 
 	public void setNextGameState(GameState nextState) {
 		assert(nextState != null);
+		
+		// Ignore the state change if we're just going to change to the same state
+		if (this.nextState.getStateType() == this.currState.getStateType()) {
+			return;
+		}
+		
 		this.nextState = nextState;
 	}
 	
-	public void kill() {
+	public void killGame() {
 		this.currState.killToIdle();
 		this.nextState = null;
 	}
@@ -64,7 +77,7 @@ public class GameModel implements IGameModel {
 		this.currState.initiateNextMatchRound();
 	}
 
-	public void togglePause() {
+	public void togglePauseGame() {
 		this.currState.togglePause();
 	}
 	

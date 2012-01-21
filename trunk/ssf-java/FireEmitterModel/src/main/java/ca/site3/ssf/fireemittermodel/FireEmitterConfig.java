@@ -1,4 +1,4 @@
-package ca.site3.ssf;
+package ca.site3.ssf.fireemittermodel;
 
 /**
  * Contains configuration information for the fire emitters.
