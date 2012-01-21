@@ -9,9 +9,9 @@ package ca.site3.ssf.gamemodel;
 public interface IGameModel {
 
 	void tick(double dT);
-	void kill();
+	void killGame();
 	void initiateNextMatchRound();
-	void togglePause();
+	void togglePauseGame();
 	
 	void addListener(IGameModelListener l);
 	void removeListener(IGameModelListener l);
