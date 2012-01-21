@@ -1,40 +1,34 @@
 package ca.site3.ssf.gamemodel;
 
-
 /**
- * Models a state of the game. Immutable.
- * 
- * @author greg
+ * Abstract class for representing a general state of the Super Street Fire game.
+ * @author Callum
+ * @author Greg
  */
-public class GameState {
+public abstract class GameState {
 
-	public final double p1HealthPercent;
-	public final double p2HealthPercent;
+	/**
+	 * The enumeration of the various game state types, useful for events and casting.
+	 */
+	public enum GameStateType { IDLE_STATE, ROUND_BEGINNING_STATE, ROUND_IN_PLAY_STATE,
+		ROUND_ENDED_STATE, SETTLE_TIE_STATE, MATCH_OVER_STATE, PAUSED_STATE }
 	
-	public final int roundNum;
+	protected GameModel gameModel = null;
 	
-	public final int timeLeftInSecs;
-	
-	
-	
-	public GameState(double p1HealthPercent, double p2HealthPercent, int roundNum, int timeLeftInSecs) {
-		this.p1HealthPercent = p1HealthPercent;
-		this.p2HealthPercent = p2HealthPercent;
-		this.roundNum = roundNum;
-		this.timeLeftInSecs = timeLeftInSecs;
+	/**
+	 * Constructor for GameState.
+	 * @param gameModel The already created/established game model, used by the states.
+	 */
+	public GameState(GameModel gameModel) {
+		this.gameModel = gameModel;
+		assert(this.gameModel != null);
 	}
-	
-	
-	
-	public double getHealth(int playerNum) {
-		if (playerNum == IGameModel.PLAYER_1) {
-			return p1HealthPercent;
-		} else if (playerNum == IGameModel.PLAYER_2) {
-			return p2HealthPercent;
-		} else {
-			throw new IllegalArgumentException("No such player: "+playerNum);
-		}
-	}
-	
-	
+
+	// Event methods that must be implemented by child classes
+	public abstract void tick(double dT);
+	public abstract void killToIdle();
+	public abstract void initiateNextMatchRound();
+	public abstract void togglePause();
+	public abstract GameState.GameStateType getStateType();
+
 }

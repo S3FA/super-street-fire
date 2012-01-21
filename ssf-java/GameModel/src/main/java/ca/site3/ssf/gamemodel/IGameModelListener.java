@@ -9,20 +9,7 @@ import java.util.EnumSet;
  */
 public interface IGameModelListener {
 
-	/**
-	 *	The 'types' of Game state changes
-	 */
-	public enum GameStateChangeFlag {
-		
-		PLAYER_HEALTH_CHANGE,
-		
-		ROUND_TIME_CHANGE,
-		
-		FIRE_EMITTER_CHANGE
-	}
+	void onGameStateChanged(GameState.GameStateType oldState, GameState.GameStateType newState);
 	
-	
-	
-	void onGameStateChanged(GameState oldState, GameState newState, EnumSet<GameStateChangeFlag> changeFlags);
 
 }
