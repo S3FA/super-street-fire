@@ -32,7 +32,8 @@ Example interface functions:
 {{{
 void Tick(double dT)
 void InitiateNextMatchRound()
-void ExecutePlayerMove(int playerNum, GameMoveType moveType, MoveQualities qualities)
+void ExecutePlayerAction(int playerNum, PlayerActionType actionType, ActionQualities qualities)
+void ExecuteRingMasterAction(RingMasterActionType actionType, ActionQualities qualities)
 bool TogglePauseGame()
 void KillGame()
 }}}
