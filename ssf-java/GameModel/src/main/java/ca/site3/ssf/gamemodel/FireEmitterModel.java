@@ -1,7 +1,10 @@
-package ca.site3.ssf.fireemittermodel;
+package ca.site3.ssf.gamemodel;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FireEmitterModel {
 	
@@ -16,15 +19,25 @@ public class FireEmitterModel {
 	
 	private FireEmitterConfig config = null;
 	
-	public FireEmitterModel(FireEmitterConfig config) {
+	private Collection<IGameModelListener> listeners = null; // Shared (w/ GameModel) collection of listeners
+	
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
+	public FireEmitterModel(FireEmitterConfig config, Collection<IGameModelListener> listeners) {
+	
 		this.config = config;
 		assert(this.config != null);
+	
+		this.listeners = listeners;
+		assert(this.listeners != null);
+		
+		int globalEmitterIDCounter = 0;
 		
 		// Setup the outer ring emitters...
 		if (this.config.isOuterRingEnabled()) {
 			this.outerRingEmitters = new ArrayList<FireEmitter>(this.config.getNumOuterRingEmitters());
 			for (int i = 0; i < this.config.getNumOuterRingEmitters(); i++) {
-				this.outerRingEmitters.add(new FireEmitter());
+				this.outerRingEmitters.add(new FireEmitter(globalEmitterIDCounter++, i, FireEmitter.Location.OUTER_RING));
 			}
 		}
 		
@@ -32,8 +45,10 @@ public class FireEmitterModel {
 		this.leftRailEmitters  = new ArrayList<GamePlayFireEmitter>(this.config.getNumEmittersPerRail());
 		this.rightRailEmitters = new ArrayList<GamePlayFireEmitter>(this.config.getNumEmittersPerRail());
 		for (int i = 0; i < this.config.getNumEmittersPerRail(); i++) {
-			this.leftRailEmitters.add(new GamePlayFireEmitter());
-			this.rightRailEmitters.add(new GamePlayFireEmitter());
+			this.leftRailEmitters.add(new GamePlayFireEmitter(globalEmitterIDCounter++, i, FireEmitter.Location.LEFT_RAIL));
+		}
+		for (int i = 0; i < this.config.getNumEmittersPerRail(); i++) {
+			this.rightRailEmitters.add(new GamePlayFireEmitter(globalEmitterIDCounter++, i, FireEmitter.Location.RIGHT_RAIL));
 		}
 	}
 	
@@ -67,8 +82,23 @@ public class FireEmitterModel {
 		return this.rightRailEmitters.get(index);
 	}
 	
+	/**
+	 * Helper method for triggering each of the listeners callbacks for a FireEmitter change.
+	 * @param fireEmitter The emitter that changed.
+	 */
+	public void fireOnFireEmitterChanged(FireEmitter fireEmitter) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onFireEmitterChanged(new ImmutableFireEmitter(fireEmitter));
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing game state change", ex);
+			}
+		}
+	}
+	
 	public static void main(String[] args) {
-		FireEmitterModel model = new FireEmitterModel(new FireEmitterConfig(true, 16, 8));
+		//FireEmitterModel model = new FireEmitterModel(new FireEmitterConfig(true, 16, 8));
 		//...
 	}
 	

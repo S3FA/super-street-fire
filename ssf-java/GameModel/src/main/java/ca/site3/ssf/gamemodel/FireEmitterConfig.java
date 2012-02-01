@@ -1,4 +1,4 @@
-package ca.site3.ssf.fireemittermodel;
+package ca.site3.ssf.gamemodel;
 
 /**
  * Contains configuration information for the FireEmitterModel.

@@ -1,4 +1,4 @@
-package ca.site3.ssf.fireemittermodel;
+package ca.site3.ssf.gamemodel;
 
 import java.util.EnumSet;
 
@@ -10,8 +10,10 @@ public class GamePlayFireEmitter extends FireEmitter {
 	
 	private EnumSet<EmitterColour> colourFlag = EnumSet.noneOf(EmitterColour.class);
 	
-	public GamePlayFireEmitter() {
-		super();
+	public GamePlayFireEmitter(int globalEmitterID, int index, FireEmitter.Location location) {
+		super(globalEmitterID, index, location);
+		// For the time being, right and left rail emitters are the only places allowed for gameplay
+		assert(location == FireEmitter.Location.LEFT_RAIL || location == FireEmitter.Location.RIGHT_RAIL);
 	}
 
 	@Override
@@ -29,12 +31,12 @@ public class GamePlayFireEmitter extends FireEmitter {
 	public boolean hasColour(EmitterColour colour) {
 		return this.colourFlag.contains(colour);
 	}
-	
-	
-	
+	public EnumSet<EmitterColour> getOnColours() {
+		return this.colourFlag;
+	}
 	
 	public static void main(String[] args) {
-		GamePlayFireEmitter emitter = new GamePlayFireEmitter();
+		GamePlayFireEmitter emitter = new GamePlayFireEmitter(0, 0, FireEmitter.Location.LEFT_RAIL);
 		
 		System.out.println(emitter.hasColour(GamePlayFireEmitter.EmitterColour.PLAYER_ONE_COLOUR));
 		System.out.println(emitter.hasColour(GamePlayFireEmitter.EmitterColour.PLAYER_TWO_COLOUR));
