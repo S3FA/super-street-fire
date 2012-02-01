@@ -25,6 +25,7 @@ void OnGameStateChanged(GameStateType stateType)
   * Tell the GameModel to tick its simulation by some delta time
   * Start the first round of a new match or begin the next round of the current match
   * Execute a move for a player in the game
+  * Execute an action for the ringmaster
   * Pause any game that is currently in-play
   * Kill the game entirely (i.e., clears it to an Idle state)
 
