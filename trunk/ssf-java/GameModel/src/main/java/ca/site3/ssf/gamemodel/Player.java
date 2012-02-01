@@ -7,18 +7,22 @@ package ca.site3.ssf.gamemodel;
  */
 public class Player {
 	
-	//public enum PlayerNumber { PLAYER_ONE, PLAYER_TWO }
+	public enum PlayerNumber { PLAYER_ONE, PLAYER_TWO }
 	
 	public static final float KO_HEALTH   = 0.0f;
 	public static final float FULL_HEALTH = 100.0f;
 	
+	private int playerNum;
 	private float health;
 	private int numRoundWins;
 	private boolean isInvincible;
 	
-	public Player() {
+	public Player(int playerNum) {
+		assert(playerNum == 1 || playerNum == 2);
+		
 		this.reset();
 		this.isInvincible = false;
+		this.playerNum = playerNum;
 	}
 	
 	public void reset() {
@@ -45,6 +49,10 @@ public class Player {
 	
 	public boolean isKOed() {
 		return (this.health <= Player.KO_HEALTH);
+	}
+	
+	public int getPlayerNumber() {
+		return this.playerNum;
 	}
 	
 	public float getHealth() {

@@ -38,11 +38,6 @@
   	</dependency>
   	<dependency>
   		<groupId>ca.site3.ssf</groupId>
-  		<artifactId>FireEmitterModel</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>ca.site3.ssf</groupId>
   		<artifactId>GestureRecognizer</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>

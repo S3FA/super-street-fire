@@ -11,7 +11,18 @@ import java.util.EnumSet;
  */
 public interface IGameModelListener {
 
+	/**
+	 * Event method, called whenever the game state changes.
+	 * @param oldState The previous game state that was set before the change.
+	 * @param newState The newly set game state after the change.
+	 */
 	void onGameStateChanged(GameState.GameStateType oldState, GameState.GameStateType newState);
 	
-
+	/**
+	 * Event method, called whenever a fire emitter changes.
+	 * @param fireEmitter
+	 */
+	void onFireEmitterChanged(ImmutableFireEmitter fireEmitter);
+	
+	
 }
