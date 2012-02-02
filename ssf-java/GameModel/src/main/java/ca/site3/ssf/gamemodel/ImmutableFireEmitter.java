@@ -12,7 +12,6 @@ final public class ImmutableFireEmitter {
 	
 	final private int index;
 	final private FireEmitter.Location location;
-	
 	final private float intensity;
 	final private EnumSet<GamePlayFireEmitter.EmitterColour> onColours;
 	

@@ -7,41 +7,41 @@ package ca.site3.ssf.gamemodel;
  * @author Callum
  * @author Greg
  */
-public class PausedGameState extends GameState {
+class PausedGameState extends GameState {
 
 	private GameState pausedState = null;
 	
-	public PausedGameState(GameModel gameModel, GameState pausedState) {
+	PausedGameState(GameModel gameModel, GameState pausedState) {
 		super(gameModel);
 		this.pausedState = pausedState;
 		assert(this.pausedState != null);
 	}
 
 	@Override
-	public void tick(double dT) {
+	void tick(double dT) {
 		// The game is paused...
 	}
 
 	@Override
-	public void killToIdle() {
+	void killToIdle() {
 		// Apply this to the paused state - since that state might want to do
 		// some clean-up / upkeep before being killed and transitioned to Idle
 		this.pausedState.killToIdle();
 	}
 
 	@Override
-	public void initiateNextMatchRound() {
+	void initiateNextMatchRound() {
 		// Ignore this, the game is paused...
 	}
 
 	@Override
-	public void togglePause() {
+	void togglePause() {
 		// Un-pause the game (go back to the previously paused state)
 		this.gameModel.setNextGameState(this.pausedState);
 	}
 
 	@Override
-	public GameState.GameStateType getStateType() {
+	GameState.GameStateType getStateType() {
 		return GameState.GameStateType.PAUSED_STATE;
 	}
 

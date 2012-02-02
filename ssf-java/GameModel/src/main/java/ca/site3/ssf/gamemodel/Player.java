@@ -1,13 +1,11 @@
 package ca.site3.ssf.gamemodel;
 
 /**
- * The Player class represents a player of the Super Street Fire game.
+ * A class that represents a player of the Super Street Fire game.
  * @author Callum
  *
  */
-public class Player {
-	
-	public enum PlayerNumber { PLAYER_ONE, PLAYER_TWO }
+class Player {
 	
 	public static final float KO_HEALTH   = 0.0f;
 	public static final float FULL_HEALTH = 100.0f;
@@ -17,53 +15,64 @@ public class Player {
 	private int numRoundWins;
 	private boolean isInvincible;
 	
-	public Player(int playerNum) {
+	private GameModelActionSignaller actionSignaller = null;
+	
+	Player(int playerNum, GameModelActionSignaller actionSignaller) {
 		assert(playerNum == 1 || playerNum == 2);
+		
+		// Set the signaller before doing anything else!
+		this.actionSignaller = actionSignaller;
+		assert(this.actionSignaller != null);
 		
 		this.reset();
 		this.isInvincible = false;
 		this.playerNum = playerNum;
 	}
 	
-	public void reset() {
+	void reset() {
 		this.resetHealth();
 		this.numRoundWins = 0;
 	}
 	
-	public void resetHealth() {
-		this.health = Player.FULL_HEALTH;
+	void resetHealth() {
+		this.setHealth(Player.FULL_HEALTH);
 	}
 	
-	public void doDamage(float damageAmt) {
+	void doDamage(float damageAmt) {
 		assert(damageAmt > 0);
 		if (this.isInvincible) {
 			return;
 		}
-		
-		this.health -= damageAmt;
+		this.setHealth(this.health - damageAmt);
 	}
 	
-	public void setInvincible(boolean invincibilityOn) {
+	void setHealth(float health) {
+		float healthBefore = this.health;
+		this.health = Math.min(Player.FULL_HEALTH, Math.max(health, Player.KO_HEALTH));
+		
+		// If the health actually changed then trigger an event to indicate the change to all gamemodel listeners
+		if (this.health != healthBefore) {
+			this.actionSignaller.fireOnPlayerHealthChanged(this.playerNum, healthBefore, this.health);
+		}
+	}
+	
+	void setInvincible(boolean invincibilityOn) {
 		this.isInvincible = invincibilityOn;
 	}
 	
-	public boolean isKOed() {
+	boolean isKOed() {
 		return (this.health <= Player.KO_HEALTH);
 	}
 	
-	public int getPlayerNumber() {
+	int getPlayerNumber() {
 		return this.playerNum;
 	}
 	
-	public float getHealth() {
+	float getHealth() {
 		return this.health;
 	}
 	
-	public int getNumRoundWins() {
+	int getNumRoundWins() {
 		return this.numRoundWins;
 	}
-	
-	
-	
-	
 }
