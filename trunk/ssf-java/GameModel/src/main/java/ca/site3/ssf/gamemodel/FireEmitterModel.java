@@ -6,7 +6,10 @@ import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FireEmitterModel {
+class FireEmitterModel {
+	private FireEmitterConfig config = null;
+	private GameModelActionSignaller actionSignaller = null;
+	private Logger logger = null;
 	
 	private ArrayList<FireEmitter> outerRingEmitters = null; // The outer ring of emitters, starting at the first emitter to the right
 															 // of player one's back
@@ -17,19 +20,14 @@ public class FireEmitterModel {
 	private ArrayList<GamePlayFireEmitter> rightRailEmitters = null; // Right rail is the rail of emitters on the right from player one's perspective,
 																	 // they are ordered starting at player one going towards player two
 	
-	private FireEmitterConfig config = null;
-	
-	private Collection<IGameModelListener> listeners = null; // Shared (w/ GameModel) collection of listeners
-	
-	private Logger logger = LoggerFactory.getLogger(getClass());
-	
-	public FireEmitterModel(FireEmitterConfig config, Collection<IGameModelListener> listeners) {
-	
+	FireEmitterModel(FireEmitterConfig config, GameModelActionSignaller actionSignaller) {
+		this.logger = LoggerFactory.getLogger(getClass());
+		
 		this.config = config;
 		assert(this.config != null);
 	
-		this.listeners = listeners;
-		assert(this.listeners != null);
+		this.actionSignaller = actionSignaller;
+		assert(this.actionSignaller != null);
 		
 		int globalEmitterIDCounter = 0;
 		
@@ -53,7 +51,7 @@ public class FireEmitterModel {
 	}
 	
 	
-	public FireEmitter GetOuterRingEmitter(int index) {
+	FireEmitter GetOuterRingEmitter(int index) {
 		if (!this.config.isOuterRingEnabled()) {
 			return null;
 		}
@@ -66,7 +64,7 @@ public class FireEmitterModel {
 		return this.outerRingEmitters.get(index);
 	}
 	
-	public GamePlayFireEmitter GetLeftRailEmitter(int index) {
+	GamePlayFireEmitter GetLeftRailEmitter(int index) {
 		if (index >= this.leftRailEmitters.size() || index < 0) {
 			assert(false);
 			return null;
@@ -74,7 +72,7 @@ public class FireEmitterModel {
 		return this.leftRailEmitters.get(index);
 	}
 	
-	public GamePlayFireEmitter GetRightRailEmitter(int index) {
+	GamePlayFireEmitter GetRightRailEmitter(int index) {
 		if (index >= this.rightRailEmitters.size() || index < 0) {
 			assert(false);
 			return null;
@@ -82,24 +80,10 @@ public class FireEmitterModel {
 		return this.rightRailEmitters.get(index);
 	}
 	
-	/**
-	 * Helper method for triggering each of the listeners callbacks for a FireEmitter change.
-	 * @param fireEmitter The emitter that changed.
-	 */
-	public void fireOnFireEmitterChanged(FireEmitter fireEmitter) {
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onFireEmitterChanged(new ImmutableFireEmitter(fireEmitter));
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing game state change", ex);
-			}
-		}
-	}
-	
+
 	public static void main(String[] args) {
-		//FireEmitterModel model = new FireEmitterModel(new FireEmitterConfig(true, 16, 8));
-		//...
+		FireEmitterModel model = new FireEmitterModel(new FireEmitterConfig(true, 16, 8), new GameModelActionSignaller());
+		
 	}
 	
 }

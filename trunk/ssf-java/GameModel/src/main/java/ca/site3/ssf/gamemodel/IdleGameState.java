@@ -8,35 +8,35 @@ package ca.site3.ssf.gamemodel;
  * @author Callum
  * 
  */
-public class IdleGameState extends GameState {
+class IdleGameState extends GameState {
 
 	/**
 	 * Constructor for IdleGameState.
 	 * @param gameModel The game model that acts as the context for the states.
 	 */
-	public IdleGameState(GameModel gameModel) {
+	IdleGameState(GameModel gameModel) {
 		super(gameModel);
 	}
 
-	public void tick(double dT) {
+	void tick(double dT) {
 		// TODO Auto-generated method stub
 
 	}
 
-	public void killToIdle() {
+	void killToIdle() {
 		// Does nothing, we're already in the idle state.
 	}
 
-	public void initiateNextMatchRound() {
+	void initiateNextMatchRound() {
 		// Starts a new match by changing the current state...
 		this.gameModel.setNextGameState(new RoundBeginningGameState(this.gameModel, 1));
 	}
 
-	public void togglePause() {
+	void togglePause() {
 		// Does nothing.
 	}
 
-	public GameState.GameStateType getStateType() {
+	GameState.GameStateType getStateType() {
 		return GameState.GameStateType.IDLE_STATE;
 	}
 
