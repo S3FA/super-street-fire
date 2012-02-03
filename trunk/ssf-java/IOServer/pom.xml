@@ -25,7 +25,6 @@
   		<artifactId>jcommander</artifactId>
   		<version>1.20</version>
   	</dependency>
-  	
   	<dependency>
   		<groupId>ca.site3.ssf</groupId>
   		<artifactId>GameModel</artifactId>
