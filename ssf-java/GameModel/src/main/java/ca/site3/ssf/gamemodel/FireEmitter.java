@@ -37,6 +37,7 @@ class FireEmitter {
 		}
 		
 		this.intensity = intensity;
+		// TODO: If the intensity is min then turn the colour off...
 	}
 	
 	int getIndex() {
