@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
  */
 public class GameModel implements IGameModel {
 
+	enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
+	
 	private GameState currState = null;
 	private GameState nextState = null;
 	

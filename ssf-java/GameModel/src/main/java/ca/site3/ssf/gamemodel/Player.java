@@ -75,4 +75,14 @@ class Player {
 	int getNumRoundWins() {
 		return this.numRoundWins;
 	}
+	
+	GameModel.Entity getEntity() {
+		switch (this.playerNum) {
+		case 1: return GameModel.Entity.PLAYER1_ENTITY;
+		case 2: return GameModel.Entity.PLAYER2_ENTITY;
+		default:
+			assert(false);
+			return GameModel.Entity.PLAYER1_ENTITY;
+		}
+	}
 }
