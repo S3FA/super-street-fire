@@ -20,6 +20,9 @@ class FireEmitterContributor {
 	
 	private GameModel.Entity owner;
 	
+	// TODO: Change FireEmitter.FlameType map key to be an Action - way more flexible and can allow multiple attacks/blocks/etc.
+	// per emitter from the same player.
+	
 	// Mapping of flame type (nature of the flame) to the intensity of the flame [0,1], 0 is completely off, 1 is completely on.
 	private AbstractMap<FireEmitter.FlameType, Float> flameTypeIntensities =
 			new HashMap<FireEmitter.FlameType, Float>(FireEmitter.FlameType.values().length);
@@ -52,6 +55,20 @@ class FireEmitterContributor {
 		this.flameTypeIntensities.put(flameType, intensity);
 	}
 	
+	/**
+	 * Get the intensity of the flame associated with a particular type of flame for this contributor.
+	 * @param flameType The type of the flame.
+	 * @return The intensity for the given flame type.
+	 */
+	float getIntensity(FireEmitter.FlameType flameType) {
+		return this.flameTypeIntensities.get(flameType);
+	}
+	
+	/**
+	 * Get the fully resolved 'final' intensity for this emitter (just the maximum of all
+	 * the intensities for all flame types for this contributor).
+	 * @return The final intensity of the emitter for this contributor.
+	 */
 	float getResolvedIntensity() {
 		float maxIntensity = FireEmitter.MIN_INTENSITY;
 		for (Map.Entry<FireEmitter.FlameType, Float> entry : this.flameTypeIntensities.entrySet()) {
