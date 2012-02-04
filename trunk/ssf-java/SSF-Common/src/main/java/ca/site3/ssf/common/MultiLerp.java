@@ -4,6 +4,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A "Multiple Linear Interpolation" class - used to simulate a piece-wise linear
+ * interpolation function from start to end. Where both the types along the 'x' and 'y'
+ * are doubles.
+ * 
+ * Useful for describing multi-step, discontinuous, piece-wise linear functions.
+ * @author Callum
+ *
+ */
 public class MultiLerp {
 	
 	private double interpolant = 0.0;
@@ -20,6 +29,20 @@ public class MultiLerp {
 	
 	public double getInterpolantValue() {
 		return this.interpolant;
+	}
+	
+	public double getFirstInterpolantValue() {
+		return this.interpolationPts.get(0);
+	}
+	public double getLastInterpolantValue() {
+		return this.interpolationPts.get(this.interpolationPts.size()-1);
+	}
+	public double getFirstTimeValue() {
+		return this.timePts.get(0);
+	}
+	
+	public double getTotalTimeLength() {
+		return this.timePts.get(this.timePts.size()-1);
 	}
 	
 	/**
@@ -63,8 +86,15 @@ public class MultiLerp {
 	public void clearLerp() {
 		this.x = 0.0;
 		this.tracker = 0;
+		
 		this.interpolationPts = new ArrayList<Double>(2);
-		this.timePts          = new ArrayList<Double>(2);
+		this.interpolationPts.add(new Double(0.0));
+		this.interpolationPts.add(new Double(0.0));
+		
+		this.timePts = new ArrayList<Double>(2);
+		this.timePts.add(new Double(0.0));
+		this.timePts.add(new Double(0.0));
+		
 		this.interpolant      = this.interpolationPts.get(0);
 	}
 	
@@ -123,6 +153,22 @@ public class MultiLerp {
 		}
 		
 		return (this.tracker == this.timePts.size()-1);
+	}
+	
+	public static void main(String[] args) {
+		
+		MultiLerp lerp = new MultiLerp();
+		double[] timeValues = { 0.0, 1.0, 1.5, 3.0, 6.0 };
+		double[] lerpValues = { 100.0, 200.0, 202.0, 300.0, 350.0 };
+		
+		lerp.tick(0.016); // should be ignored
+		
+		lerp.setLerp(timeValues, lerpValues);
+		while (!lerp.isFinished()) {
+			System.out.println(lerp.getInterpolantValue());
+			lerp.tick(0.016);
+		}
+		System.out.println(lerp.getInterpolantValue());
 	}
 	
 }
