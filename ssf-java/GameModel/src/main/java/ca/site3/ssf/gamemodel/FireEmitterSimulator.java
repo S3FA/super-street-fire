@@ -1,6 +1,5 @@
 package ca.site3.ssf.gamemodel;
 
-import java.awt.Desktop.Action;
 import java.util.Collection;
 
 import ca.site3.ssf.common.MultiLerp;
@@ -49,6 +48,10 @@ class FireEmitterSimulator {
 	
 	boolean isFinished() {
 		return (this.currNumberOfPlays >= this.numPlays);
+	}
+	
+	void kill() {
+		this.currNumberOfPlays = this.numPlays;
 	}
 	
 	/**
@@ -128,6 +131,7 @@ class FireEmitterSimulator {
 	private void tickSim(double dT, GameModel.Entity executingEntity, FireEmitter.FlameType flameType) {
 		// If we're finished the simulation for this emitter then exit immediately
 		if (this.isFinished()) {
+			this.emitter.setIntensity(executingEntity, flameType, 0.0f);
 			return;
 		}
 		
@@ -140,7 +144,7 @@ class FireEmitterSimulator {
 		
 		float simulatedFlameIntensity = (float)this.intensityLerp.getInterpolantValue();
 		this.emitter.setIntensity(executingEntity, flameType, simulatedFlameIntensity);
-		this.blockAttackCancellationOccurredOnLastLerp |= this.emitter.hasAttackBlockCancellation();
+		this.blockAttackCancellationOccurredOnLastLerp |= this.emitter.hasAttackBlockConflict();
 		
 		this.intensityLerp.tick(dT);
 	}

@@ -16,13 +16,13 @@ class PlayerBlockAction extends Action {
 	}
 	
 	void blockOccurred() {
-		// The action is now officially over.
+		// do nothing currently, the block will stay sustained just like in street fire.
 	}
 	
 	@Override
-	void tick(double dT) {
-		// TODO Auto-generated method stub
-
+	void tickSimulator(double dT, FireEmitterSimulator simulator) {
+		simulator.tick(this, dT);
 	}
+
 
 }

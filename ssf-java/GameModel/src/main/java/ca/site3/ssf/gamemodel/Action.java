@@ -1,6 +1,7 @@
 package ca.site3.ssf.gamemodel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Abstract superclass for any move/action taken by participants
@@ -48,6 +49,18 @@ abstract class Action {
 	//double getDurationPerEmitterWithoutDelay() { return this.getDurationPerEmitterWithDelay() - this.burstDelayInSecs; }
 	
 	
-	abstract void tick(double dT);
+	void tick(double dT) {
+		Iterator<FireEmitterSimulator> iter = this.orderedFireSims.iterator();
+		while (iter.hasNext()) {
+			FireEmitterSimulator simulator = iter.next();
+			this.tickSimulator(dT, simulator);
+			
+			if (simulator.isFinished()) {
+				iter.remove();
+			}
+		}
+	}
+	
+	abstract void tickSimulator(double dT, FireEmitterSimulator simulator);
 	
 }

@@ -64,5 +64,16 @@ class FireEmitter {
 		return this.location;
 	}
 	
+	/**
+	 * Determine if this emitter has a simultaneous attack from one player and block from another
+	 * player currently being executed on it.
+	 * @return true if there is a simultaneous block/attack on this emitter from conflicting players, false if not.
+	 */
+	boolean hasAttackBlockConflict() {
+		return (this.contributors.get(GameModel.Entity.PLAYER1_ENTITY).getIntensity(FireEmitter.FlameType.ATTACK_FLAME) > 0  &&
+		        this.contributors.get(GameModel.Entity.PLAYER2_ENTITY).getIntensity(FireEmitter.FlameType.BLOCK_FLAME)  > 0) ||
+		       (this.contributors.get(GameModel.Entity.PLAYER1_ENTITY).getIntensity(FireEmitter.FlameType.BLOCK_FLAME)  > 0  &&
+				this.contributors.get(GameModel.Entity.PLAYER2_ENTITY).getIntensity(FireEmitter.FlameType.ATTACK_FLAME) > 0);
+	}
 	
 }

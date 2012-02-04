@@ -58,16 +58,8 @@ class PlayerAttackAction extends Action {
 	
 	
 	@Override
-	void tick(double dT) {
-		Iterator<FireEmitterSimulator> iter = this.orderedFireSims.iterator();
-		while (iter.hasNext()) {
-			FireEmitterSimulator simulator = iter.next();
-			simulator.tick(this, dT);
-			
-			if (simulator.isFinished()) {
-				iter.remove();
-			}
-		}
+	void tickSimulator(double dT, FireEmitterSimulator simulator) {
+		simulator.tick(this, dT);
 	}
 
 }
