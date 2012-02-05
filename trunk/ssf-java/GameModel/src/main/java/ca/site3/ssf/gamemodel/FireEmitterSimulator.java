@@ -8,12 +8,13 @@ import ca.site3.ssf.common.MultiLerp;
 class FireEmitterSimulator {
 	
 	final private FireEmitter emitter;
+	final private Action action;
 	final private int indexInSimArray;
 	
-	private double initialDelayCounterInSecs;
+	private double initialDelayCounterInSecs = 0.0;
 	
-	private int numPlays;
-	private int currNumberOfPlays;
+	private int numPlays            = 0;
+	private int currNumberOfPlays   = 0;
 	private MultiLerp intensityLerp = null;
 	
 	// Used to track whether an attack from one player went off at the same time as a block
@@ -21,7 +22,7 @@ class FireEmitterSimulator {
 	private boolean blockAttackCancellationOccurredOnLastLerp; 
 								
 	
-	FireEmitterSimulator(int indexInSimArray, FireEmitter emitter, double initialDelayInSecs,
+	FireEmitterSimulator(int indexInSimArray, Action action, FireEmitter emitter, double initialDelayInSecs,
 						 int numPlays, MultiLerp intensityLerpPerPlay) {
 		
 		this.indexInSimArray = indexInSimArray;
@@ -29,6 +30,9 @@ class FireEmitterSimulator {
 		
 		this.emitter = emitter;
 		assert(emitter != null);
+		
+		this.action = action;
+		assert(action != null);
 		
 		this.initialDelayCounterInSecs = initialDelayInSecs;
 		assert(initialDelayInSecs >= 0.0);
@@ -46,12 +50,21 @@ class FireEmitterSimulator {
 		this.blockAttackCancellationOccurredOnLastLerp = false;
 	}
 	
+	/**
+	 * Query whether this simulator is finished simulating.
+	 * @return true if finished simulating, false if not.
+	 */
 	boolean isFinished() {
 		return (this.currNumberOfPlays >= this.numPlays);
 	}
 	
+	/**
+	 * Kill this simulator - causes isFinished() to be true and removes all
+	 * contributions for the associated action from the simulated emitter.
+	 */
 	void kill() {
 		this.currNumberOfPlays = this.numPlays;
+		this.emitter.setIntensity(this.action, 0.0f);
 	}
 	
 	/**
@@ -69,9 +82,10 @@ class FireEmitterSimulator {
 	// the state of the emitter being simulated...
 	
 	void tick(PlayerAttackAction action, double dT) {
+		assert(this.action == action);
 		
 		boolean currLerpWasNotFinishedBeforeTick = !this.intensityLerp.isFinished();
-		this.tickSim(dT, action.getAttacker().getEntity(), FireEmitter.FlameType.ATTACK_FLAME);
+		this.tickSim(dT);
 
 		// Check for special issues that are specific to player attacks...
 		if (currLerpWasNotFinishedBeforeTick && this.intensityLerp.isFinished()) {
@@ -105,8 +119,10 @@ class FireEmitterSimulator {
 	}
 	
 	void tick(PlayerBlockAction action, double dT) {
+		assert(this.action == action);
+		
 		boolean currLerpWasNotFinishedBeforeTick = !this.intensityLerp.isFinished();
-		this.tickSim(dT, action.getBlocker().getEntity(), FireEmitter.FlameType.BLOCK_FLAME);
+		this.tickSim(dT);
 		
 		// Check for special issues that are specific to player blocks...
 		if (currLerpWasNotFinishedBeforeTick && this.intensityLerp.isFinished()) {
@@ -122,16 +138,24 @@ class FireEmitterSimulator {
 	}
 	
 	void tick(RingMasterAction action, double dT) {
-		this.tickSim(dT, GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.FlameType.NON_GAME_FLAME);
+		assert(this.action == action);
+		
+		this.tickSim(dT);
 		this.updateLerp();
 		// Don't have to worry about side effects or other such consequences, the ring master's flames
 		// do not interact with the game state in any significant way - they're just for show.
 	}
 	
-	private void tickSim(double dT, GameModel.Entity executingEntity, FireEmitter.FlameType flameType) {
+	/**
+	 * Tick the multi-linear interpolation for simulating the flame intensity and then
+	 * apply it to the emitter being simulated. This will do nothing if the simulation
+	 * is already finished.
+	 * @param dT The delta time since the last frame/tick.
+	 */
+	private void tickSim(double dT) {
 		// If we're finished the simulation for this emitter then exit immediately
 		if (this.isFinished()) {
-			this.emitter.setIntensity(executingEntity, flameType, 0.0f);
+			this.emitter.setIntensity(this.action, 0.0f);
 			return;
 		}
 		
@@ -143,17 +167,28 @@ class FireEmitterSimulator {
 		
 		
 		float simulatedFlameIntensity = (float)this.intensityLerp.getInterpolantValue();
-		this.emitter.setIntensity(executingEntity, flameType, simulatedFlameIntensity);
+		this.emitter.setIntensity(this.action, simulatedFlameIntensity);
 		this.blockAttackCancellationOccurredOnLastLerp |= this.emitter.hasAttackBlockConflict();
 		
 		this.intensityLerp.tick(dT);
 	}
 	
+	/**
+	 * Update the linear interpolation, should be called sometime soon after tickSim.
+	 */
 	private void updateLerp() {
+		if (this.isFinished()) {
+			return;
+		}
+		
 		if (this.intensityLerp.isFinished()) {
 			this.currNumberOfPlays++;
 			this.intensityLerp.resetLerp();
 			this.blockAttackCancellationOccurredOnLastLerp = false;
+			
+			if (this.isFinished()) {
+				this.emitter.setIntensity(this.action, 0.0f);
+			}
 		}
 	}
 	

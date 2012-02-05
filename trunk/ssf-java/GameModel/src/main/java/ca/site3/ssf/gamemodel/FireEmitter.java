@@ -1,10 +1,17 @@
 package ca.site3.ssf.gamemodel;
 
-import java.util.AbstractMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Container for representing a flame-effect/fire emitter in the Super Street Fire game.
+ * Holds information about its location within the game and information about the
+ * entities and actions contributing towards its overall intensity.
+ * 
+ * @author Callum
+ *
+ */
 class FireEmitter {
 	
 	public enum Location  { LEFT_RAIL, RIGHT_RAIL, OUTER_RING };
@@ -18,8 +25,9 @@ class FireEmitter {
 	final private int globalEmitterID;  // Unique identifier among all other fire emitters in the simulation
 	
 	// Mapping of contributors to this flame emitter
-	private AbstractMap<GameModel.Entity, FireEmitterContributor> contributors =
+	private Map<GameModel.Entity, FireEmitterContributor> contributors =
 			new HashMap<GameModel.Entity, FireEmitterContributor>(GameModel.Entity.values().length);
+	
 	
 	FireEmitter(int globalEmitterID, int index, Location location) {
 		this.globalEmitterID = globalEmitterID;
@@ -35,6 +43,23 @@ class FireEmitter {
 	}
 	
 	/**
+	 * Get the index of this emitter within its location (e.g., if its on the right rail, how
+	 * far along the rail is it?).
+	 * @return The zero-based index.
+	 */
+	int getIndex() {
+		return this.index;
+	}
+	
+	/**
+	 * The location of this emitter within the game arena.
+	 * @return The emitter location.
+	 */
+	FireEmitter.Location getLocation() {
+		return this.location;
+	}	
+	
+	/**
 	 * Reset this FireEmitter to be completely off i.e., all intensities of all
 	 * contributors are reduced to zero.
 	 */
@@ -45,23 +70,27 @@ class FireEmitter {
 	}
 	
 	/**
-	 * Sets the intensity for a particular contributor for a particular flame type on this FireEmitter.
-	 * @param contributor The player or ringmaster entity contributing to the flame.
-	 * @param flameType The type of flame being contributed.
+	 * Sets the intensity for a particular contributor for a particular action on this FireEmitter.
+	 * @param action The action contributing to the flame.
 	 * @param intensity The intensity of the flame being contributed.
 	 */
-	void setIntensity(GameModel.Entity contributor, FireEmitter.FlameType flameType, float intensity) {
-		FireEmitterContributor fireEmitterContrib = this.contributors.get(contributor);
+	void setIntensity(Action action, float intensity) {
+		FireEmitterContributor fireEmitterContrib = this.contributors.get(action.getContributorEntity());
 		assert(fireEmitterContrib != null);
-		fireEmitterContrib.setIntensity(flameType, intensity);
+		fireEmitterContrib.setIntensity(action, intensity);
 	}
 	
-	int getIndex() {
-		return this.index;
-	}
-	
-	FireEmitter.Location getLocation() {
-		return this.location;
+	/**
+	 * Gets the total, final intensity of this emitter after consideration of all contributors
+	 * to its flame.
+	 * @return The intensity of this fire emitter.
+	 */
+	float getIntensity() {
+		float totalIntensity = FireEmitter.MIN_INTENSITY;
+		for (FireEmitterContributor contributor : this.contributors.values()) {
+			totalIntensity = Math.max(totalIntensity, contributor.getResolvedIntensity());
+		}
+		return totalIntensity;
 	}
 	
 	/**
@@ -70,10 +99,13 @@ class FireEmitter {
 	 * @return true if there is a simultaneous block/attack on this emitter from conflicting players, false if not.
 	 */
 	boolean hasAttackBlockConflict() {
-		return (this.contributors.get(GameModel.Entity.PLAYER1_ENTITY).getIntensity(FireEmitter.FlameType.ATTACK_FLAME) > 0  &&
-		        this.contributors.get(GameModel.Entity.PLAYER2_ENTITY).getIntensity(FireEmitter.FlameType.BLOCK_FLAME)  > 0) ||
-		       (this.contributors.get(GameModel.Entity.PLAYER1_ENTITY).getIntensity(FireEmitter.FlameType.BLOCK_FLAME)  > 0  &&
-				this.contributors.get(GameModel.Entity.PLAYER2_ENTITY).getIntensity(FireEmitter.FlameType.ATTACK_FLAME) > 0);
+		EnumSet<FireEmitter.FlameType> player1FlameTypes = this.contributors.get(GameModel.Entity.PLAYER1_ENTITY).getFlameTypes();
+		EnumSet<FireEmitter.FlameType> player2FlameTypes = this.contributors.get(GameModel.Entity.PLAYER2_ENTITY).getFlameTypes();
+		
+		return (player1FlameTypes.contains(FireEmitter.FlameType.ATTACK_FLAME) &&
+				player2FlameTypes.contains(FireEmitter.FlameType.BLOCK_FLAME)) ||
+		       (player1FlameTypes.contains(FireEmitter.FlameType.BLOCK_FLAME)  &&
+		    	player2FlameTypes.contains(FireEmitter.FlameType.ATTACK_FLAME));
 	}
 	
 }

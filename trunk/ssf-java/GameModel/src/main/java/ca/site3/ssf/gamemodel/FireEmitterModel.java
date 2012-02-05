@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class FireEmitterModel {
+	
 	private FireEmitterConfig config = null;
 	private GameModelActionSignaller actionSignaller = null;
 	private Logger logger = null;
