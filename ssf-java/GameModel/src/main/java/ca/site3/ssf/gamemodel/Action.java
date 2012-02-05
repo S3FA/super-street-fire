@@ -32,6 +32,10 @@ abstract class Action {
 		return this.fireEmitterModel;
 	}
 	
+	//double getDurationPerEmitterWithDelay() { return (this.totalDurationInSecs / (double)totalNumEmitters); }
+	//double getDurationPerEmitterWithoutDelay() { return this.getDurationPerEmitterWithDelay() - this.burstDelayInSecs; }
+	
+	
 	/**
 	 * Whether this action is completed or not.
 	 * @return true if the action is done executing, false if not.
@@ -42,12 +46,11 @@ abstract class Action {
 	}
 	
 	void kill() {
-		
+		for (FireEmitterSimulator simulator : this.orderedFireSims) {
+			simulator.kill();
+		}
+		this.orderedFireSims.clear();
 	}
-	
-	//double getDurationPerEmitterWithDelay() { return (this.totalDurationInSecs / (double)totalNumEmitters); }
-	//double getDurationPerEmitterWithoutDelay() { return this.getDurationPerEmitterWithDelay() - this.burstDelayInSecs; }
-	
 	
 	void tick(double dT) {
 		Iterator<FireEmitterSimulator> iter = this.orderedFireSims.iterator();
@@ -62,5 +65,8 @@ abstract class Action {
 	}
 	
 	abstract void tickSimulator(double dT, FireEmitterSimulator simulator);
+	
+	abstract GameModel.Entity getContributorEntity();
+	abstract FireEmitter.FlameType getActionFlameType();
 	
 }

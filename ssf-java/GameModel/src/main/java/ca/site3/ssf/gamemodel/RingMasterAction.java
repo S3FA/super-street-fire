@@ -12,5 +12,14 @@ class RingMasterAction extends Action {
 		// TODO Auto-generated method stub
 
 	}
-
+	
+	@Override
+	FireEmitter.FlameType getActionFlameType() {
+		return FireEmitter.FlameType.NON_GAME_FLAME;
+	}
+	
+	@Override
+	GameModel.Entity getContributorEntity() {
+		return GameModel.Entity.RINGMASTER_ENTITY;
+	}
 }

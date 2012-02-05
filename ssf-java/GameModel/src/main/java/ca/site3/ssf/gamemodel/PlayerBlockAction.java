@@ -23,6 +23,14 @@ class PlayerBlockAction extends Action {
 	void tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
 	}
+	
+	@Override
+	FireEmitter.FlameType getActionFlameType() {
+		return FireEmitter.FlameType.BLOCK_FLAME;
+	}
 
-
+	@Override
+	GameModel.Entity getContributorEntity() {
+		return this.getBlocker().getEntity();
+	}
 }

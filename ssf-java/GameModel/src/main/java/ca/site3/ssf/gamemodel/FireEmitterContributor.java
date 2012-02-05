@@ -1,15 +1,15 @@
 package ca.site3.ssf.gamemodel;
 
-import java.util.AbstractMap;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.EnumSet;
+import java.util.HashMap;
 
 /**
  * A FlameEmitter has zero or more owners/contributors, up to the total number of game entities, which
  * is currently 3 (player1, player2, and ringmaster). 
- * Each owner contributes different flame types with different intensities. Ultimately
+ * Each owner contributes different actions, which in turn contribute different intensities. Ultimately
  * an emitter will always have the maximum of all the intensities contributing to it.
- * If a given owner's intensity is greater than the minimum (i.e., zero), this it is
+ * If a given action's contribution intensity is greater than the minimum (i.e., zero), it is
  * considered to be contributing towards the overall emitter and that owner's colour
  * (if it has a colour) will be added to the flame as well.
  * 
@@ -20,12 +20,10 @@ class FireEmitterContributor {
 	
 	private GameModel.Entity owner;
 	
-	// TODO: Change FireEmitter.FlameType map key to be an Action - way more flexible and can allow multiple attacks/blocks/etc.
-	// per emitter from the same player.
-	
-	// Mapping of flame type (nature of the flame) to the intensity of the flame [0,1], 0 is completely off, 1 is completely on.
-	private AbstractMap<FireEmitter.FlameType, Float> flameTypeIntensities =
-			new HashMap<FireEmitter.FlameType, Float>(FireEmitter.FlameType.values().length);
+	// Mapping of an Action to the intensity of the flame driven by that action
+	// NOTE: Once the intensity contribution for a given action is set to FireEmitter.MIN_INTENSITY,
+	// it will be removed from this map entirely
+	private Map<Action, Float> actionIntensities = new HashMap<Action, Float>(3);
 	
 	FireEmitterContributor(GameModel.Entity owner) {
 		this.owner = owner;
@@ -36,12 +34,19 @@ class FireEmitterContributor {
 	 * Reset the intensity of this contributor's flames to the zero.
 	 */
 	void reset() {
-		for (FireEmitter.FlameType flameType : FireEmitter.FlameType.values()) {
-			this.flameTypeIntensities.put(flameType, FireEmitter.MIN_INTENSITY);
-		}
+		this.actionIntensities.clear();
 	}
 	
-	void setIntensity(FireEmitter.FlameType flameType, float intensity) {
+	/**
+	 * Set the intensity for an action of this contributor to the given value.
+	 * @param action The action whose associated intensity is being changed.
+	 * @param intensity The intensity to apply, if FireEmitter.MIN_INTENSITY, the 
+	 * action will no longer be contributing.
+	 */
+	void setIntensity(Action action, float intensity) {
+		assert(action != null);
+		assert(action.getContributorEntity() == this.owner);
+		
 		if (intensity > FireEmitter.MAX_INTENSITY || intensity < FireEmitter.MIN_INTENSITY) {
 			assert(false);
 			return;
@@ -49,31 +54,55 @@ class FireEmitterContributor {
 		
 		// Make sure that the ringmaster is not participating in the game flame types and that
 		// players are not participating in non-game flame types!
-		assert(this.owner != GameModel.Entity.RINGMASTER_ENTITY || flameType == FireEmitter.FlameType.NON_GAME_FLAME);
-		assert(this.owner == GameModel.Entity.RINGMASTER_ENTITY || flameType != FireEmitter.FlameType.NON_GAME_FLAME);
+		assert(this.owner != GameModel.Entity.RINGMASTER_ENTITY || action.getActionFlameType() == FireEmitter.FlameType.NON_GAME_FLAME);
+		assert(this.owner == GameModel.Entity.RINGMASTER_ENTITY || action.getActionFlameType() != FireEmitter.FlameType.NON_GAME_FLAME);
 		
-		this.flameTypeIntensities.put(flameType, intensity);
+		// If the set intensity is zero then just remove the action from contributing
+		if (intensity == FireEmitter.MIN_INTENSITY) {
+			this.actionIntensities.remove(action);
+			return;
+		}
+		
+		this.actionIntensities.put(action, intensity);
 	}
 	
 	/**
-	 * Get the intensity of the flame associated with a particular type of flame for this contributor.
-	 * @param flameType The type of the flame.
+	 * Get the intensity of the flame associated with a given action.
+	 * @param action The action with the associated flame intensity.
 	 * @return The intensity for the given flame type.
 	 */
-	float getIntensity(FireEmitter.FlameType flameType) {
-		return this.flameTypeIntensities.get(flameType);
+	float getIntensity(Action action) {
+		assert(action != null);
+		if (!this.actionIntensities.containsKey(action)) {
+			return FireEmitter.MIN_INTENSITY;
+		}
+		
+		return this.actionIntensities.get(action);
 	}
 	
 	/**
 	 * Get the fully resolved 'final' intensity for this emitter (just the maximum of all
-	 * the intensities for all flame types for this contributor).
+	 * the intensities for all actions for this contributor).
 	 * @return The final intensity of the emitter for this contributor.
 	 */
 	float getResolvedIntensity() {
 		float maxIntensity = FireEmitter.MIN_INTENSITY;
-		for (Map.Entry<FireEmitter.FlameType, Float> entry : this.flameTypeIntensities.entrySet()) {
-			maxIntensity = Math.max(maxIntensity, entry.getValue());
+		for (Float currIntensity : this.actionIntensities.values()) {
+			maxIntensity = Math.max(maxIntensity, currIntensity);
 		}
 		return maxIntensity;
 	}
+	
+	/**
+	 * Get the set of contributing flame types from all actions in this contributor.
+	 * @return The set of active flame types from this contributor.
+	 */
+	EnumSet<FireEmitter.FlameType> getFlameTypes() {
+		EnumSet<FireEmitter.FlameType> result = EnumSet.noneOf(FireEmitter.FlameType.class);
+		for (Action action : this.actionIntensities.keySet()) {
+			result.add(action.getActionFlameType());
+		}
+		return result;
+	}
+	
 }
