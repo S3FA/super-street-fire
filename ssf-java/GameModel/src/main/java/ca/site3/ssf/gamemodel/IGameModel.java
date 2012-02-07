@@ -14,7 +14,8 @@ public interface IGameModel {
 	void killGame();
 	void initiateNextMatchRound();
 	void togglePauseGame();
-	
+
+	ActionFactory getActionFactory();
 	//void executePlayerAction(Player.PlayerNumber playerNum, PlayerAction action);
 	//void executeRingmasterAction(RingmasterAction action);
 	
