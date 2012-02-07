@@ -52,33 +52,51 @@ class FireEmitterModel {
 	}
 	
 	
-	FireEmitter GetOuterRingEmitter(int index) {
+	FireEmitter getOuterRingEmitter(int index, boolean wrapAround) {
 		if (!this.config.isOuterRingEnabled()) {
 			return null;
 		}
 		
-		if (index >= this.outerRingEmitters.size() || index < 0) {
-			assert(false);
+		int actualIndex = index;
+		if (wrapAround) {
+			actualIndex %= this.outerRingEmitters.size();
+		}
+		
+		if (actualIndex >= this.outerRingEmitters.size() || actualIndex < 0) {
 			return null;
 		}
 		
-		return this.outerRingEmitters.get(index);
+		return this.outerRingEmitters.get(actualIndex);
 	}
 	
-	FireEmitter GetLeftRailEmitter(int index) {
+	FireEmitter getLeftRailEmitter(int index) {
 		if (index >= this.leftRailEmitters.size() || index < 0) {
-			assert(false);
 			return null;
 		}
 		return this.leftRailEmitters.get(index);
 	}
 	
-	FireEmitter GetRightRailEmitter(int index) {
+	FireEmitter getRightRailEmitter(int index) {
 		if (index >= this.rightRailEmitters.size() || index < 0) {
-			assert(false);
 			return null;
 		}
 		return this.rightRailEmitters.get(index);
+	}
+	
+	FireEmitter getEmitter(FireEmitter.Location location, int index) {
+		switch (location) {
+			case LEFT_RAIL:
+				return this.getLeftRailEmitter(index);
+			case RIGHT_RAIL:
+				return this.getRightRailEmitter(index);
+			case OUTER_RING:
+				return this.getOuterRingEmitter(index, true);
+			default:
+				assert(false);
+				break;
+		}
+		
+		return null;
 	}
 	
 	/**

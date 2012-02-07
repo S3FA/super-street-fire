@@ -80,6 +80,10 @@ public class GameModel implements IGameModel {
 		this.currState.togglePause();
 	}
 	
+	public ActionFactory getActionFactory() {
+		return new ActionFactory(this.fireEmitterModel);
+	}
+	
 	public void addGameModelListener(IGameModelListener l) {
 		this.actionSignaller.addGameModelListener(l);
 	}

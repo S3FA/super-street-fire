@@ -1,5 +1,6 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 class PlayerAttackAction extends Action {
@@ -32,12 +33,17 @@ class PlayerAttackAction extends Action {
 	 * attack action.
 	 * @param simIndex The index of the simulator in this action where the block occurred.
 	 */
-	void blockOccurred(int simIndex) {
-		// When a block occurs on a particular simulator we need to propogate the effects
+	void blockOccurred(int waveIndex, int simulatorIndex) {
+		assert(waveIndex >= 0 && waveIndex < this.wavesOfOrderedFireSims.size());
+		
+		// When a block occurs on a particular simulator we need to propagate the effects
 		// of that block to each of the simulators that are after it - this will cancel out
 		// one of the flames on each of the successive simulators
-		for (int i = simIndex+1; i < this.orderedFireSims.size(); i++) {
-			this.orderedFireSims.get(i).flameBlocked();
+		ArrayList<FireEmitterSimulator> simulatorWave = this.wavesOfOrderedFireSims.get(waveIndex);
+		assert(simulatorIndex >= 0 && simulatorIndex < simulatorWave.size());
+		
+		for (int i = simulatorIndex+1; i < simulatorWave.size(); i++) {
+			simulatorWave.get(i).flameBlocked();
 		}
 	}
 	

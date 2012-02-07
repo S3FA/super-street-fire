@@ -28,6 +28,8 @@ abstract class GameState {
 	abstract void tick(double dT);
 	abstract void killToIdle();
 	abstract void initiateNextMatchRound();
+	//abstract void executePlayerAction();
+	//abstract void executeRingmasterAction();
 	abstract void togglePause();
 	abstract GameState.GameStateType getStateType();
 

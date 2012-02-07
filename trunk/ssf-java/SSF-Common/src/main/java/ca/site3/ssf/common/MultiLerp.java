@@ -13,7 +13,7 @@ import java.util.List;
  * @author Callum
  *
  */
-public class MultiLerp {
+public class MultiLerp implements Cloneable {
 	
 	private double interpolant = 0.0;
 	private double x           = 0.0;
@@ -25,6 +25,29 @@ public class MultiLerp {
 	
 	public MultiLerp() {
 		this.clearLerp();
+	}
+	
+	public MultiLerp(double[] times, double[] values) {
+		this.setLerp(times, values);
+	}
+	
+	public MultiLerp(List<Double> times, List<Double> values) {
+		this.setLerp(times, values);
+	}
+	
+	public Object clone() {
+		try {
+			MultiLerp clonedMultiLerp = (MultiLerp)super.clone();
+			clonedMultiLerp.timePts = new ArrayList<Double>(this.timePts);
+			Collections.copy(clonedMultiLerp.timePts, this.timePts);
+			clonedMultiLerp.interpolationPts = new ArrayList<Double>(this.interpolationPts);
+			Collections.copy(clonedMultiLerp.interpolationPts, this.interpolationPts);
+					
+			return clonedMultiLerp;
+		}
+		catch (CloneNotSupportedException ex) {
+			return null;
+		}
 	}
 	
 	public double getInterpolantValue() {
@@ -157,18 +180,23 @@ public class MultiLerp {
 	
 	public static void main(String[] args) {
 		
-		MultiLerp lerp = new MultiLerp();
+		MultiLerp lerp1 = new MultiLerp();
 		double[] timeValues = { 0.0, 1.0, 1.5, 3.0, 6.0 };
 		double[] lerpValues = { 100.0, 200.0, 202.0, 300.0, 350.0 };
 		
-		lerp.tick(0.016); // should be ignored
+		lerp1.tick(0.016); // should be ignored
+
+		lerp1.setLerp(timeValues, lerpValues);
+		MultiLerp lerp2 = (MultiLerp)lerp1.clone();
 		
-		lerp.setLerp(timeValues, lerpValues);
-		while (!lerp.isFinished()) {
-			System.out.println(lerp.getInterpolantValue());
-			lerp.tick(0.016);
+		while (!lerp1.isFinished() || !lerp2.isFinished()) {
+			System.out.println(lerp1.getInterpolantValue());
+			System.out.println(lerp2.getInterpolantValue());
+			lerp1.tick(0.016);
+			lerp2.tick(0.5);
 		}
-		System.out.println(lerp.getInterpolantValue());
+		System.out.println(lerp1.getInterpolantValue());
+		System.out.println(lerp2.getInterpolantValue());
 	}
 	
 }

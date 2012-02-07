@@ -9,10 +9,11 @@ class FireEmitterSimulator {
 	
 	final private FireEmitter emitter;
 	final private Action action;
-	final private int indexInSimArray;
 	
 	private double initialDelayCounterInSecs = 0.0;
 	
+	final private int waveIndex;
+	final private int simulatorIndex;
 	private int numPlays            = 0;
 	private int currNumberOfPlays   = 0;
 	private MultiLerp intensityLerp = null;
@@ -22,17 +23,19 @@ class FireEmitterSimulator {
 	private boolean blockAttackCancellationOccurredOnLastLerp; 
 								
 	
-	FireEmitterSimulator(int indexInSimArray, Action action, FireEmitter emitter, double initialDelayInSecs,
-						 int numPlays, MultiLerp intensityLerpPerPlay) {
-		
-		this.indexInSimArray = indexInSimArray;
-		assert(indexInSimArray >= 0);
+	FireEmitterSimulator(Action action, FireEmitter emitter, int waveIndex, int simulatorIndex,
+						 double initialDelayInSecs, int numPlays, MultiLerp intensityLerpPerPlay) {
 		
 		this.emitter = emitter;
 		assert(emitter != null);
 		
 		this.action = action;
 		assert(action != null);
+		
+		this.waveIndex = waveIndex;
+		this.simulatorIndex = simulatorIndex;
+		assert(waveIndex >= 0);
+		assert(simulatorIndex >= 0);
 		
 		this.initialDelayCounterInSecs = initialDelayInSecs;
 		assert(initialDelayInSecs >= 0.0);
@@ -98,7 +101,7 @@ class FireEmitterSimulator {
 			// - We check the 'blockAttackCancellationOccurredOnLastLerp' flag, which indicates whether a block
 			// occurred during the entire interval of the current attack flame's lerp
 		    if (this.blockAttackCancellationOccurredOnLastLerp) {
-		    	action.blockOccurred(this.indexInSimArray);
+		    	action.blockOccurred(this.waveIndex, this.simulatorIndex);
 		    }
 			else {
 				// If an attack flame succeeded in getting to the opposing player then we need to tell the
