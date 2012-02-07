@@ -27,7 +27,7 @@ abstract class Action {
 	 * emitter though to the last emitter of each rail.
 	 * 
 	 * @param location The location within the game arena of the emitters involved in the wave simulation.
-	 * @param startingIndex The starting index of the first emitter int he wave simultion within the given location.
+	 * @param startIndex The starting index of the first emitter int he wave simultion within the given location.
 	 * @param travelLength The total travelling length of the wave (e.g, if there are 8 emitters to a rail and you want
 	 * a wave to travel the entire length of the rail, this value would be 8).
 	 * @param width The width of the wave (how many emitters will be on, at maximum, simultaneously during the wave's simulation).
@@ -39,10 +39,10 @@ abstract class Action {
 	 * 
 	 * @return true on success, false on failure.
 	 */
-	boolean AddFireEmitterWave(FireEmitter.Location location, int startingIndex, int travelLength, int width, MultiLerp intensityLerp) {
+	boolean AddFireEmitterWave(FireEmitter.Location location, int startIndex, int travelLength, int width, MultiLerp intensityLerp) {
 		
 		// Make sure the parameters are at least moderately correct
-		if (intensityLerp == null || startingIndex < 0 || travelLength <= 0 || width <= 0 || width > travelLength) {
+		if (intensityLerp == null || startIndex < 0 || travelLength <= 0 || width <= 0 || width > travelLength) {
 			assert(false);
 			return false;
 		}
@@ -54,8 +54,8 @@ abstract class Action {
 		
 		// Go through the full wave of simulations required for what has been specified
 		// by the parameters and add a simulator for each emitter in the wave
-		int endingIndex = startingIndex + travelLength;
-		for (int i = startingIndex; i <= endingIndex; i++, count++) {
+		int endingIndex = startIndex + travelLength;
+		for (int i = startIndex; i <= endingIndex; i++, count++) {
 			FireEmitter currEmitter = this.fireEmitterModel.getEmitter(location, i);
 			if (currEmitter == null) {
 				assert(false);
