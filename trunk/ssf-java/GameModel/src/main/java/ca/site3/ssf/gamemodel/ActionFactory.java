@@ -21,16 +21,51 @@ final public class ActionFactory {
 	//final public Action BuildPlayerTwoHandedSymetricalAction(int playerNum, PlayerHand hand, double totalDurationInSecs, double burstDelayPercent, int width) {
 	//}
 	
+	/**
+	 * Add a wave of fire emitter simulation to the given action.
+	 * @param action The action to add a wave to.
+	 * @param location The location in the SSF arena where the wave will take place.
+	 * @param startIndex The index of the fire emitter in the given location where the wave will start.
+	 * @param travelLength The length of travel of the action.
+	 * @param width The width of the action (i.e., how many simultaneous flames as the wave travels).
+	 * @param totalDurationInSecs Total duration of the wave (length of time it will have fire emitters simulating for, in total).
+	 * @param fullOnFraction The fraction [0,1] of time that the emitters will be turned completely on.
+	 * @param offFraction The fraction of time that the emitters will be turned completely off.
+	 * @return true on success, false on failure.
+	 */
 	final private boolean AddWaveToAction(Action action, FireEmitter.Location location, int startIndex, int travelLength,
-										  int width, double totalDurationInSecs, double burstDelayFraction) {
+										  int width, double totalDurationInSecs, double fullOnFraction, double offFraction) {
 		
 		// Make sure all the provided parameters are correct
-		if (action == null || totalDurationInSecs < 0.001) {
+		if (action == null || totalDurationInSecs < 0.001 || travelLength <= 0 || width <= 0 ||
+			fullOnFraction < 0.0 || fullOnFraction > 1.0 || offFraction < 0.0 || offFraction > 1.0 ||
+			(fullOnFraction + offFraction) > 1.0) {
+			
 			assert(false);
 			return false;
 		}
 
+		// Calculate values on a per-lerp basis (i.e., time of each on/off cycle per fire emitter in the wave)
+		// NOTE: Since the wave form cascades over the travel length of emitters, it causes the
+		// duration for each lerp cycle to be (totalDuration / (double)(width + travelLength - 1)).
+		double durationPerLerp  = totalDurationInSecs / (double)(width + travelLength - 1);
+		double offTimePerLerp   = durationPerLerp * offFraction;
+		double onTimePerLerp    = durationPerLerp - offTimePerLerp;
+		double maxOnTimePerLerp = durationPerLerp * fullOnFraction;
 		
+		assert(onTimePerLerp >= maxOnTimePerLerp);
+		double startMaxIntensityTime = (onTimePerLerp - maxOnTimePerLerp) / 2.0;
+		double endMaxIntensityTime   = startMaxIntensityTime + maxOnTimePerLerp;
+		double startDelayTime        = onTimePerLerp;
+		
+		MultiLerp intensityLerp = this.BuildIntensityMultiLerp(startMaxIntensityTime,
+				endMaxIntensityTime, startDelayTime, durationPerLerp);
+		if (intensityLerp == null) {
+			assert(false);
+			return false;
+		}
+		
+		return action.AddFireEmitterWave(location, startIndex, travelLength, width, intensityLerp);
 	}
 	
 	/**
@@ -54,7 +89,8 @@ final public class ActionFactory {
 			                                        double startDelayTime, double endDelayTime) {
 		
 		// Make sure the provided parameters are in sequential order from least to greatest
-		if (startMaxIntensityTime > endMaxIntensityTime || endMaxIntensityTime > startDelayTime || startDelayTime > endDelayTime) {
+		if (startMaxIntensityTime <= 0.0 || startMaxIntensityTime > endMaxIntensityTime ||
+		    endMaxIntensityTime > startDelayTime || startDelayTime > endDelayTime) {
 			assert(false);
 			return null;
 		}
