@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GameModel implements IGameModel {
 
-	enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
+	public enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
 	
 	private GameState currState = null;
 	private GameState nextState = null;
@@ -81,7 +81,7 @@ public class GameModel implements IGameModel {
 	}
 	
 	public ActionFactory getActionFactory() {
-		return new ActionFactory(this.fireEmitterModel);
+		return new ActionFactory(this);
 	}
 	
 	public void addGameModelListener(IGameModelListener l) {
@@ -138,6 +138,9 @@ public class GameModel implements IGameModel {
 	
 	GameModelActionSignaller GetActionSignaller() {
 		return this.actionSignaller;
+	}
+	FireEmitterModel getFireEmitterModel() {
+		return this.fireEmitterModel;
 	}
 	
 }

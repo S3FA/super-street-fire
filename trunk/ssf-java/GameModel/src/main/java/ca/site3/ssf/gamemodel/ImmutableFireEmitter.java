@@ -13,13 +13,13 @@ final public class ImmutableFireEmitter {
 	final private int index;
 	final private FireEmitter.Location location;
 	final private float intensity;
-	final private EnumSet<GamePlayFireEmitter.EmitterColour> onColours;
+	final private EnumSet<GameModel.Entity> contributingEntities;
 	
 	public ImmutableFireEmitter(FireEmitter emitter) {
 		this.index     = emitter.getIndex();
 		this.location  = emitter.getLocation();
 		this.intensity = emitter.getIntensity();
-		this.onColours = emitter.getOnColours();
+		this.contributingEntities = emitter.getContributingEntities();
 	}
 	
 	public int getIndex() {
@@ -31,8 +31,8 @@ final public class ImmutableFireEmitter {
 	public float getIntensity() {
 		return this.intensity;
 	}
-	public EnumSet<GamePlayFireEmitter.EmitterColour> getOnColours() {
-		return this.onColours;
+	public EnumSet<GameModel.Entity> getOnColours() {
+		return this.contributingEntities;
 	}
 	
 }

@@ -85,4 +85,15 @@ class Player {
 			return GameModel.Entity.PLAYER1_ENTITY;
 		}
 	}
+	
+	static int getOpposingPlayerNum(int playerNum) {
+		switch (playerNum) {
+		case 1: return 2;
+		case 2: return 1;
+		default:
+			assert(false);
+			return 1;
+		}
+	}
+	
 }

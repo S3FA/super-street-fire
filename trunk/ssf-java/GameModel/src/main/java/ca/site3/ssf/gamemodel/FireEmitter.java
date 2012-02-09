@@ -43,6 +43,23 @@ class FireEmitter {
 	}
 	
 	/**
+	 * Get a set of all the game entities that are contributing towards a greater than zero
+	 * flame intensity for this fire effect.
+	 * @return The set of enumerated contributing game entities.
+	 */
+	EnumSet<GameModel.Entity> getContributingEntities() {
+		EnumSet<GameModel.Entity> contributorSet = EnumSet.noneOf(GameModel.Entity.class);
+		
+		for (Map.Entry<GameModel.Entity, FireEmitterContributor> entry : this.contributors.entrySet()) {
+			if (entry.getValue().getResolvedIntensity() > FireEmitter.MIN_INTENSITY) {
+				contributorSet.add(entry.getKey());
+			}
+		}
+		
+		return contributorSet;
+	}
+	
+	/**
 	 * Get the index of this emitter within its location (e.g., if its on the right rail, how
 	 * far along the rail is it?).
 	 * @return The zero-based index.

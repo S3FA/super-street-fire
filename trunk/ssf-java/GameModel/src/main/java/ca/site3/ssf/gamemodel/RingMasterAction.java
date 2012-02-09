@@ -22,4 +22,10 @@ class RingMasterAction extends Action {
 	GameModel.Entity getContributorEntity() {
 		return GameModel.Entity.RINGMASTER_ENTITY;
 	}
+
+	@Override
+	void tickSimulator(double dT, FireEmitterSimulator simulator) {
+		// TODO Auto-generated method stub
+		
+	}
 }
