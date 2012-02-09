@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 
 class FireEmitterModel {
 	
-	private FireEmitterConfig config = null;
+	final private FireEmitterConfig config;
+	
 	private GameModelActionSignaller actionSignaller = null;
 	private Logger logger = null;
 	
@@ -51,6 +52,9 @@ class FireEmitterModel {
 		}
 	}
 	
+	FireEmitterConfig getConfig() {
+		return this.config;
+	}
 	
 	FireEmitter getOuterRingEmitter(int index, boolean wrapAround) {
 		if (!this.config.isOuterRingEnabled()) {
@@ -124,6 +128,33 @@ class FireEmitterModel {
 		
 		return result;
 	}
+	
+	
+	FireEmitterIterator getPlayerLeftHandStartEmitterIter(int playerNum) {
+		assert(playerNum == 1 || playerNum == 2);
+		switch (playerNum) {
+			case 1:
+				return new FireEmitterIterator(this.leftRailEmitters, 0, false);
+			case 2:
+				return new FireEmitterIterator(this.rightRailEmitters, this.rightRailEmitters.size(), true);
+			default:
+				assert(false);
+				return null;
+		}
+	}
+	FireEmitterIterator getPlayerRightHandStartEmitterIter(int playerNum) {
+		assert(playerNum == 1 || playerNum == 2);
+		switch (playerNum) {
+			case 1:
+				return new FireEmitterIterator(this.rightRailEmitters, 0, false);
+			case 2:
+				return new FireEmitterIterator(this.leftRailEmitters, this.leftRailEmitters.size(), true);
+			default:
+				assert(false);
+				return null;
+		}
+	}
+	
 	
 	/**
 	 * Resets all of the emitters in the game (both rails and the outer ring). This

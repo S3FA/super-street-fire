@@ -14,7 +14,8 @@ import ca.site3.ssf.common.MultiLerp;
 abstract class Action {
 	
 	protected FireEmitterModel fireEmitterModel = null;
-	protected ArrayList<ArrayList<FireEmitterSimulator>> wavesOfOrderedFireSims = null;
+	protected ArrayList<ArrayList<FireEmitterSimulator>> wavesOfOrderedFireSims =
+			new ArrayList<ArrayList<FireEmitterSimulator>>(2);
 	
 	Action(FireEmitterModel fireEmitterModel) {
 		this.fireEmitterModel = fireEmitterModel;
@@ -26,8 +27,8 @@ abstract class Action {
 	 * two 'waves' of simulation: one on the left rail and one on the right rail going all the way from the first
 	 * emitter though to the last emitter of each rail.
 	 * 
-	 * @param location The location within the game arena of the emitters involved in the wave simulation.
-	 * @param startIndex The starting index of the first emitter int he wave simultion within the given location.
+	 * @param emitterIter The fire emitter iterator that is set to the starting emitter where the wave will begin and
+	 * will iterate in the direction of the action.
 	 * @param travelLength The total travelling length of the wave (e.g, if there are 8 emitters to a rail and you want
 	 * a wave to travel the entire length of the rail, this value would be 8).
 	 * @param width The width of the wave (how many emitters will be on, at maximum, simultaneously during the wave's simulation).
@@ -39,10 +40,10 @@ abstract class Action {
 	 * 
 	 * @return true on success, false on failure.
 	 */
-	boolean AddFireEmitterWave(FireEmitter.Location location, int startIndex, int travelLength, int width, MultiLerp intensityLerp) {
+	boolean addFireEmitterWave(FireEmitterIterator emitterIter, int travelLength, int width, MultiLerp intensityLerp) {
 		
 		// Make sure the parameters are at least moderately correct
-		if (intensityLerp == null || startIndex < 0 || travelLength <= 0 || width <= 0 || width > travelLength) {
+		if (intensityLerp == null || emitterIter == null || travelLength <= 0 || width <= 0 || width > travelLength) {
 			assert(false);
 			return false;
 		}
@@ -54,9 +55,9 @@ abstract class Action {
 		
 		// Go through the full wave of simulations required for what has been specified
 		// by the parameters and add a simulator for each emitter in the wave
-		int endingIndex = startIndex + travelLength;
-		for (int i = startIndex; i <= endingIndex; i++, count++) {
-			FireEmitter currEmitter = this.fireEmitterModel.getEmitter(location, i);
+		for (int i = 0; i < travelLength; i++) {
+			assert(emitterIter.hasNext());
+			FireEmitter currEmitter = emitterIter.next();
 			if (currEmitter == null) {
 				assert(false);
 				return false;
@@ -67,7 +68,7 @@ abstract class Action {
 			
 			initialDelayTimeCounter += intensityLerp.getTotalTimeLength();
 		}
-		
+
 		// Successfully generated a new wave of fire emitter simulators, add it to this action and exit with success!
 		this.wavesOfOrderedFireSims.add(newSimWave);
 		return true;
