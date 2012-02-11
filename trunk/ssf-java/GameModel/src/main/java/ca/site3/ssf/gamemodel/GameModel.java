@@ -28,12 +28,16 @@ public class GameModel implements IGameModel {
 	
 	private Logger logger = null;
 	
+	private int numRoundsPlayed; // The number of rounds that are played
+	
+	
 	public GameModel(GameConfig config) {
 		this.logger = LoggerFactory.getLogger(getClass());
 		
 		this.config = config;
 		assert(this.config != null);
 		
+		this.numRoundsPlayed = 0;
 		this.actionSignaller = new GameModelActionSignaller();
 		
 		this.player1 = new Player(1, this.actionSignaller);
@@ -68,12 +72,12 @@ public class GameModel implements IGameModel {
 	}
 	
 	public void killGame() {
-		this.currState.killToIdle();
 		this.nextState = null;
+		this.currState.killToIdle();
 	}
 
 	public void initiateNextMatchRound() {
-		this.currState.initiateNextMatchRound();
+		this.currState.initiateNextState();
 	}
 
 	public void togglePauseGame() {
@@ -82,6 +86,10 @@ public class GameModel implements IGameModel {
 	
 	public ActionFactory getActionFactory() {
 		return new ActionFactory(this);
+	}
+	
+	public void executeAction(Action action) {
+		this.currState.executeAction(action);
 	}
 	
 	public void addGameModelListener(IGameModelListener l) {
@@ -103,12 +111,34 @@ public class GameModel implements IGameModel {
 		assert(nextState != null);
 		
 		// Ignore the state change if we're just going to change to the same state
-		if (this.nextState.getStateType() == this.currState.getStateType()) {
+		if (nextState.getStateType() == this.currState.getStateType()) {
 			return;
 		}
-		
+
 		this.nextState = nextState;
 	}	
+	
+	/**
+	 * Completely resets the game data and turns all emitters off.
+	 */
+	void resetGame() {
+		// Make sure the game is completely reset:
+		// - All emitters must be turned off
+		// - All players must have full health restored and all record of wins/losses wiped
+		this.getFireEmitterModel().resetAllEmitters();
+		this.getPlayer1().reset();
+		this.getPlayer2().reset();
+		assert(this.numRoundsPlayed <= this.getConfig().getNumRoundsPerMatch());
+		this.numRoundsPlayed = 0;
+	}
+	
+	void incrementNumRoundsPlayed() {
+		this.numRoundsPlayed++;
+	}
+	int getNumRoundsPlayed() {
+		return this.numRoundsPlayed;
+	}
+	
 	
 	/**
 	 * Get the player with the given player number.
@@ -136,7 +166,11 @@ public class GameModel implements IGameModel {
 		return this.player2;
 	}
 	
-	GameModelActionSignaller GetActionSignaller() {
+	GameConfig getConfig() {
+		return this.config;
+	}
+	
+	GameModelActionSignaller getActionSignaller() {
 		return this.actionSignaller;
 	}
 	FireEmitterModel getFireEmitterModel() {

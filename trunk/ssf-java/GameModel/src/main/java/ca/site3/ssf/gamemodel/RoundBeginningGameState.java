@@ -2,47 +2,71 @@ package ca.site3.ssf.gamemodel;
 
 /**
  * Round Beginning State, think "3, 2, 1, FIGHT!" - Happens 
- * at the beginning of every new round of play.
+ * at the beginning of every new round of play. This state has its own mini, internal
+ * statemachine that ensures that the countdown triggers the proper
+ * countdown events for all gamemodel listeners.
+ * 
+ * This state will automatically move to the in-play state once the countdown has
+ * completed via its 'tick' method.
+ * 
  * @author Callum
  * @author Greg
  *
  */
 class RoundBeginningGameState extends GameState {
-
-	private int roundNum;
+	
+	final static private double FIGHT_COUNT_TOTAL = 3.0; // 3, 2, 1, FIGHT!
+	private double fightCounter;
+	
+	private enum CountState { BEFORE_THREE, THREE, TWO, ONE, FIGHT };
+	private CountState currState;
 	
 	/**
 	 * Constructor for RoundBeginningGameState.
 	 * @param gameModel The game model that acts as the context for the states.
-	 * @param roundNum  The round number (starts at 1).
 	 */
-	RoundBeginningGameState(GameModel gameModel, int roundNum) {
+	RoundBeginningGameState(GameModel gameModel) {
 		super(gameModel);
-		this.roundNum = roundNum;
+		this.fightCounter = RoundBeginningGameState.FIGHT_COUNT_TOTAL;
+		this.currState    = RoundBeginningGameState.CountState.BEFORE_THREE;
 	}
 
 	@Override
 	void tick(double dT) {
-		// TODO Auto-generated method stub
+		this.updateCountState();
+		
+		// NOTE: We use a number slightly less than zero because there's the 'FIGHT' portion
+		// of the count down.
+		if (this.fightCounter <= -0.1) {
+			// Change to the next state...
+			this.gameModel.setNextGameState(new RoundInPlayState(this.gameModel));
+			return;
+		}
 
+		this.fightCounter -= dT;
 	}
 
 	@Override
 	void killToIdle() {
-		// TODO Auto-generated method stub
-
+		this.gameModel.setNextGameState(new IdleGameState(this.gameModel));
 	}
 
 	@Override
-	void initiateNextMatchRound() {
-		// TODO Auto-generated method stub
-
+	void initiateNextState() {
+		// Ignore this - this state will automatically move to the RoundInPlayGameState
+		// when it's ready to.
 	}
 
+	@Override
+	void executeAction(Action action) {
+		// No actions are allowed here - this is the uninterrupted
+		// count down to the beginning of the next round
+	}
+	
 	@Override
 	void togglePause() {
-		// TODO Auto-generated method stub
-
+		// Pause the game...
+		this.gameModel.setNextGameState(new PausedGameState(this.gameModel, this));
 	}
 
 	@Override
@@ -50,4 +74,47 @@ class RoundBeginningGameState extends GameState {
 		return GameState.GameStateType.ROUND_BEGINNING_STATE;
 	}
 
+	/**
+	 * Helper for updating the internal count down state machine within
+	 * this. This method ensures that the proper events for the round begin count down
+	 * are executed on all gamemodel listeners.
+	 */
+	private void updateCountState() {
+		switch (this.currState) {
+		
+			case BEFORE_THREE:
+				this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.THREE);
+				this.currState = RoundBeginningGameState.CountState.THREE;
+				break;
+				
+			case THREE:
+				if (this.fightCounter <= 2.0) {
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.TWO);
+					this.currState = RoundBeginningGameState.CountState.TWO;
+				}
+				break;
+				
+			case TWO:
+				if (this.fightCounter <= 1.0) {
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.ONE);
+					this.currState = RoundBeginningGameState.CountState.ONE;
+				}
+				break;
+				
+			case ONE:
+				if (this.fightCounter <= 1.0) {
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.FIGHT);
+					this.currState = RoundBeginningGameState.CountState.FIGHT;
+				}
+				break;
+				
+			case FIGHT:
+				break;
+				
+			default:
+				assert(false);
+				return;
+		}
+	}
+	
 }

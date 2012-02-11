@@ -163,18 +163,17 @@ class FireEmitterModel {
 	void resetAllEmitters() {
 		for (FireEmitter emitter : this.leftRailEmitters) {
 			emitter.reset();
+			this.actionSignaller.fireOnFireEmitterChanged(emitter);
 		}
 		for (FireEmitter emitter : this.rightRailEmitters) {
 			emitter.reset();
+			this.actionSignaller.fireOnFireEmitterChanged(emitter);
 		}
 		for (FireEmitter emitter : this.outerRingEmitters) {
 			emitter.reset();
+			this.actionSignaller.fireOnFireEmitterChanged(emitter);
 		}
 	}
 	
-	public static void main(String[] args) {
-		FireEmitterModel model = new FireEmitterModel(new FireEmitterConfig(true, 16, 8), new GameModelActionSignaller());
-		
-	}
-	
+
 }

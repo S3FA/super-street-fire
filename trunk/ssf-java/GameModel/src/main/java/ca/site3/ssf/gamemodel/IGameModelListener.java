@@ -10,7 +10,9 @@ import java.util.EnumSet;
  * @author Greg
  */
 public interface IGameModelListener {
-
+	
+	public enum RoundBeginCountdownType { THREE, TWO, ONE, FIGHT };
+	
 	/**
 	 * Event method, called whenever the game state changes.
 	 * @param oldState The previous game state that was set before the change.
@@ -26,7 +28,27 @@ public interface IGameModelListener {
 	 */
 	void onPlayerHealthChanged(int playerNum, float prevLifePercentage, float newLifePercentage);
 	
-	//void onRoundTimeChanged(int newCountdownTimeInSecs);
+	/**
+	 * Event method, called each change in tick of the round in-play game state.
+	 * @param newCountdownTimeInSecs The current count down time of the current game round. The
+	 * timer will start at a large time value and count down to zero over the course of a round.
+	 * NOTE: These events will stop if the round stops due to a player winning/losing or an abrupt
+	 * change in state.
+	 */
+	void onRoundPlayTimerChanged(int newCountdownTimeInSecs);
+	
+	/**
+	 * Event method, called when the round begin timer is counting down (i.e., "3, 2, 1, FIGHT!").
+	 * For each state in the count down this method will be called. This method
+	 * should be expected to be called four times at the beginning of each round.
+	 * @param threeTwoOneFightTime The current count down value.
+	 */
+	void onRoundBeginFightTimerChanged(RoundBeginCountdownType threeTwoOneFightTime);
+	
+	//public enum GameResult { PLAYER1_VICTORY, PLAYER2_VICTORY, TIE };
+	//void onRoundEnded(GameResult roundResult, boolean roundTimedOut);
+	
+	//void onMatchEnded(GameResult matchResult);
 	
 	
 	/**
