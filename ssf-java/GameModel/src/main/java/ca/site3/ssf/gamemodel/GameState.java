@@ -10,7 +10,7 @@ abstract class GameState {
 	/**
 	 * The enumeration of the various game state types, useful for events and casting.
 	 */
-	enum GameStateType { IDLE_STATE, ROUND_BEGINNING_STATE, ROUND_IN_PLAY_STATE,
+	enum GameStateType { IDLE_STATE, RINGMASTER_STATE, ROUND_BEGINNING_STATE, ROUND_IN_PLAY_STATE,
 		ROUND_ENDED_STATE, SETTLE_TIE_STATE, MATCH_OVER_STATE, PAUSED_STATE }
 	
 	protected GameModel gameModel = null;
@@ -27,9 +27,8 @@ abstract class GameState {
 	// Event methods that must be implemented by child classes
 	abstract void tick(double dT);
 	abstract void killToIdle();
-	abstract void initiateNextMatchRound();
-	//abstract void executePlayerAction();
-	//abstract void executeRingmasterAction();
+	abstract void initiateNextState();
+	abstract void executeAction(Action action);
 	abstract void togglePause();
 	abstract GameState.GameStateType getStateType();
 

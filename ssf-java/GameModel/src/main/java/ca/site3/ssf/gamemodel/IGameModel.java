@@ -16,8 +16,7 @@ public interface IGameModel {
 	void togglePauseGame();
 
 	ActionFactory getActionFactory();
-	//void executePlayerAction(Player.PlayerNumber playerNum, PlayerAction action);
-	//void executeRingmasterAction(RingmasterAction action);
+	void executeAction(Action action);
 	
 	void addGameModelListener(IGameModelListener l);
 	void removeGameModelListener(IGameModelListener l);

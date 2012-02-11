@@ -30,10 +30,16 @@ class PausedGameState extends GameState {
 	}
 
 	@Override
-	void initiateNextMatchRound() {
+	void initiateNextState() {
 		// Ignore this, the game is paused...
 	}
-
+	
+	@Override
+	void executeAction(Action action) {
+		// Do nothing with the action - we're in an paused state, all
+		// actions will be ignored until an in-game state is reached/resumed.
+	}	
+	
 	@Override
 	void togglePause() {
 		// Un-pause the game (go back to the previously paused state)

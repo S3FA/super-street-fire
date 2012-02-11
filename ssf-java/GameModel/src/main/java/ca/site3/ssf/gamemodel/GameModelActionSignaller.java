@@ -66,6 +66,32 @@ class GameModelActionSignaller {
 		}
 	}
 	
+	void fireOnRoundPlayTimerChanged(int newCountdownTimeInSecs) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onRoundPlayTimerChanged(newCountdownTimeInSecs);
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing round in-play timer changed", ex);
+			}
+		}
+	}
+	
+	/**
+	 * Triggers each of the listener's callbacks for a round begin fight timer change.
+	 * @param threeTwoOneFightTime The latest/current value of the timer.
+	 */
+	void fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType threeTwoOneFightTime) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onRoundBeginFightTimerChanged(threeTwoOneFightTime);
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing round begin fight timer changed", ex);
+			}
+		}
+	}
+	
 	/**
 	 * Triggers each of the listener's callbacks for a FireEmitter change.
 	 * @param fireEmitter The emitter that changed.
@@ -76,7 +102,7 @@ class GameModelActionSignaller {
 				listener.onFireEmitterChanged(new ImmutableFireEmitter(fireEmitter));
 			}
 			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing game state change", ex);
+				this.logger.error("Exception occurred while firing fire emitter changed", ex);
 			}
 		}
 	}

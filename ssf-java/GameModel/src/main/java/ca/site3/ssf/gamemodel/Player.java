@@ -75,6 +75,9 @@ class Player {
 	int getNumRoundWins() {
 		return this.numRoundWins;
 	}
+	void incrementNumRoundWins() {
+		this.numRoundWins++;
+	}
 	
 	GameModel.Entity getEntity() {
 		switch (this.playerNum) {
