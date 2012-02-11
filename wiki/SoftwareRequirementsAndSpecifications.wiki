@@ -35,6 +35,7 @@
 
   * Game states i.e., what is the flow of the game...
     ** Idle State (no game play, waiting for a game to start)
+    ** Ringmaster State (Where the ringmaster is free to perform amazing feats of awesomeness and trigger round/match beginnings)
     ** Round Beginning State (Initiated by ringmaster. Start up the timers, special flame effects?, 3-2-1 FIGHT etc.)
     ** Round In-Play State (Players are attacking/blocking, trying to defeat the other)
     ** Round Ended State (A player won the round, special flame effects? flashing timer? etc.) Effectively a paused state until ringmaster starts a new Round Beginning State
