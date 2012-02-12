@@ -76,6 +76,9 @@ class RoundInPlayState extends GameState {
 			currAction.tick(dT);
 		}
 		
+		// Send event to update all the fire emitters...
+		this.gameModel.getFireEmitterModel().fireAllEmitterChangedEvent();
+		
 		// Update the count down timer...
 		this.setCountdownTimer(this.countdownTimeInSecs - dT);
 	}
@@ -135,6 +138,13 @@ class RoundInPlayState extends GameState {
 		return GameState.GameStateType.ROUND_IN_PLAY_STATE;
 	}
 	
+	/**
+	 * Helper function to set the count down timer to the given time. This will not only
+	 * set the count down timer value but also perform other functions required whenever
+	 * the timer is updated.
+	 * 
+	 * @param timeInSecs The time to set the count down timer to.
+	 */
 	private void setCountdownTimer(double timeInSecs) {
 		this.countdownTimeInSecs = timeInSecs;
 		
@@ -213,6 +223,10 @@ class RoundInPlayState extends GameState {
 		this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, null));
 	}
 	
+	/**
+	 * Helper function, used to check if the given player has won the entire match.
+	 * @param playerToCheck The player to check.
+	 */
 	private boolean checkForMatchOverVictory(Player playerToCheck) {
 		// Check to see if the match is over...
 		GameConfig gameConfig = this.gameModel.getConfig();

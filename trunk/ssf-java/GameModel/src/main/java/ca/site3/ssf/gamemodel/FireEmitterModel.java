@@ -14,7 +14,7 @@ class FireEmitterModel {
 	private Logger logger = null;
 	
 	private ArrayList<FireEmitter> outerRingEmitters = null; // The outer ring of emitters, starting at the first emitter to the right
-															 // of player one's back
+															 // of player one's back and moving in a counter-clockwise direction
 	
 	private ArrayList<FireEmitter> leftRailEmitters  = null; // Left rail is the rail of emitters on the left from player one's perspective,
 														     // they are ordered starting at player one going towards player two
@@ -134,9 +134,9 @@ class FireEmitterModel {
 		assert(playerNum == 1 || playerNum == 2);
 		switch (playerNum) {
 			case 1:
-				return new FireEmitterIterator(this.leftRailEmitters, 0, false);
+				return new FireEmitterIterator(this.leftRailEmitters, 0, false, false);
 			case 2:
-				return new FireEmitterIterator(this.rightRailEmitters, this.rightRailEmitters.size(), true);
+				return new FireEmitterIterator(this.rightRailEmitters, this.rightRailEmitters.size(), true, false);
 			default:
 				assert(false);
 				return null;
@@ -146,34 +146,64 @@ class FireEmitterModel {
 		assert(playerNum == 1 || playerNum == 2);
 		switch (playerNum) {
 			case 1:
-				return new FireEmitterIterator(this.rightRailEmitters, 0, false);
+				return new FireEmitterIterator(this.rightRailEmitters, 0, false, false);
 			case 2:
-				return new FireEmitterIterator(this.leftRailEmitters, this.leftRailEmitters.size(), true);
+				return new FireEmitterIterator(this.leftRailEmitters, this.leftRailEmitters.size(), true, false);
 			default:
 				assert(false);
 				return null;
 		}
 	}
+	FireEmitterIterator getRingmasterStartEmitterIter(int startEmitterIdx, boolean clockwise) {
+		return this.getOuterRingStartEmitterIter(startEmitterIdx, clockwise);
+	}
 	
+	FireEmitterIterator getOuterRingStartEmitterIter(int startEmitterIdx, boolean clockwise) {
+		return new FireEmitterIterator(this.outerRingEmitters, startEmitterIdx, clockwise, true);
+	}
+	FireEmitterIterator getLeftRailStartEmitterIter(int startEmitterIdx) {
+		return new FireEmitterIterator(this.leftRailEmitters, startEmitterIdx, false, false);
+	}
+	FireEmitterIterator getRightRailStartEmitterIter(int startEmitterIdx) {
+		return new FireEmitterIterator(this.rightRailEmitters, startEmitterIdx, false, false);
+	}
 	
 	/**
 	 * Resets all of the emitters in the game (both rails and the outer ring). This
 	 * effectively reduces the intensity of every emitter to zero, instantly.
 	 */
 	void resetAllEmitters() {
+		for (FireEmitter emitter : this.outerRingEmitters) {
+			emitter.reset();
+		}
 		for (FireEmitter emitter : this.leftRailEmitters) {
 			emitter.reset();
-			this.actionSignaller.fireOnFireEmitterChanged(emitter);
 		}
 		for (FireEmitter emitter : this.rightRailEmitters) {
 			emitter.reset();
-			this.actionSignaller.fireOnFireEmitterChanged(emitter);
 		}
+		this.fireAllEmitterChangedEvent();
+	}
+	
+	void fireAllEmitterChangedEvent() {
+		this.fireAllOuterRingChangedEvent();
+		this.fireAllLeftRailChangedEvent();
+		this.fireAllRightRailChangedEvent();
+	}
+	void fireAllOuterRingChangedEvent() {
 		for (FireEmitter emitter : this.outerRingEmitters) {
-			emitter.reset();
 			this.actionSignaller.fireOnFireEmitterChanged(emitter);
 		}
 	}
-	
+	void fireAllRightRailChangedEvent() {
+		for (FireEmitter emitter : this.rightRailEmitters) {
+			this.actionSignaller.fireOnFireEmitterChanged(emitter);
+		}
+	}
+	void fireAllLeftRailChangedEvent() {
+		for (FireEmitter emitter : this.leftRailEmitters) {
+			this.actionSignaller.fireOnFireEmitterChanged(emitter);
+		}
+	}
 
 }

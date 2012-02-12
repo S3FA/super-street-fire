@@ -1,5 +1,7 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.EnumSet;
+
 import ca.site3.ssf.common.MultiLerp;
 
 /**
@@ -20,6 +22,65 @@ final public class ActionFactory {
 		this.gameModel = gameModel;
 		assert(gameModel != null);
 	}
+	
+	
+	//final public Action buildRingmasterAction(double totalDurationInSecs, int width, int startEmitterIdx) {
+	//}
+	
+	// Crowd-Pleasing Actions **************************************************************************
+	
+	/**
+	 * Create an end-of-round burst of flames at the given location of fire emitters in the arena.
+	 * ya know.. cause we gotta wow the crowd.
+	 * @param colourEntity The entity that will drive the colour of the flames.
+	 * @param location The emitters location in the game arena.
+	 * @param totalDurationInSecs Length of the whole burst action in seconds.
+	 * @param numBursts The number of bursts.
+	 * @return The resulting action, null on failure.
+	 */
+	final public Action buildBurstAction(GameModel.Entity colourEntity, FireEmitter.Location location,
+										 double totalDurationInSecs, int numBursts) {
+		
+		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
+		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
+		
+		int numEmitters = 0;
+		
+		FireEmitterIterator emitterIter = null;
+		switch (location) {
+			case LEFT_RAIL:
+				emitterIter = fireEmitterModel.getLeftRailStartEmitterIter(0);
+				numEmitters = fireEmitterConfig.getNumEmittersPerRail();
+				break;
+			case RIGHT_RAIL:
+				emitterIter = fireEmitterModel.getRightRailStartEmitterIter(0);
+				numEmitters = fireEmitterConfig.getNumEmittersPerRail();
+				break;
+			case OUTER_RING:
+				emitterIter = fireEmitterModel.getOuterRingStartEmitterIter(0, false);
+				numEmitters = fireEmitterConfig.getNumOuterRingEmitters();
+				break;
+			default:
+				assert(false);
+				return null;
+		}
+
+		Action action = null;
+		switch (colourEntity) {
+			case PLAYER1_ENTITY:
+			case PLAYER2_ENTITY:
+				action = new PlayerBlockAction(fireEmitterModel, this.gameModel.getPlayer(colourEntity));
+				break;
+			default:
+				action = new RingmasterAction(fireEmitterModel);
+				break;
+		}
+		
+		this.addBurstToAction(action, emitterIter, numEmitters, numBursts, totalDurationInSecs, 0.8f, 0.05f);
+		return action;
+	}
+
+	// *************************************************************************************************
 	
 	/**
 	 * Build a left-handed player attack action.
@@ -149,6 +210,41 @@ final public class ActionFactory {
 		return action.addFireEmitterWave(emitterIter, travelLength, width, intensityLerp);
 	}
 	
+	final private boolean addBurstToAction(Action action, FireEmitterIterator emitterIter, int width, int numBursts,
+										   double totalDurationInSecs, double fullOnFraction, double fullOffFraction) {
+		
+		// Make sure all the provided parameters are correct
+		if (action == null || emitterIter == null || totalDurationInSecs < 0.001 || width <= 0 || numBursts <= 0 ||
+			fullOnFraction < 0.0 || fullOnFraction > 1.0 || fullOffFraction < 0.0 || fullOffFraction > 1.0 ||
+			(fullOnFraction + fullOffFraction) > 1.0) {
+			
+			assert(false);
+			return false;
+		}
+
+		// Calculate values on a per-lerp basis (i.e., time of each on/off cycle per fire emitter in the wave)
+		// NOTE: Since the wave form cascades over the travel length of emitters, it causes the
+		// duration for each lerp cycle to be (totalDuration / (double)(width + travelLength - 1)).
+		double durationPerLerp  = totalDurationInSecs / (double)numBursts;
+		double offTimePerLerp   = durationPerLerp * fullOffFraction;
+		double onTimePerLerp    = durationPerLerp - offTimePerLerp;
+		double maxOnTimePerLerp = durationPerLerp * fullOnFraction;
+		
+		assert(onTimePerLerp >= maxOnTimePerLerp);
+		double startMaxIntensityTime = (onTimePerLerp - maxOnTimePerLerp) / 2.0;
+		double endMaxIntensityTime   = startMaxIntensityTime + maxOnTimePerLerp;
+		double startDelayTime        = onTimePerLerp;
+		
+		MultiLerp intensityLerp = this.buildIntensityMultiLerp(startMaxIntensityTime,
+				endMaxIntensityTime, startDelayTime, durationPerLerp);
+		if (intensityLerp == null) {
+			assert(false);
+			return false;
+		}
+		
+		return action.addFireEmitterBurst(emitterIter, width, numBursts, intensityLerp);
+	}
+	
 	/**
 	 * Builds a piece-wise linear function that describes a stepped wave function for changing
 	 * the intensity value of a fire emitter. The step will look as follows:
@@ -183,7 +279,7 @@ final public class ActionFactory {
 	}
 	
 	public static void main(String[] args) {
-		GameModel model = new GameModel(new GameConfig());
+		GameModel model = new GameModel(new GameConfig(true, 1.0, 60, 3));
 		ActionFactory actionFactory = model.getActionFactory();
 		
 		// One handed attacks...
@@ -256,6 +352,43 @@ final public class ActionFactory {
 			}			
 			System.out.println();
 		}
+
+		Action outerRingVictoryAction = actionFactory.buildBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 1.0, 1);
+		assert(outerRingVictoryAction != null);
+		while (!outerRingVictoryAction.isFinished()) {
+			outerRingVictoryAction.tick(0.01666);
+			
+			System.out.print("OUTER RING: ");
+			for (int i = 0; i < 16; i++) {
+				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getOuterRingEmitter(i, false).getIntensity() + "|");
+			}	
+			System.out.println();
+		}
+		
+		
+		Action leftRailBurst = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.LEFT_RAIL, 1.0, 1);
+		assert(leftRailBurst != null);
+		while (!leftRailBurst.isFinished()) {
+			leftRailBurst.tick(0.01666);
+			
+			System.out.print("LEFT RAIL: ");
+			for (int i = 0; i < 8; i++) {
+				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getLeftRailEmitter(i).getIntensity() + "|");
+			}
+			System.out.println();
+		}
 		*/
+		Action rightRailBurst = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 1.0, 1);
+		assert(rightRailBurst != null);
+		while (!rightRailBurst.isFinished()) {
+			rightRailBurst.tick(0.01666);
+			
+			System.out.print("RIGHT RAIL: ");
+			for (int i = 0; i < 8; i++) {
+				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getRightRailEmitter(i).getIntensity() + "|");
+			}
+			System.out.println();
+		}		
+		
 	}
 }

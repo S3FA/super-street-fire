@@ -22,6 +22,36 @@ abstract class Action {
 		assert(this.fireEmitterModel != null);
 	}
 	
+	boolean addFireEmitterBurst(FireEmitterIterator emitterIter, int width, int numBursts, MultiLerp intensityLerp) {
+		// Make sure the parameters are at least moderately correct
+		if (intensityLerp == null || emitterIter == null || width <= 0 || numBursts <= 0) {
+			assert(false);
+			return false;
+		}
+		
+		ArrayList<FireEmitterSimulator> newSimWave = new ArrayList<FireEmitterSimulator>(width);
+		
+		int count = 0;
+
+		// Go through the full wave of simulations required for what has been specified
+		// by the parameters and add a simulator for each emitter in the wave
+		for (int i = 0; i < width; i++) {
+			assert(emitterIter.hasNext());
+			FireEmitter currEmitter = emitterIter.next();
+			if (currEmitter == null) {
+				assert(false);
+				return false;
+			}
+			
+			newSimWave.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(),
+					count, 0.0, numBursts, (MultiLerp)intensityLerp.clone()));
+		}
+
+		// Successfully generated a new wave of fire emitter simulators, add it to this action and exit with success!
+		this.wavesOfOrderedFireSims.add(newSimWave);
+		return true;
+	}
+	
 	/**
 	 * Adds a new 'wave' of simulation to this action, for example if a player did a hadouken there would be
 	 * two 'waves' of simulation: one on the left rail and one on the right rail going all the way from the first

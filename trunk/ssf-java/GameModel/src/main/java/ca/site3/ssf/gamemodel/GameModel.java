@@ -159,6 +159,19 @@ public class GameModel implements IGameModel {
 		return null;
 	}
 	
+	Player getPlayer(GameModel.Entity entity) {
+		switch (entity) {
+			case PLAYER1_ENTITY:
+				return this.getPlayer1();
+			case PLAYER2_ENTITY:
+				return this.getPlayer2();
+			default:
+				assert(false);
+				break;
+		}
+		return null;
+	}
+	
 	Player getPlayer1() {
 		return this.player1;
 	}

@@ -27,6 +27,10 @@ class RoundBeginningGameState extends GameState {
 	 */
 	RoundBeginningGameState(GameModel gameModel) {
 		super(gameModel);
+		
+		// Turn off all the fire emitters
+		this.gameModel.getFireEmitterModel().resetAllEmitters();
+		
 		this.fightCounter = RoundBeginningGameState.FIGHT_COUNT_TOTAL;
 		this.currState    = RoundBeginningGameState.CountState.BEFORE_THREE;
 	}
@@ -42,7 +46,10 @@ class RoundBeginningGameState extends GameState {
 			this.gameModel.setNextGameState(new RoundInPlayState(this.gameModel));
 			return;
 		}
-
+		
+		// TODO: Have some actions here for fire emitters...?
+		//this.gameModel.getFireEmitterModel().fireAllEmitterChangedEvent();
+		
 		this.fightCounter -= dT;
 	}
 

@@ -10,7 +10,6 @@ class PlayerBlockAction extends Action {
 		assert(blocker != null);
 	}
 
-	
 	Player getBlocker() {
 		return this.blocker;
 	}

@@ -140,7 +140,7 @@ class FireEmitterSimulator {
 		this.updateLerp();
 	}
 	
-	void tick(RingMasterAction action, double dT) {
+	void tick(RingmasterAction action, double dT) {
 		assert(this.action == action);
 		
 		this.tickSim(dT);
