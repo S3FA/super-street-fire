@@ -12,6 +12,7 @@ import java.util.EnumSet;
 public interface IGameModelListener {
 	
 	public enum RoundBeginCountdownType { THREE, TWO, ONE, FIGHT };
+	public enum GameResult { PLAYER1_VICTORY, PLAYER2_VICTORY, TIE };
 	
 	/**
 	 * Event method, called whenever the game state changes.
@@ -45,8 +46,13 @@ public interface IGameModelListener {
 	 */
 	void onRoundBeginFightTimerChanged(RoundBeginCountdownType threeTwoOneFightTime);
 	
-	//public enum GameResult { PLAYER1_VICTORY, PLAYER2_VICTORY, TIE };
-	//void onRoundEnded(GameResult roundResult, boolean roundTimedOut);
+	/**
+	 * Event method, called when a game round ends - this is for all rounds including tie breaker rounds.
+	 * @param roundResult The result of the round.
+	 * @param roundTimedOut Whether the round timed out or not, in the case of a tie breaker round, this
+	 * will always be true.
+	 */
+	void onRoundEnded(GameResult roundResult, boolean roundTimedOut);
 	
 	//void onMatchEnded(GameResult matchResult);
 	

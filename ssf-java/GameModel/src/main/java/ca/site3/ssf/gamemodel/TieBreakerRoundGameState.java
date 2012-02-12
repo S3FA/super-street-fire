@@ -11,18 +11,18 @@ class TieBreakerGameState extends GameState {
 	void tick(double dT) {
 		// TODO Auto-generated method stub
 
+		// TODO: this.gameModel.getActionSignaller().fireOnRoundEnded(result, true);
+		
 	}
 
 	@Override
 	void killToIdle() {
-		// TODO Auto-generated method stub
-
+		this.gameModel.setNextGameState(new IdleGameState(this.gameModel));
 	}
 
 	@Override
 	void initiateNextState() {
-		// TODO Auto-generated method stub
-
+		// The tie breaker must play out before going to the next state
 	}
 
 	@Override
@@ -33,14 +33,12 @@ class TieBreakerGameState extends GameState {
 
 	@Override
 	void togglePause() {
-		// TODO Auto-generated method stub
-
+		this.gameModel.setNextGameState(new PausedGameState(this.gameModel, this));
 	}
 
 	@Override
 	GameStateType getStateType() {
-		// TODO Auto-generated method stub
-		return null;
+		return GameState.GameStateType.TIE_BREAKER_ROUND_STATE;
 	}
 
 }
