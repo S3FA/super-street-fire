@@ -6,6 +6,8 @@ import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+
 /**
  * The GameModelActionSignaller provides a centralized location for all methods used
  * to fire off events for all of the registered event listeners for the gamemodel package.
@@ -44,7 +46,7 @@ class GameModelActionSignaller {
 				listener.onGameStateChanged(oldState.getStateType(), newState.getStateType());
 			}
 			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing game state change", ex);
+				this.logger.error("Exception occurred while firing game state change event", ex);
 			}
 		}
 	}	
@@ -61,7 +63,7 @@ class GameModelActionSignaller {
 				listener.onPlayerHealthChanged(playerNum, prevLifePercentage, newLifePercentage);
 			}
 			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing player health change", ex);
+				this.logger.error("Exception occurred while firing player health change event", ex);
 			}
 		}
 	}
@@ -72,7 +74,7 @@ class GameModelActionSignaller {
 				listener.onRoundPlayTimerChanged(newCountdownTimeInSecs);
 			}
 			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing round in-play timer changed", ex);
+				this.logger.error("Exception occurred while firing round in-play timer changed event", ex);
 			}
 		}
 	}
@@ -87,7 +89,23 @@ class GameModelActionSignaller {
 				listener.onRoundBeginFightTimerChanged(threeTwoOneFightTime);
 			}
 			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing round begin fight timer changed", ex);
+				this.logger.error("Exception occurred while firing round begin fight timer changed event", ex);
+			}
+		}
+	}
+	
+	/**
+	 * Triggers each of the listener's callbacks for a round ended event.
+	 * @param roundResult The round result.
+	 * @param roundTimedOut Whether the round timed out or not.
+	 */
+	void fireOnRoundEnded(IGameModelListener.GameResult roundResult, boolean roundTimedOut) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onRoundEnded(roundResult, roundTimedOut);
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing round ended event", ex);
 			}
 		}
 	}
@@ -102,7 +120,7 @@ class GameModelActionSignaller {
 				listener.onFireEmitterChanged(new ImmutableFireEmitter(fireEmitter));
 			}
 			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing fire emitter changed", ex);
+				this.logger.error("Exception occurred while firing fire emitter changed event", ex);
 			}
 		}
 	}

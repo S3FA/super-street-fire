@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+
 class RoundInPlayState extends GameState {
 
 	private Collection<Action> activeActions = new ArrayList<Action>();
@@ -17,6 +19,18 @@ class RoundInPlayState extends GameState {
 	
 	public RoundInPlayState(GameModel gameModel) {
 		super(gameModel);
+		
+		// Clear the complete fire emitter state, just for good measure
+		this.gameModel.getFireEmitterModel().resetAllEmitters();
+		
+		// Make sure both players health is at full
+		Player p1 = this.gameModel.getPlayer1();
+		Player p2 = this.gameModel.getPlayer2();
+		assert(p1 != null && p2 != null);
+		p1.resetHealth();
+		p2.resetHealth();
+		
+		// Initialize the count down timer
 		this.setCountdownTimer(this.gameModel.getConfig().getRoundTimeInSecs());
 	}
 
@@ -29,7 +43,7 @@ class RoundInPlayState extends GameState {
 		if (p1.isKOed()) {
 			if (!p2.isKOed()) {
 				// Player 2 has officially won this match!
-				this.roundWasWonLost(p2);
+				this.roundWasWon(p2);
 			}
 			else {
 				this.roundWasTied();
@@ -39,7 +53,7 @@ class RoundInPlayState extends GameState {
 		else if (p2.isKOed()) {
 			if (!p1.isKOed()) {
 				// Player 1 has officially won this match!
-				this.roundWasWonLost(p1);
+				this.roundWasWon(p1);
 			}
 			else {
 				this.roundWasTied();
@@ -52,10 +66,10 @@ class RoundInPlayState extends GameState {
 			// Match timer just ran out, check which player has the most life left, they win by default
 			// if both players have the same amount of life left then it's a tie
 			if (p1.getHealth() > p2.getHealth()) {
-				this.roundWasWonLost(p1);
+				this.roundWasWon(p1);
 			}
 			else if (p2.getHealth() > p1.getHealth()) {
-				this.roundWasWonLost(p2);
+				this.roundWasWon(p2);
 			}
 			else {
 				// Tie...
@@ -163,11 +177,18 @@ class RoundInPlayState extends GameState {
 	 * Helper function, only called when the round has officially been won by one player and
 	 * lost by the other.
 	 */
-	private void roundWasWonLost(Player victoryPlayer) {
+	private void roundWasWon(Player victoryPlayer) {
 		assert(victoryPlayer != null);
 		
 		victoryPlayer.incrementNumRoundWins();
 		this.gameModel.incrementNumRoundsPlayed();
+		
+		// Signal an event for the round ending in victory for a player...
+		GameResult result = GameResult.PLAYER1_VICTORY;
+		if (victoryPlayer.getPlayerNumber() == 2) {
+			result = GameResult.PLAYER2_VICTORY;
+		}
+		this.gameModel.getActionSignaller().fireOnRoundEnded(result, this.countdownTimeInSecs <= 0.0);
 		
 		// Check to see if the match is over...
 		GameConfig gameConfig = this.gameModel.getConfig();
@@ -199,6 +220,8 @@ class RoundInPlayState extends GameState {
 		p1.incrementNumRoundWins();
 		p2.incrementNumRoundWins();
 		
+		this.gameModel.getActionSignaller().fireOnRoundEnded(GameResult.TIE, this.countdownTimeInSecs <= 0.0);
+		
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);
 		
@@ -209,8 +232,9 @@ class RoundInPlayState extends GameState {
 		// Check for a complete match tie (i.e., over the entire match there has
 		// been a full tie between players) - this should almost never happen...
 		if (p1.getNumRoundWins() == NUM_WINS_FOR_VICTORY && p2.getNumRoundWins() == NUM_WINS_FOR_VICTORY) {
-			// Go to a tie breaker state...
-			this.gameModel.setNextGameState(new TieBreakerGameState(this.gameModel));
+			// The round is over, it looks like the match will be settled in a tie-breaker,
+			// but that state won't happen until the next round begins (see RoundBeginningGameState)...
+			this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, null));
 			return;
 		}
 		
@@ -228,6 +252,7 @@ class RoundInPlayState extends GameState {
 	 * @param playerToCheck The player to check.
 	 */
 	private boolean checkForMatchOverVictory(Player playerToCheck) {
+		
 		// Check to see if the match is over...
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);

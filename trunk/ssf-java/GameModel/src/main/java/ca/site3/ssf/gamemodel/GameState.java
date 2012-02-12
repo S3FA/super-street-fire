@@ -11,7 +11,7 @@ abstract class GameState {
 	 * The enumeration of the various game state types, useful for events and casting.
 	 */
 	enum GameStateType { IDLE_STATE, RINGMASTER_STATE, ROUND_BEGINNING_STATE, ROUND_IN_PLAY_STATE,
-		ROUND_ENDED_STATE, SETTLE_TIE_STATE, MATCH_OVER_STATE, PAUSED_STATE }
+		ROUND_ENDED_STATE, TIE_BREAKER_ROUND_STATE, MATCH_OVER_STATE, PAUSED_STATE }
 	
 	protected GameModel gameModel = null;
 	

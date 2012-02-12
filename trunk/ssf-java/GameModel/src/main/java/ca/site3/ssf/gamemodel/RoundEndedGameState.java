@@ -40,30 +40,30 @@ class RoundEndedGameState extends GameState {
 		Action tempAction = null;
 		
 		// Action for the various of fire emitter areas in the game arena...
-		tempAction = actionFactory.buildBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 1.0, 1);
+		tempAction = actionFactory.buildBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 2.0, 1);
 		assert(tempAction != null);
 		this.roundEndActions.add(tempAction);
 		
 		if (roundVictor != null) {
-			tempAction  = actionFactory.buildBurstAction(roundVictor.getEntity(), FireEmitter.Location.LEFT_RAIL,  3.0, 3);
+			tempAction  = actionFactory.buildBurstAction(roundVictor.getEntity(), FireEmitter.Location.LEFT_RAIL,  2.0, 3);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
-			tempAction = actionFactory.buildBurstAction(roundVictor.getEntity(), FireEmitter.Location.RIGHT_RAIL, 3.0, 3);
+			tempAction = actionFactory.buildBurstAction(roundVictor.getEntity(), FireEmitter.Location.RIGHT_RAIL, 2.0, 3);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 		}
 		else {
-			tempAction  = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.LEFT_RAIL,  3.0, 3);
+			tempAction  = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.LEFT_RAIL,  2.0, 3);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
-			tempAction = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 3.0, 3);
+			tempAction = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 2.0, 3);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 			
-			tempAction  = actionFactory.buildBurstAction(GameModel.Entity.PLAYER2_ENTITY, FireEmitter.Location.LEFT_RAIL,  3.0, 3);
+			tempAction  = actionFactory.buildBurstAction(GameModel.Entity.PLAYER2_ENTITY, FireEmitter.Location.LEFT_RAIL,  2.0, 3);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
-			tempAction = actionFactory.buildBurstAction(GameModel.Entity.PLAYER2_ENTITY, FireEmitter.Location.RIGHT_RAIL, 3.0, 3);
+			tempAction = actionFactory.buildBurstAction(GameModel.Entity.PLAYER2_ENTITY, FireEmitter.Location.RIGHT_RAIL, 2.0, 3);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 		}
