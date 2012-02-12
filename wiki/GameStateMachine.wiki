@@ -2,44 +2,4 @@
 
 = Game State Machine =
 
-|| || *Idle* || *Calibration* || *RoundBegin* || *RoundInPlay* || *RoundEnded* || *SettleTie* || *MatchOver* || *Paused(pausedState)* ||
-|| *Tick* ||Idle||Calibration (Idle if calibration is done)||RoundBegin (RoundInPlay after timer to start)||RoundInPlay (RoundEnded when the round is over i.e., time runs out or player is KOed)||(SettleTie if all rounds are done and there's a tie, MatchOver if all rounds are done an there's a winner)|| SettleTie (MatchOver If either player is hit by an unblocked attack, in which case the attacker wins) ||MatchOver (Idle once some timer runs out or something...)|| Paused ||
-|| *Calibrate* ||Calibration||Calibration|| RoundBegin||RoundInPlay||RoundEnded||SettleTie||MatchOver||Paused||
-|| *StartGame* ||RoundBegin||Calibration||RoundBegin||RoundInPlay|| RoundEnded ||SettleTie||MatchOver||Paused||
-|| *TogglePauseGame* ||Idle||Calibration||Paused(RoundBegin)||Paused(RoundInPlay)||Paused(RoundEnded)||Paused(SettleTie)||MatchOver||pausedState||
-|| *StopGame* ||Idle||Calibration||Idle||Idle||Idle||Idle||Idle||Idle||
-|| *UpdateWithHeadsetData* ||Idle||Calibration||RoundBegin||RoundInPlay||RoundEnded||SettleTie||MatchOver||Paused||
-|| *UpdateWithGloveData* ||Idle||Calibration||RoundBegin||RoundInPlay||RoundEnded||SettleTie||MatchOver||Paused||
-
-== Events ==
-*Tick* : An event triggered every frame of the game simulation. When a tick occurs it updates the current state with the delta time that has occurred in the last frame and may result in a change of state based on the current state's internal values (e.g., timers, changes of condition, etc.)
-
-*Calibrate* : A very particular event that changes the current state to be in the 'Calibration' state, this event only has an effect in vary particular states.
-
-*StartGame* : An event used to trigger the beginning of a game - this is mainly used as an event that allows the game state to depart from being Idle and move into the various 'round' states.
-
-*TogglePauseGame* : Pauses or un-pauses the game based on the current state. The game can only be paused if it's currently in play, otherwise pause will be ignored (except in the special case where the game is already paused, in which case the game will be restored to its previous state before the pause).
-
-*StopGame* : Causes the game to stop, immediately. Consider this event a type of 'kill' event - it will instantly cease all game play and terminate the current game state, bringing it back to being Idle.
-
-*UpdateWithHeadsetData* : Updates the current state with headset data - this never causes the state to change.
-
-*UpdateWithGloveData* : Updates the current state with glove data - this never causes the state to change.
-
-== States ==
-
-*Idle* : A state where the entire game is reset so that nothing is happening - all fire emitters should be turned off and no game or calibration is occurring.
-
-*Calibration* : A special state where players orient/position themselves in a particular way so that data can be collected from glove/headset sensors in order to give a 'zero' state that the game can use as a reference point when actual game play is taking place. This state lasts for a set amount of time.
-
-*RoundBegin* : A brief state that takes place before each round is in play - during this state no player actions are considered and instead a countdown timer is presented (e.g., "3, 2, 1, FIGHT!"). This state is mainly for preparing the players for each round's game play.
-
-*RoundInPlay* : This is a game play state where player actions are interpreted and carried out on the fire emitters. During this state the game is the most 'active', players attack and block - each round has an official timer and can end when that timer expires or when a player is KOed (i.e., their life goes to or below 0).
-
-*RoundEnded* : This is an extremely brief state that occurs at the end of every round - it has no game play in it, instead it contains the logic used to decide whether a) the game is over with a winner, b) there's a tie or c) more rounds are required.
-
-*SettleTie* : This state occurs when, over the course of the rounds both players manage to tie one another (this happens very rarely). This state is a game play state that plays out similar to the RoundInPlay state. The major difference is that chip damage is turned off and the victor is decided based on whoever lands the first attack that isn't blocked. 
-
-*MatchOver* : When a game is won by a particular player this state is entered - it is the definitive ending of a match (set of rounds) where either player 1 or player 2 is declared the winner.
-
-*Paused(pausedState)* : This state is entered from various game play states when the game gets paused - this state does nothing except act as a 'stasis' for the current state of the game, which can be reinstated by un-pausing the game.
+[https://lh4.googleusercontent.com/-C-yx2qPywcs/TzgpsVj_lII/AAAAAAAAAfs/ZsWXB3BvXpo/s576/gamemodel_statemachine.png]
