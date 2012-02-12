@@ -15,13 +15,19 @@ import java.util.NoSuchElementException;
  */
 class FireEmitterIterator {
 	
-	private ListIterator<FireEmitter> iterator = null;
-	private boolean reverseDirection = false;
+	final private List<FireEmitter> fireEmitterList;
+	final private boolean reverseDirection;
+	final private boolean wrapAround;
+	private ListIterator<FireEmitter> iterator;
 	
-	FireEmitterIterator(List<FireEmitter> fireEmitterList, int startIdx, boolean reverseDirection) {
+	FireEmitterIterator(List<FireEmitter> fireEmitterList, int startIdx, boolean reverseDirection, boolean wrapAround) {
 		assert(startIdx >= 0 && startIdx <= fireEmitterList.size());
+		assert(fireEmitterList != null);
+		
+		this.fireEmitterList = fireEmitterList;
 		this.iterator = fireEmitterList.listIterator(startIdx);
 		this.reverseDirection = reverseDirection;
+		this.wrapAround = wrapAround;
 	}
 	
 	boolean hasNext() {
@@ -39,8 +45,28 @@ class FireEmitterIterator {
 			return this.iterator.next();
 		}
 		catch (NoSuchElementException ex) {
-			assert(false);
+			if (this.wrapAround) {
+				if (this.reverseDirection) {
+					this.iterator = this.fireEmitterList.listIterator(this.fireEmitterList.size());
+				}
+				else {
+					this.iterator = this.fireEmitterList.listIterator(0);
+				}
+			}
+		}
+		
+		// We've fallen through due to a wrap around, try again... this should
+		// only fail if the original list was empty
+		try {
+			if (this.reverseDirection) {
+				return this.iterator.previous();
+			}
+			return this.iterator.next();
+		}
+		catch (NoSuchElementException ex) {
+			assert(this.fireEmitterList.isEmpty());
 			return null;
 		}
+		
 	}
 }

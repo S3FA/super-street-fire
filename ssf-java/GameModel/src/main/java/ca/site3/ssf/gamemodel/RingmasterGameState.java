@@ -37,7 +37,9 @@ class RingmasterGameState extends GameState {
 			}
 			currAction.tick(dT);
 		}
-
+		
+		// Send event to update all the fire emitters...
+		this.gameModel.getFireEmitterModel().fireAllEmitterChangedEvent();
 	}
 
 	@Override
