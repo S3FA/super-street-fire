@@ -111,6 +111,67 @@ class GameModelActionSignaller {
 	}
 	
 	/**
+	 * Triggers each of the listener's callbacks for the match ended event.
+	 * @param matchResult The match result.
+	 */
+	void fireOnMatchEnded(GameResult matchResult) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onMatchEnded(matchResult);
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing match ended event", ex);
+			}
+		}
+		
+	}
+	
+	/**
+	 * Triggers each of the listener's callbacks for a player attack event.
+	 * @param playerNum Attacker player number.
+	 * @param attackType The type of attack.
+	 */
+	void fireOnPlayerAttackAction(int playerNum, PlayerAttackAction.AttackType attackType) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onPlayerAttackAction(playerNum, attackType);
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing player attack action event", ex);
+			}
+		}
+	}
+	
+	/**
+	 * Triggers each of the listener's callbacks for a player block event.
+	 * @param playerNum Blocker player number.
+	 */
+	void fireOnPlayerBlockAction(int playerNum) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onPlayerBlockAction(playerNum);
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing player block action event", ex);
+			}
+		}
+	}
+	
+	/**
+	 * Triggers each of the listener's callbacks for a ringmaster action event.
+	 */
+	void fireOnRingmasterAction() {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onRingmasterAction();
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing ringmaster action event", ex);
+			}
+		}
+	}
+	
+	/**
 	 * Triggers each of the listener's callbacks for a FireEmitter change.
 	 * @param fireEmitter The emitter that changed.
 	 */

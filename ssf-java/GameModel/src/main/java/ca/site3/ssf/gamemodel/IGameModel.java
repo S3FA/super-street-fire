@@ -9,15 +9,17 @@ package ca.site3.ssf.gamemodel;
  * @author Greg
  */
 public interface IGameModel {
-
+	
+	public enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
+	
 	void tick(double dT);
 	void killGame();
 	void initiateNextMatchRound();
 	void togglePauseGame();
 
 	ActionFactory getActionFactory();
-	void executeAction(Action action);
-	
+	void executeGenericAction(Action action);
+
 	void addGameModelListener(IGameModelListener l);
 	void removeGameModelListener(IGameModelListener l);
 }

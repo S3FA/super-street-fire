@@ -149,6 +149,15 @@ class FireEmitterSimulator {
 		// do not interact with the game state in any significant way - they're just for show.
 	}
 	
+	void tick(CrowdPleaserAction action, double dT) {
+		assert(this.action == action);
+		
+		this.tickSim(dT);
+		this.updateLerp();
+		// Don't have to worry about side effects or other such consequences, flames
+		// do not interact with the game state in any significant way - they're just for show.
+	}
+	
 	/**
 	 * Tick the multi-linear interpolation for simulating the flame intensity and then
 	 * apply it to the emitter being simulated. This will do nothing if the simulation

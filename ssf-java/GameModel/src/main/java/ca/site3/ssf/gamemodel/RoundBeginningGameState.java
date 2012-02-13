@@ -50,7 +50,8 @@ class RoundBeginningGameState extends GameState {
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
 		assert(p1 != null && p2 != null);
-		double playerHealthLerp = (this.fightCounter - RoundBeginningGameState.FIGHT_COUNT_TOTAL) * ((Player.FULL_HEALTH) / (-RoundBeginningGameState.FIGHT_COUNT_TOTAL));
+		double playerHealthLerp = (Math.max(0.0, this.fightCounter) - RoundBeginningGameState.FIGHT_COUNT_TOTAL) * 
+				((Player.FULL_HEALTH) / (-RoundBeginningGameState.FIGHT_COUNT_TOTAL));
 		p1.setHealth((float)playerHealthLerp);
 		p2.setHealth((float)playerHealthLerp);
 		

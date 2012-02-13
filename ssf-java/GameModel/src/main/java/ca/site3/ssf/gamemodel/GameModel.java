@@ -3,6 +3,8 @@ package ca.site3.ssf.gamemodel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.gamemodel.IGameModel.PlayerActionType;
+
 /**
  * Default implementation of GameModel
  * 
@@ -12,8 +14,6 @@ import org.slf4j.LoggerFactory;
  */
 public class GameModel implements IGameModel {
 
-	public enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
-	
 	private GameState currState = null;
 	private GameState nextState = null;
 	
@@ -88,7 +88,7 @@ public class GameModel implements IGameModel {
 		return new ActionFactory(this);
 	}
 	
-	public void executeAction(Action action) {
+	public void executeGenericAction(Action action) {
 		this.currState.executeAction(action);
 	}
 	

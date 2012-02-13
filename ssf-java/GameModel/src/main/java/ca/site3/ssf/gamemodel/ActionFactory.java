@@ -1,17 +1,16 @@
 package ca.site3.ssf.gamemodel;
 
-import java.util.EnumSet;
-
 import ca.site3.ssf.common.MultiLerp;
 
 /**
- * Publically exposed factory class for building the various actions/moves for players and
+ * Publicly exposed factory class for building the various actions/moves for players and
  * the ringmaster in the SSF game.
  * @author Callum
  *
  */
 final public class ActionFactory {
 	
+	public enum PlayerActionType { BLOCK, JAB_ATTACK, HOOK_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
 
 	final static private float DEFAULT_FULL_ON_FRACTION  = 0.45f;
 	final static private float DEFAULT_FULL_OFF_FRACTION = 0.25f;
@@ -23,11 +22,96 @@ final public class ActionFactory {
 		assert(gameModel != null);
 	}
 	
+	/**
+	 * Builds an enumerated player action type.
+	 * @param playerNum The player who is initiating the action.
+	 * @param playerActionType The type of player action.
+	 * @param leftHand Whether the player's left hand is being used in the action.
+	 * @param rightHand Whether the player's right hand is being used in the action.
+	 * @return The resulting action, null on failure.
+	 */
+	final public Action buildPlayerAction(int playerNum, PlayerActionType playerActionType,
+			                              boolean leftHand, boolean rightHand) {
+		
+		// Player number should be valid
+		if (playerNum != 1 && playerNum != 2) {
+			assert(false);
+			return null;
+		}
+		
+		Action action = null;
+		
+		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
+		FireEmitterIterator emitterIterLeft  = fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum);
+		FireEmitterIterator emitterIterRight = fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum);
+		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
+		
+		Player blockerOrAttacker = this.gameModel.getPlayer(playerNum);
+		Player attackee = this.gameModel.getPlayer(Player.getOpposingPlayerNum(playerNum));
+		
+		boolean success = true;
+		
+		switch (playerActionType) {
+			case BLOCK:
+				action = new PlayerBlockAction(fireEmitterModel, blockerOrAttacker);
+
+				success &= this.addBurstToAction(action, emitterIterLeft, 1, 1, 1.0, 0.9, 0.01);
+				success &= this.addBurstToAction(action, emitterIterRight, 1, 1, 1.0, 0.9, 0.01);
+				break;
+				
+			case JAB_ATTACK:
+				assert(leftHand || rightHand);
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
+					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
+					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				break;
+			
+			case HOOK_ATTACK:
+				assert(leftHand || rightHand);
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
+					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							2, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
+					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							2, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				break;
+				
+			case HADOUKEN_ATTACK:
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.HADOUKEN_ATTACK, playerNum, 4.0, 3, 5.0f);
+				break;
+				
+			case SONIC_BOOM_ATTACK:
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum, 4.0, 3, 5.0f);
+				break;
+			
+			default:
+				assert(false);
+				return null;
+		}
+		
+		if (!success) {
+			return null;
+		}
+		
+		return action;
+	}
 	
+	// TODO
 	//final public Action buildRingmasterAction(double totalDurationInSecs, int width, int startEmitterIdx) {
 	//}
 	
-	// Crowd-Pleasing Actions **************************************************************************
+	// Crowd-Pleasing Actions (internal package use only) *******************************************************
 	
 	/**
 	 * Create an end-of-round burst of flames at the given location of fire emitters in the arena.
@@ -38,8 +122,8 @@ final public class ActionFactory {
 	 * @param numBursts The number of bursts.
 	 * @return The resulting action, null on failure.
 	 */
-	final public Action buildBurstAction(GameModel.Entity colourEntity, FireEmitter.Location location,
-										 double totalDurationInSecs, int numBursts) {
+	final Action buildCrowdPleaserBurstAction(GameModel.Entity colourEntity, FireEmitter.Location location,
+								              double totalDurationInSecs, int numBursts) {
 		
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
@@ -65,17 +149,7 @@ final public class ActionFactory {
 				return null;
 		}
 
-		Action action = null;
-		switch (colourEntity) {
-			case PLAYER1_ENTITY:
-			case PLAYER2_ENTITY:
-				action = new PlayerBlockAction(fireEmitterModel, this.gameModel.getPlayer(colourEntity));
-				break;
-			default:
-				action = new RingmasterAction(fireEmitterModel);
-				break;
-		}
-		
+		Action action = new CrowdPleaserAction(fireEmitterModel, colourEntity);
 		this.addBurstToAction(action, emitterIter, numEmitters, numBursts, totalDurationInSecs, 0.8f, 0.05f);
 		return action;
 	}
@@ -90,27 +164,30 @@ final public class ActionFactory {
 	 * @param dmgPerFlame The base damage per flame delivered to the opposing player.
 	 * @return The resulting action, null on failure.
 	 */
-	final public Action buildPlayerLeftHandAttack(int attackerPlayerNum, double totalDurationInSecs, int width, float baseDmgPerFlame) {
+	final Action buildPlayerLeftHandAttack(PlayerAttackAction.AttackType type, int attackerPlayerNum,
+			                               double totalDurationInSecs, int width, float baseDmgPerFlame) {
 		
 		int attackeePlayerNum = Player.getOpposingPlayerNum(attackerPlayerNum);
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 		FireEmitterIterator emitterIter = fireEmitterModel.getPlayerLeftHandStartEmitterIter(attackerPlayerNum);	
 
-		return this.buildPlayerAttack(this.gameModel.getPlayer(attackerPlayerNum), this.gameModel.getPlayer(attackeePlayerNum),
+		return this.buildPlayerAttack(type, this.gameModel.getPlayer(attackerPlayerNum), this.gameModel.getPlayer(attackeePlayerNum),
 				emitterIter, totalDurationInSecs, width, baseDmgPerFlame);
 	}
-	final public Action buildPlayerRightHandAttack(int attackerPlayerNum, double totalDurationInSecs, int width, float baseDmgPerFlame) {
+	final Action buildPlayerRightHandAttack(PlayerAttackAction.AttackType type, int attackerPlayerNum,
+			                                double totalDurationInSecs, int width, float baseDmgPerFlame) {
+		
 		int attackeePlayerNum = Player.getOpposingPlayerNum(attackerPlayerNum);
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 		FireEmitterIterator emitterIter = fireEmitterModel.getPlayerRightHandStartEmitterIter(attackerPlayerNum);		
 
-		return this.buildPlayerAttack(this.gameModel.getPlayer(attackerPlayerNum), this.gameModel.getPlayer(attackeePlayerNum),
+		return this.buildPlayerAttack(type, this.gameModel.getPlayer(attackerPlayerNum), this.gameModel.getPlayer(attackeePlayerNum),
 				emitterIter, totalDurationInSecs, width, baseDmgPerFlame);
 	}
 	
 	
-	final public Action buildPlayerTwoHandedSymetricalAttack(int attackerPlayerNum, double totalDurationInSecs,
-															 int width, float baseDmgPerFlame) {
+	final Action buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType type, int attackerPlayerNum,
+													  double totalDurationInSecs, int width, float baseDmgPerFlame) {
 
 		int attackeePlayerNum = Player.getOpposingPlayerNum(attackerPlayerNum);
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
@@ -121,7 +198,7 @@ final public class ActionFactory {
 		Player attacker = this.gameModel.getPlayer(attackerPlayerNum);
 		Player attackee = this.gameModel.getPlayer(attackeePlayerNum);
 		
-		PlayerAttackAction atkAction = new PlayerAttackAction(fireEmitterModel, attacker, attackee, baseDmgPerFlame);
+		PlayerAttackAction atkAction = new PlayerAttackAction(fireEmitterModel, type, attacker, attackee, baseDmgPerFlame);
 		
 		// Add the left and right handed attacks...
 		boolean success = true;
@@ -143,14 +220,15 @@ final public class ActionFactory {
 	}
 	
 	
-	final private Action buildPlayerAttack(Player attacker, Player attackee, FireEmitterIterator emitterIter,
-										   double totalDurationInSecs, int width, float baseDmgPerFlame) {
+	final private Action buildPlayerAttack(PlayerAttackAction.AttackType type, Player attacker, Player attackee,
+										   FireEmitterIterator emitterIter, double totalDurationInSecs,
+										   int width, float baseDmgPerFlame) {
 		assert(attacker != null);
 		assert(attackee != null);
 		assert(emitterIter != null);
 		
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
-		PlayerAttackAction atkAction = new PlayerAttackAction(fireEmitterModel, attacker, attackee, baseDmgPerFlame);
+		PlayerAttackAction atkAction = new PlayerAttackAction(fireEmitterModel, type, attacker, attackee, baseDmgPerFlame);
 		
 		boolean success = this.addWaveToAction(atkAction, emitterIter,
 				fireEmitterModel.getConfig().getNumEmittersPerRail(), width, totalDurationInSecs,
@@ -378,7 +456,7 @@ final public class ActionFactory {
 			System.out.println();
 		}
 		*/
-		Action rightRailBurst = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 1.0, 1);
+		Action rightRailBurst = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 1.0, 1);
 		assert(rightRailBurst != null);
 		while (!rightRailBurst.isFinished()) {
 			rightRailBurst.tick(0.01666);
