@@ -32,4 +32,12 @@ class PlayerBlockAction extends Action {
 	GameModel.Entity getContributorEntity() {
 		return this.getBlocker().getEntity();
 	}
+	
+	@Override
+	void onFirstTick() {
+		// Raise an event for the action...
+		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
+		assert(actionSignaller != null);
+		actionSignaller.fireOnPlayerBlockAction(this.getBlocker().getPlayerNumber());
+	}	
 }

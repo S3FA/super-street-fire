@@ -1,7 +1,7 @@
 package ca.site3.ssf.gamemodel;
 
 class RingmasterAction extends Action {
-
+	
 	public RingmasterAction(FireEmitterModel fireEmitterModel) {
 		super(fireEmitterModel);
 	}
@@ -19,5 +19,13 @@ class RingmasterAction extends Action {
 	@Override
 	void tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
+	}
+
+	@Override
+	void onFirstTick() {
+		// Raise an event for the action...
+		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
+		assert(actionSignaller != null);
+		actionSignaller.fireOnRingmasterAction();
 	}
 }

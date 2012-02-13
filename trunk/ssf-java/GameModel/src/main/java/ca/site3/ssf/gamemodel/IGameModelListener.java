@@ -54,12 +54,33 @@ public interface IGameModelListener {
 	 */
 	void onRoundEnded(GameResult roundResult, boolean roundTimedOut);
 	
-	//void onMatchEnded(GameResult matchResult);
+	/**
+	 * Event method, called when the game match ends.
+	 * @param matchResult The result of the match.
+	 */
+	void onMatchEnded(GameResult matchResult);
 	
+	/**
+	 * Event method, called when a player attack action is executed in the game.
+	 * @param playerNum The number of the player who is attacking.
+	 * @param attackType The type of attack that was executed.
+	 */
+	void onPlayerAttackAction(int playerNum, PlayerAttackAction.AttackType attackType);
+	
+	/**
+	 * Event method, called when a player block action is executed in the game.
+	 * @param playerNum The number of the player who is blocking.
+	 */
+	void onPlayerBlockAction(int playerNum);
+	
+	/**
+	 * Event method, called when the ringmaster executes an action.
+	 */
+	void onRingmasterAction();
 	
 	/**
 	 * Event method, called whenever a fire emitter changes.
-	 * @param fireEmitter
+	 * @param fireEmitter Data describing the fire emitter that changed.
 	 */
 	void onFireEmitterChanged(ImmutableFireEmitter fireEmitter);
 	

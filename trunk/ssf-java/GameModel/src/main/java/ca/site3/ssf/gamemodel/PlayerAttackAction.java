@@ -1,18 +1,23 @@
 package ca.site3.ssf.gamemodel;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 class PlayerAttackAction extends Action {
 	
+	public enum AttackType { UNDEFINED_ATTACK, LEFT_JAB_ATTACK, RIGHT_JAB_ATTACK,
+		LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
+	
+	final private AttackType type;
 	final private Player attacker;
 	final private Player attackee;
 	
 	final private float damagePerFlame; // Amount of damage dealt to the attackee per flame delivered
 		
-	PlayerAttackAction(FireEmitterModel fireEmitterModel, Player attacker, Player attackee, float dmgPerFlame) {
+	PlayerAttackAction(FireEmitterModel fireEmitterModel, AttackType type, Player attacker, Player attackee, float dmgPerFlame) {
 		
 		super(fireEmitterModel);
+		
+		this.type = type;
 		
 		this.attacker = attacker;
 		this.attackee = attackee;
@@ -24,7 +29,6 @@ class PlayerAttackAction extends Action {
 		this.damagePerFlame = dmgPerFlame;
 		assert(dmgPerFlame > 0.0f);
 	}
-	
 	
 	/**
 	 * Inform this action that a block (i.e., an attack from the attacker was carried out on the same
@@ -62,7 +66,6 @@ class PlayerAttackAction extends Action {
 		return this.attackee;
 	}
 	
-	
 	@Override
 	void tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
@@ -78,4 +81,11 @@ class PlayerAttackAction extends Action {
 		return this.getAttacker().getEntity();
 	}
 	
+	@Override
+	void onFirstTick() {
+		// Raise an event for the action...
+		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
+		assert(actionSignaller != null);
+		actionSignaller.fireOnPlayerAttackAction(this.getAttacker().getPlayerNumber(), this.type);
+	}
 }

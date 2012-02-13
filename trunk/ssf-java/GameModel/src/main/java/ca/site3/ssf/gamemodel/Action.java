@@ -13,6 +13,7 @@ import ca.site3.ssf.common.MultiLerp;
  */
 abstract class Action {
 	
+	private boolean firstTickDone = false;
 	protected FireEmitterModel fireEmitterModel = null;
 	protected ArrayList<ArrayList<FireEmitterSimulator>> wavesOfOrderedFireSims =
 			new ArrayList<ArrayList<FireEmitterSimulator>>(2);
@@ -136,6 +137,12 @@ abstract class Action {
 	}
 	
 	void tick(double dT) {
+		
+		if (!this.firstTickDone) {
+			this.onFirstTick();
+			this.firstTickDone = true;
+		}
+		
 		for (ArrayList<FireEmitterSimulator> simulatorWave : this.wavesOfOrderedFireSims) {
 			for (FireEmitterSimulator simulator : simulatorWave) {
 				this.tickSimulator(dT, simulator);
@@ -144,6 +151,7 @@ abstract class Action {
 	}
 	
 	abstract void tickSimulator(double dT, FireEmitterSimulator simulator);
+	abstract void onFirstTick();
 	abstract GameModel.Entity getContributorEntity();
 	abstract FireEmitter.FlameType getActionFlameType();
 	

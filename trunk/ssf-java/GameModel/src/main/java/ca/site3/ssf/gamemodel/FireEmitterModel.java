@@ -55,6 +55,10 @@ class FireEmitterModel {
 	FireEmitterConfig getConfig() {
 		return this.config;
 	}
+	GameModelActionSignaller getActionSignaller() {
+		return this.actionSignaller;
+	}
+	
 	
 	FireEmitter getOuterRingEmitter(int index, boolean wrapAround) {
 		if (!this.config.isOuterRingEnabled()) {

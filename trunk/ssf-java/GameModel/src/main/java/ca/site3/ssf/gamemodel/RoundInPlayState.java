@@ -198,7 +198,7 @@ class RoundInPlayState extends GameState {
 		assert(victoryPlayer.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
 		if (victoryPlayer.getNumRoundWins() == NUM_WINS_FOR_VICTORY) {
 			// The player who won this round just won the match as well
-			this.gameModel.setNextGameState(new MatchOverGameState(this.gameModel, victoryPlayer));
+			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, victoryPlayer));
 			return;
 		}
 		
@@ -261,7 +261,7 @@ class RoundInPlayState extends GameState {
 		assert(playerToCheck.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
 		if (playerToCheck.getNumRoundWins() == NUM_WINS_FOR_VICTORY) {
 			// The player who won this round just won the match as well
-			this.gameModel.setNextGameState(new MatchOverGameState(this.gameModel, playerToCheck));
+			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, playerToCheck));
 			return true;
 		}
 		

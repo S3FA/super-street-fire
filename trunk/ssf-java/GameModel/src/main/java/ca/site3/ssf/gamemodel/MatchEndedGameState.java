@@ -4,17 +4,29 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-class MatchOverGameState extends GameState {
+import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+
+class MatchEndedGameState extends GameState {
 
 	final private Player victoryPlayer;
 	private Collection<Action> matchEndActions = new ArrayList<Action>(3);
 	
-	public MatchOverGameState(GameModel gameModel, Player victoryPlayer) {
+	public MatchEndedGameState(GameModel gameModel, Player victoryPlayer) {
 		super(gameModel);
 		
 		this.victoryPlayer = victoryPlayer;
 		assert(victoryPlayer != null);
 		assert(victoryPlayer == this.gameModel.getPlayer1() || victoryPlayer == this.gameModel.getPlayer2());
+		
+		// Signal the event for the end of the match...
+		GameModelActionSignaller actionSignaller = this.gameModel.getActionSignaller();
+		assert(actionSignaller != null);
+		if (victoryPlayer.getPlayerNumber() == 1) {
+			actionSignaller.fireOnMatchEnded(GameResult.PLAYER1_VICTORY);
+		}
+		else {
+			actionSignaller.fireOnMatchEnded(GameResult.PLAYER2_VICTORY);
+		}
 		
 		// Add match end actions to show the victory player's flames in all their glory...
 		ActionFactory actionFactory = this.gameModel.getActionFactory();
@@ -22,15 +34,15 @@ class MatchOverGameState extends GameState {
 		
 		Action tempAction = null;
 		
-		tempAction = actionFactory.buildBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 3.0, 1);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 3.0, 1);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction  = actionFactory.buildBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 3.0, 6);
+		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 3.0, 6);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction = actionFactory.buildBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 3.0, 6);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 3.0, 6);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 	}
@@ -41,15 +53,13 @@ class MatchOverGameState extends GameState {
 		// Once all the flashy actions are done we move on to the next state...
 		if (this.matchEndActions.isEmpty()) {
 			
-			// Turn off all the fire emitters and set the player health to zero...
-			this.gameModel.getFireEmitterModel().resetAllEmitters();
-			this.gameModel.getPlayer1().setHealth(Player.KO_HEALTH);
-			this.gameModel.getPlayer2().setHealth(Player.KO_HEALTH);
+			// Reset the game entirely, the match is now over
+			this.gameModel.resetGame();
 			this.gameModel.setNextGameState(new RingmasterGameState(this.gameModel));
 			return;
 		}
 		
-		// Tick the crowd wow-ing actions for the end of the round...
+		// Tick the crowd wow-ing actions for the end of the match...
 		Iterator<Action> iter = this.matchEndActions.iterator();
 		while (iter.hasNext()) {
 			Action currAction = iter.next();
@@ -66,31 +76,28 @@ class MatchOverGameState extends GameState {
 
 	@Override
 	void killToIdle() {
-		// TODO Auto-generated method stub
-
+		this.gameModel.setNextGameState(new IdleGameState(this.gameModel));
 	}
 
 	@Override
 	void initiateNextState() {
-		// TODO Auto-generated method stub
-
+		// Does nothing, have to wait for the match over state to finish on its own
+		// in order to move to the next state.
 	}
 
 	@Override
 	void executeAction(Action action) {
-		// TODO Auto-generated method stub
-
+		// All executed actions are ignored in this state.
 	}
 
 	@Override
 	void togglePause() {
-		// TODO Auto-generated method stub
-
+		this.gameModel.setNextGameState(new PausedGameState(this.gameModel, this));
 	}
 
 	@Override
 	GameStateType getStateType() {
-		return GameState.GameStateType.MATCH_OVER_STATE;
+		return GameState.GameStateType.MATCH_ENDED_STATE;
 	}
 
 }
