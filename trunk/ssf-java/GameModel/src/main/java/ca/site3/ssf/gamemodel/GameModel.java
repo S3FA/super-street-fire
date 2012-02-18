@@ -3,10 +3,8 @@ package ca.site3.ssf.gamemodel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.gamemodel.IGameModel.PlayerActionType;
-
 /**
- * Default implementation of GameModel
+ * Default implementation of GameModel.
  * 
  * @author Callum
  * @author Greg
@@ -72,6 +70,8 @@ public class GameModel implements IGameModel {
 	}
 	
 	public void killGame() {
+		this.logger.info("Request to kill the game was received, killing game to idle state.");
+		
 		this.nextState = null;
 		this.currState.killToIdle();
 	}
@@ -115,6 +115,7 @@ public class GameModel implements IGameModel {
 			return;
 		}
 
+		this.logger.info("Changing game state on next tick to " + nextState.getStateType().toString());
 		this.nextState = nextState;
 	}	
 	

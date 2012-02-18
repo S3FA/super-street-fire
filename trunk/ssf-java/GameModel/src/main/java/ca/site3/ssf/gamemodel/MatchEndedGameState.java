@@ -8,13 +8,13 @@ import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
 
 class MatchEndedGameState extends GameState {
 
-	final private Player victoryPlayer;
+	//final private Player victoryPlayer;
 	private Collection<Action> matchEndActions = new ArrayList<Action>(3);
 	
 	public MatchEndedGameState(GameModel gameModel, Player victoryPlayer) {
 		super(gameModel);
 		
-		this.victoryPlayer = victoryPlayer;
+		//this.victoryPlayer = victoryPlayer;
 		assert(victoryPlayer != null);
 		assert(victoryPlayer == this.gameModel.getPlayer1() || victoryPlayer == this.gameModel.getPlayer2());
 		
