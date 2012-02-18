@@ -4,21 +4,26 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 
 class ArenaDisplay extends Container {
 
 	final private class EmitterData {
+		final float maxIntensity;
 		final Color colour;
 		
 		EmitterData() {
 			this.colour = Color.darkGray;
+			this.maxIntensity = 0.0f;
 		}
 		
 		EmitterData(float[] intensities, Color[] colours) {
@@ -27,12 +32,16 @@ class ArenaDisplay extends Container {
 			int totalRed = 0;
 			int totalGreen = 0;
 			int totalBlue = 0;
+			float maxIntensity = 0.0f;
 			
 			for (int i = 0; i < intensities.length; i++) {
 				totalRed   = Math.min(255, (int)(totalRed + intensities[i] * colours[i].getRed()));
 				totalGreen = Math.min(255, (int)(totalRed + intensities[i] * colours[i].getGreen()));
 				totalBlue  = Math.min(255, (int)(totalRed + intensities[i] * colours[i].getBlue()));
+				maxIntensity = Math.max(maxIntensity, intensities[i]);
 			}
+			
+			this.maxIntensity = maxIntensity;
 			
 			if (totalRed == 0 && totalGreen == 0 && totalBlue == 0) {
 				this.colour = Color.darkGray;
@@ -47,9 +56,11 @@ class ArenaDisplay extends Container {
 	private static final long serialVersionUID = 7000442714767712317L;
 
 	final static float DASH_1[] = {10.0f};
-	final static private BasicStroke railStroke = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-	final static private BasicStroke dashedStroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, DASH_1, 0.0f);
-	final static private BasicStroke emitterOutlineStroke = new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+	final static private BasicStroke RAIL_STROKE            = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+	final static private BasicStroke DASHED_STROKE          = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, DASH_1, 0.0f);
+	final static private BasicStroke EMITTER_OUTLINE_STROKE = new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+	
+	final static private Font INTENSITY_FONT = new Font("SansSerif", Font.PLAIN, 12);
 	
 	// Colours used when drawing the fire emitters whose flame belongs to a particular entity in the game...
 	final static private Color PLAYER_1_COLOUR   = new Color(1.0f, 0.0f, 0.0f);
@@ -86,8 +97,14 @@ class ArenaDisplay extends Container {
 
 	public void paint(Graphics g) {
 		super.paint(g);
+		
 		Graphics2D g2 = (Graphics2D)g;
+		
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+		
+		final FontMetrics INTENSITY_FONT_METRICS = g2.getFontMetrics(INTENSITY_FONT);
 		
 		Dimension size = this.getSize();
 		
@@ -112,19 +129,22 @@ class ArenaDisplay extends Container {
 		final float RIGHT_RAIL_CENTER_X = CENTER_X + HALF_WIDTH_BETWEEN_RAILS + EMITTER_RADIUS;
 		
 		g2.setPaint(Color.black);
-		g2.setStroke(this.railStroke);
+		g2.setStroke(ArenaDisplay.RAIL_STROKE);
 		g2.draw(new Line2D.Float(LEFT_RAIL_CENTER_X, RAIL_TOP_Y, LEFT_RAIL_CENTER_X, RAIL_BOTTOM_Y));
 		g2.draw(new Line2D.Float(RIGHT_RAIL_CENTER_X, RAIL_TOP_Y, RIGHT_RAIL_CENTER_X, RAIL_BOTTOM_Y));		
 		
 		// Now draw all of the rail emitters as filled-in shapes
-		g2.setStroke(this.emitterOutlineStroke);
-		
+		g2.setStroke(ArenaDisplay.EMITTER_OUTLINE_STROKE);
+		g2.setFont(ArenaDisplay.INTENSITY_FONT);
 		float currPosition = RAIL_BOTTOM_Y;
 		for (int i = 0; i < this.fireEmitterConfig.getNumEmittersPerRail(); i++) {
-			Ellipse2D.Float leftRailEmitterShape  = new Ellipse2D.Float(LEFT_RAIL_CENTER_X - EMITTER_RADIUS,
-					currPosition - EMITTER_RADIUS, EMITTER_DIAMETER, EMITTER_DIAMETER);
-			Ellipse2D.Float rightRailEmitterShape = new Ellipse2D.Float(RIGHT_RAIL_CENTER_X - EMITTER_RADIUS,
-					currPosition - EMITTER_RADIUS, EMITTER_DIAMETER, EMITTER_DIAMETER);
+			Point2D.Float leftRailEmitterPos = new Point2D.Float(LEFT_RAIL_CENTER_X - EMITTER_RADIUS, currPosition - EMITTER_RADIUS);
+			Point2D.Float rightRailEmitterPos = new Point2D.Float(RIGHT_RAIL_CENTER_X - EMITTER_RADIUS, currPosition - EMITTER_RADIUS);
+			
+			Ellipse2D.Float leftRailEmitterShape  = new Ellipse2D.Float(leftRailEmitterPos.x,
+					leftRailEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
+			Ellipse2D.Float rightRailEmitterShape = new Ellipse2D.Float(rightRailEmitterPos.x,
+					rightRailEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 			
 			g2.setPaint(this.leftRingColours[i].colour);
 			g2.fill(leftRailEmitterShape);
@@ -134,6 +154,12 @@ class ArenaDisplay extends Container {
 			g2.setPaint(Color.black);
 			g2.draw(leftRailEmitterShape);
 			g2.draw(rightRailEmitterShape);
+			
+			String leftEmitterPercentStr = "" + (int)(this.leftRingColours[i].maxIntensity * 100) + "%";
+			String rightEmitterPercentStr = "" + (int)(this.rightRingColours[i].maxIntensity * 100) + "%";
+			g2.drawString(leftEmitterPercentStr, leftRailEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(leftEmitterPercentStr),
+					leftRailEmitterPos.y + EMITTER_RADIUS);
+			g2.drawString(rightEmitterPercentStr, rightRailEmitterPos.x + EMITTER_DIAMETER + 2, rightRailEmitterPos.y + EMITTER_RADIUS);
 			
 			currPosition -= (EMITTER_DIAMETER + DISTANCE_BETWEEN_RAIL_EMITTERS);
 		}
@@ -149,22 +175,30 @@ class ArenaDisplay extends Container {
 		final float OUTER_RING_X = CENTER_X - OUTER_RING_RADIUS;
 		final float OUTER_RING_Y = CENTER_Y - OUTER_RING_RADIUS;
 		
-		g2.setStroke(dashedStroke);
+		g2.setFont(ArenaDisplay.INTENSITY_FONT);
+		g2.setStroke(ArenaDisplay.DASHED_STROKE);
 		g2.setPaint(Color.black);
 		g2.draw(new Ellipse2D.Float(OUTER_RING_X, OUTER_RING_Y, OUTER_RING_DIAMETER, OUTER_RING_DIAMETER));
 		
 		// Start by drawing the right-hand side of the outer ring, staring with the bottom-right emitter and moving
 		// up and around the outer ring to the top-right emitter...
-		g2.setStroke(this.emitterOutlineStroke);
+		g2.setStroke(ArenaDisplay.EMITTER_OUTLINE_STROKE);
 		float currAngle = -HALF_PI + INCREMENT_ANGLE;
 		for (int i = 0; i < HALF_NUM_OUTER_RING_EMITTERS; i++) {
-			Ellipse2D.Float outerRingEmitterShape  = new Ellipse2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
-					CENTER_Y + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS, EMITTER_DIAMETER, EMITTER_DIAMETER);
+			Point2D.Float outerRingEmitterPos =
+					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
+					CENTER_Y + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);
+			
+			Ellipse2D.Float outerRingEmitterShape  = 
+					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 			
 			g2.setPaint(this.outerRingColours[i].colour);
 			g2.fill(outerRingEmitterShape);
 			g2.setPaint(Color.black);
 			g2.draw(outerRingEmitterShape);
+			
+			g2.drawString("" + (int)(this.outerRingColours[i].maxIntensity * 100) + "%",
+					outerRingEmitterPos.x + EMITTER_DIAMETER + 2, outerRingEmitterPos.y + EMITTER_RADIUS);
 			
 			currAngle += INCREMENT_ANGLE;
 		}
@@ -172,13 +206,21 @@ class ArenaDisplay extends Container {
 		// Now draw the left-hand side of the outer ring...
 		currAngle = HALF_PI + INCREMENT_ANGLE;
 		for (int i = HALF_NUM_OUTER_RING_EMITTERS; i < this.fireEmitterConfig.getNumOuterRingEmitters(); i++) {
-			Ellipse2D.Float outerRingEmitterShape  = new Ellipse2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
-					CENTER_Y + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS, EMITTER_DIAMETER, EMITTER_DIAMETER);
+			Point2D.Float outerRingEmitterPos =
+					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
+					CENTER_Y + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);			
+			
+			Ellipse2D.Float outerRingEmitterShape  =
+					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 		
 			g2.setPaint(this.outerRingColours[i].colour);
 			g2.fill(outerRingEmitterShape);
 			g2.setPaint(Color.black);
 			g2.draw(outerRingEmitterShape);
+			
+			String emitterPercentStr = "" + (int)(this.outerRingColours[i].maxIntensity * 100) + "%";
+			g2.drawString(emitterPercentStr, outerRingEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(emitterPercentStr),
+					outerRingEmitterPos.y + EMITTER_RADIUS);
 			
 			currAngle += INCREMENT_ANGLE;
 		}
