@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.RoundRectangle2D;
 
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 
@@ -59,8 +60,10 @@ class ArenaDisplay extends Container {
 	final static private BasicStroke RAIL_STROKE            = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	final static private BasicStroke DASHED_STROKE          = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, DASH_1, 0.0f);
 	final static private BasicStroke EMITTER_OUTLINE_STROKE = new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+	final static private BasicStroke PODIUM_OUTLINE_STROKE  = new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	
 	final static private Font INTENSITY_FONT = new Font("SansSerif", Font.PLAIN, 12);
+	final static private Font PLAYER_FONT    = new Font("SansSerif", Font.BOLD, 16);
 	
 	// Colours used when drawing the fire emitters whose flame belongs to a particular entity in the game...
 	final static private Color PLAYER_1_COLOUR   = new Color(1.0f, 0.0f, 0.0f);
@@ -73,7 +76,6 @@ class ArenaDisplay extends Container {
 	private EmitterData[] leftRingColours  = null;
 	private EmitterData[] rightRingColours = null;
 	private EmitterData[] outerRingColours = null;
-	
 	
 	public ArenaDisplay(FireEmitterConfig fireEmitterConfig) {
 		super();
@@ -105,6 +107,7 @@ class ArenaDisplay extends Container {
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 		
 		final FontMetrics INTENSITY_FONT_METRICS = g2.getFontMetrics(INTENSITY_FONT);
+		final FontMetrics PLAYER_FONT_METRICS    = g2.getFontMetrics(PLAYER_FONT);
 		
 		Dimension size = this.getSize();
 		
@@ -224,6 +227,35 @@ class ArenaDisplay extends Container {
 			
 			currAngle += INCREMENT_ANGLE;
 		}
+		
+		// Draw the player podiums
+		final float PODIUM_WIDTH      = WIDTH_BETWEEN_RAILS * 0.5f;
+		final float HALF_PODIUM_WIDTH = PODIUM_WIDTH / 2.0f;
+				
+		final float PLAYER_LEFT_X  = CENTER_X - PODIUM_WIDTH / 2.0f;
+		final float PLAYER_1_TOP_Y = RAIL_BOTTOM_Y;
+		final float PLAYER_2_TOP_Y = RAIL_TOP_Y - PODIUM_WIDTH;
+		
+		RoundRectangle2D.Float player1PodiumShape = new RoundRectangle2D.Float(PLAYER_LEFT_X, PLAYER_1_TOP_Y, PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
+		g2.setStroke(ArenaDisplay.PODIUM_OUTLINE_STROKE);
+		g2.setPaint(ArenaDisplay.PLAYER_1_COLOUR);
+		g2.fill(player1PodiumShape);
+		g2.setPaint(Color.black);
+		g2.draw(player1PodiumShape);
+		
+		RoundRectangle2D.Float player2PodiumShape = new RoundRectangle2D.Float(PLAYER_LEFT_X, PLAYER_2_TOP_Y, PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
+		g2.setStroke(ArenaDisplay.PODIUM_OUTLINE_STROKE);
+		g2.setPaint(ArenaDisplay.PLAYER_2_COLOUR);
+		g2.fill(player2PodiumShape);
+		g2.setPaint(Color.black);
+		g2.draw(player2PodiumShape);
+		
+		String player1Str = "Player 1";
+		String player2Str = "Player 2";
+		g2.setFont(PLAYER_FONT);
+		g2.drawString(player1Str, player1PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player1Str)) / 2.0f, player1PodiumShape.y + HALF_PODIUM_WIDTH);
+		g2.drawString(player2Str, player2PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player2Str)) / 2.0f, player2PodiumShape.y + HALF_PODIUM_WIDTH);
+		
 	}
 
 }
