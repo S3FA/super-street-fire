@@ -177,6 +177,8 @@ class FireEmitterModel {
 	 * effectively reduces the intensity of every emitter to zero, instantly.
 	 */
 	void resetAllEmitters() {
+		this.logger.info("Resetting all fire emitters.");
+		
 		for (FireEmitter emitter : this.outerRingEmitters) {
 			emitter.reset();
 		}

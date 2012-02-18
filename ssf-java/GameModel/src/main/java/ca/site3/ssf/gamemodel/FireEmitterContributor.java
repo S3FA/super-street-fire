@@ -52,11 +52,6 @@ class FireEmitterContributor {
 			return;
 		}
 		
-		// Make sure that the ringmaster is not participating in the game flame types and that
-		// players are not participating in non-game flame types!
-		assert(this.owner != GameModel.Entity.RINGMASTER_ENTITY || action.getActionFlameType() == FireEmitter.FlameType.NON_GAME_FLAME);
-		assert(this.owner == GameModel.Entity.RINGMASTER_ENTITY || action.getActionFlameType() != FireEmitter.FlameType.NON_GAME_FLAME);
-		
 		// If the set intensity is zero then just remove the action from contributing
 		if (intensity == FireEmitter.MIN_INTENSITY) {
 			this.actionIntensities.remove(action);

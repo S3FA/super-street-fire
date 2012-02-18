@@ -69,6 +69,14 @@ class FireEmitter {
 	}
 	
 	/**
+	 * Get the globally unique identifier for this emitter.
+	 * @return The emitter's global ID.
+	 */
+	int getGlobalEmitterID() {
+		return this.globalEmitterID;
+	}
+	
+	/**
 	 * The location of this emitter within the game arena.
 	 * @return The emitter location.
 	 */
