@@ -1,10 +1,12 @@
 package ca.site3.ssf.devgui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -12,6 +14,7 @@ import javax.swing.Timer;
 
 import ca.site3.ssf.gamemodel.*;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 
 
@@ -127,12 +130,54 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 	}
 
 	public void onFireEmitterChanged(ImmutableFireEmitter fireEmitter) {
-		// TODO Auto-generated method stub
+		Color[] colours     = new Color[fireEmitter.getContributingEntities().size()];
+		float[] intensities = new float[fireEmitter.getContributingEntities().size()];
+		
+		int i = 0;
+		for (Entity entity : fireEmitter.getContributingEntities()) {
+			switch (entity) {
+			case PLAYER1_ENTITY:
+				colours[i] = ArenaDisplay.PLAYER_1_COLOUR;
+				break;
+			case PLAYER2_ENTITY:
+				colours[i] = ArenaDisplay.PLAYER_2_COLOUR;
+				break;
+			case RINGMASTER_ENTITY:
+				colours[i] = ArenaDisplay.RINGMASTER_COLOUR;
+				break;
+			default:
+				assert(false);
+				break;
+			}
+			
+			intensities[i] = fireEmitter.getIntensity(entity);
+			i++;
+		}
+		
+		switch (fireEmitter.getLocation()) {
+		case LEFT_RAIL:
+			this.arenaDisplay.setLeftRailEmitter(fireEmitter.getIndex(), new EmitterData(intensities, colours));
+			break;
+			
+		case RIGHT_RAIL:
+			this.arenaDisplay.setRightRailEmitter(fireEmitter.getIndex(), new EmitterData(intensities, colours));
+			break;
+			
+		case OUTER_RING:
+			this.arenaDisplay.setOuterRingEmitter(fireEmitter.getIndex(), new EmitterData(intensities, colours));
+			break;
+			
+		default:
+			assert(false);
+			break;
+		}
 		
 	}
 
-	public void actionPerformed(ActionEvent arg0) {
-    	gameModel.tick(0.016666666);
+	public void actionPerformed(ActionEvent event) {
+		if (event.getSource() == this.gameSimTimer) {
+			gameModel.tick(0.016666666);
+		}
 	}
 
 }

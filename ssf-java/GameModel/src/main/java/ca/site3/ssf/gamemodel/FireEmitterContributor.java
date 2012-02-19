@@ -37,6 +37,10 @@ class FireEmitterContributor {
 		this.actionIntensities.clear();
 	}
 	
+	GameModel.Entity getContributor() {
+		return this.owner;
+	}
+	
 	/**
 	 * Set the intensity for an action of this contributor to the given value.
 	 * @param action The action whose associated intensity is being changed.

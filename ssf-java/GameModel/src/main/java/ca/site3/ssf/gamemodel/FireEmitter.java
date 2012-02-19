@@ -118,6 +118,12 @@ class FireEmitter {
 		return totalIntensity;
 	}
 	
+	float getContributorIntensity(IGameModel.Entity contributor) {
+		FireEmitterContributor fireEmitterContrib = (FireEmitterContributor)this.contributors.get(contributor);
+		assert(fireEmitterContrib != null);
+		return fireEmitterContrib.getResolvedIntensity();
+	}
+	
 	/**
 	 * Determine if this emitter has a simultaneous attack from one player and block from another
 	 * player currently being executed on it.
