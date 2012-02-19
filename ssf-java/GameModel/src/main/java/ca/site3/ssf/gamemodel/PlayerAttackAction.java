@@ -2,11 +2,11 @@ package ca.site3.ssf.gamemodel;
 
 import java.util.ArrayList;
 
-class PlayerAttackAction extends Action {
+public class PlayerAttackAction extends Action {
 	
 	public enum AttackType { UNDEFINED_ATTACK, LEFT_JAB_ATTACK, RIGHT_JAB_ATTACK,
-		LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
-	
+	LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK }
+
 	final private AttackType type;
 	final private Player attacker;
 	final private Player attackee;

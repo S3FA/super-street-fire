@@ -5,12 +5,12 @@ package ca.site3.ssf.gamemodel;
  * @author Callum
  * @author Greg
  */
-abstract class GameState {
+public abstract class GameState {
 
 	/**
 	 * The enumeration of the various game state types, useful for events and casting.
 	 */
-	enum GameStateType { IDLE_STATE, RINGMASTER_STATE, ROUND_BEGINNING_STATE, ROUND_IN_PLAY_STATE,
+	public enum GameStateType { NO_STATE, IDLE_STATE, RINGMASTER_STATE, ROUND_BEGINNING_STATE, ROUND_IN_PLAY_STATE,
 		ROUND_ENDED_STATE, TIE_BREAKER_ROUND_STATE, MATCH_ENDED_STATE, PAUSED_STATE }
 	
 	protected GameModel gameModel = null;

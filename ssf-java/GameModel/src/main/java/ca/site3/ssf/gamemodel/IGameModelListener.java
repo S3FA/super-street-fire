@@ -9,7 +9,13 @@ package ca.site3.ssf.gamemodel;
  */
 public interface IGameModelListener {
 	
-	public enum RoundBeginCountdownType { THREE, TWO, ONE, FIGHT };
+	public enum RoundBeginCountdownType {
+		THREE { public String toString() { return "3"; } },
+		TWO   { public String toString() { return "2"; } },
+		ONE   { public String toString() { return "1"; } },
+		FIGHT { public String toString() { return "FIGHT!"; } }
+	}
+	
 	public enum GameResult { PLAYER1_VICTORY, PLAYER2_VICTORY, TIE };
 	
 	/**
