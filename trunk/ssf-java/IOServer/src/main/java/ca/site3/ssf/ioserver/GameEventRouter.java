@@ -52,7 +52,7 @@ public class GameEventRouter implements IGameModelListener {
 		
 	}
 
-	public void onRoundEnded(GameResult roundResult, boolean roundTimedOut) {
+	public void onRoundEnded(int roundNumber, GameResult roundResult, boolean roundTimedOut) {
 		
 	}
 
