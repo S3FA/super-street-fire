@@ -10,8 +10,17 @@ public abstract class GameState {
 	/**
 	 * The enumeration of the various game state types, useful for events and casting.
 	 */
-	public enum GameStateType { NO_STATE, IDLE_STATE, RINGMASTER_STATE, ROUND_BEGINNING_STATE, ROUND_IN_PLAY_STATE,
-		ROUND_ENDED_STATE, TIE_BREAKER_ROUND_STATE, MATCH_ENDED_STATE, PAUSED_STATE }
+	public enum GameStateType {
+		NO_STATE                 { public String toString() { return "N/A"; } },
+		IDLE_STATE               { public String toString() { return "Idle"; } },
+		RINGMASTER_STATE         { public String toString() { return "Ringmaster Control"; } },
+		ROUND_BEGINNING_STATE    { public String toString() { return "Round Beginning"; } },
+		ROUND_IN_PLAY_STATE      { public String toString() { return "Round In-Play"; } },
+		ROUND_ENDED_STATE        { public String toString() { return "Round Ended"; } },
+		TIE_BREAKER_ROUND_STATE  { public String toString() { return "Tie Breaker Round In-Play"; } },
+		MATCH_ENDED_STATE        { public String toString() { return "Match Ended"; } },
+		PAUSED_STATE             { public String toString() { return "Paused"; } }
+	};
 	
 	protected GameModel gameModel = null;
 	

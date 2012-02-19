@@ -75,7 +75,7 @@ public class GameModel implements IGameModel {
 		this.currState.killToIdle();
 	}
 
-	public void initiateNextMatchRound() {
+	public void initiateNextState() {
 		this.currState.initiateNextState();
 	}
 

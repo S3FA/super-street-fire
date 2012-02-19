@@ -14,9 +14,13 @@ public interface IGameModelListener {
 		TWO   { public String toString() { return "2"; } },
 		ONE   { public String toString() { return "1"; } },
 		FIGHT { public String toString() { return "FIGHT!"; } }
-	}
+	};
 	
-	public enum GameResult { PLAYER1_VICTORY, PLAYER2_VICTORY, TIE };
+	public enum GameResult { 
+		PLAYER1_VICTORY { public String toString() { return "Player 1 Wins!"; } }, 
+		PLAYER2_VICTORY { public String toString() { return "Player 2 Wins!"; } }, 
+		TIE             { public String toString() { return "Tie!"; } }
+	};
 	
 	/**
 	 * Event method, called whenever the game state changes.
@@ -52,11 +56,12 @@ public interface IGameModelListener {
 	
 	/**
 	 * Event method, called when a game round ends - this is for all rounds including tie breaker rounds.
+	 * @param roundNumber The number of the round that just ended (starting at 1).
 	 * @param roundResult The result of the round.
 	 * @param roundTimedOut Whether the round timed out or not, in the case of a tie breaker round, this
 	 * will always be true.
 	 */
-	void onRoundEnded(GameResult roundResult, boolean roundTimedOut);
+	void onRoundEnded(int roundNumber, GameResult roundResult, boolean roundTimedOut);
 	
 	/**
 	 * Event method, called when the game match ends.

@@ -106,13 +106,14 @@ class GameModelActionSignaller {
 	
 	/**
 	 * Triggers each of the listener's callbacks for a round ended event.
+	 * @param roundNumber The number of the round that ended.
 	 * @param roundResult The round result.
 	 * @param roundTimedOut Whether the round timed out or not.
 	 */
-	void fireOnRoundEnded(IGameModelListener.GameResult roundResult, boolean roundTimedOut) {
+	void fireOnRoundEnded(int roundNumber, IGameModelListener.GameResult roundResult, boolean roundTimedOut) {
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onRoundEnded(roundResult, roundTimedOut);
+				listener.onRoundEnded(roundNumber, roundResult, roundTimedOut);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing round ended event", ex);

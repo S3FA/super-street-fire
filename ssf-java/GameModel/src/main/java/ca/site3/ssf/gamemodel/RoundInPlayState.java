@@ -163,7 +163,7 @@ class RoundInPlayState extends GameState {
 		this.countdownTimeInSecs = timeInSecs;
 		
 		int prevLastRoundedTime = this.lastRoundedCountdownValueInSecs;
-		this.lastRoundedCountdownValueInSecs = (int)this.countdownTimeInSecs;
+		this.lastRoundedCountdownValueInSecs = (int)Math.ceil(this.countdownTimeInSecs);
 		
 		// Fire off an event if the count down value has changed
 		if (prevLastRoundedTime != this.lastRoundedCountdownValueInSecs &&
@@ -188,7 +188,7 @@ class RoundInPlayState extends GameState {
 		if (victoryPlayer.getPlayerNumber() == 2) {
 			result = GameResult.PLAYER2_VICTORY;
 		}
-		this.gameModel.getActionSignaller().fireOnRoundEnded(result, this.countdownTimeInSecs <= 0.0);
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, this.countdownTimeInSecs <= 0.0);
 		
 		// Check to see if the match is over...
 		GameConfig gameConfig = this.gameModel.getConfig();
@@ -220,7 +220,7 @@ class RoundInPlayState extends GameState {
 		p1.incrementNumRoundWins();
 		p2.incrementNumRoundWins();
 		
-		this.gameModel.getActionSignaller().fireOnRoundEnded(GameResult.TIE, this.countdownTimeInSecs <= 0.0);
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), GameResult.TIE, this.countdownTimeInSecs <= 0.0);
 		
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);
