@@ -28,7 +28,6 @@ public class GameModel implements IGameModel {
 	
 	private int numRoundsPlayed; // The number of rounds that are played
 	
-	
 	public GameModel(GameConfig config) {
 		this.logger = LoggerFactory.getLogger(getClass());
 		
@@ -44,7 +43,7 @@ public class GameModel implements IGameModel {
 		this.fireEmitterModel = new FireEmitterModel(new FireEmitterConfig(true, 16, 8), this.actionSignaller);
 		
 		// Make sure the rest of the model is setup before the state
-		this.currState = new IdleGameState(this);
+		this.nextState = new IdleGameState(this);
 	}
 	
 	// Begin IGameModel Interface function implementations *******************************************

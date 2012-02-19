@@ -64,11 +64,12 @@ class ArenaDisplay extends Container {
 	
 	final static private Font INTENSITY_FONT = new Font("SansSerif", Font.PLAIN, 12);
 	final static private Font PLAYER_FONT    = new Font("SansSerif", Font.BOLD, 16);
+	final static private Font COUNTDOWN_FONT = new Font("SansSerif", Font.ITALIC, 32);
 	
 	// Colours used when drawing the fire emitters whose flame belongs to a particular entity in the game...
-	final static private Color PLAYER_1_COLOUR   = new Color(1.0f, 0.0f, 0.0f);
-	final static private Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
-	final static private Color RINGMASTER_COLOUR = Color.yellow;
+	final static Color PLAYER_1_COLOUR   = new Color(1.0f, 0.0f, 0.0f);
+	final static Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
+	final static Color RINGMASTER_COLOUR = Color.yellow;
 	
 	private FireEmitterConfig fireEmitterConfig;
 	
@@ -77,10 +78,11 @@ class ArenaDisplay extends Container {
 	private EmitterData[] rightRingColours = null;
 	private EmitterData[] outerRingColours = null;
 	
+	private String infoText = "";
+	
 	public ArenaDisplay(FireEmitterConfig fireEmitterConfig) {
 		super();
-		this.setMinimumSize(new Dimension(800, 600));
-		
+
 		this.fireEmitterConfig = fireEmitterConfig;
 		assert(fireEmitterConfig != null);
 		
@@ -97,6 +99,10 @@ class ArenaDisplay extends Container {
 		}
 	}
 
+	public void setInfoText(String text) {
+		this.infoText = text;
+	}
+	
 	public void paint(Graphics g) {
 		super.paint(g);
 		
@@ -113,6 +119,8 @@ class ArenaDisplay extends Container {
 		
 		final float CENTER_X = size.width/2.0f;
 		final float CENTER_Y = size.height/2.0f;
+		
+		size.setSize(Math.min(950, size.width), Math.min(800, size.height));
 		
 		final float WIDTH_BETWEEN_RAILS       = size.width * 0.2f;
 		final float HALF_WIDTH_BETWEEN_RAILS  = WIDTH_BETWEEN_RAILS / 2.0f;
@@ -255,6 +263,11 @@ class ArenaDisplay extends Container {
 		g2.setFont(PLAYER_FONT);
 		g2.drawString(player1Str, player1PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player1Str)) / 2.0f, player1PodiumShape.y + HALF_PODIUM_WIDTH);
 		g2.drawString(player2Str, player2PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player2Str)) / 2.0f, player2PodiumShape.y + HALF_PODIUM_WIDTH);
+		
+		// Draw the countdown text...
+		FontMetrics COUNTDOWN_FONT_METRICS = g2.getFontMetrics(ArenaDisplay.COUNTDOWN_FONT);
+		g2.setFont(ArenaDisplay.COUNTDOWN_FONT);
+		g2.drawString(this.infoText, CENTER_X - COUNTDOWN_FONT_METRICS.stringWidth(this.infoText) / 2.0f, CENTER_Y);
 		
 	}
 

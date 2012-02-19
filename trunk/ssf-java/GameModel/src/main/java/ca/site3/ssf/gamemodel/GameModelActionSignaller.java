@@ -28,7 +28,8 @@ class GameModelActionSignaller {
 	}
 	
 	void addGameModelListener(IGameModelListener l) {
-		this.listeners.add(l);
+		boolean success = this.listeners.add(l);
+		assert(success);
 	}
 	
 	void removeGameModelListener(IGameModelListener l) {
@@ -41,9 +42,18 @@ class GameModelActionSignaller {
 	 * @param newState The current/new state that was just set.
 	 */
 	void fireOnGameStateChanged(GameState oldState, GameState newState) {
+		GameState.GameStateType oldStateType = GameState.GameStateType.NO_STATE;
+		GameState.GameStateType newStateType = GameState.GameStateType.NO_STATE;
+		if (oldState != null) {
+			oldStateType = oldState.getStateType();
+		}
+		if (newState != null) {
+			newStateType = newState.getStateType();
+		}
+		
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onGameStateChanged(oldState.getStateType(), newState.getStateType());
+				listener.onGameStateChanged(oldStateType, newStateType);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing game state change event", ex);
