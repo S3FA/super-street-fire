@@ -12,7 +12,13 @@ public interface IGameModel {
 	
 	public enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
 	
+	/**
+	 * Tick the game model.
+	 * @param dT time since last tick (in seconds)
+	 */
 	void tick(double dT);
+	
+	
 	void killGame();
 	void initiateNextState();
 	void togglePauseGame();
