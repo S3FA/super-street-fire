@@ -18,42 +18,6 @@ import ca.site3.ssf.gamemodel.FireEmitterConfig;
 
 class ArenaDisplay extends Container {
 
-	final private class EmitterData {
-		final float maxIntensity;
-		final Color colour;
-		
-		EmitterData() {
-			this.colour = Color.darkGray;
-			this.maxIntensity = 0.0f;
-		}
-		
-		EmitterData(float[] intensities, Color[] colours) {
-			assert(intensities.length == colours.length);
-			
-			int totalRed = 0;
-			int totalGreen = 0;
-			int totalBlue = 0;
-			float maxIntensity = 0.0f;
-			
-			for (int i = 0; i < intensities.length; i++) {
-				totalRed   = Math.min(255, (int)(totalRed + intensities[i] * colours[i].getRed()));
-				totalGreen = Math.min(255, (int)(totalRed + intensities[i] * colours[i].getGreen()));
-				totalBlue  = Math.min(255, (int)(totalRed + intensities[i] * colours[i].getBlue()));
-				maxIntensity = Math.max(maxIntensity, intensities[i]);
-			}
-			
-			this.maxIntensity = maxIntensity;
-			
-			if (totalRed == 0 && totalGreen == 0 && totalBlue == 0) {
-				this.colour = Color.darkGray;
-			}
-			else {
-				this.colour = new Color(totalRed, totalGreen, totalBlue);
-			}
-		}
-
-	}
-	
 	private static final long serialVersionUID = 7000442714767712317L;
 
 	final static float DASH_1[] = {10.0f};
@@ -74,9 +38,9 @@ class ArenaDisplay extends Container {
 	private FireEmitterConfig fireEmitterConfig;
 	
 	// Emitter data is stored in the same orderings as the FireEmitterModel in the gamemodel
-	private EmitterData[] leftRingColours  = null;
-	private EmitterData[] rightRingColours = null;
-	private EmitterData[] outerRingColours = null;
+	private EmitterData[] leftRailEmitterData  = null;
+	private EmitterData[] rightRailEmitterData = null;
+	private EmitterData[] outerRingEmitterData = null;
 	
 	private String infoText = "";
 	
@@ -86,21 +50,31 @@ class ArenaDisplay extends Container {
 		this.fireEmitterConfig = fireEmitterConfig;
 		assert(fireEmitterConfig != null);
 		
-		this.leftRingColours  = new EmitterData[fireEmitterConfig.getNumEmittersPerRail()];
-		this.rightRingColours = new EmitterData[fireEmitterConfig.getNumEmittersPerRail()];
+		this.leftRailEmitterData  = new EmitterData[fireEmitterConfig.getNumEmittersPerRail()];
+		this.rightRailEmitterData = new EmitterData[fireEmitterConfig.getNumEmittersPerRail()];
 		for (int i = 0; i < fireEmitterConfig.getNumEmittersPerRail(); i++) {
-			this.leftRingColours[i]  = new EmitterData();
-			this.rightRingColours[i] = new EmitterData();
+			this.leftRailEmitterData[i]  = new EmitterData();
+			this.rightRailEmitterData[i] = new EmitterData();
 		}
 		
-		this.outerRingColours = new EmitterData[fireEmitterConfig.getNumOuterRingEmitters()];
+		this.outerRingEmitterData = new EmitterData[fireEmitterConfig.getNumOuterRingEmitters()];
 		for (int i = 0; i < fireEmitterConfig.getNumOuterRingEmitters(); i++) {
-			this.outerRingColours[i] = new EmitterData();
+			this.outerRingEmitterData[i] = new EmitterData();
 		}
 	}
 
 	public void setInfoText(String text) {
 		this.infoText = text;
+	}
+	
+	public void setLeftRailEmitter(int index, EmitterData data) {
+		this.leftRailEmitterData[index] = data;
+	}
+	public void setRightRailEmitter(int index, EmitterData data) {
+		this.rightRailEmitterData[index] = data;
+	}
+	public void setOuterRingEmitter(int index, EmitterData data) {
+		this.outerRingEmitterData[index] = data;
 	}
 	
 	public void paint(Graphics g) {
@@ -157,17 +131,17 @@ class ArenaDisplay extends Container {
 			Ellipse2D.Float rightRailEmitterShape = new Ellipse2D.Float(rightRailEmitterPos.x,
 					rightRailEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 			
-			g2.setPaint(this.leftRingColours[i].colour);
+			g2.setPaint(this.leftRailEmitterData[i].colour);
 			g2.fill(leftRailEmitterShape);
-			g2.setPaint(this.rightRingColours[i].colour);
+			g2.setPaint(this.rightRailEmitterData[i].colour);
 			g2.fill(rightRailEmitterShape);
 			
 			g2.setPaint(Color.black);
 			g2.draw(leftRailEmitterShape);
 			g2.draw(rightRailEmitterShape);
 			
-			String leftEmitterPercentStr = "" + (int)(this.leftRingColours[i].maxIntensity * 100) + "%";
-			String rightEmitterPercentStr = "" + (int)(this.rightRingColours[i].maxIntensity * 100) + "%";
+			String leftEmitterPercentStr = "" + (int)(this.leftRailEmitterData[i].maxIntensity * 100) + "%";
+			String rightEmitterPercentStr = "" + (int)(this.rightRailEmitterData[i].maxIntensity * 100) + "%";
 			g2.drawString(leftEmitterPercentStr, leftRailEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(leftEmitterPercentStr),
 					leftRailEmitterPos.y + EMITTER_RADIUS);
 			g2.drawString(rightEmitterPercentStr, rightRailEmitterPos.x + EMITTER_DIAMETER + 2, rightRailEmitterPos.y + EMITTER_RADIUS);
@@ -203,12 +177,12 @@ class ArenaDisplay extends Container {
 			Ellipse2D.Float outerRingEmitterShape  = 
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 			
-			g2.setPaint(this.outerRingColours[i].colour);
+			g2.setPaint(this.outerRingEmitterData[i].colour);
 			g2.fill(outerRingEmitterShape);
 			g2.setPaint(Color.black);
 			g2.draw(outerRingEmitterShape);
 			
-			g2.drawString("" + (int)(this.outerRingColours[i].maxIntensity * 100) + "%",
+			g2.drawString("" + (int)(this.outerRingEmitterData[i].maxIntensity * 100) + "%",
 					outerRingEmitterPos.x + EMITTER_DIAMETER + 2, outerRingEmitterPos.y + EMITTER_RADIUS);
 			
 			currAngle += INCREMENT_ANGLE;
@@ -224,12 +198,12 @@ class ArenaDisplay extends Container {
 			Ellipse2D.Float outerRingEmitterShape  =
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 		
-			g2.setPaint(this.outerRingColours[i].colour);
+			g2.setPaint(this.outerRingEmitterData[i].colour);
 			g2.fill(outerRingEmitterShape);
 			g2.setPaint(Color.black);
 			g2.draw(outerRingEmitterShape);
 			
-			String emitterPercentStr = "" + (int)(this.outerRingColours[i].maxIntensity * 100) + "%";
+			String emitterPercentStr = "" + (int)(this.outerRingEmitterData[i].maxIntensity * 100) + "%";
 			g2.drawString(emitterPercentStr, outerRingEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(emitterPercentStr),
 					outerRingEmitterPos.y + EMITTER_RADIUS);
 			
