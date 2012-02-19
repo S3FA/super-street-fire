@@ -16,15 +16,21 @@ final public class ImmutableFireEmitter {
 	final private FireEmitter.Location location;
 	final private EnumSet<GameModel.Entity> contributingEntities;
 	final private Map<GameModel.Entity, Float> intensities;
+	final private float maxIntensity;
 	
 	public ImmutableFireEmitter(FireEmitter emitter) {
 		this.index     = emitter.getIndex();
 		this.location  = emitter.getLocation();
 		this.contributingEntities = emitter.getContributingEntities();
 		this.intensities = new HashMap<GameModel.Entity, Float>(3);
+		
+		float maxIntensity = 0;
 		for (GameModel.Entity entity : this.contributingEntities) {
-			this.intensities.put(entity, emitter.getContributorIntensity(entity));
+			float intensity = emitter.getContributorIntensity(entity);
+			this.intensities.put(entity, intensity);
+			maxIntensity = Math.max(intensity, this.maxIntensity);
 		}
+		this.maxIntensity = maxIntensity;
 	}
 	
 	public int getIndex() {
@@ -35,6 +41,9 @@ final public class ImmutableFireEmitter {
 	}
 	public float getIntensity(GameModel.Entity entity) {
 		return this.intensities.get(entity).floatValue();
+	}
+	public float getMaxIntensity() {
+		return this.maxIntensity;
 	}
 	public EnumSet<GameModel.Entity> getContributingEntities() {
 		return this.contributingEntities;

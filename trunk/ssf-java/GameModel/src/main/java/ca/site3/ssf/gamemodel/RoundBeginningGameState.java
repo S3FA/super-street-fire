@@ -57,7 +57,7 @@ class RoundBeginningGameState extends GameState {
 		
 		// NOTE: We use a number slightly less than zero because there's the 'FIGHT' portion
 		// of the count down.
-		if (this.fightCounter <= -0.1) {
+		if (this.fightCounter <= -1.0) {
 			// Change to the next state...
 			this.goToNextState();
 			return;
@@ -125,7 +125,7 @@ class RoundBeginningGameState extends GameState {
 				break;
 				
 			case ONE:
-				if (this.fightCounter <= 1.0) {
+				if (this.fightCounter <= 0.0) {
 					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.FIGHT);
 					this.currState = RoundBeginningGameState.CountState.FIGHT;
 				}

@@ -6,17 +6,25 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-import ca.site3.ssf.gamemodel.FireEmitterConfig;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 
-class ArenaDisplay extends Container {
+import ca.site3.ssf.gamemodel.FireEmitterConfig;
+import ca.site3.ssf.gamemodel.GameConfig;
+import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+
+class ArenaDisplay extends JPanel {
 
 	private static final long serialVersionUID = 7000442714767712317L;
 
@@ -25,17 +33,20 @@ class ArenaDisplay extends Container {
 	final static private BasicStroke DASHED_STROKE          = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, DASH_1, 0.0f);
 	final static private BasicStroke EMITTER_OUTLINE_STROKE = new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	final static private BasicStroke PODIUM_OUTLINE_STROKE  = new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+	final static private BasicStroke ROUND_OUTLINE_STROKE   = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	
 	final static private Font INTENSITY_FONT = new Font("SansSerif", Font.PLAIN, 12);
 	final static private Font PLAYER_FONT    = new Font("SansSerif", Font.BOLD, 16);
 	final static private Font COUNTDOWN_FONT = new Font("SansSerif", Font.ITALIC, 32);
+	final static private Font ROUND_FONT     = new Font("SansSerif", Font.BOLD, 24);
 	
 	// Colours used when drawing the fire emitters whose flame belongs to a particular entity in the game...
 	final static Color PLAYER_1_COLOUR   = new Color(1.0f, 0.0f, 0.0f);
 	final static Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
-	final static Color RINGMASTER_COLOUR = Color.yellow;
+	final static Color RINGMASTER_COLOUR = Color.orange;
 	
-	private FireEmitterConfig fireEmitterConfig;
+	final private FireEmitterConfig fireEmitterConfig;
+	final private GameConfig gameConfig;
 	
 	// Emitter data is stored in the same orderings as the FireEmitterModel in the gamemodel
 	private EmitterData[] leftRailEmitterData  = null;
@@ -44,11 +55,23 @@ class ArenaDisplay extends Container {
 	
 	private String infoText = "";
 	
-	public ArenaDisplay(FireEmitterConfig fireEmitterConfig) {
+	GameResult[] roundResults = null;
+	
+	public ArenaDisplay(GameConfig gameConfig, FireEmitterConfig fireEmitterConfig) {
 		super();
 
+		this.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+		this.setBackground(Color.white);
+		
 		this.fireEmitterConfig = fireEmitterConfig;
 		assert(fireEmitterConfig != null);
+		this.gameConfig = gameConfig;
+		assert(gameConfig != null);
+		
+		this.roundResults = new GameResult[gameConfig.getNumRoundsPerMatch()];
+		for (int i = 0; i < this.roundResults.length; i++) {
+			this.roundResults[i] = null;
+		}
 		
 		this.leftRailEmitterData  = new EmitterData[fireEmitterConfig.getNumEmittersPerRail()];
 		this.rightRailEmitterData = new EmitterData[fireEmitterConfig.getNumEmittersPerRail()];
@@ -62,19 +85,34 @@ class ArenaDisplay extends Container {
 			this.outerRingEmitterData[i] = new EmitterData();
 		}
 	}
+	
+	public void setRoundResult(int roundNum, GameResult roundResult) {
+		assert(roundNum > 0 && roundNum <= this.roundResults.length);
+		this.roundResults[roundNum-1] = roundResult; 
+	}
+	public void clearRoundResults() {
+		for (int i = 0; i < this.roundResults.length; i++) {
+			this.roundResults[i] = null;
+		}
+		this.repaint();
+	}
 
 	public void setInfoText(String text) {
 		this.infoText = text;
+		this.repaint();
 	}
 	
 	public void setLeftRailEmitter(int index, EmitterData data) {
 		this.leftRailEmitterData[index] = data;
+		this.repaint();
 	}
 	public void setRightRailEmitter(int index, EmitterData data) {
 		this.rightRailEmitterData[index] = data;
+		this.repaint();
 	}
 	public void setOuterRingEmitter(int index, EmitterData data) {
 		this.outerRingEmitterData[index] = data;
+		this.repaint();
 	}
 	
 	public void paint(Graphics g) {
@@ -242,6 +280,51 @@ class ArenaDisplay extends Container {
 		FontMetrics COUNTDOWN_FONT_METRICS = g2.getFontMetrics(ArenaDisplay.COUNTDOWN_FONT);
 		g2.setFont(ArenaDisplay.COUNTDOWN_FONT);
 		g2.drawString(this.infoText, CENTER_X - COUNTDOWN_FONT_METRICS.stringWidth(this.infoText) / 2.0f, CENTER_Y);
+		
+		// Draw the round display text and fill shapes...
+		FontMetrics ROUND_FONT_METRICS = g2.getFontMetrics(ArenaDisplay.ROUND_FONT);
+		g2.setFont(ArenaDisplay.ROUND_FONT);
+		g2.setPaint(Color.darkGray);
+		String roundsStr = "Rounds: ";
+		g2.drawString(roundsStr, 10, ROUND_FONT_METRICS.getHeight());
+		
+		final float DISTANCE_BETWEEN_ROUND_SHAPES = 8;
+		final float ROUND_SHAPE_SIZE              = 25;
+		
+		float xPos = 10 + ROUND_FONT_METRICS.stringWidth(roundsStr) + 5;
+		float yPos = 8 + (((float)ROUND_FONT_METRICS.getHeight() - ROUND_SHAPE_SIZE) / 2.0f);
+		
+		g2.setStroke(ArenaDisplay.ROUND_OUTLINE_STROKE);
+		for (int i = 0; i < this.roundResults.length; i++) {
+			Rectangle2D.Float roundShape = new Rectangle2D.Float(xPos, yPos, ROUND_SHAPE_SIZE, ROUND_SHAPE_SIZE);
+			
+			if (this.roundResults[i] == null) {
+				g2.setPaint(Color.lightGray);	
+			}
+			else {
+				switch (this.roundResults[i]) {
+				case PLAYER1_VICTORY:
+					g2.setPaint(ArenaDisplay.PLAYER_1_COLOUR);
+					break;
+				case PLAYER2_VICTORY:
+					g2.setPaint(ArenaDisplay.PLAYER_2_COLOUR);
+					break;
+				case TIE:
+					Paint tiePaint = new GradientPaint(xPos, yPos, ArenaDisplay.PLAYER_1_COLOUR,
+							xPos+ROUND_SHAPE_SIZE, yPos+ROUND_SHAPE_SIZE, ArenaDisplay.PLAYER_2_COLOUR);
+					g2.setPaint(tiePaint);
+					break;
+				default:
+					assert(false);
+					break;
+				}
+			}
+			
+			g2.fill(roundShape);
+			g2.setPaint(Color.black);
+			g2.draw(roundShape);
+			xPos += ROUND_SHAPE_SIZE + DISTANCE_BETWEEN_ROUND_SHAPES;
+		}
 		
 	}
 

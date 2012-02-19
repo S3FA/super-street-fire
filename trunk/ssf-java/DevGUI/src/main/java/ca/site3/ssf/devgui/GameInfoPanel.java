@@ -16,11 +16,13 @@ class GameInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private JLabel prevStateLabel;
 	private JLabel currStateLabel;
 	private JLabel currRoundTimeLabel;
 	
 	private PlayerInfoPanel player1Panel;
 	private PlayerInfoPanel player2Panel;
+	private RingmasterInfoPanel ringmasterPanel;
 	
 	GameInfoPanel() {
 		super();
@@ -38,7 +40,14 @@ class GameInfoPanel extends JPanel {
 
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();		
 		
-		JLabel currStateLabel = new JLabel("Game State:");
+		JLabel prevStateLabel = new JLabel("Previous State:");
+		prevStateLabel.setForeground(Color.black);
+		formLayoutHelper.addLabel(prevStateLabel, stateInfoPanel);
+		this.prevStateLabel = new JLabel("N/A");
+		this.prevStateLabel.setForeground(Color.black);
+		formLayoutHelper.addLastField(this.prevStateLabel, stateInfoPanel);
+		
+		JLabel currStateLabel = new JLabel("Current State:");
 		currStateLabel.setForeground(Color.black);
 		formLayoutHelper.addLabel(currStateLabel, stateInfoPanel);
 		this.currStateLabel = new JLabel("N/A");
@@ -59,12 +68,14 @@ class GameInfoPanel extends JPanel {
 		
 		this.player1Panel = new PlayerInfoPanel(1);
 		this.player2Panel = new PlayerInfoPanel(2);
+		this.ringmasterPanel = new RingmasterInfoPanel();
 
-		this.setLayout(new GridLayout(0,3));
+		this.setLayout(new GridLayout(0,4));
 		
 		this.add(stateInfoPanel);
-		this.add(player1Panel);
-		this.add(player2Panel);
+		this.add(this.player1Panel);
+		this.add(this.player2Panel);
+		this.add(this.ringmasterPanel);
 	}
 
 	void setRoundTimer(double time) {
@@ -79,7 +90,10 @@ class GameInfoPanel extends JPanel {
 		return Double.parseDouble(this.currRoundTimeLabel.getText());
 	}
 	
-	void setGameState(GameState.GameStateType state) {
+	void setPreviousGameState(GameState.GameStateType state) {
+		this.prevStateLabel.setText(state.toString());
+	}
+	void setCurrentGameState(GameState.GameStateType state) {
 		this.currStateLabel.setText(state.toString());
 	}
 

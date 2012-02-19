@@ -48,7 +48,7 @@ class PlayerInfoPanel extends JPanel {
 		this.lifeBar = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
 		this.lifeBar.setBorderPainted(true);
 		this.lifeBar.setStringPainted(true);
-		this.setLife(100);
+		this.setLife(0);
 		
 		JLabel lifeLabel = new JLabel("Life:");
 		lifeLabel.setForeground(Color.black);

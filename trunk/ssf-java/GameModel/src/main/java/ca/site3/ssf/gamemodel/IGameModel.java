@@ -14,7 +14,7 @@ public interface IGameModel {
 	
 	void tick(double dT);
 	void killGame();
-	void initiateNextMatchRound();
+	void initiateNextState();
 	void togglePauseGame();
 
 	ActionFactory getActionFactory();
