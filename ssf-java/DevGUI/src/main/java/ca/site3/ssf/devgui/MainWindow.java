@@ -3,6 +3,7 @@ package ca.site3.ssf.devgui;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 
@@ -30,13 +31,22 @@ public class MainWindow extends JFrame {
 		this.setLocationRelativeTo(null);
 	}
 
+	static void createAndShowGUI() {
+		MainWindow mainWindow = new MainWindow();
+		mainWindow.setVisible(true);
+	}
+	
 	/**
 	 * The main driver method for the Developer GUI.
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MainWindow mainWindow = new MainWindow();
-		mainWindow.setVisible(true);
+        Runnable doCreateAndShowGUI = new Runnable() {
+            public void run() {
+            	MainWindow.createAndShowGUI();
+            }
+        };
+        SwingUtilities.invokeLater(doCreateAndShowGUI);
 	}
 
 }
