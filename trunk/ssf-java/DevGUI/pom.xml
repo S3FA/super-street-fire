@@ -16,8 +16,8 @@
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
   	<dependency>
-	  <groupId>ch.qos.logback</groupId>
-	  <artifactId>logback-classic</artifactId>
-  	</dependency>
+	  <groupId>org.slf4j</groupId>
+	  <artifactId>slf4j-api</artifactId>
+	</dependency>
   </dependencies>
 </project>
