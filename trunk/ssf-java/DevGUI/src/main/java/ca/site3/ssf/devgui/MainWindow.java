@@ -90,58 +90,94 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 	}
 
 	// GameModel 
+	public void onGameModelEvent(IGameModelEvent event) {
+		switch (event.getType()) {
+		case FireEmitterChanged:
+			this.onFireEmitterChanged((FireEmitterChangedEvent)event);
+			break;
+		case GameStateChanged:
+			this.onGameStateChanged((GameStateChangedEvent)event);
+			break;
+		case MatchEnded:
+			this.onMatchEnded((MatchEndedEvent)event);
+			break;
+		case PlayerAttackAction:
+			this.onPlayerAttackAction((PlayerAttackActionEvent)event);
+			break;
+		case PlayerBlockAction:
+			this.onPlayerBlockAction((PlayerBlockActionEvent)event);
+			break;
+		case PlayerHealthChanged:
+			this.onPlayerHealthChanged((PlayerHealthChangedEvent)event);
+			break;
+		case RingmasterAction:
+			this.onRingmasterAction((RingmasterActionEvent)event);
+			break;
+		case RoundBeginTimerChanged:
+			this.onRoundBeginFightTimerChanged((RoundBeginTimerChangedEvent)event);
+			break;
+		case RoundEnded:
+			this.onRoundEnded((RoundEndedEvent)event);
+			break;
+		case RoundPlayTimerChanged:
+			this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
+			break;
+		default:
+			assert(false);
+			break;
+		}
+	}
 	
-	public void onGameStateChanged(GameStateType oldState, GameStateType newState) {
-		this.infoPanel.setPreviousGameState(oldState);
-		this.infoPanel.setCurrentGameState(newState);
-		if (newState != GameStateType.ROUND_IN_PLAY_STATE) {
+	private void onGameStateChanged(GameStateChangedEvent event) {
+		this.infoPanel.setPreviousGameState(event.getOldState());
+		this.infoPanel.setCurrentGameState(event.getNewState());
+		if (event.getNewState() != GameStateType.ROUND_IN_PLAY_STATE) {
 			this.infoPanel.setRoundTimer(-1);
 		}
 	}
 
-	public void onPlayerHealthChanged(int playerNum, float prevLifePercentage, float newLifePercentage) {
-		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(playerNum);
-		playerPanel.setLife(newLifePercentage);
+	private void onPlayerHealthChanged(PlayerHealthChangedEvent event) {
+		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(event.getPlayerNum());
+		playerPanel.setLife(event.getNewLifePercentage());
 	}
 
-	public void onRoundPlayTimerChanged(int newCountdownTimeInSecs) {
-		this.infoPanel.setRoundTimer(newCountdownTimeInSecs);
+	private void onRoundPlayTimerChanged(RoundPlayTimerChangedEvent event) {
+		this.infoPanel.setRoundTimer(event.getCountdownTimeInSecs());
 	}
 
-	public void onRoundBeginFightTimerChanged(RoundBeginCountdownType threeTwoOneFightTime) {
-		this.arenaDisplay.setInfoText(threeTwoOneFightTime.toString());
+	private void onRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent event) {
+		this.arenaDisplay.setInfoText(event.getThreeTwoOneFightTime().toString());
 	}
 
-	public void onRoundEnded(int roundNumber, GameResult roundResult, boolean roundTimedOut) {
-		this.arenaDisplay.setRoundResult(roundNumber, roundResult);
+	private void onRoundEnded(RoundEndedEvent event) {
+		this.arenaDisplay.setRoundResult(event.getRoundNumber(), event.getRoundResult());
 		this.arenaDisplay.setInfoText("Time Out");
 	}
 
-	public void onMatchEnded(GameResult matchResult) {
+	private void onMatchEnded(MatchEndedEvent event) {
 		this.arenaDisplay.setInfoText("Match Over");
 	}
 
-	public void onPlayerAttackAction(int playerNum, AttackType attackType) {
-		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(playerNum);
-		playerPanel.setLastActionAsAttack(attackType, this.infoPanel.getRoundTime());
+	private void onPlayerAttackAction(PlayerAttackActionEvent event) {
+		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(event.getPlayerNum());
+		playerPanel.setLastActionAsAttack(event.getAttackType(), this.infoPanel.getRoundTime());
 	}
 
-	public void onPlayerBlockAction(int playerNum) {
-		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(playerNum);
+	private void onPlayerBlockAction(PlayerBlockActionEvent event) {
+		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(event.getPlayerNum());
 		playerPanel.setLastActionAsBlock(this.infoPanel.getRoundTime());
 	}
 
-	public void onRingmasterAction() {
+	private void onRingmasterAction(RingmasterActionEvent event) {
 		// TODO Auto-generated method stub
-		
 	}
 
-	public void onFireEmitterChanged(ImmutableFireEmitter fireEmitter) {
-		Color[] colours     = new Color[fireEmitter.getContributingEntities().size()];
-		float[] intensities = new float[fireEmitter.getContributingEntities().size()];
+	private void onFireEmitterChanged(FireEmitterChangedEvent event) {
+		Color[] colours     = new Color[event.getContributingEntities().size()];
+		float[] intensities = new float[event.getContributingEntities().size()];
 		
 		int i = 0;
-		for (Entity entity : fireEmitter.getContributingEntities()) {
+		for (Entity entity : event.getContributingEntities()) {
 			switch (entity) {
 			case PLAYER1_ENTITY:
 				colours[i] = ArenaDisplay.PLAYER_1_COLOUR;
@@ -157,21 +193,21 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 				break;
 			}
 			
-			intensities[i] = fireEmitter.getIntensity(entity);
+			intensities[i] = event.getIntensity(entity);
 			i++;
 		}
 		
-		switch (fireEmitter.getLocation()) {
+		switch (event.getLocation()) {
 		case LEFT_RAIL:
-			this.arenaDisplay.setLeftRailEmitter(fireEmitter.getIndex(), new EmitterData(intensities, colours));
+			this.arenaDisplay.setLeftRailEmitter(event.getIndex(), new EmitterData(intensities, colours));
 			break;
 			
 		case RIGHT_RAIL:
-			this.arenaDisplay.setRightRailEmitter(fireEmitter.getIndex(), new EmitterData(intensities, colours));
+			this.arenaDisplay.setRightRailEmitter(event.getIndex(), new EmitterData(intensities, colours));
 			break;
 			
 		case OUTER_RING:
-			this.arenaDisplay.setOuterRingEmitter(fireEmitter.getIndex(), new EmitterData(intensities, colours));
+			this.arenaDisplay.setOuterRingEmitter(event.getIndex(), new EmitterData(intensities, colours));
 			break;
 			
 		default:

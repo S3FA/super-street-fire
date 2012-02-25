@@ -12,20 +12,16 @@ public interface IGameModel {
 	
 	public enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
 	
-	/**
-	 * Tick the game model.
-	 * @param dT time since last tick (in seconds)
-	 */
 	void tick(double dT);
 	
-	
-	void killGame();
-	void initiateNextState();
-	void togglePauseGame();
-
 	ActionFactory getActionFactory();
-	void executeGenericAction(Action action);
+	void executeGenericAction(Action action);  // Or use the ExecuteGenericActionCommand class
+	void killGame();						   // Or use the KillGameCommand class
+	void initiateNextState();				   // Or use the InitiateNextStateCommand class
+	void togglePauseGame();					   // Or use the TogglePauseGameCommand class
 
 	void addGameModelListener(IGameModelListener l);
 	void removeGameModelListener(IGameModelListener l);
+	
+	void executeCommand(AbstractGameModelCommand command);
 }

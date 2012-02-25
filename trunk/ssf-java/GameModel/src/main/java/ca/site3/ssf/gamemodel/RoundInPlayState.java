@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
 class RoundInPlayState extends GameState {
 
@@ -184,9 +184,9 @@ class RoundInPlayState extends GameState {
 		this.gameModel.incrementNumRoundsPlayed();
 		
 		// Signal an event for the round ending in victory for a player...
-		GameResult result = GameResult.PLAYER1_VICTORY;
+		RoundResult result = RoundResult.PLAYER1_VICTORY;
 		if (victoryPlayer.getPlayerNumber() == 2) {
-			result = GameResult.PLAYER2_VICTORY;
+			result = RoundResult.PLAYER2_VICTORY;
 		}
 		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, this.countdownTimeInSecs <= 0.0);
 		
@@ -220,7 +220,7 @@ class RoundInPlayState extends GameState {
 		p1.incrementNumRoundWins();
 		p2.incrementNumRoundWins();
 		
-		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), GameResult.TIE, this.countdownTimeInSecs <= 0.0);
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), RoundResult.TIE, this.countdownTimeInSecs <= 0.0);
 		
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);

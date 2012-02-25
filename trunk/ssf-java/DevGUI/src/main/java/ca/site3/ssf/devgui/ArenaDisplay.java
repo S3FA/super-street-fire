@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameConfig;
-import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
 class ArenaDisplay extends JPanel {
 
@@ -55,7 +55,7 @@ class ArenaDisplay extends JPanel {
 	
 	private String infoText = "";
 	
-	GameResult[] roundResults = null;
+	RoundResult[] roundResults = null;
 	
 	public ArenaDisplay(GameConfig gameConfig, FireEmitterConfig fireEmitterConfig) {
 		super();
@@ -68,7 +68,7 @@ class ArenaDisplay extends JPanel {
 		this.gameConfig = gameConfig;
 		assert(gameConfig != null);
 		
-		this.roundResults = new GameResult[gameConfig.getNumRoundsPerMatch()];
+		this.roundResults = new RoundResult[gameConfig.getNumRoundsPerMatch()];
 		for (int i = 0; i < this.roundResults.length; i++) {
 			this.roundResults[i] = null;
 		}
@@ -86,7 +86,7 @@ class ArenaDisplay extends JPanel {
 		}
 	}
 	
-	public void setRoundResult(int roundNum, GameResult roundResult) {
+	public void setRoundResult(int roundNum, RoundResult roundResult) {
 		assert(roundNum > 0 && roundNum <= this.roundResults.length);
 		this.roundResults[roundNum-1] = roundResult; 
 	}
