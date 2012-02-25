@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 
 class MatchEndedGameState extends GameState {
 
@@ -22,10 +22,10 @@ class MatchEndedGameState extends GameState {
 		GameModelActionSignaller actionSignaller = this.gameModel.getActionSignaller();
 		assert(actionSignaller != null);
 		if (victoryPlayer.getPlayerNumber() == 1) {
-			actionSignaller.fireOnMatchEnded(GameResult.PLAYER1_VICTORY);
+			actionSignaller.fireOnMatchEnded(MatchResult.PLAYER1_VICTORY);
 		}
 		else {
-			actionSignaller.fireOnMatchEnded(GameResult.PLAYER2_VICTORY);
+			actionSignaller.fireOnMatchEnded(MatchResult.PLAYER2_VICTORY);
 		}
 		
 		// Add match end actions to show the victory player's flames in all their glory...

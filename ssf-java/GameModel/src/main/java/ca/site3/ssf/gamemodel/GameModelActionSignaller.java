@@ -6,7 +6,8 @@ import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.gamemodel.IGameModelListener.GameResult;
+import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
 /**
  * The GameModelActionSignaller provides a centralized location for all methods used
@@ -51,9 +52,10 @@ class GameModelActionSignaller {
 			newStateType = newState.getStateType();
 		}
 		
+		GameStateChangedEvent event = new GameStateChangedEvent(oldStateType, newStateType);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onGameStateChanged(oldStateType, newStateType);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing game state change event", ex);
@@ -68,9 +70,11 @@ class GameModelActionSignaller {
 	 * @param newLifePercentage The player's new health amount, after the change. 
 	 */
 	void fireOnPlayerHealthChanged(int playerNum, float prevLifePercentage, float newLifePercentage) {
+		
+		PlayerHealthChangedEvent event = new PlayerHealthChangedEvent(playerNum, prevLifePercentage, newLifePercentage);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onPlayerHealthChanged(playerNum, prevLifePercentage, newLifePercentage);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing player health change event", ex);
@@ -79,9 +83,11 @@ class GameModelActionSignaller {
 	}
 	
 	void fireOnRoundPlayTimerChanged(int newCountdownTimeInSecs) {
+		
+		RoundPlayTimerChangedEvent event = new RoundPlayTimerChangedEvent(newCountdownTimeInSecs);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onRoundPlayTimerChanged(newCountdownTimeInSecs);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing round in-play timer changed event", ex);
@@ -93,10 +99,11 @@ class GameModelActionSignaller {
 	 * Triggers each of the listener's callbacks for a round begin fight timer change.
 	 * @param threeTwoOneFightTime The latest/current value of the timer.
 	 */
-	void fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType threeTwoOneFightTime) {
+	void fireOnRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent.RoundBeginCountdownType threeTwoOneFightTime) {
+		RoundBeginTimerChangedEvent event = new RoundBeginTimerChangedEvent(threeTwoOneFightTime);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onRoundBeginFightTimerChanged(threeTwoOneFightTime);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing round begin fight timer changed event", ex);
@@ -110,10 +117,11 @@ class GameModelActionSignaller {
 	 * @param roundResult The round result.
 	 * @param roundTimedOut Whether the round timed out or not.
 	 */
-	void fireOnRoundEnded(int roundNumber, IGameModelListener.GameResult roundResult, boolean roundTimedOut) {
+	void fireOnRoundEnded(int roundNumber, RoundResult roundResult, boolean roundTimedOut) {
+		RoundEndedEvent event = new RoundEndedEvent(roundNumber, roundResult, roundTimedOut);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onRoundEnded(roundNumber, roundResult, roundTimedOut);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing round ended event", ex);
@@ -125,10 +133,11 @@ class GameModelActionSignaller {
 	 * Triggers each of the listener's callbacks for the match ended event.
 	 * @param matchResult The match result.
 	 */
-	void fireOnMatchEnded(GameResult matchResult) {
+	void fireOnMatchEnded(MatchResult matchResult) {
+		MatchEndedEvent event = new MatchEndedEvent(matchResult);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onMatchEnded(matchResult);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing match ended event", ex);
@@ -143,9 +152,10 @@ class GameModelActionSignaller {
 	 * @param attackType The type of attack.
 	 */
 	void fireOnPlayerAttackAction(int playerNum, PlayerAttackAction.AttackType attackType) {
+		PlayerAttackActionEvent event = new PlayerAttackActionEvent(playerNum, attackType);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onPlayerAttackAction(playerNum, attackType);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing player attack action event", ex);
@@ -158,9 +168,10 @@ class GameModelActionSignaller {
 	 * @param playerNum Blocker player number.
 	 */
 	void fireOnPlayerBlockAction(int playerNum) {
+		PlayerBlockActionEvent event = new PlayerBlockActionEvent(playerNum);
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onPlayerBlockAction(playerNum);
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing player block action event", ex);
@@ -172,9 +183,10 @@ class GameModelActionSignaller {
 	 * Triggers each of the listener's callbacks for a ringmaster action event.
 	 */
 	void fireOnRingmasterAction() {
+		RingmasterActionEvent event = new RingmasterActionEvent();
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onRingmasterAction();
+				listener.onGameModelEvent(event);
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing ringmaster action event", ex);
@@ -189,7 +201,7 @@ class GameModelActionSignaller {
 	void fireOnFireEmitterChanged(FireEmitter fireEmitter) {
 		for (IGameModelListener listener : this.listeners) {
 			try {
-				listener.onFireEmitterChanged(new ImmutableFireEmitter(fireEmitter));
+				listener.onGameModelEvent(new FireEmitterChangedEvent(fireEmitter));
 			}
 			catch (Exception ex) {
 				this.logger.error("Exception occurred while firing fire emitter changed event", ex);

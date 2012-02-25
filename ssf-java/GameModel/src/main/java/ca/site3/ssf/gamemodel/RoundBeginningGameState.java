@@ -1,5 +1,7 @@
 package ca.site3.ssf.gamemodel;
 
+import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
+
 /**
  * Round Beginning State, think "3, 2, 1, FIGHT!" - Happens 
  * at the beginning of every new round of play. This state has its own mini, internal
@@ -106,27 +108,27 @@ class RoundBeginningGameState extends GameState {
 		switch (this.currState) {
 		
 			case BEFORE_THREE:
-				this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.THREE);
+				this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.THREE);
 				this.currState = RoundBeginningGameState.CountState.THREE;
 				break;
 				
 			case THREE:
 				if (this.fightCounter <= 2.0) {
-					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.TWO);
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.TWO);
 					this.currState = RoundBeginningGameState.CountState.TWO;
 				}
 				break;
 				
 			case TWO:
 				if (this.fightCounter <= 1.0) {
-					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.ONE);
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.ONE);
 					this.currState = RoundBeginningGameState.CountState.ONE;
 				}
 				break;
 				
 			case ONE:
 				if (this.fightCounter <= 0.0) {
-					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(IGameModelListener.RoundBeginCountdownType.FIGHT);
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.FIGHT);
 					this.currState = RoundBeginningGameState.CountState.FIGHT;
 				}
 				break;

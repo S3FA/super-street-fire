@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Callum
  *
  */
-final public class ImmutableFireEmitter {
+final public class FireEmitterChangedEvent implements IGameModelEvent {
 	
 	final private int index;
 	final private FireEmitter.Location location;
@@ -18,7 +18,9 @@ final public class ImmutableFireEmitter {
 	final private Map<GameModel.Entity, Float> intensities;
 	final private float maxIntensity;
 	
-	public ImmutableFireEmitter(FireEmitter emitter) {
+	public FireEmitterChangedEvent(FireEmitter emitter) {
+		super();
+		
 		this.index     = emitter.getIndex();
 		this.location  = emitter.getLocation();
 		this.contributingEntities = emitter.getContributingEntities();
@@ -47,6 +49,10 @@ final public class ImmutableFireEmitter {
 	}
 	public EnumSet<GameModel.Entity> getContributingEntities() {
 		return this.contributingEntities;
+	}
+
+	public Type getType() {
+		return Type.FireEmitterChanged;
 	}
 	
 }

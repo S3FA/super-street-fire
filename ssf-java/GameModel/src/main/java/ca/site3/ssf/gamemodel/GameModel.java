@@ -99,6 +99,10 @@ public class GameModel implements IGameModel {
 		this.actionSignaller.removeGameModelListener(l);
 	}	
 	
+	public void executeCommand(AbstractGameModelCommand command) {
+		command.execute(this);
+	}
+	
 	// End IGameModel Interface function implementations *******************************************
 	
 	/**
