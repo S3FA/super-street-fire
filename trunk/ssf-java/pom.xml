@@ -29,6 +29,9 @@
   	<developer>
   		<name>Greg Wiseman</name>
   	</developer>
+	<developer>
+  		<name>Mike Everson</name>
+  	</developer>
   </developers>
   <modules>
   	<module>GestureRecognizer</module>
@@ -39,6 +42,7 @@
   	<module>GUIProtocol</module>
   	<module>AndroidGUI</module>
   	<module>DevGUI</module>
+  	<module>GestureRecorderGUI</module>
   </modules>
   <dependencyManagement>
   	<dependencies>
