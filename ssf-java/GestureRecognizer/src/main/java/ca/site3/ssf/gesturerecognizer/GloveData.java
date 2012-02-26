@@ -59,7 +59,7 @@ public class GloveData {
 	
 	public boolean fromString(String str) {
 		Scanner scanner = new Scanner(str);
-		scanner.useDelimiter("[\\[\\],\\s*\\(\\)]");
+		scanner.useDelimiter(",\\s*");
 		
 		this.gyroData    = this.readDataVector(scanner);
 		this.accelData   = this.readDataVector(scanner);
@@ -72,19 +72,9 @@ public class GloveData {
 		double tempX, tempY, tempZ;
 		
 		try {
-			while (!scanner.hasNextDouble()) {
-				scanner.next();
-			}
 			tempX = scanner.nextDouble();
-			while (!scanner.hasNextDouble()) {
-				scanner.next();
-			}
 			tempY = scanner.nextDouble();
-			while (!scanner.hasNextDouble()) {
-				scanner.next();
-			}
 			tempZ = scanner.nextDouble();
-			
 		}
 		catch (InputMismatchException ex) {
 			return null;
@@ -94,10 +84,10 @@ public class GloveData {
 	}
 	
 	public String toString() {
-		String gyroStr  = "(" + this.gyroData.getX() + ", "  + this.gyroData.getY() + ", " + this.gyroData.getZ() + ")";
-		String accelStr = "(" + this.accelData.getX() + ", "  + this.accelData.getY() + ", " + this.accelData.getZ() + ")";
-		String magnetoStr = "(" + this.magnetoData.getX() + ", "  + this.magnetoData.getY() + ", " + this.magnetoData.getZ() + ")";
-		return "[" + gyroStr + ", " + accelStr + ", " + magnetoStr + "]";
+		String gyroStr  = this.gyroData.getX() + ", "  + this.gyroData.getY() + ", " + this.gyroData.getZ();
+		String accelStr = this.accelData.getX() + ", "  + this.accelData.getY() + ", " + this.accelData.getZ();
+		String magnetoStr = this.magnetoData.getX() + ", "  + this.magnetoData.getY() + ", " + this.magnetoData.getZ();
+		return gyroStr + ", " + accelStr + ", " + magnetoStr;
 	}
 
 	
