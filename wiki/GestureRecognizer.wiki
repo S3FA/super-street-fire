@@ -6,7 +6,7 @@ The GestureRecognizer contains all of the code responsible for analyzing incomin
 
 In order to train the machine learning data structure in the GestureRecognizer package, several sub-packages will be required. These sub-packages will allow gesture data to be captured/recorded, written to file on disk, read from file on disk and then used to train the data structure / algorithm that is chosen (e.g., Neural Network, Bayesian Network). 
 
-Data from the gloves will come over wifi in UDP. Each value (gyroscope [per axis??], accelerometer and magnetometer.) will be 10-bits packed into 2 bytes.
+Data from the gloves will come over wifi in UDP. Each value (gyroscope, accelerometer and magnetometer.) will be 10-bits packed into 2 bytes. Clarification needed, is gyroscope one per axis or one overall?
 
 = Interface =
 
