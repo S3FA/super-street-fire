@@ -1,2 +1,0 @@
-GestureName,Gyroscope,Magnetometer,Accelerometer,Time
-test,10,10,10,2012/02/25 14:23:07
