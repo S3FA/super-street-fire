@@ -19,13 +19,14 @@ public class MainWindow extends JFrame implements HardwareEvent, ActionListener 
 
 	private RecorderPanel recorderPanel   = null;
 	private ControlPanel controlPanel = null;
+	private boolean IsRecordMode = false;
 	
 	public MainWindow() {
 		super();
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Gesture Recorder GUI)");
-		this.setPreferredSize(new Dimension(600, 200));
+		this.setPreferredSize(new Dimension(700, 200));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		
@@ -69,18 +70,31 @@ public class MainWindow extends JFrame implements HardwareEvent, ActionListener 
 
 	// Triggered from IOServer. Set the coordinates data. If we're in record mode, save that data too.
 	public void actionPerformed(ActionEvent event) {
-		//if (event.getSource() == someHardwareEvent from IOServer)
-			this.recorderPanel.sensorDataPanel.gyroscopeData.setText(""); // hardware data
-			this.recorderPanel.sensorDataPanel.magnetometerData.setText(""); // hardware data
-			this.recorderPanel.sensorDataPanel.accelerometerData.setText(""); // hardware data
+//		if (event.getSource() == recordButtonPress from IOServer)
+//		{
+			// Currently we're assuming one record mode/trigger for both gloves, we can split it if needed
+			IsRecordMode = !IsRecordMode;
+//		}
+//		else if (event.getSource() == someHardwareEvent from IOServer)
+			// Populate the displays on the GUI with the data we're sent
+			this.recorderPanel.sensorDataPanelLeft.gyroscopeData.setText("0"); 
+			this.recorderPanel.sensorDataPanelLeft.magnetometerData.setText("0");
+			this.recorderPanel.sensorDataPanelLeft.accelerometerData.setText("0"); 
+			this.recorderPanel.sensorDataPanelRight.gyroscopeData.setText("0"); 
+			this.recorderPanel.sensorDataPanelRight.magnetometerData.setText("0"); 
+			this.recorderPanel.sensorDataPanelRight.accelerometerData.setText("0"); 
 			
-			if (this.controlPanel.IsRecordMode){
-				this.recorderPanel.fileInfoPanel.recordFileInformation(this.recorderPanel.sensorDataPanel.gyroscopeData.getText(),
-																		this.recorderPanel.sensorDataPanel.magnetometerData.getText(),
-																		this.recorderPanel.sensorDataPanel.accelerometerData.getText(),
-																		this.recorderPanel.fileInfoPanel.gestureName.getText(),
-																		this.recorderPanel.fileInfoPanel.fileName.getText() == "" ? "default" : this.recorderPanel.fileInfoPanel.fileName.getText());
+			// If in record mode, write the data to the specified file
+			if (this.IsRecordMode){
+				this.recorderPanel.fileInfoPanel.recordFileInformation(this.recorderPanel.sensorDataPanelLeft.gyroscopeData.getText(),
+																		this.recorderPanel.sensorDataPanelLeft.magnetometerData.getText(),
+																		this.recorderPanel.sensorDataPanelLeft.accelerometerData.getText(),
+																		this.recorderPanel.sensorDataPanelRight.gyroscopeData.getText(),
+																		this.recorderPanel.sensorDataPanelRight.magnetometerData.getText(),
+																		this.recorderPanel.sensorDataPanelRight.accelerometerData.getText(),
+																		this.recorderPanel.fileInfoPanel.gestureName.getText() == "" ? "Unspecified" : this.recorderPanel.fileInfoPanel.gestureName.getText(),
+																		this.recorderPanel.fileInfoPanel.fileName.getText() == "" ? "RecorderData" : this.recorderPanel.fileInfoPanel.fileName.getText());
 			}
-		//}
+//		}
 	}
 }

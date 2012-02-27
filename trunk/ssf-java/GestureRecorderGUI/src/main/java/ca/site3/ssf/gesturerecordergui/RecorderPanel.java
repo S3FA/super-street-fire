@@ -14,7 +14,8 @@ class RecorderPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	public SensorDataPanel sensorDataPanel;
+	public SensorDataPanel sensorDataPanelLeft;
+	public SensorDataPanel sensorDataPanelRight;
 	public FileInfoPanel fileInfoPanel;
 	
 	RecorderPanel() {
@@ -29,11 +30,13 @@ class RecorderPanel extends JPanel {
         GridBagLayout layout = new GridBagLayout();
         stateInfoPanel.setLayout(layout);
 
-		this.sensorDataPanel = new SensorDataPanel();
+		this.sensorDataPanelLeft = new SensorDataPanel("Left");
+		this.sensorDataPanelRight = new SensorDataPanel("Right");
 		this.fileInfoPanel = new FileInfoPanel();
-		this.setLayout(new GridLayout(0,2));
+		this.setLayout(new GridLayout(1,2));
 		
-		this.add(this.sensorDataPanel, BorderLayout.WEST);
-		this.add(this.fileInfoPanel, BorderLayout.EAST);
+		this.add(this.sensorDataPanelLeft, BorderLayout.WEST);
+		this.add(this.sensorDataPanelRight, BorderLayout.EAST);
+		this.add(this.fileInfoPanel, BorderLayout.SOUTH);
 	}
 }

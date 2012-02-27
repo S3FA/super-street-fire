@@ -18,12 +18,12 @@ class SensorDataPanel extends JPanel {
 	public JTextField magnetometerData;
 	public JTextField accelerometerData;
 	
-	SensorDataPanel() {
+	SensorDataPanel(String title) {
 		super();
 		
 		Color borderColour = Color.black;
 		
-		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(borderColour), "Sensor Data");
+		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(borderColour), "Sensor Data (" + title + ")");
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 		
