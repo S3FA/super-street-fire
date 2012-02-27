@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridBagLayout;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -40,7 +41,10 @@ class FileInfoPanel extends JPanel {
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
 		
 		this.gestureName = new JTextField(25);
+		this.gestureName.setText("Unspecified");
+		
 		this.fileName = new JTextField(25);
+		this.fileName.setText("RecorderData");
 		
 		JLabel gestureNameLabel = new JLabel("Gesture Name:");
 		gestureNameLabel.setForeground(Color.black);
@@ -53,14 +57,37 @@ class FileInfoPanel extends JPanel {
 		formLayoutHelper.addLastField(this.fileName, this);
 	}
 	
-	public void recordFileInformation(String gyroscope, String magnetometer, String accelerometer, String gestureName, String fileName){
+	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
+	public void recordFileInformation(String gyroDataLeft, String magDataLeft, String accDataLeft, String gyroDataRight, String magDataRight, String accDataRight, String gestureName, String fileName){
 		try
-		{
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		{		
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 	        Date date = new Date();
 
-	        FileWriter writer = new FileWriter(fileName + ".txt", true);
-		    writer.write(gestureName + ',' + gyroscope + ',' + magnetometer + ',' + accelerometer + ',' + dateFormat.format(date));
+	        FileWriter writer = new FileWriter(fileName + ".csv", true);
+	        
+	        // If creating a new file then put the column names at the top of the file
+	        if(!new File(fileName).exists())
+	        {
+	        	writer.write("GestureName,GyroDataLeft,MagDataLeft,AccDataLeft,GyroDataRight,MagDataRight,AccDataRight,DateTime\n");
+	        }
+	        
+		    writer.append(gestureName);
+		    writer.append(",");
+		    writer.append(gyroDataLeft);
+		    writer.append(",");
+		    writer.append(magDataLeft);
+		    writer.append(",");
+		    writer.append(accDataLeft);
+		    writer.append(",");
+		    writer.append(gyroDataRight);
+		    writer.append(",");
+		    writer.append(magDataRight);
+		    writer.append(",");
+		    writer.append(accDataRight);
+		    writer.append(",");
+		    writer.append(dateFormat.format(date));
+		    writer.append("\n");
 	 
 		    writer.flush();
 		    writer.close();
