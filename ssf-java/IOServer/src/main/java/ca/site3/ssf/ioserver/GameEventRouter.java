@@ -35,7 +35,31 @@ public class GameEventRouter implements IGameModelListener {
 
 
 	public void onGameModelEvent(IGameModelEvent event) {
-		
+		switch (event.getType()) {
+		case FireEmitterChanged:
+			break;
+		case GameStateChanged:
+			break;
+		case MatchEnded:
+			break;
+		case PlayerAttackAction:
+			break;
+		case PlayerBlockAction:
+			break;
+		case PlayerHealthChanged:
+			break;
+		case RingmasterAction:
+			break;
+		case RoundBeginTimerChanged:
+			break;
+		case RoundEnded:
+			break;
+		case RoundPlayTimerChanged:
+			break;
+		default:
+			log.warn("Unhandled GameModel event type: "+event.getType());
+			break;
+		}
 	}
 	
 }
