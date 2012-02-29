@@ -9,7 +9,25 @@
   <artifactId>GestureRecognizer</artifactId>
   <description>Contains all of the code responsible for analyzing incoming data from a player's (or ring master's) gloves (i.e., gyroscopic, accelerometer and magnetometer data from each of the glove's inertial measurement units) and then recognizing and outputting gestures that are relevant to the Super Street Fire game.</description>
   <name>Gesture Recognizer</name>
+  
+  
+  
+  <repositories>
+    <repository>
+      <!-- This is a random project on sourceforge I found that happens 
+      to have the Java-ML jars in a maven-friendly format. -->
+      <id>spantus</id>
+      <name>spantus sourceforge</name>
+      <url>http://spantus.sourceforge.net/maven/global/</url>
+    </repository>
+  </repositories>
+  
   <dependencies>
+    <dependency>
+      <groupId>net.sourceforge</groupId>
+      <artifactId>javaml</artifactId>
+      <version>0.1.5</version>
+    </dependency>
   	<dependency>
   		<groupId>ca.site3.ssf</groupId>
   		<artifactId>SSF-Common</artifactId>
