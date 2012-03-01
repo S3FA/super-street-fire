@@ -1,0 +1,1 @@
+mvn install:install-file -DgroupId=be.abeel -DartifactId=ajt -Dpackaging=jar -Dversion=1.20 -Dfile=ajt-1.20.jar
