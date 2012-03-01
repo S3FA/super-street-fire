@@ -15,6 +15,9 @@ import java.util.Scanner;
  * If a given glove data array is null within this object then the gesture is considered
  * one-handed (NOTE: The gesture is not valid if both arrays are null).
  * 
+ * Similar to the GloveData the GestureInstance and be written to and read from string using
+ * its toDataString and fromDataString methods.
+ * 
  * @author Callum
  *
  */
@@ -30,9 +33,10 @@ public class GestureInstance {
 	
 	public GestureInstance() {
 		super();
-		this.leftGloveData  = null;
+		this.leftGloveData  = new GloveData[1];
+		this.leftGloveData[0] = new GloveData();
 		this.rightGloveData = null;
-		this.timePts = null;
+		this.timePts = new double[1];
 	}
 	
 	public GestureInstance(GloveData[] leftGloveData, GloveData[] rightGloveData, double[] timePts) {
@@ -41,6 +45,25 @@ public class GestureInstance {
 		this.rightGloveData = rightGloveData;
 		this.timePts = timePts;
 		assert(this.isValid());
+	}
+	
+
+	public int getNumDataPts() {
+		assert(this.timePts != null);
+		return this.timePts.length;
+	}
+	public GloveData getLeftGloveDataAt(int index) {
+		assert(this.hasLeftGloveData());
+		return this.leftGloveData[index];
+	}
+	public GloveData getRightGloveDataAt(int index) {
+		assert(this.hasRightGloveData());
+		return this.rightGloveData[index];
+	}
+	public double getTimeAt(int index) {
+		assert(this.timePts != null);
+		assert(index < this.timePts.length);
+		return this.timePts[index];
 	}
 	
 	public boolean hasLeftGloveData() {
@@ -162,6 +185,11 @@ public class GestureInstance {
 		return result;
 	}
 	
+	public String toString() {
+		return this.toDataString();
+	}
+	
+	
 	private String gloveDataToString(String gloveTitle, GloveData[] data) {
 		if (data == null) {
 			return "";
@@ -241,11 +269,7 @@ public class GestureInstance {
 		}
 		return true;
 	}
-	public String toString() {
-		return this.toDataString();
-	}
-	
-	
+
 	public static void main(String[] args) {
 		GloveData[] leftGloveData = new GloveData[10];
 		GloveData[] rightGloveData = new GloveData[10];
@@ -271,6 +295,9 @@ public class GestureInstance {
 		fromStrInstance.fromDataString(dataStr);
 		
 		System.out.println(fromStrInstance.equals(toStrInstance));
+		
+		System.out.println(JavaMLConverter.ConvertGestureInstanceToTimeSeries(fromStrInstance, 10).toString());
+		
 	}
 
 }

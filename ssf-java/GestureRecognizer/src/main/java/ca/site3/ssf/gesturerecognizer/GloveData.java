@@ -21,7 +21,8 @@ import ca.site3.ssf.common.Algebra;
  *
  */
 public class GloveData {
-
+	public enum DataType { ACCEL_DATA, GYRO_DATA, MAGNETO_DATA };
+	
 	private Vector3D gyroData;
 	private Vector3D accelData;
 	private Vector3D magnetoData;
