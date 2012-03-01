@@ -4,6 +4,8 @@ import java.util.EnumSet;
 
 import org.apache.commons.math.geometry.Vector3D;
 
+import ca.site3.ssf.common.Algebra;
+
 import net.sf.javaml.distance.fastdtw.timeseries.PAA;
 import net.sf.javaml.distance.fastdtw.timeseries.TimeSeries;
 import net.sf.javaml.distance.fastdtw.timeseries.TimeSeriesPoint;
@@ -24,12 +26,12 @@ class JavaMLConverter {
 	 * Converts the given gesture into a javaml library TimeSeries type and constrains the
 	 * number of time point samples to the given fixed length.
 	 * @param gestureInst The gesture instance to convert.
-	 * @param fixedTimeSeriesLength The number of time point samples in the returned TimeSeries.
+	 * @param minTimeSeriesLength The minimum number of time point samples in the returned TimeSeries.
 	 * @return The resulting TimeSeries.
 	 */
 	public static TimeSeries ConvertGestureInstanceToTimeSeries(GestureInstance gestureInst,
-																int fixedTimeSeriesLength) {
-		assert(fixedTimeSeriesLength > 0);
+																int minTimeSeriesLength) {
+		assert(minTimeSeriesLength > 0);
 		assert(gestureInst != null);
 		assert(gestureInst.isValid());
 		
@@ -105,7 +107,9 @@ class JavaMLConverter {
 			}
 		}
 
-		return new PAA(gestureTimeSeries, fixedTimeSeriesLength);
+		assert(gestureTimeSeries != null);
+		PAA result = new PAA(gestureTimeSeries, Math.min(gestureTimeSeries.numOfPts(), minTimeSeriesLength));
+		return result;
 	}
 	
 	public static void printTimeSeries(TimeSeries timeSeries) {
@@ -136,11 +140,8 @@ class JavaMLConverter {
 		GestureInstance instanceLeftHand = new GestureInstance(leftGloveData, null, timeData);
 		GestureInstance instanceRightHand = new GestureInstance(null, rightGloveData, timeData);
 
-		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceBothHands, 7));
-		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceLeftHand, 7));
-		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceRightHand, 7));
+		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceBothHands, 6));
+		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceLeftHand,  6));
+		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceRightHand, 6));
 	}
-	
-
-	
 }
