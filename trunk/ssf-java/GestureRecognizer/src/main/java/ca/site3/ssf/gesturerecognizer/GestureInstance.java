@@ -4,24 +4,43 @@ import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+/**
+ * The GestureInstance is a fully recorded 'instance' of a single gesture for
+ * the Super Street Fire game. A gesture can be a one or two handed action/movement
+ * of a player or ringmaster. The record is kept as two arrays (one for each hand)
+ * of GloveData objects, which act as the discrete data points that define the gesture
+ * over some time period (which is also recorded as an array of double values held by
+ * the instance). 
+ * 
+ * If a given glove data array is null within this object then the gesture is considered
+ * one-handed (NOTE: The gesture is not valid if both arrays are null).
+ * 
+ * @author Callum
+ *
+ */
 public class GestureInstance {
 
 	static final private String LEFT_GLOVE_DATA_STR  = "LEFT_GLOVE_DATA";
 	static final private String RIGHT_GLOVE_DATA_STR = "RIGHT_GLOVE_DATA";
+	static final private String TIME_PTS_DATA_STR    = "TIME_PTS";
 	
 	private GloveData[] leftGloveData;
 	private GloveData[] rightGloveData;
+	private double[] timePts;
 	
 	public GestureInstance() {
 		super();
 		this.leftGloveData  = null;
 		this.rightGloveData = null;
+		this.timePts = null;
 	}
 	
-	public GestureInstance(GloveData[] leftGloveData, GloveData[] rightGloveData) {
+	public GestureInstance(GloveData[] leftGloveData, GloveData[] rightGloveData, double[] timePts) {
 		super();
 		this.leftGloveData  = leftGloveData;
 		this.rightGloveData = rightGloveData;
+		this.timePts = timePts;
+		assert(this.isValid());
 	}
 	
 	public boolean hasLeftGloveData() {
@@ -29,6 +48,23 @@ public class GestureInstance {
 	}
 	public boolean hasRightGloveData() {
 		return this.rightGloveData != null;
+	}
+	public boolean isValid() {
+		boolean isValid = (this.hasLeftGloveData() || this.hasRightGloveData()) && this.timePts != null;
+		if (this.hasLeftGloveData() && this.hasRightGloveData()) {
+			isValid &= (this.leftGloveData.length == this.rightGloveData.length);
+			isValid &= (this.leftGloveData.length == this.timePts.length);
+			return isValid;
+		}
+		
+		if (this.hasLeftGloveData()) {
+			isValid &= (this.leftGloveData.length == this.timePts.length);
+		}
+		else if (this.hasRightGloveData()) {
+			isValid &= (this.rightGloveData.length == this.timePts.length);
+		}
+		
+		return isValid;
 	}
 	
 	public boolean equals(Object other) {
@@ -38,7 +74,7 @@ public class GestureInstance {
 		if (other == null) {
 			return false;
 		}
-		if (!(other instanceof GloveData)) {
+		if (!(other instanceof GestureInstance)) {
 			return false;
 		}
 		
@@ -49,7 +85,9 @@ public class GestureInstance {
 		if (!Arrays.equals(this.rightGloveData, otherGestureInstance.rightGloveData)) {
 			return false;
 		}
-		
+		if (!Arrays.equals(this.timePts, otherGestureInstance.timePts)) {
+			return false;
+		}
 		return true;
 	}
 	
@@ -86,8 +124,11 @@ public class GestureInstance {
 			count++;
 		}
 		
+		this.timePts = new double[amtOfData];
+		count++;
+		
 		for (int i = 0; i < count; i++) {
-			if (!this.gloveHeaderAndDataFromScanner(scanner)) {
+			if (!this.gloveAndTimeHeaderAndDataFromScanner(scanner)) {
 				return false;
 			}
 		}
@@ -116,6 +157,7 @@ public class GestureInstance {
 		result += " " + amtOfData + "\n";
 		result += this.gloveDataToString(LEFT_GLOVE_DATA_STR,  this.leftGloveData);
 		result += this.gloveDataToString(RIGHT_GLOVE_DATA_STR, this.rightGloveData);
+		result += this.timeDataToString(TIME_PTS_DATA_STR);
 		
 		return result;
 	}
@@ -132,23 +174,41 @@ public class GestureInstance {
 		return result;
 	}
 	
+	private String timeDataToString(String timeTitle) {
+		if (this.timePts == null) {
+			return "";
+		}
+		String result = timeTitle + "\n";
+		for (int i = 0; i < this.timePts.length; i++) {
+			result += this.timePts[i] + "\n";
+		}
+		return result;
+	}
 	
-	private boolean gloveHeaderAndDataFromScanner(Scanner scanner) {
+	
+	private boolean gloveAndTimeHeaderAndDataFromScanner(Scanner scanner) {
 		try {
-			String gloveHeaderStr;
-			gloveHeaderStr = scanner.next();
+			String headerStr;
+			headerStr = scanner.next();
+			scanner.nextLine();
 
-			if (gloveHeaderStr.equals(LEFT_GLOVE_DATA_STR)) {
+			if (headerStr.equals(LEFT_GLOVE_DATA_STR)) {
 				if (!this.hasLeftGloveData()) {
 					return false;
 				}
 				return this.gloveDataFromString(scanner, this.leftGloveData);
 			}
-			else if (gloveHeaderStr.equals(RIGHT_GLOVE_DATA_STR)) {
+			else if (headerStr.equals(RIGHT_GLOVE_DATA_STR)) {
 				if (!this.hasRightGloveData()) {
 					return false;
 				}
 				return this.gloveDataFromString(scanner, this.rightGloveData);
+			}
+			else if (headerStr.equals(TIME_PTS_DATA_STR)) {
+				if (this.timePts == null) {
+					return false;
+				}
+				return this.timeDataFromString(scanner, this.timePts);
 			}
 			
 		}
@@ -169,7 +229,18 @@ public class GestureInstance {
 		}
 		return true;
 	}
-	
+	private boolean timeDataFromString(Scanner scanner, double[] data) {
+		try {
+			for (int i = 0; i < data.length; i++) {
+				String nextLine = scanner.nextLine();
+				data[i] = Double.parseDouble(nextLine);
+			}
+		}
+		catch (NumberFormatException ex) {
+			return false;
+		}
+		return true;
+	}
 	public String toString() {
 		return this.toDataString();
 	}
@@ -178,6 +249,7 @@ public class GestureInstance {
 	public static void main(String[] args) {
 		GloveData[] leftGloveData = new GloveData[10];
 		GloveData[] rightGloveData = new GloveData[10];
+		double[] timeData = new double[10];
 		
 		for (int i = 0; i < 10; i++) {
 			leftGloveData[i] = new GloveData(
@@ -188,14 +260,17 @@ public class GestureInstance {
 					Math.random(), Math.random(), Math.random(),
 					Math.random(), Math.random(), Math.random(),
 					Math.random(), Math.random(), Math.random());
+			timeData[i] = i;
 		}
 		
-		GestureInstance toStrInstance = new GestureInstance(leftGloveData, rightGloveData);
+		GestureInstance toStrInstance = new GestureInstance(leftGloveData, rightGloveData, timeData);
 		String dataStr = toStrInstance.toDataString();
 		System.out.println(dataStr);
 		
-		GestureInstance fromStrInstance = new GestureInstance(null, null);
+		GestureInstance fromStrInstance = new GestureInstance();
 		fromStrInstance.fromDataString(dataStr);
+		
+		System.out.println(fromStrInstance.equals(toStrInstance));
 	}
 
 }
