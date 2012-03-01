@@ -7,6 +7,19 @@ import org.apache.commons.math.geometry.Vector3D;
 
 import ca.site3.ssf.common.Algebra;
 
+/**
+ * A class for representing a single point of a single glove's data for Super Street Fire.
+ * A glove's data consists of three 3-vectors of information:
+ * - Gyroscopic data on x,y,z
+ * - Accelerometer data on x,y,z
+ * - Magnetometer data on x,y,z
+ * 
+ * This class also provides methods to quickly read/write all of a gloves data to and from
+ * a comma separated string (see fromDataString and toDataString).
+ * 
+ * @author Callum
+ *
+ */
 public class GloveData {
 
 	private Vector3D gyroData;
@@ -57,7 +70,7 @@ public class GloveData {
 			   Algebra.Approx(this.getMagnetoData(), otherGloveData.getMagnetoData(), Algebra.FLT_EPSILON);
 	}
 	
-	public boolean fromString(String str) {
+	public boolean fromDataString(String str) {
 		Scanner scanner = new Scanner(str);
 		scanner.useDelimiter(",\\s*");
 		
@@ -83,22 +96,25 @@ public class GloveData {
 		return new Vector3D(tempX, tempY, tempZ);
 	}
 	
-	public String toString() {
+	public String toDataString() {
 		String gyroStr  = this.gyroData.getX() + ", "  + this.gyroData.getY() + ", " + this.gyroData.getZ();
 		String accelStr = this.accelData.getX() + ", "  + this.accelData.getY() + ", " + this.accelData.getZ();
 		String magnetoStr = this.magnetoData.getX() + ", "  + this.magnetoData.getY() + ", " + this.magnetoData.getZ();
 		return gyroStr + ", " + accelStr + ", " + magnetoStr;
 	}
 
+	public String toString() {
+		return this.toDataString();
+	}
 	
 	public static void main(String[] args) {
 		
 		// Test to/from string
 		GloveData writeData = new GloveData(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
-		String toString = writeData.toString();
+		String toString = writeData.toDataString();
 		
 		GloveData readData = new GloveData();
-		readData.fromString(toString);
+		readData.fromDataString(toString);
 		
 		boolean equals = writeData.equals(readData);
 		System.out.println(equals);
