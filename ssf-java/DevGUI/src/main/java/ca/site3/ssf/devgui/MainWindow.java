@@ -4,22 +4,40 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
-import ca.site3.ssf.gamemodel.*;
+import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
+import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
+import ca.site3.ssf.gamemodel.GameStateChangedEvent;
+import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
-import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
+import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.IGameModelListener;
+import ca.site3.ssf.gamemodel.MatchEndedEvent;
+import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
+import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RingmasterActionEvent;
+import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
+import ca.site3.ssf.gamemodel.RoundEndedEvent;
+import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 
 
-public class MainWindow extends JFrame implements IGameModelListener, ActionListener {
+/**
+ * Main frame for the developer GUI. Displays current state of the FireEmitterModel, 
+ * player health, game status etc. 
+ * 
+ *  TODO: get the devgui to be using the guiprotocol to communicate with the ioserver directly
+ *  (might be nice to have an option to either directly listen on the game model or else
+ *  use the GUIProtocol)
+ *  
+ *  @author Callum
+ */
+public class MainWindow extends JFrame implements IGameModelListener {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -27,15 +45,12 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 	private GameInfoPanel infoPanel   = null;
 	private ControlPanel controlPanel = null;
 	
-	private Timer gameSimTimer;
-    // TODO: For now we simulate a game model here, in the future we should get the
-    // devgui to be using the guiprotocol to communicate with the ioserver directly!
-    private GameConfig gameConfig = new GameConfig(true, 0.1, 5, 3);
-    private IGameModel gameModel  = new GameModel(this.gameConfig);	
+	
+    private IGameModel gameModel;	
 	
 	
-	public MainWindow() {
-		super();
+	public MainWindow(IGameModel gameModel) {
+		this.gameModel = gameModel;
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
@@ -45,7 +60,7 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		this.setLayout(new BorderLayout());
 		
 		// Setup the frame's contents...
-		this.arenaDisplay = new ArenaDisplay(this.gameConfig, new FireEmitterConfig(true, 16, 8));
+		this.arenaDisplay = new ArenaDisplay(gameModel.getConfiguration(), new FireEmitterConfig(true, 16, 8));
 		Container contentPane = this.getContentPane();
 		contentPane.add(this.arenaDisplay, BorderLayout.CENTER);
 		
@@ -64,68 +79,51 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		this.setLocationRelativeTo(null);
 		
 		this.gameModel.addGameModelListener(this);
-		this.gameSimTimer = new Timer(16, this);
-		this.gameSimTimer.start();
 	}
 
 	
-	static void createAndShowGUI() {
-		MainWindow mainWindow = new MainWindow();
-		mainWindow.setVisible(true);
-	}
-	
-	/**
-	 * The main driver method for the Developer GUI.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-        Runnable doCreateAndShowGUI = new Runnable() {
-        	
-            public void run() {
-            	MainWindow.createAndShowGUI();
-            }
-        };
-        SwingUtilities.invokeLater(doCreateAndShowGUI);
-	}
 
 	// GameModel 
-	public void onGameModelEvent(IGameModelEvent event) {
-		switch (event.getType()) {
-		case FireEmitterChanged:
-			this.onFireEmitterChanged((FireEmitterChangedEvent)event);
-			break;
-		case GameStateChanged:
-			this.onGameStateChanged((GameStateChangedEvent)event);
-			break;
-		case MatchEnded:
-			this.onMatchEnded((MatchEndedEvent)event);
-			break;
-		case PlayerAttackAction:
-			this.onPlayerAttackAction((PlayerAttackActionEvent)event);
-			break;
-		case PlayerBlockAction:
-			this.onPlayerBlockAction((PlayerBlockActionEvent)event);
-			break;
-		case PlayerHealthChanged:
-			this.onPlayerHealthChanged((PlayerHealthChangedEvent)event);
-			break;
-		case RingmasterAction:
-			this.onRingmasterAction((RingmasterActionEvent)event);
-			break;
-		case RoundBeginTimerChanged:
-			this.onRoundBeginFightTimerChanged((RoundBeginTimerChangedEvent)event);
-			break;
-		case RoundEnded:
-			this.onRoundEnded((RoundEndedEvent)event);
-			break;
-		case RoundPlayTimerChanged:
-			this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
-			break;
-		default:
-			assert(false);
-			break;
-		}
+	public void onGameModelEvent(final IGameModelEvent event) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				switch (event.getType()) {
+				case FireEmitterChanged:
+					MainWindow.this.onFireEmitterChanged((FireEmitterChangedEvent)event);
+					break;
+				case GameStateChanged:
+					MainWindow.this.onGameStateChanged((GameStateChangedEvent)event);
+					break;
+				case MatchEnded:
+					MainWindow.this.onMatchEnded((MatchEndedEvent)event);
+					break;
+				case PlayerAttackAction:
+					MainWindow.this.onPlayerAttackAction((PlayerAttackActionEvent)event);
+					break;
+				case PlayerBlockAction:
+					MainWindow.this.onPlayerBlockAction((PlayerBlockActionEvent)event);
+					break;
+				case PlayerHealthChanged:
+					MainWindow.this.onPlayerHealthChanged((PlayerHealthChangedEvent)event);
+					break;
+				case RingmasterAction:
+					MainWindow.this.onRingmasterAction((RingmasterActionEvent)event);
+					break;
+				case RoundBeginTimerChanged:
+					MainWindow.this.onRoundBeginFightTimerChanged((RoundBeginTimerChangedEvent)event);
+					break;
+				case RoundEnded:
+					MainWindow.this.onRoundEnded((RoundEndedEvent)event);
+					break;
+				case RoundPlayTimerChanged:
+					MainWindow.this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
+					break;
+				default:
+					assert(false);
+					break;
+				}				
+			}
+		});
 	}
 	
 	private void onGameStateChanged(GameStateChangedEvent event) {
@@ -215,12 +213,6 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 			break;
 		}
 		
-	}
-
-	public void actionPerformed(ActionEvent event) {
-		if (event.getSource() == this.gameSimTimer) {
-			gameModel.tick(0.016666666);
-		}
 	}
 
 }

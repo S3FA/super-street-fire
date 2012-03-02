@@ -2,7 +2,6 @@ package ca.site3.ssf.devgui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -46,7 +45,6 @@ class ArenaDisplay extends JPanel {
 	final static Color RINGMASTER_COLOUR = Color.orange;
 	
 	final private FireEmitterConfig fireEmitterConfig;
-	final private GameConfig gameConfig;
 	
 	// Emitter data is stored in the same orderings as the FireEmitterModel in the gamemodel
 	private EmitterData[] leftRailEmitterData  = null;
@@ -65,7 +63,6 @@ class ArenaDisplay extends JPanel {
 		
 		this.fireEmitterConfig = fireEmitterConfig;
 		assert(fireEmitterConfig != null);
-		this.gameConfig = gameConfig;
 		assert(gameConfig != null);
 		
 		this.roundResults = new RoundResult[gameConfig.getNumRoundsPerMatch()];

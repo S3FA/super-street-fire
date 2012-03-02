@@ -24,4 +24,6 @@ public interface IGameModel {
 	void removeGameModelListener(IGameModelListener l);
 	
 	void executeCommand(AbstractGameModelCommand command);
+	
+	GameConfig getConfiguration();
 }

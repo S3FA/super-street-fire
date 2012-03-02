@@ -1,20 +1,14 @@
 package ca.site3.ssf.devgui;
 
 import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
-import ca.site3.ssf.gamemodel.ActionFactory;
 import ca.site3.ssf.gamemodel.PlayerAttackAction;
 
 class PlayerInfoPanel extends JPanel {

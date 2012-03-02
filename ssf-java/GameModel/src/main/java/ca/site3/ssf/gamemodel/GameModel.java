@@ -103,6 +103,12 @@ public class GameModel implements IGameModel {
 		command.execute(this);
 	}
 	
+	
+	public GameConfig getConfiguration() {
+		return config;
+	}
+	
+	
 	// End IGameModel Interface function implementations *******************************************
 	
 	/**
