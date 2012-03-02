@@ -11,7 +11,7 @@ import ca.site3.ssf.gamemodel.IGameModelListener;
 
 
 /**
- * Handles notifications coming from the {@link IGameModel} by wrapping them in a GameEvent
+ * Handles notifications coming from the {@link IGameModel} by wrapping them in a IGameModelEvent
  * and shoving them onto the appropriate queue to be consumed by other thread(s). 
  * 
  * @author greg
@@ -20,15 +20,15 @@ public class GameEventRouter implements IGameModelListener {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private AbstractQueue<GameEvent> commQueue;
-	private AbstractQueue<GameEvent> guiQueue;
+	private AbstractQueue<IGameModelEvent> commQueue;
+	private AbstractQueue<IGameModelEvent> guiQueue;
 	
 	
 	/**
 	 * @param commQueue for events of interest to non-GUI game hardware
 	 * @param guiQueue for events that should be passed along to the GUI
 	 */
-	public GameEventRouter(AbstractQueue<GameEvent> commQueue, AbstractQueue<GameEvent> guiQueue) {
+	public GameEventRouter(AbstractQueue<IGameModelEvent> commQueue, AbstractQueue<IGameModelEvent> guiQueue) {
 		this.commQueue = commQueue;
 		this.guiQueue = guiQueue;
 	}

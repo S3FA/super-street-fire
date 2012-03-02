@@ -4,6 +4,8 @@ import java.util.AbstractQueue;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import ca.site3.ssf.gamemodel.IGameModelEvent;
+
 /**
  * Holds queues to be used for passing game events / info to and from the main event thread.
  * Also manages consumer threads for the queues.
@@ -12,11 +14,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class CommunicationsManager {
 
-	private AbstractQueue<GameEvent> commOutQueue = new ConcurrentLinkedQueue<GameEvent>();
+	private AbstractQueue<IGameModelEvent> commOutQueue = new ConcurrentLinkedQueue<IGameModelEvent>();
 	
 	private AbstractQueue<HardwareEvent> commInQueue = new ConcurrentLinkedQueue<HardwareEvent>();
 	
-	private AbstractQueue<GameEvent> guiOutQueue = new ConcurrentLinkedQueue<GameEvent>();
+	private AbstractQueue<IGameModelEvent> guiOutQueue = new ConcurrentLinkedQueue<IGameModelEvent>();
 	
 	private AbstractQueue<GUIEvent> guiInQueue = new ConcurrentLinkedQueue<GUIEvent>();
 	
@@ -45,7 +47,7 @@ public class CommunicationsManager {
 		}
 	}
 	
-	AbstractQueue<GameEvent> getCommOutQueue() {
+	AbstractQueue<IGameModelEvent> getCommOutQueue() {
 		return commOutQueue;
 	}
 
@@ -55,7 +57,7 @@ public class CommunicationsManager {
 	}
 
 
-	AbstractQueue<GameEvent> getGuiOutQueue() {
+	AbstractQueue<IGameModelEvent> getGuiOutQueue() {
 		return guiOutQueue;
 	}
 

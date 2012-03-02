@@ -13,10 +13,10 @@ public class CommandLineArgs {
 	public Integer verbosity = 3;
 	
 	@Parameter(names = "-chipDamage", description = "Chip damage enabled")
-	public Boolean isChipDamage = false;
+	public Boolean isChipDamage = true;
 	
 	@Parameter(names = "-actionGap", description = "Minimum time (in seconds) between player actions")
-	public Double minTimeBetweenPlayerActionsInSecs;
+	public Double minTimeBetweenPlayerActionsInSecs = 0.1;
 	
 	@Parameter(names="-roundLength", description="Length of rounds (in seconds)")
 	public Integer roundTimeInSecs = 60;

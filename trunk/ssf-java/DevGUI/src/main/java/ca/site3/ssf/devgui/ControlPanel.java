@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 
 import ca.site3.ssf.gamemodel.IGameModel;
 
+@SuppressWarnings("serial")
 class ControlPanel extends JPanel implements ActionListener {
 	
 	private IGameModel gameModel    = null;

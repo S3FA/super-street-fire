@@ -1,12 +1,9 @@
 package ca.site3.ssf.ioserver;
 
-import java.util.AbstractQueue;
-import java.util.Arrays;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.devgui.MainWindow;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
@@ -44,6 +41,10 @@ public class IOServer {
 	private CommunicationsManager commManager;
 	
 	
+	private MainWindow mainFrame;
+	
+	
+	
 	/**
 	 * Configure things and kick off the event loop 
 	 */
@@ -57,6 +58,10 @@ public class IOServer {
 		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
 												args.roundTimeInSecs, args.numRoundsPerMatch);
 		game = new GameModel(gameConfig);
+		
+		mainFrame = new MainWindow(game);
+		mainFrame.setLocationRelativeTo(null);
+		mainFrame.setVisible(true);
 		
 		commManager  = new CommunicationsManager();
 		this.gameEventRouter = new GameEventRouter(commManager.getCommOutQueue(), commManager.getGuiOutQueue());
