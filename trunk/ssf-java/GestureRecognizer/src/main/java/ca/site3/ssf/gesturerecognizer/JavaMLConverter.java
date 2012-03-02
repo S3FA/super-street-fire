@@ -27,87 +27,25 @@ class JavaMLConverter {
 	 * number of time point samples to the given fixed length.
 	 * @param gestureInst The gesture instance to convert.
 	 * @param minTimeSeriesLength The minimum number of time point samples in the returned TimeSeries.
-	 * @return The resulting TimeSeries.
+	 * @return The resulting TimeSeries, null on failure.
 	 */
-	public static TimeSeries ConvertGestureInstanceToTimeSeries(GestureInstance gestureInst,
-																int minTimeSeriesLength) {
+	public static TimeSeries gestureInstanceToTimeSeries(GestureInstance gestureInst,
+														 int minTimeSeriesLength) {
 		assert(minTimeSeriesLength > 0);
 		assert(gestureInst != null);
 		assert(gestureInst.isValid());
 		
-		TimeSeries gestureTimeSeries = null;
-		
-		if (gestureInst.hasLeftGloveData()) {
-			
-			if (gestureInst.hasRightGloveData()) {
-				// Two handed gesture...
-				gestureTimeSeries = new TimeSeries(6);
-				double[] values = new double[6];
-				
-				for (int i = 0; i < gestureInst.getNumDataPts(); i++) {
-					
-					// Right now we only consider accelerometer data...
-					GloveData leftGloveData  = gestureInst.getLeftGloveDataAt(i);
-					GloveData rightGloveData = gestureInst.getRightGloveDataAt(i);
-					assert(leftGloveData != null && rightGloveData != null);
-					
-					Vector3D leftGloveAccelData  = leftGloveData.getAccelData();
-					Vector3D rightGloveAccelData = rightGloveData.getAccelData();
-					assert(leftGloveAccelData != null && rightGloveAccelData != null);
-					
-					values[0] = leftGloveAccelData.getX();
-					values[1] = leftGloveAccelData.getY();
-					values[2] = leftGloveAccelData.getZ();
-					values[3] = rightGloveAccelData.getX();
-					values[4] = rightGloveAccelData.getY();
-					values[5] = rightGloveAccelData.getZ();
-					
-					gestureTimeSeries.addLast(gestureInst.getTimeAt(i), new TimeSeriesPoint(values));
-				}
-			}
-			else {
-				// Left glove data exists but not right...
-				// One-handed (Left) gesture
-				gestureTimeSeries = new TimeSeries(3);
-				double[] values = new double[3];
-				
-				for (int i = 0; i < gestureInst.getNumDataPts(); i++) {
-					// Right now we only consider accelerometer data...
-					GloveData leftGloveData  = gestureInst.getLeftGloveDataAt(i);
-					assert(leftGloveData != null);
-					Vector3D leftGloveAccelData  = leftGloveData.getAccelData();
-					assert(leftGloveAccelData != null);
-					
-					values[0] = leftGloveAccelData.getX();
-					values[1] = leftGloveAccelData.getY();
-					values[2] = leftGloveAccelData.getZ();
-					gestureTimeSeries.addLast(gestureInst.getTimeAt(i), new TimeSeriesPoint(values));
-				}
-			}
+		double[][] trainingSeq = gestureInst.getTrainingSequence();
+		if (trainingSeq == null || trainingSeq.length == 0) {
+			assert(false);
+			return null;
 		}
-		else {
-			// Right glove data must exist...
-			assert(gestureInst.hasRightGloveData());
 		
-			// One-handed (Right) gesture
-			gestureTimeSeries = new TimeSeries(3);
-			double[] values = new double[3];
-			
-			for (int i = 0; i < gestureInst.getNumDataPts(); i++) {
-				// Right now we only consider accelerometer data...
-				GloveData rightGloveData  = gestureInst.getRightGloveDataAt(i);
-				assert(rightGloveData != null);
-				Vector3D rightGloveAccelData  = rightGloveData.getAccelData();
-				assert(rightGloveAccelData != null);
-				
-				values[0] = rightGloveAccelData.getX();
-				values[1] = rightGloveAccelData.getY();
-				values[2] = rightGloveAccelData.getZ();
-				gestureTimeSeries.addLast(gestureInst.getTimeAt(i), new TimeSeriesPoint(values));
-			}
+		TimeSeries gestureTimeSeries = new TimeSeries(trainingSeq[0].length);
+		for (int i = 0; i < trainingSeq.length; i++) {
+			gestureTimeSeries.addLast(gestureInst.getTimeAt(i), new TimeSeriesPoint(trainingSeq[i]));
 		}
 
-		assert(gestureTimeSeries != null);
 		PAA result = new PAA(gestureTimeSeries, Math.min(gestureTimeSeries.numOfPts(), minTimeSeriesLength));
 		return result;
 	}
@@ -140,8 +78,8 @@ class JavaMLConverter {
 		GestureInstance instanceLeftHand = new GestureInstance(leftGloveData, null, timeData);
 		GestureInstance instanceRightHand = new GestureInstance(null, rightGloveData, timeData);
 
-		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceBothHands, 6));
-		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceLeftHand,  6));
-		printTimeSeries(JavaMLConverter.ConvertGestureInstanceToTimeSeries(instanceRightHand, 6));
+		printTimeSeries(JavaMLConverter.gestureInstanceToTimeSeries(instanceBothHands, 6));
+		printTimeSeries(JavaMLConverter.gestureInstanceToTimeSeries(instanceLeftHand,  6));
+		printTimeSeries(JavaMLConverter.gestureInstanceToTimeSeries(instanceRightHand, 6));
 	}
 }

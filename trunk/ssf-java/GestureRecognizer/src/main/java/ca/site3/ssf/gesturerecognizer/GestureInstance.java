@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import net.sf.javaml.distance.fastdtw.timeseries.TimeSeriesPoint;
+
+import org.apache.commons.math.geometry.Vector3D;
+
 /**
  * The GestureInstance is a fully recorded 'instance' of a single gesture for
  * the Super Street Fire game. A gesture can be a one or two handed action/movement
@@ -54,15 +58,17 @@ public class GestureInstance {
 	}
 	public GloveData getLeftGloveDataAt(int index) {
 		assert(this.hasLeftGloveData());
+		assert(index >= 0 && index < this.leftGloveData.length);
 		return this.leftGloveData[index];
 	}
 	public GloveData getRightGloveDataAt(int index) {
 		assert(this.hasRightGloveData());
+		assert(index >= 0 && index < this.rightGloveData.length);
 		return this.rightGloveData[index];
 	}
 	public double getTimeAt(int index) {
 		assert(this.timePts != null);
-		assert(index < this.timePts.length);
+		assert(index >= 0 && index < this.timePts.length);
 		return this.timePts[index];
 	}
 	
@@ -88,6 +94,82 @@ public class GestureInstance {
 		}
 		
 		return isValid;
+	}
+	
+	/**
+	 * Obtains the training sequence for this gesture instance. This will provide
+	 * and in-order sequence of tuples that can be fed to a classification/machine learning
+	 * algorithm for identifying gestures.
+	 * @return A sequential array of tuples, each tuple will be the same size.
+	 */
+	public double[][] getTrainingSequence() {
+		
+		if (this.hasLeftGloveData()) {
+			if (this.hasRightGloveData()) {
+				double[][] result = new double[this.getNumDataPts()][6];
+				
+				// Two handed gesture, each tuple is size 6 (for two glove's worth of accelerometer data)
+				for (int i = 0; i < this.getNumDataPts(); i++) {
+					
+					// Right now we only consider accelerometer data...
+					GloveData leftGloveData  = this.getLeftGloveDataAt(i);
+					GloveData rightGloveData = this.getRightGloveDataAt(i);
+					assert(leftGloveData != null && rightGloveData != null);
+					
+					Vector3D leftGloveAccelData  = leftGloveData.getAccelData();
+					Vector3D rightGloveAccelData = rightGloveData.getAccelData();
+					assert(leftGloveAccelData != null && rightGloveAccelData != null);
+					
+					result[i][0] = leftGloveAccelData.getX();
+					result[i][1] = leftGloveAccelData.getY();
+					result[i][2] = leftGloveAccelData.getZ();
+					result[i][3] = rightGloveAccelData.getX();
+					result[i][4] = rightGloveAccelData.getY();
+					result[i][5] = rightGloveAccelData.getZ();
+				}
+				return result;
+			}
+			else {
+				// Left handed gesture, each tuple is size 3 (for one glove's worth of accelerometer data)
+				double[][] result = new double[this.getNumDataPts()][3];
+				
+				// Two handed gesture, each tuple is size 6 (for two glove's worth of accelerometer data)
+				for (int i = 0; i < this.getNumDataPts(); i++) {
+					
+					// Right now we only consider accelerometer data...
+					GloveData leftGloveData  = this.getLeftGloveDataAt(i);
+					assert(leftGloveData != null);
+					
+					Vector3D leftGloveAccelData  = leftGloveData.getAccelData();
+					assert(leftGloveAccelData != null);
+					
+					result[i][0] = leftGloveAccelData.getX();
+					result[i][1] = leftGloveAccelData.getY();
+					result[i][2] = leftGloveAccelData.getZ();
+				}
+				return result;
+			}
+		}
+		else {
+			// Right handed gesture, each tuple is size 3 (for one glove's worth of accelerometer data)
+			double[][] result = new double[this.getNumDataPts()][3];
+			
+			// Two handed gesture, each tuple is size 6 (for two glove's worth of accelerometer data)
+			for (int i = 0; i < this.getNumDataPts(); i++) {
+				
+				// Right now we only consider accelerometer data...
+				GloveData rightGloveData = this.getRightGloveDataAt(i);
+				assert(rightGloveData != null);
+				
+				Vector3D rightGloveAccelData = rightGloveData.getAccelData();
+				assert(rightGloveAccelData != null);
+				
+				result[i][0] = rightGloveAccelData.getX();
+				result[i][1] = rightGloveAccelData.getY();
+				result[i][2] = rightGloveAccelData.getZ();
+			}
+			return result;
+		}
 	}
 	
 	public boolean equals(Object other) {
@@ -296,7 +378,16 @@ public class GestureInstance {
 		
 		System.out.println(fromStrInstance.equals(toStrInstance));
 		
-		System.out.println(JavaMLConverter.ConvertGestureInstanceToTimeSeries(fromStrInstance, 10).toString());
+		System.out.println(JavaMLConverter.gestureInstanceToTimeSeries(fromStrInstance, 10).toString());
+		System.out.println();
+		
+		double[][] trainingSeq = fromStrInstance.getTrainingSequence();
+		for (int i = 0; i < trainingSeq.length; i++) {
+			for (int j = 0; j < trainingSeq[i].length; j++) {
+				System.out.print(trainingSeq[i][j] + " ");
+			}
+			System.out.println();
+		}
 		
 	}
 
