@@ -1,5 +1,8 @@
 package ca.site3.ssf.gesturerecognizer;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -9,10 +12,10 @@ import ca.site3.ssf.gamemodel.IGameModel;
 /**
  * Public facade for the gesturerecognizer module. Use this class to perform the following...
  * 
- * 1. Train recognizer(s) for the Super Street Fire game.
- * 2. Write recognizer(s) to file.
- * 3. Read recognizer(s) from file.
- * 4. Execute in real-time using gesture instance data in order to recognizer novel gestures.
+ * 1. Train the recognizer engine for the Super Street Fire game.
+ * 2. Write the recognizer engine to file.
+ * 3. Read the recognizer engine from file.
+ * 4. Execute in real-time using gesture instance data in order to recognize novel gestures.
  * 
  * NOTE: Performing actions 1, 2 and 3 should be done offline (likely in a separate program from the
  * running game).
@@ -87,6 +90,61 @@ public class GestureRecognizer {
 		// the context of the current game
 		gameModel.executeGenericAction(gameModel.getActionFactory().buildPlayerAction(playerNum,
 				result.getActionFactoryType(), result.getUsesLeftHand(), result.getUsesRightHand()));
+	}
+	
+	public static void main(String[] args) {
+		
+		// Build a nonsense test data set
+		GestureInstance[] gestureInstances = new GestureInstance[20];
+		for (int i = 0; i < 20; i++) {
+			GloveData[] leftGloveData = new GloveData[10];
+			GloveData[] rightGloveData = new GloveData[10];
+			double[] timeData = new double[10];
+			
+			for (int j = 0; j < 10; j++) {
+				leftGloveData[j] = new GloveData(
+						j, j, j,
+						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random(),
+						j, j, j);
+				rightGloveData[j] = new GloveData(
+						j, j, j,
+						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
+						j, j, j);
+				timeData[j] = j*0.1;
+			}
+			
+			gestureInstances[i] = new GestureInstance(leftGloveData, rightGloveData, timeData);
+		}
+		GestureDataSet dataSet = new GestureDataSet(gestureInstances);		
+		
+		GestureRecognizer writeRecognizer = new GestureRecognizer();
+		for (GestureType type : GestureType.values()) {
+			writeRecognizer.trainGesture(type, dataSet);
+		}
+		
+		// Attempt writing the recognizer engine...
+		final String fileName = "recognizer_engine.txt";
+		try {
+			FileWriter fileWriter = new FileWriter(fileName);
+			boolean success = writeRecognizer.saveRecognizerEngine(fileWriter);
+			fileWriter.close();
+			System.out.println("Write result: " + success);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// Attempt reading the recognizer engine...
+		GestureRecognizer readRecognizer = new GestureRecognizer();
+		try {
+			FileReader fileReader = new FileReader(fileName);
+			boolean success = readRecognizer.loadRecognizerEngine(fileReader);
+			System.out.println("Read result: " + success);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 }
