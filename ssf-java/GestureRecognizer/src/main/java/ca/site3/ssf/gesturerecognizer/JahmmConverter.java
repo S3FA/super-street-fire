@@ -46,7 +46,7 @@ public class JahmmConverter {
 	/**
 	 * Builds a list of sequences of observation vectors for the jahmm library.
 	 * @param dataSet The gesture's data set - set of all instances for a particular gesture.
-	 * @return 
+	 * @return The resulting sequences of observations for the given gesture data set, null on failure.
 	 */
 	public static List<List<ObservationVector>> gestureDataSetToObservationSequences(GestureDataSet dataSet) {
 		assert(dataSet != null);
@@ -66,80 +66,41 @@ public class JahmmConverter {
 		return result;
 	}
 	
-	public static Hmm<ObservationVector> buildKMeansHMM(GestureDataSet dataSet) {
+	public static Hmm<ObservationVector> buildKMeansHMMWithTraining(GestureDataSet dataSet, int numStates) {
 		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
-		KMeansLearner<ObservationVector> kMeansLearner =
-				new KMeansLearner<ObservationVector>(10, new OpdfMultiGaussianFactory(sequences.get(0).get(0).dimension()), sequences);
-		return kMeansLearner.learn();
-	}
-	
-	/*
-	public static ObservationVector gestureInstanceToObservation(GestureInstance gestureInst) {
-		assert(gestureInst != null);
-		
-		double[][] trainingSeq = gestureInst.getTrainingSequence();
-		if (trainingSeq == null || trainingSeq.length == 0) {
-			assert(false);
-			return null;
-		}
-		
-		double[] resultValues = new double[trainingSeq.length * trainingSeq[0].length];
-		int count = 0;
-		for (int i = 0; i < trainingSeq.length; i++) {
-			for (int j = 0; j < trainingSeq[i].length; j++)
-			resultValues[count++] = trainingSeq[i][j];
-		}
-		
-		return new ObservationVector(resultValues);
-	}
-	
-	public static List<ObservationVector> gestureDataSetToObservationSequence(GestureDataSet dataSet) {
-		assert(dataSet != null);
-		
-		// Go through each gesture instance in the data set and add the observation sequence
-		// generated for that instance to the list of lists of observations
-		List<ObservationVector> result = new ArrayList<ObservationVector>(dataSet.getNumGestureInstances());
-		for (int i = 0; i < dataSet.getNumGestureInstances(); i++) {
-			ObservationVector currObservation = JahmmConverter.gestureInstanceToObservation(dataSet.getGestureInstanceAt(i));
-			if (currObservation == null || currObservation.dimension() == 0) {
-				assert(false);
-				return null;
-			}
-			result.add(currObservation);
-		}
-		
-		return result;
-	}
-	
-
-	public static Hmm<ObservationVector> BuildKMeansHMM(List<GestureDataSet> dataSets) {
-		List<List<ObservationVector>> sequences = new ArrayList<List<ObservationVector>>(dataSets.size());
-		for (GestureDataSet dataSet : dataSets) {
-			List<ObservationVector> seq = JahmmConverter.gestureDataSetToObservationSequence(dataSet);
-			sequences.add(seq);
-		}
 		
 		KMeansLearner<ObservationVector> kMeansLearner =
-				new KMeansLearner<ObservationVector>(nbStates, opdfFactory, sequences)
+				new KMeansLearner<ObservationVector>(numStates, 
+						new OpdfMultiGaussianFactory(sequences.get(0).get(0).dimension()), sequences);
+		
+		Hmm<ObservationVector> kMeansHmm = kMeansLearner.learn();
+		BaumWelchLearner bwl = new BaumWelchLearner();
+		return bwl.learn(kMeansHmm, sequences);
 	}
-	*/
+	
+	public static Hmm<ObservationVector> trainHMM(Hmm<ObservationVector> hmm, GestureDataSet dataSet) {
+		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
+		BaumWelchLearner bwl = new BaumWelchLearner();
+		return bwl.learn(hmm, sequences);
+	}
+	
 	
 	public static void main(String[] args) {
 		
 		GestureInstance[] gestureInstances = new GestureInstance[20];
 		for (int i = 0; i < 20; i++) {
-			GloveData[] leftGloveData = new GloveData[10 + i];
-			GloveData[] rightGloveData = new GloveData[10 + i];
-			double[] timeData = new double[10 + i];
+			GloveData[] leftGloveData = new GloveData[10];
+			GloveData[] rightGloveData = new GloveData[10];
+			double[] timeData = new double[10];
 			
-			for (int j = 0; j < 10 + i; j++) {
+			for (int j = 0; j < 10; j++) {
 				leftGloveData[j] = new GloveData(
 						j, j, j,
-						(i+j+1) * Math.random(), (i+j+1) + Math.random() * Math.random(), (i+j+1) + Math.random(),
+						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random(),
 						j, j, j);
 				rightGloveData[j] = new GloveData(
 						j, j, j,
-						(i+j+1) + Math.random() * Math.random(), (i+j+1) + Math.random(), (i+j+1) + Math.random() * Math.random(),
+						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
 						j, j, j);
 				timeData[j] = j*0.1;
 			}
@@ -155,18 +116,17 @@ public class JahmmConverter {
 		System.out.println();
 		
 		
-		Hmm<ObservationVector> hmm = JahmmConverter.buildKMeansHMM(dataSet);
+		Hmm<ObservationVector> hmm = JahmmConverter.buildKMeansHMMWithTraining(dataSet, 6);
 		System.out.println();
 		System.out.println(hmm);
-		
-		BaumWelchLearner bwl = new BaumWelchLearner();
-		Hmm<ObservationVector> furtherTrainedHmm = bwl.learn(hmm, observationSeqs);
+		System.out.println();
 		for (List<ObservationVector> seq : observationSeqs) {
-			System.out.println(furtherTrainedHmm.probability(seq));
-		}
-		
-		System.out.println(furtherTrainedHmm);
-		
+			System.out.println(hmm.probability(seq));
+		}		
+		System.out.println();
+		for (List<ObservationVector> seq : observationSeqs) {
+			System.out.println(hmm.lnProbability(seq));
+		}	
 		//MarkovGenerator<ObservationVector> mg = new MarkovGenerator<ObservationVector>(hmm);
 		//System.out.println(mg.observationSequence(10));
 
