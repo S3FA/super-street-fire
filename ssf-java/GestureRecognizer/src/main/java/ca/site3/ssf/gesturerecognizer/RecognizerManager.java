@@ -1,7 +1,12 @@
 package ca.site3.ssf.gesturerecognizer;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+
+import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 
 /**
  * Manager of all the recognizers in the GestureRecognizer system. This brings
@@ -14,7 +19,7 @@ import java.util.Map;
  */
 class RecognizerManager {
 	
-	final static double MINIMUM_PROBABILITY_THRESHOLD = 0.1;
+	private final static double MINIMUM_PROBABILITY_THRESHOLD = 0.1;
 	
 	private Map<GestureType, Recognizer> recognizerMap =
 			new HashMap<GestureType, Recognizer>(GestureType.values().length);
@@ -65,6 +70,53 @@ class RecognizerManager {
 		return bestGesture;
 	}
 	
+	/**
+	 * Writes/Saves all of the recognizers in this manager.
+	 * @param writer The writer to write the recognizers to.
+	 * @return true on success, false on failure.
+	 */
+	boolean writeRecognizers(Writer writer) {
+		try {
+			for (Recognizer recognizer : this.recognizerMap.values()) {
+				recognizer.save(writer);
+			}
+		}
+		catch (IOException ex) {
+			System.err.println(ex.toString());
+			return false;
+		}
+
+		return true;
+	}
 	
+	/**
+	 * Reads/Loads all of the recognizers in this manager.
+	 * @param reader The reader for reading the recognizers from.
+	 * @return true on success, false on failure.
+	 */
+	boolean readRecognizers(Reader reader) {
+		try {
+			Recognizer newRecognizer = new Recognizer();
+			newRecognizer.load(reader);
+			
+			// Make sure there aren't duplicates...
+			if (this.recognizerMap.containsKey(newRecognizer.getGestureType())) {
+				System.err.println("Duplicate gesture recognizer type was found.");
+				return false;
+			}
+			
+			this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
+		}
+		catch (IOException ex) {
+			System.err.println(ex.toString());
+			return false;
+		}
+		catch (FileFormatException ex) {
+			System.err.println(ex.toString());
+			return false;
+		}
+		
+		return true;
+	}
 	
 }

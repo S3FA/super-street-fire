@@ -1,7 +1,16 @@
 package ca.site3.ssf.gesturerecognizer;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
+import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
+import be.ac.ulg.montefiore.run.jahmm.io.HmmReader;
+import be.ac.ulg.montefiore.run.jahmm.io.HmmWriter;
+import be.ac.ulg.montefiore.run.jahmm.io.OpdfMultiGaussianReader;
+import be.ac.ulg.montefiore.run.jahmm.io.OpdfMultiGaussianWriter;
 
 /**
  * Contains the structures and functionality to recognize one particular type of gesture
@@ -12,8 +21,17 @@ import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
  */
 class Recognizer {
 
-	final private GestureType gestureType;
+	private GestureType gestureType;
 	private Hmm<ObservationVector> recognizer;
+	
+	/**
+	 * Default constructor for Recognizer. Creates an invalid Recognizer.
+	 * This should only be used right before reading in a recognizer.
+	 */
+	Recognizer() {
+		this.gestureType = null;
+		this.recognizer  = null;
+	}
 	
 	Recognizer(GestureType gestureType) {
 		this.gestureType = gestureType;
@@ -67,6 +85,42 @@ class Recognizer {
 		
 		return this.recognizer.probability(JahmmConverter.gestureInstanceToObservationSequence(inst));
 	}
+	
+	/**
+	 * Saves this recognizer to the given writer.
+	 * @param writer The writer to save this to.
+	 * @throws IOException Occurs when there's an error while writing.
+	 */
+	void save(Writer writer) throws IOException {
+		writer.write(this.gestureType.name());
+		HmmWriter.write(writer, new OpdfMultiGaussianWriter(), this.recognizer);
+	}
+	
+	/**
+	 * Loads a recognizer from the given reader.
+	 * @param reader The reader to read this from.
+	 * @throws IOException Occurs when there's an I/O error while reading.
+	 * @throws FileFormatException Occurs when there's a format error while reading.
+	 */
+	void load(Reader reader) throws IOException, FileFormatException {
+		
+		String temp = "";
+		char[] charArray = new char[1];
+
+		while (GestureType.valueOf(temp) == null) {
+			if (reader.read(charArray) == -1) {
+				throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
+			}
+			temp += charArray[0];
+		}
+		
+		this.gestureType = GestureType.valueOf(temp); 
+		this.recognizer = HmmReader.read(reader, new OpdfMultiGaussianReader());
+		
+		assert(this.gestureType != null);
+		assert(this.recognizer  != null);
+	}
+	
 	
 	/**
 	 * Allows the existing recognizer for the gesture to learn more from another data set.

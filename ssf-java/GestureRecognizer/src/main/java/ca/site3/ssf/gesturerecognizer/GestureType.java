@@ -1,5 +1,7 @@
 package ca.site3.ssf.gesturerecognizer;
 
+import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
+
 /**
  * Enumeration for the various types of one-handed and two-handed gestures
  * in the Super Street Fire game. Also contains important tweaking information for
@@ -10,25 +12,61 @@ package ca.site3.ssf.gesturerecognizer;
  *
  */
 public enum GestureType {
-	LEFT_JAB(5, 1), LEFT_HOOK(5, 1),   					// One-handed left-handed gestures
-	RIGHT_JAB(5, 1), RIGHT_HOOK(5, 1), 					// One-handed right-handed gestures
-	BLOCK(2, 2), HADOUKEN(10, 2), SONIC_BOOM(10, 2);  	// Two-handed gestures
 	
+	LEFT_JAB(5, PlayerActionType.JAB_ATTACK, true, false),
+	LEFT_HOOK(5, PlayerActionType.HOOK_ATTACK, true, false),
+	RIGHT_JAB(5, PlayerActionType.JAB_ATTACK, false, true),
+	RIGHT_HOOK(5, PlayerActionType.HOOK_ATTACK, false, true),
+	BLOCK(2, PlayerActionType.BLOCK, true, true),
+	HADOUKEN(10, PlayerActionType.HADOUKEN_ATTACK, true, true),
+	SONIC_BOOM(10, PlayerActionType.SONIC_BOOM_ATTACK, true, true);
+	
+	final private PlayerActionType actionFactoryType; // The corresponding gamemodel factory type for when
+													  // it comes time to build the gesture for the gamemodel
+	
+	final private boolean leftHanded;  // Whether a left hand is used to make the gesture
+	final private boolean rightHanded; // Whether a right hand is used to make the gesture
+	
+	final private int numHands;    // The number of hands used to make the gesture
 	final private int numHmmNodes; // The number of Hidden Markov Model nodes
-	final private int numHands;    // The number of hands used in the gesture
-	
-	GestureType(int numHmmNodes, int numHands) {
+
+	GestureType(int numHmmNodes, PlayerActionType actionFactoryType,
+			    boolean leftHand, boolean rightHand) {
+		
 		assert(numHmmNodes > 0);
-		assert(numHands == 1 || numHands == 2);
+		assert(leftHand || rightHand);
+		assert(actionFactoryType != null);
+		
+		this.actionFactoryType = actionFactoryType;
+		
+		this.leftHanded  = leftHand;
+		this.rightHanded = rightHand;
 		
 		this.numHmmNodes = numHmmNodes;
-		this.numHands = numHands;
+		
+		int count = 0;
+		if (this.leftHanded) {
+			count++;
+		}
+		if (this.rightHanded) {
+			count++;
+		}		
+		this.numHands = count;
 	}
 	
+	PlayerActionType getActionFactoryType() {
+		return this.actionFactoryType;
+	}
 	int getNumHmmNodes() {
 		return this.numHmmNodes;
 	}
 	int getNumHands() {
 		return this.numHands;
+	}
+	boolean getUsesLeftHand() {
+		return this.leftHanded;
+	}
+	boolean getUsesRightHand() {
+		return this.rightHanded;
 	}
 }

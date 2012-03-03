@@ -96,7 +96,7 @@ public class GestureInstance {
 		return isValid;
 	}
 	
-	public int getTrainingDataObservationWidth() {
+	int getTrainingDataObservationWidth() {
 		assert(this.isValid());
 		if (this.hasLeftGloveData() && this.hasRightGloveData()) {
 			return 6;
@@ -110,7 +110,7 @@ public class GestureInstance {
 	 * algorithm for identifying gestures.
 	 * @return A sequential array of tuples, each tuple will be the same size.
 	 */
-	public double[][] getTrainingSequence() {
+	double[][] getTrainingSequence() {
 		
 		if (this.hasLeftGloveData()) {
 			if (this.hasRightGloveData()) {
