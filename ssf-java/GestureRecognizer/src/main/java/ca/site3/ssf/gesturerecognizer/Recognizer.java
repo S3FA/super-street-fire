@@ -92,8 +92,13 @@ class Recognizer {
 	 * @throws IOException Occurs when there's an error while writing.
 	 */
 	void save(Writer writer) throws IOException {
-		writer.write(this.gestureType.name());
-		HmmWriter.write(writer, new OpdfMultiGaussianWriter(), this.recognizer);
+		assert(this.gestureType != null);
+		
+		writer.write(this.gestureType.name() + "\n");
+		
+		if (this.recognizer != null) {
+			HmmWriter.write(writer, new OpdfMultiGaussianWriter(), this.recognizer);
+		}
 	}
 	
 	/**
@@ -107,17 +112,34 @@ class Recognizer {
 		String temp = "";
 		char[] charArray = new char[1];
 
-		while (GestureType.valueOf(temp) == null) {
-			if (reader.read(charArray) == -1) {
-				throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
+		// Attempt to read the gesture type
+		GestureType readType = null;
+		do {
+			try {
+				readType = GestureType.valueOf(GestureType.class, temp);
 			}
-			temp += charArray[0];
+			catch (IllegalArgumentException ex) {
+				if (reader.read(charArray) == -1) {
+					throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
+				}
+				temp += charArray[0];
+			}
+		}
+		while (readType == null);
+		this.gestureType = readType;
+		
+		// Skip the newline character
+		reader.skip(1);
+		
+		// Attempt to read the recognizer...
+		try {
+			this.recognizer = HmmReader.read(reader, new OpdfMultiGaussianReader());
+		}
+		catch (FileFormatException ex) {
+			this.recognizer = null;
+			return;
 		}
 		
-		this.gestureType = GestureType.valueOf(temp); 
-		this.recognizer = HmmReader.read(reader, new OpdfMultiGaussianReader());
-		
-		assert(this.gestureType != null);
 		assert(this.recognizer  != null);
 	}
 	

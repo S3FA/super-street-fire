@@ -98,13 +98,6 @@ class RecognizerManager {
 		try {
 			Recognizer newRecognizer = new Recognizer();
 			newRecognizer.load(reader);
-			
-			// Make sure there aren't duplicates...
-			if (this.recognizerMap.containsKey(newRecognizer.getGestureType())) {
-				System.err.println("Duplicate gesture recognizer type was found.");
-				return false;
-			}
-			
 			this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
 		}
 		catch (IOException ex) {
