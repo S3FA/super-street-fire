@@ -96,6 +96,14 @@ public class GestureInstance {
 		return isValid;
 	}
 	
+	public int getTrainingDataObservationWidth() {
+		assert(this.isValid());
+		if (this.hasLeftGloveData() && this.hasRightGloveData()) {
+			return 6;
+		}
+		return 3;
+	}
+	
 	/**
 	 * Obtains the training sequence for this gesture instance. This will provide
 	 * and in-order sequence of tuples that can be fed to a classification/machine learning
