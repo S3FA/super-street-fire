@@ -54,4 +54,12 @@ class SensorDataPanel extends JPanel {
 		formLayoutHelper.addLabel(accelerometerLabel, this);
 		formLayoutHelper.addLastField(this.accelerometerData, this);
 	}
+	
+	// Update the current data values on the UI
+	public void showCurrentData(String gyro, String mag, String acc)
+	{
+		this.gyroscopeData.setText(gyro); 
+		this.magnetometerData.setText(mag);
+		this.accelerometerData.setText(acc); 
+	}
 }

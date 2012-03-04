@@ -1,7 +1,11 @@
 package ca.site3.ssf.gesturerecordergui;
 
+import java.awt.BorderLayout;
+import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,6 +13,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -23,8 +29,12 @@ class FileInfoPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public boolean isNewFile = false;
+	private int currentIteration = 0;
+	
 	public JTextField gestureName;
-	public JTextField fileName;
+	public Checkbox exportRecognizer;
+	public Checkbox exportCsv;
 	
 	FileInfoPanel() {
 		super();
@@ -43,37 +53,44 @@ class FileInfoPanel extends JPanel {
 		this.gestureName = new JTextField(25);
 		this.gestureName.setText("Unspecified");
 		
-		this.fileName = new JTextField(25);
-		this.fileName.setText("RecorderData");
+		this.exportRecognizer = new Checkbox();
+		this.exportCsv = new Checkbox();
+		
+		JLabel exportToRecognizerLabel = new JLabel("Export to Gesture Recognizer");
+		exportToRecognizerLabel.setForeground(Color.black);
+		formLayoutHelper.addMiddleField(this.exportRecognizer, this);
+		formLayoutHelper.addLastField(exportToRecognizerLabel, this);
+		
+		JLabel exportToCsvLabel = new JLabel("Export to CSV");
+		exportToCsvLabel.setForeground(Color.black);
+		formLayoutHelper.addMiddleField(this.exportCsv, this);
+		formLayoutHelper.addLastField(exportToCsvLabel, this);
 		
 		JLabel gestureNameLabel = new JLabel("Gesture Name:");
 		gestureNameLabel.setForeground(Color.black);
-		formLayoutHelper.addLabel(gestureNameLabel, this);
+		formLayoutHelper.addMiddleField(gestureNameLabel, this);
 		formLayoutHelper.addLastField(this.gestureName, this);
-		
-		JLabel fileNameLabel = new JLabel("File Name:");
-		fileNameLabel.setForeground(Color.black);
-		formLayoutHelper.addLabel(fileNameLabel, this);
-		formLayoutHelper.addLastField(this.fileName, this);
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
-	public void recordFileInformation(String gyroDataLeft, String magDataLeft, String accDataLeft, String gyroDataRight, String magDataRight, String accDataRight, String gestureName, String fileName){
+	public void recordFileInformation(String gyroDataLeft, String magDataLeft, String accDataLeft, String gyroDataRight, String magDataRight, String accDataRight, String gestureName, String time){
 		try
 		{		
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-	        Date date = new Date();
-
-	        FileWriter writer = new FileWriter(fileName + ".csv", true);
-	        
-	        // If creating a new file then put the column names at the top of the file
-	        if(!new File(fileName).exists())
+	        // If the file exists, check if the next iteration of the file exists until we can make a new one
+	        while (isNewFile && new File("Data/" + gestureName + Integer.toString(currentIteration) + ".csv").exists())
 	        {
-	        	writer.write("GestureName,GyroDataLeft,MagDataLeft,AccDataLeft,GyroDataRight,MagDataRight,AccDataRight,DateTime\n");
+	        	currentIteration++;
+	        }
+	       
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(currentIteration) + ".csv"), !isNewFile);
+        	
+	        // If we just created the file, 
+	        if(isNewFile)
+	        {
+	        	writer.write("GyroDataLeft,MagDataLeft,AccDataLeft,GyroDataRight,MagDataRight,AccDataRight,DateTime");
+	        	writer.append("\n");
 	        }
 	        
-		    writer.append(gestureName);
-		    writer.append(",");
 		    writer.append(gyroDataLeft);
 		    writer.append(",");
 		    writer.append(magDataLeft);
@@ -86,7 +103,7 @@ class FileInfoPanel extends JPanel {
 		    writer.append(",");
 		    writer.append(accDataRight);
 		    writer.append(",");
-		    writer.append(dateFormat.format(date));
+		    writer.append(time);
 		    writer.append("\n");
 	 
 		    writer.flush();
