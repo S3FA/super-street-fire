@@ -5,16 +5,26 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import ca.site3.ssf.gesturerecognizer.*;
-//import ca.site3.ssf.ioserver.HardwareEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.ioserver.DeviceEvent;
+import ca.site3.ssf.ioserver.GloveEvent;
+import ca.site3.ssf.ioserver.DeviceEvent.Type;
+import ca.site3.ssf.ioserver.DeviceNetworkListener;
 
 // The main window for the recorder GUI.
 public class MainWindow extends JFrame {
+	
+	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private static final long serialVersionUID = 1L;
 	private GestureData gesture = null;
@@ -22,6 +32,12 @@ public class MainWindow extends JFrame {
 	private ControlPanel controlPanel = null;
 	private LoggerPanel loggerPanel = null;
 	private boolean IsRecordMode = false;
+	
+	private volatile boolean isListeningForEvents = true;
+	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
+	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(31337, eventQueue);
+	private Thread consumerThread;
+	
 	
 	public MainWindow() {
 		super();
@@ -50,16 +66,36 @@ public class MainWindow extends JFrame {
 		this.pack();
 		this.setLocationRelativeTo(null);
 		
+		
 		// Kick off the hardware event listener in the IOServer 
+		Thread producerThread = new Thread(gloveListener);
+		// to stop this call gloveListener.stop()
+		producerThread.start();
+		
+		// to stop this set isListeningForEvents false and call consumerThread.interrupt()
+		consumerThread = new Thread(new Runnable() {
+			public void run() {
+				DeviceEvent e;
+				while (isListeningForEvents) {					
+					try {
+						e = eventQueue.take();
+					} catch (InterruptedException ex) {
+						log.info("Glove event consumer interrupted",ex);
+						e = null;
+					}
+					if (null != e && e.getType() == Type.GloveEvent) {
+						hardwareEventListener((GloveEvent)e);
+					}
+				}
+			}
+		});
+		
 		/* For debugging/testing purposes only */
 		this.recorderPanel.fileInfoPanel.isNewFile = true;
 		this.recorderPanel.fileInfoPanel.exportCsv.setState(true);
 		this.recorderPanel.fileInfoPanel.exportRecognizer.setState(true);
 		this.IsRecordMode = true;
-		for(int i = 0; i < 10; i++)
-		{
-			hardwareEventListener();
-		}
+		
 	}
 
 	
@@ -85,7 +121,7 @@ public class MainWindow extends JFrame {
 
 	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
 	// Should accept an IOServer.GloveData object from IOServer
-	public void hardwareEventListener() {
+	public void hardwareEventListener(GloveEvent gloveEvent) {
 		if (false)//event.getSource() == recordButtonPress from IOServer)
 		{
 			// Toggle record mode. Currently we're assuming one record mode/trigger for both gloves, we can split it if needed
@@ -123,6 +159,8 @@ public class MainWindow extends JFrame {
 			}
 		}
 	}
+	
+	
 	
 	// Constructs a gesture object from the data sent by the IOServer
 	public void BuildGestureObject()
