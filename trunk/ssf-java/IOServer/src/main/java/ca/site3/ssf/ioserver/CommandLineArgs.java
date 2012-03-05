@@ -27,4 +27,8 @@ public class CommandLineArgs {
 	
 	@Parameter(names="-tickFreq", description="Tick frequency (Hz)")
 	public Integer tickFrequency = 50;
+	
+	@Parameter(names={"-devicePort","-p"}, description="Port to listen on for peripherals")
+	public Integer devicePort = 31337;
+	
 }

@@ -16,7 +16,7 @@ public class CommunicationsManager {
 
 	private AbstractQueue<IGameModelEvent> commOutQueue = new ConcurrentLinkedQueue<IGameModelEvent>();
 	
-	private AbstractQueue<HardwareEvent> commInQueue = new ConcurrentLinkedQueue<HardwareEvent>();
+	private AbstractQueue<DeviceEvent> commInQueue = new ConcurrentLinkedQueue<DeviceEvent>();
 	
 	private AbstractQueue<IGameModelEvent> guiOutQueue = new ConcurrentLinkedQueue<IGameModelEvent>();
 	
@@ -52,7 +52,7 @@ public class CommunicationsManager {
 	}
 
 
-	AbstractQueue<HardwareEvent> getCommInQueue() {
+	AbstractQueue<DeviceEvent> getCommInQueue() {
 		return commInQueue;
 	}
 
