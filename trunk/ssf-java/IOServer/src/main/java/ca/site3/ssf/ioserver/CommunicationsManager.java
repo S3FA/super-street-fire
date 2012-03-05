@@ -1,8 +1,8 @@
 package ca.site3.ssf.ioserver;
 
-import java.util.AbstractQueue;
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 
@@ -14,13 +14,13 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
  */
 public class CommunicationsManager {
 
-	private AbstractQueue<IGameModelEvent> commOutQueue = new ConcurrentLinkedQueue<IGameModelEvent>();
+	private BlockingQueue<IGameModelEvent> commOutQueue = new LinkedBlockingQueue<IGameModelEvent>();
 	
-	private AbstractQueue<DeviceEvent> commInQueue = new ConcurrentLinkedQueue<DeviceEvent>();
+	private BlockingQueue<DeviceEvent> commInQueue = new LinkedBlockingQueue<DeviceEvent>();
 	
-	private AbstractQueue<IGameModelEvent> guiOutQueue = new ConcurrentLinkedQueue<IGameModelEvent>();
+	private BlockingQueue<IGameModelEvent> guiOutQueue = new LinkedBlockingQueue<IGameModelEvent>();
 	
-	private AbstractQueue<GUIEvent> guiInQueue = new ConcurrentLinkedQueue<GUIEvent>();
+	private BlockingQueue<GUIEvent> guiInQueue = new LinkedBlockingQueue<GUIEvent>();
 	
 	
 	private Thread commOutConsumer;
@@ -39,7 +39,7 @@ public class CommunicationsManager {
 	
 	@SuppressWarnings("unchecked")
 	public void shutdown() {
-		for (AbstractQueue<?> q : Arrays.asList(commOutQueue,commInQueue,guiOutQueue,guiInQueue)) {
+		for (BlockingQueue<?> q : Arrays.asList(commOutQueue,commInQueue,guiOutQueue,guiInQueue)) {
 			q.clear();
 		}
 		for (Thread t : Arrays.asList(commOutConsumer, commInConsumer, guiOutConsumer, guiInConsumer)) {
@@ -47,22 +47,22 @@ public class CommunicationsManager {
 		}
 	}
 	
-	AbstractQueue<IGameModelEvent> getCommOutQueue() {
+	BlockingQueue<IGameModelEvent> getCommOutQueue() {
 		return commOutQueue;
 	}
 
 
-	AbstractQueue<DeviceEvent> getCommInQueue() {
+	BlockingQueue<DeviceEvent> getCommInQueue() {
 		return commInQueue;
 	}
 
 
-	AbstractQueue<IGameModelEvent> getGuiOutQueue() {
+	BlockingQueue<IGameModelEvent> getGuiOutQueue() {
 		return guiOutQueue;
 	}
 
 
-	AbstractQueue<GUIEvent> getGuiInQueue() {
+	BlockingQueue<GUIEvent> getGuiInQueue() {
 		return guiInQueue;
 	}
 }

@@ -1,6 +1,6 @@
 package ca.site3.ssf.ioserver;
 
-import java.util.AbstractQueue;
+import java.util.concurrent.BlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,15 +20,15 @@ public class GameEventRouter implements IGameModelListener {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private AbstractQueue<IGameModelEvent> commQueue;
-	private AbstractQueue<IGameModelEvent> guiQueue;
+	private BlockingQueue<IGameModelEvent> commQueue;
+	private BlockingQueue<IGameModelEvent> guiQueue;
 	
 	
 	/**
 	 * @param commQueue for events of interest to non-GUI game hardware
 	 * @param guiQueue for events that should be passed along to the GUI
 	 */
-	public GameEventRouter(AbstractQueue<IGameModelEvent> commQueue, AbstractQueue<IGameModelEvent> guiQueue) {
+	public GameEventRouter(BlockingQueue<IGameModelEvent> commQueue, BlockingQueue<IGameModelEvent> guiQueue) {
 		this.commQueue = commQueue;
 		this.guiQueue = guiQueue;
 	}
