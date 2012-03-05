@@ -40,7 +40,9 @@ public class IOServer {
 	
 	private CommunicationsManager commManager;
 	
+	private DeviceNetworkListener deviceListener;
 	
+	/** Developer / test GUI */
 	private MainWindow mainFrame;
 	
 	
@@ -51,9 +53,9 @@ public class IOServer {
 	public void start(CommandLineArgs arguments) {
 		
 		log.info("Starting I/O server");
-		this.args = arguments;
+		args = arguments;
 		
-		this.frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
+		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
 		
 		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
 												args.roundTimeInSecs, args.numRoundsPerMatch);
@@ -64,13 +66,18 @@ public class IOServer {
 		mainFrame.setVisible(true);
 		
 		commManager  = new CommunicationsManager();
-		this.gameEventRouter = new GameEventRouter(commManager.getCommOutQueue(), commManager.getGuiOutQueue());
+		
+		gameEventRouter = new GameEventRouter(commManager.getCommOutQueue(), commManager.getGuiOutQueue());
 		game.addGameModelListener(gameEventRouter);
+		
+		deviceListener = new DeviceNetworkListener(arguments.devicePort, new DeviceDataParser(), commManager.getCommInQueue());
+		Thread deviceListenerThread = new Thread(deviceListener);
+		deviceListenerThread.start();
 		
 		isStopped = false;
 		runLoop();
 		log.info("I/O server terminating");
-		
+		deviceListener.stop();
 		
 	}
 	
