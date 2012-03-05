@@ -36,6 +36,14 @@ public class DeviceNetworkListener implements Runnable {
 	
 	/**
 	 * @param port the port to listen on
+	 * @param q queue the {@link DeviceEvent}s will be placed on 
+	 */
+	public DeviceNetworkListener(int port, Queue<DeviceEvent> q) {
+		this(port, new DeviceDataParser(), q);
+	}
+	
+	/**
+	 * @param port the port to listen on
 	 * @param dataParser an object that can translate raw data into higher-level {@link DeviceEvent}s
 	 * @param q queue the {@link DeviceEvent}s will be placed on 
 	 */
