@@ -15,33 +15,52 @@ class Player {
 	private int numRoundWins;
 	private boolean isInvincible;
 	
+	private GameConfig gameConfig = null;
 	private GameModelActionSignaller actionSignaller = null;
 	
-	Player(int playerNum, GameModelActionSignaller actionSignaller) {
+	Player(int playerNum, GameModelActionSignaller actionSignaller, GameConfig gameConfig) {
 		assert(playerNum == 1 || playerNum == 2);
 		
 		// Set the signaller before doing anything else!
 		this.actionSignaller = actionSignaller;
 		assert(this.actionSignaller != null);
+	
+		this.gameConfig = gameConfig;
+		assert(this.gameConfig != null);
 		
 		this.reset();
 		this.isInvincible = false;
 		this.playerNum = playerNum;
 	}
 	
+	/**
+	 * Reset the player's win/loss record and health. (e.g., do this whenever
+	 * starting an new match).
+	 */
 	void reset() {
 		this.resetHealth();
 		this.numRoundWins = 0;
 	}
 	
+	/**
+	 * Reset a player's health.
+	 */
 	void resetHealth() {
 		this.setHealth(Player.FULL_HEALTH);
 	}
 	
+	/**
+	 * Do chip damage to a player with the given full damage amount.
+	 * @param beforeChipDmgAmt The total damage of an attack before it is reduced to a chip damage amount.
+	 */
 	void doChipDamage(float beforeChipDmgAmt) {
-		this.doDamage(beforeChipDmgAmt * GameModel.config.getChipDamagePercentage());
+		this.doDamage(Math.max(1.0f, beforeChipDmgAmt * this.gameConfig.getChipDamagePercentage()));
 	}
 	
+	/**
+	 * Do damage to this player of the following amount.
+	 * @param damageAmt The amount of damage to do.
+	 */
 	void doDamage(float damageAmt) {
 		assert(damageAmt > 0);
 		if (this.isInvincible) {
@@ -50,6 +69,11 @@ class Player {
 		this.setHealth(this.health - damageAmt);
 	}
 	
+	/**
+	 * Sets the health of this player to the given amount, this will also cause
+	 * an event to occur within the game model signaling a health change.
+	 * @param health The amount to set for this player's health.
+	 */
 	void setHealth(float health) {
 		float healthBefore = this.health;
 		this.health = Math.min(Player.FULL_HEALTH, Math.max(health, Player.KO_HEALTH));
@@ -60,29 +84,57 @@ class Player {
 		}
 	}
 	
+	/**
+	 * Set this player as invincible.
+	 * @param invincibilityOn true if invincible, false if not.
+	 */
 	void setInvincible(boolean invincibilityOn) {
 		this.isInvincible = invincibilityOn;
 	}
 	
+	/**
+	 * Query whether this player is knocked-out.
+	 * @return true if KOed, false if not.
+	 */
 	boolean isKOed() {
 		return (this.health <= Player.KO_HEALTH);
 	}
 	
+	/**
+	 * Gets this player's number in the game.
+	 * @return 1 or 2, depending on this player's number.
+	 */
 	int getPlayerNumber() {
 		return this.playerNum;
 	}
 	
+	/**
+	 * Gets the health of this player.
+	 * @return The health amount.
+	 */
 	float getHealth() {
 		return this.health;
 	}
 	
+	/**
+	 * Gets the number of rounds this player has one during the current match.
+	 * @return The number of rounds won.
+	 */
 	int getNumRoundWins() {
 		return this.numRoundWins;
 	}
+	
+	/**
+	 * Increments the number of rounds won for this player.
+	 */
 	void incrementNumRoundWins() {
 		this.numRoundWins++;
 	}
 	
+	/**
+	 * Gets the enumerated entity represented by this player.
+	 * @return The entity enumeration of the player.
+	 */
 	GameModel.Entity getEntity() {
 		switch (this.playerNum) {
 		case 1: return GameModel.Entity.PLAYER1_ENTITY;
@@ -93,6 +145,11 @@ class Player {
 		}
 	}
 	
+	/**
+	 * Gets the number of the player that isn't this the one given.
+	 * @param playerNum The player whose opponent's number we want.
+	 * @return The opposing player number of the given playerNum.
+	 */
 	static int getOpposingPlayerNum(int playerNum) {
 		switch (playerNum) {
 		case 1: return 2;

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GameModel implements IGameModel {
 
-	static GameConfig config;
+	GameConfig config;
 	
 	private GameState currState = null;
 	private GameState nextState = null;
@@ -37,8 +37,8 @@ public class GameModel implements IGameModel {
 		this.numRoundsPlayed = 0;
 		this.actionSignaller = new GameModelActionSignaller();
 		
-		this.player1 = new Player(1, this.actionSignaller);
-		this.player2 = new Player(2, this.actionSignaller);
+		this.player1 = new Player(1, this.actionSignaller, this.config);
+		this.player2 = new Player(2, this.actionSignaller, this.config);
 		
 		this.fireEmitterModel = new FireEmitterModel(new FireEmitterConfig(true, 16, 8), this.actionSignaller);
 		
