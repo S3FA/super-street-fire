@@ -95,6 +95,10 @@ class RoundInPlayState extends GameState {
 		
 		// Update the count down timer...
 		this.setCountdownTimer(this.countdownTimeInSecs - dT);
+		
+		// Update time since last attack counters
+		this.secsSinceLastP1Action += dT;
+		this.secsSinceLastP2Action += dT;
 	}
 
 	@Override

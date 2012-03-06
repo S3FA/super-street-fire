@@ -19,7 +19,7 @@ final public class ActionFactory {
 	
 	ActionFactory(GameModel gameModel) {
 		this.gameModel = gameModel;
-		assert(gameModel != null);
+		assert(this.gameModel != null);
 	}
 	
 	/**
@@ -41,10 +41,10 @@ final public class ActionFactory {
 		
 		Action action = null;
 		
-		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
+		FireEmitterModel fireEmitterModel    = this.gameModel.getFireEmitterModel();
 		FireEmitterIterator emitterIterLeft  = fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum);
 		FireEmitterIterator emitterIterRight = fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum);
-		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
+		FireEmitterConfig fireEmitterConfig  = fireEmitterModel.getConfig();
 		
 		Player blockerOrAttacker = this.gameModel.getPlayer(playerNum);
 		Player attackee = this.gameModel.getPlayer(Player.getOpposingPlayerNum(playerNum));

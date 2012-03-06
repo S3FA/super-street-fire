@@ -47,18 +47,14 @@ class Recognizer {
 		return this.gestureType;
 	}
 	
-	boolean hasTrainedRecognizer() {
-		return (this.recognizer != null);
-	}
-	
 	/**
-	 * Resets the recognizer for this gesture and trains a new one with the given data set.
+	 * Trains the recognizer for this gesture with the given data set.
 	 * @param dataSet The data set used to train the recognizer.
 	 */
 	void train(GestureDataSet dataSet) {
 		assert(dataSet != null);
 		assert(dataSet.getGestureInstanceAt(0).getTrainingDataObservationWidth() == this.gestureType.getNumHands()*3);
-		if (this.hasTrainedRecognizer()) {
+		if (this.recognizer != null) {
 			this.trainMore(dataSet);
 		}
 		else {
@@ -142,7 +138,6 @@ class Recognizer {
 		
 		assert(this.recognizer  != null);
 	}
-	
 	
 	/**
 	 * Allows the existing recognizer for the gesture to learn more from another data set.
