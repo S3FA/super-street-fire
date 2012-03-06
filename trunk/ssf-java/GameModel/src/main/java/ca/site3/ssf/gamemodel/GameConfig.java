@@ -12,6 +12,9 @@ final public class GameConfig {
 	
 	// Whether chip damage (damage when a player is blocking) is turned on or not
 	final private boolean chipDamageOn;
+	// The total percent of the attack damage that is done when it is blocked, this is only
+	// considered if chipDamageOn is true
+	final private float chipDamagePercentage; 
 	
 	// The minimum delay between player actions (i.e., players have to wait at least this long before
 	// another performed action is executed).
@@ -24,21 +27,26 @@ final public class GameConfig {
 	final private int numRoundsPerMatch;
 	
 	public GameConfig(boolean chipDamageOn, double minTimeBetweenPlayerActionsInSecs,
-				      int roundTimeInSecs, int numRoundsPerMatch) {
+				      int roundTimeInSecs, int numRoundsPerMatch, float chipDamagePercentage) {
 		
 		this.chipDamageOn = chipDamageOn;
 		this.minTimeBetweenPlayerActionsInSecs = minTimeBetweenPlayerActionsInSecs;
 		this.roundTimeInSecs = roundTimeInSecs;
 		this.numRoundsPerMatch = numRoundsPerMatch;
+		this.chipDamagePercentage = chipDamagePercentage;
 		
 		assert(roundTimeInSecs > 0);
 		assert(minTimeBetweenPlayerActionsInSecs >= 0);
 		assert(numRoundsPerMatch > 0 && numRoundsPerMatch % 2 == 1);
+		assert(chipDamagePercentage >= 0.0f && chipDamagePercentage <= 1.0f);
 	}
 	
 
 	public boolean getChipDamageOn() {
 		return this.chipDamageOn;
+	}
+	public float getChipDamagePercentage() {
+		return this.chipDamagePercentage;
 	}
 	public double getMinTimeBetweenPlayerActionsInSecs() {
 		return this.minTimeBetweenPlayerActionsInSecs;
