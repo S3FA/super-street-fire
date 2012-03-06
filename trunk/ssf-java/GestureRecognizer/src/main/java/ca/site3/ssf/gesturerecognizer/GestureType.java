@@ -54,19 +54,21 @@ public enum GestureType {
 		this.numHands = count;
 	}
 	
-	PlayerActionType getActionFactoryType() {
+	public PlayerActionType getActionFactoryType() {
 		return this.actionFactoryType;
 	}
-	int getNumHmmNodes() {
-		return this.numHmmNodes;
-	}
-	int getNumHands() {
+	public int getNumHands() {
 		return this.numHands;
 	}
-	boolean getUsesLeftHand() {
+	public boolean getUsesLeftHand() {
 		return this.leftHanded;
 	}
-	boolean getUsesRightHand() {
+	public boolean getUsesRightHand() {
 		return this.rightHanded;
 	}
+	
+	int getNumHmmNodes() {
+		return this.numHmmNodes;
+	}	
+	
 }

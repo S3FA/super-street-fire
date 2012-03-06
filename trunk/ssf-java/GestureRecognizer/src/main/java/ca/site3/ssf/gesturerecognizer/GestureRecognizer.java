@@ -128,7 +128,7 @@ public class GestureRecognizer {
 			FileWriter fileWriter = new FileWriter(fileName);
 			boolean success = writeRecognizer.saveRecognizerEngine(fileWriter);
 			fileWriter.close();
-			System.out.println("Write result: " + success);
+			System.out.println("Write success: " + success);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -139,7 +139,7 @@ public class GestureRecognizer {
 		try {
 			FileReader fileReader = new FileReader(fileName);
 			boolean success = readRecognizer.loadRecognizerEngine(fileReader);
-			System.out.println("Read result: " + success);
+			System.out.println("Read success: " + success);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -4,8 +4,11 @@ import java.util.ArrayList;
 
 public class PlayerAttackAction extends Action {
 	
-	public enum AttackType { UNDEFINED_ATTACK, LEFT_JAB_ATTACK, RIGHT_JAB_ATTACK,
-	LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK }
+	public enum AttackType {
+		LEFT_JAB_ATTACK, RIGHT_JAB_ATTACK, 
+		LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK,
+		HADOUKEN_ATTACK, SONIC_BOOM_ATTACK
+	};
 
 	final private AttackType type;
 	final private Player attacker;
@@ -13,7 +16,8 @@ public class PlayerAttackAction extends Action {
 	
 	final private float damagePerFlame; // Amount of damage dealt to the attackee per flame delivered
 		
-	PlayerAttackAction(FireEmitterModel fireEmitterModel, AttackType type, Player attacker, Player attackee, float dmgPerFlame) {
+	PlayerAttackAction(FireEmitterModel fireEmitterModel, AttackType type,
+					   Player attacker, Player attackee, float dmgPerFlame) {
 		
 		super(fireEmitterModel);
 		
