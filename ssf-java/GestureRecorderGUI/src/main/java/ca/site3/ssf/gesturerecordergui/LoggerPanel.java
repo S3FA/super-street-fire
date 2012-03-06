@@ -20,6 +20,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import ca.site3.ssf.gesturerecognizer.GloveData;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.text.DateFormat;
@@ -46,22 +48,28 @@ class LoggerPanel extends JPanel {
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
-	public void logGestureData(String gyroDataLeft, String magDataLeft, String accDataLeft, String gyroDataRight, String magDataRight, String accDataRight, String gestureName, String time){
+	public void logGestureData(GloveData data, String gestureName, double time){
 		this.log.append(gestureName);
 		this.log.append(": ");
-	    this.log.append("Gyro (L): " + gyroDataLeft);
+	    this.log.append("Gyro: " + Double.toString(data.getGyroData().getX()));
 	    this.log.append(", ");
-	    this.log.append("Mag (L): " + magDataLeft);
+	    this.log.append(Double.toString(data.getGyroData().getY()));
 	    this.log.append(", ");
-	    this.log.append("Acc (L): " + accDataLeft);
+	    this.log.append(Double.toString(data.getGyroData().getZ()));
 	    this.log.append(", ");
-	    this.log.append("Gyro (R): " + gyroDataRight);
+	    this.log.append("Mag: " + Double.toString(data.getMagnetoData().getX()));
 	    this.log.append(", ");
-	    this.log.append("Mag (R): " + magDataRight);
+	    this.log.append(Double.toString(data.getMagnetoData().getY()));
 	    this.log.append(", ");
-	    this.log.append("Acc (R): " + accDataRight);
+	    this.log.append(Double.toString(data.getMagnetoData().getZ()));
 	    this.log.append(", ");
-	    this.log.append(time);
+	    this.log.append("Acc: " + Double.toString(data.getAccelData().getX()));
+	    this.log.append(", ");
+	    this.log.append(Double.toString(data.getAccelData().getY()));
+	    this.log.append(", ");
+	    this.log.append(Double.toString(data.getAccelData().getZ()));
+	    this.log.append(", ");
+	    this.log.append(Double.toString(time));
 	    this.log.append("\n");
 	}
 }

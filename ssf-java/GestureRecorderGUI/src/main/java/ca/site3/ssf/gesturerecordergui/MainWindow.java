@@ -4,7 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,10 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GloveData;
 import ca.site3.ssf.ioserver.DeviceEvent;
-import ca.site3.ssf.ioserver.GloveEvent;
-import ca.site3.ssf.ioserver.DeviceEvent.Type;
 import ca.site3.ssf.ioserver.DeviceNetworkListener;
+import ca.site3.ssf.ioserver.GloveEvent;
 
 // The main window for the recorder GUI.
 public class MainWindow extends JFrame {
@@ -27,7 +29,13 @@ public class MainWindow extends JFrame {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private static final long serialVersionUID = 1L;
-	private GestureData gesture = null;
+	
+	private GestureInstance gestureInstance;
+	private ArrayList<GloveData> leftGloveData;
+	private ArrayList<GloveData> rightGloveData;
+	private ArrayList<Double> timeData;
+	private Long startTime;
+	
 	private RecorderPanel recorderPanel   = null;
 	private ControlPanel controlPanel = null;
 	private LoggerPanel loggerPanel = null;
@@ -37,7 +45,7 @@ public class MainWindow extends JFrame {
 	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
 	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(31337, eventQueue);
 	private Thread consumerThread;
-	
+	private Runnable doUpdateInterface;
 	
 	public MainWindow() {
 		super();
@@ -66,13 +74,13 @@ public class MainWindow extends JFrame {
 		this.pack();
 		this.setLocationRelativeTo(null);
 		
-		
 		// Kick off the hardware event listener in the IOServer 
 		Thread producerThread = new Thread(gloveListener);
-		// to stop this call gloveListener.stop()
+		
+		// To stop this call gloveListener.stop()
 		producerThread.start();
 		
-		// to stop this set isListeningForEvents false and call consumerThread.interrupt()
+		// To stop this set isListeningForEvents false and call consumerThread.interrupt()
 		consumerThread = new Thread(new Runnable() {
 			public void run() {
 				DeviceEvent e;
@@ -83,19 +91,15 @@ public class MainWindow extends JFrame {
 						log.info("Glove event consumer interrupted",ex);
 						e = null;
 					}
-					if (null != e && e.getType() == Type.GloveEvent) {
+					if (null != e && e.getType() == DeviceEvent.Type.GloveEvent) {
 						hardwareEventListener((GloveEvent)e);
 					}
 				}
 			}
 		});
 		
-		/* For debugging/testing purposes only */
-		this.recorderPanel.fileInfoPanel.isNewFile = true;
-		this.recorderPanel.fileInfoPanel.exportCsv.setState(true);
-		this.recorderPanel.fileInfoPanel.exportRecognizer.setState(true);
-		this.IsRecordMode = true;
-		
+		// Start listening for and consuming the data from the gloves
+		consumerThread.start();
 	}
 
 	
@@ -120,102 +124,119 @@ public class MainWindow extends JFrame {
 	}
 
 	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
-	// Should accept an IOServer.GloveData object from IOServer
 	public void hardwareEventListener(GloveEvent gloveEvent) {
-		if (false)//event.getSource() == recordButtonPress from IOServer)
+		if (gloveEvent.isButtonPressed())
 		{
-			// Toggle record mode. Currently we're assuming one record mode/trigger for both gloves, we can split it if needed
-			this.IsRecordMode = !this.IsRecordMode;
-			this.recorderPanel.fileInfoPanel.isNewFile = true;
-			this.controlPanel.recordingLabel.setVisible(this.IsRecordMode);
+			// If we just started recording, mark the start time. This will be a brand new gesture and file.
+			if (!this.IsRecordMode)
+			{
+				this.recorderPanel.fileInfoPanel.isNewFile = true; 
+				this.leftGloveData = new ArrayList<GloveData>();
+				this.rightGloveData = new ArrayList<GloveData>();
+				this.timeData = new ArrayList<Double>();
+				this.startTime = System.nanoTime();
+			}
+			
+			this.IsRecordMode = true;
 		}
-		else if (true){//event.getSource() == someHardwareEvent from IOServer)
-			
-			// Build the gesture coordinates object
-			BuildGestureObject();
-			DisplayAndLogData();
-			
-			// If we're recording, do some additional actions with the data object
+		else
+		{
+			// If we're ending a recording, create and export the gesture instance object
 			if(this.IsRecordMode)
 			{
-				// Export to the gesture recognizer if selected
-				if (this.recorderPanel.fileInfoPanel.exportRecognizer.getState()){
-					SendDataToGestureRecognizer();
+				GestureInstance instance = createGestureInstance();
+				
+				// If export to CSV is selected, perform the export
+				if(this.recorderPanel.fileInfoPanel.exportCsv.getState())
+				{
+					this.recorderPanel.fileInfoPanel.exportToCsv(instance);
 				}
 				
-				// Write the results to a CSV file if selected
-				if (this.recorderPanel.fileInfoPanel.exportCsv.getState()){
-					this.recorderPanel.fileInfoPanel.recordFileInformation(this.gesture.gyroLeft,
-						this.gesture.magLeft,
-						this.gesture.accLeft,
-						this.gesture.gyroRight,
-						this.gesture.magRight,
-						this.gesture.accRight,
-						this.gesture.GestureName,
-						this.gesture.Time);
+				// If export to the gesture recognizer is selected, export to the GestureRecognizer
+				if(this.recorderPanel.fileInfoPanel.exportRecognizer.getState())
+				{
+					this.recorderPanel.fileInfoPanel.exportToRecognizer(instance);
 				}
-				
-				this.recorderPanel.fileInfoPanel.isNewFile = false;
 			}
+			
+			this.IsRecordMode = false;
 		}
-	}
-	
-	
-	
-	// Constructs a gesture object from the data sent by the IOServer
-	public void BuildGestureObject()
-	{
-		Calendar cal = Calendar.getInstance();
-	    SimpleDateFormat sdf = new SimpleDateFormat("H:mm:ss:SSS");
-	    
-		this.gesture = new GestureData();
-		this.gesture.gyroLeft = "0";
-		this.gesture.magLeft = "0";
-		this.gesture.accLeft = "0";
-		this.gesture.gyroRight = "0";
-		this.gesture.magRight = "0";
-		this.gesture.accRight = "0";
-		this.gesture.GestureName = this.recorderPanel.fileInfoPanel.gestureName.getText() == "" ? "Unspecified" : this.recorderPanel.fileInfoPanel.gestureName.getText();
-		this.gesture.Time = sdf.format(cal.getTime());
+		
+		// Set the recording indicator
+		this.controlPanel.recordingLabel.setVisible(this.IsRecordMode);
+		
+		// Build the gesture coordinates object and final vars to use in the UI thread
+		final double time = getElapsedTime();
+		final GloveData gloveData = buildGloveData(gloveEvent);
+		final String gestureName = this.recorderPanel.fileInfoPanel.gestureName.getSelectedItem().toString();
+		
+		//TODO: Find out which glove we're using and add to the appropriate list
+		this.leftGloveData.add(gloveData);
+		this.rightGloveData.add(gloveData);
+		this.timeData.add(time);
+		
+		// Set up a UI updating thread
+		doUpdateInterface = new Runnable() {       	
+            public void run() {
+            	displayAndLogData(gloveData, gestureName, time);
+            }
+        };
+		SwingUtilities.invokeLater(doUpdateInterface);
 	}
 	
 	// Displays the coordinates in the UI and logs anything recorded on screen
-	public void DisplayAndLogData()
+	public void displayAndLogData(GloveData data, String gestureName, double time)
 	{
-		// Populate the displays on the GUI with the data we're sent
-		this.recorderPanel.sensorDataPanelLeft.showCurrentData(this.gesture.gyroLeft, this.gesture.magLeft, this.gesture.accLeft);
-		this.recorderPanel.sensorDataPanelRight.showCurrentData(this.gesture.gyroRight, this.gesture.magRight, this.gesture.accRight);
+		// Populate the displays on the GUI with the data we're sent depending on which glove to display
+		this.recorderPanel.sensorDataPanelLeft.showCurrentData(data);
+		this.recorderPanel.sensorDataPanelRight.showCurrentData(data);
 		
 		// Log the data on the UI
-		this.loggerPanel.logGestureData(this.gesture.gyroLeft,
-			this.gesture.magLeft,
-			this.gesture.accLeft,
-			this.gesture.gyroRight,
-			this.gesture.magRight,
-			this.gesture.accRight,
-			this.gesture.GestureName,
-			this.gesture.Time);
+		this.loggerPanel.logGestureData(data, gestureName, time);
 	}
 	
-	// Get a string of instance data from the Gesture Recognizer
-	public void GetDataFromGestureRecognizer(){
-		GestureInstance gestureInstance = new GestureInstance();
-		//String gestureInstanceData = gestureInstance.toDataString();
+	// Construct a glove data object using the gesture recognizer
+	public GloveData buildGloveData(GloveEvent event)
+	{
+		double[] gyro = event.getGyro();
+		double[] mag = event.getMagnetometer();
+		double[] acc = event.getAcceleration();
 		
-		// Convert gestureInstanceData to a GestureData object. 
-		//TODO: What format does gesture instance need? 
+		GloveData gloveData = new GloveData();
+		gloveData.fromDataString(Double.toString(gyro[0]) + "," + Double.toString(gyro[1]) + "," + Double.toString(gyro[2]) + "," + 
+								 Double.toString(acc[0]) + "," + Double.toString(acc[1]) + "," + Double.toString(acc[2]) + "," + 
+								 Double.toString(mag[0]) + "," + Double.toString(mag[1]) + "," + Double.toString(mag[2]));
+		
+		return gloveData;
 	}
 	
-	// Send a data string to the Gesture Recognizer
-	public void SendDataToGestureRecognizer(){
-		GestureInstance gestureInstance = new GestureInstance();
-		String formattedGestureData = "";
+	// Create a gesture instance from a list of left glove, right glove and time objects
+	public GestureInstance createGestureInstance()
+	{
+		GloveData[] leftGloveData = new GloveData[this.leftGloveData.size()];
+		GloveData[] rightGloveData = new GloveData[this.rightGloveData.size()];
+		double[] timeData = new double[this.timeData.size()];
 		
-		// Convert the data to a string readable by the gesture recognizer
-		//TODO: How is this data string formatted?
+		int count = 0;
+		for (GloveData data : this.leftGloveData)
+		{
+			data.toDataString();
+			leftGloveData[count] = data;
+			count++;
+		}
 		
-		//gestureInstance.fromDataString(formattedGestureData);
+		count = 0;
+		for (GloveData data : this.rightGloveData)
+		{
+			rightGloveData[count] = data;
+		}
 		
-		// Log and/or record the data?
+		return new GestureInstance(leftGloveData, rightGloveData, timeData);
+	}
+	
+	// Gets the time elapsed since recording started in milliseconds
+	public double getElapsedTime()
+	{
+		return (double)(System.nanoTime() - this.startTime) / 1000000;
 	}
 }

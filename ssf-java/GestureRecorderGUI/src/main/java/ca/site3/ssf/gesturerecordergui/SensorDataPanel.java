@@ -9,6 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import ca.site3.ssf.gesturerecognizer.GloveData;
+
 // A container panel for the hardware data displays
 class SensorDataPanel extends JPanel {
 	
@@ -56,10 +58,10 @@ class SensorDataPanel extends JPanel {
 	}
 	
 	// Update the current data values on the UI
-	public void showCurrentData(String gyro, String mag, String acc)
+	public void showCurrentData(GloveData data)
 	{
-		this.gyroscopeData.setText(gyro); 
-		this.magnetometerData.setText(mag);
-		this.accelerometerData.setText(acc); 
+		this.gyroscopeData.setText(Double.toString(data.getGyroData().getX()) + ", " + Double.toString(data.getGyroData().getY()) + ", " + Double.toString(data.getGyroData().getZ())); 
+		this.magnetometerData.setText(Double.toString(data.getMagnetoData().getX()) + ", " + Double.toString(data.getMagnetoData().getY()) + ", " + Double.toString(data.getMagnetoData().getZ()));
+		this.accelerometerData.setText(Double.toString(data.getAccelData().getX()) + ", " + Double.toString(data.getAccelData().getY()) + ", " + Double.toString(data.getAccelData().getZ()));
 	}
 }
