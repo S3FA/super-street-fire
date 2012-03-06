@@ -38,6 +38,10 @@ class Player {
 		this.setHealth(Player.FULL_HEALTH);
 	}
 	
+	void doChipDamage(float beforeChipDmgAmt) {
+		this.doDamage(beforeChipDmgAmt * GameModel.config.getChipDamagePercentage());
+	}
+	
 	void doDamage(float damageAmt) {
 		assert(damageAmt > 0);
 		if (this.isInvincible) {

@@ -58,7 +58,7 @@ public class IOServer {
 		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
 		
 		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
-												args.roundTimeInSecs, args.numRoundsPerMatch);
+												args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage);
 		game = new GameModel(gameConfig);
 		
 		mainFrame = new MainWindow(game);

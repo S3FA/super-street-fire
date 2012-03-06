@@ -44,6 +44,9 @@ public class PlayerAttackAction extends Action {
 	void blockOccurred(int waveIndex, int simulatorIndex) {
 		assert(waveIndex >= 0 && waveIndex < this.wavesOfOrderedFireSims.size());
 		
+		// Chip damage...
+		this.attackee.doChipDamage(this.damagePerFlame);
+		
 		// When a block occurs on a particular simulator we need to propagate the effects
 		// of that block to each of the simulators that are after it - this will cancel out
 		// one of the flames on each of the successive simulators

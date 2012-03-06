@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
  */
 public class GameModel implements IGameModel {
 
+	static GameConfig config;
+	
 	private GameState currState = null;
 	private GameState nextState = null;
-	
-	private GameConfig config = null;
 	
 	private Player player1 = null;
 	private Player player2 = null;

@@ -357,7 +357,7 @@ final public class ActionFactory {
 	}
 	
 	public static void main(String[] args) {
-		GameModel model = new GameModel(new GameConfig(true, 1.0, 60, 3));
+		GameModel model = new GameModel(new GameConfig(true, 1.0, 60, 3, 0.1f));
 		ActionFactory actionFactory = model.getActionFactory();
 		
 		// One handed attacks...
