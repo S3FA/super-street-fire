@@ -20,6 +20,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GestureType;
+import ca.site3.ssf.gesturerecognizer.GloveData;
+
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,12 +34,11 @@ class FileInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	public boolean isNewFile = false;
-	private int currentIteration = 0;
 	
-	public JTextField gestureName;
+	public JComboBox gestureName;
 	public Checkbox exportRecognizer;
 	public Checkbox exportCsv;
-	
+
 	FileInfoPanel() {
 		super();
 		
@@ -50,8 +53,14 @@ class FileInfoPanel extends JPanel {
 
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
 		
-		this.gestureName = new JTextField(25);
-		this.gestureName.setText("Unspecified");
+		this.gestureName = new JComboBox<GestureType>();
+		this.gestureName.addItem(GestureType.LEFT_JAB);
+		this.gestureName.addItem(GestureType.LEFT_HOOK);
+		this.gestureName.addItem(GestureType.RIGHT_JAB);
+		this.gestureName.addItem(GestureType.RIGHT_HOOK);
+		this.gestureName.addItem(GestureType.BLOCK);
+		this.gestureName.addItem(GestureType.HADOUKEN);
+		this.gestureName.addItem(GestureType.SONIC_BOOM);
 		
 		this.exportRecognizer = new Checkbox();
 		this.exportCsv = new Checkbox();
@@ -73,38 +82,98 @@ class FileInfoPanel extends JPanel {
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
-	public void recordFileInformation(String gyroDataLeft, String magDataLeft, String accDataLeft, String gyroDataRight, String magDataRight, String accDataRight, String gestureName, String time){
+	public void exportToCsv(GestureInstance instance){
 		try
-		{		
+		{	
+			int iteration = 0;
+			
 	        // If the file exists, check if the next iteration of the file exists until we can make a new one
-	        while (isNewFile && new File("Data/" + gestureName + Integer.toString(currentIteration) + ".csv").exists())
+	        while (isNewFile && new File("Data/" + gestureName + Integer.toString(iteration) + ".csv").exists())
 	        {
-	        	currentIteration++;
+	        	iteration++;
 	        }
 	       
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(currentIteration) + ".csv"), !isNewFile);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + ".csv"), !isNewFile);
         	
 	        // If we just created the file, 
 	        if(isNewFile)
 	        {
-	        	writer.write("GyroDataLeft,MagDataLeft,AccDataLeft,GyroDataRight,MagDataRight,AccDataRight,DateTime");
+	        	writer.write("GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,Time");
 	        	writer.append("\n");
 	        }
 	        
-		    writer.append(gyroDataLeft);
-		    writer.append(",");
-		    writer.append(magDataLeft);
-		    writer.append(",");
-		    writer.append(accDataLeft);
-		    writer.append(",");
-		    writer.append(gyroDataRight);
-		    writer.append(",");
-		    writer.append(magDataRight);
-		    writer.append(",");
-		    writer.append(accDataRight);
-		    writer.append(",");
-		    writer.append(time);
-		    writer.append("\n");
+	        // Save the data to a CSV file
+	        for (int i = 0; i < instance.getNumDataPts(); i++)
+	        {
+	        	GloveData left = instance.getLeftGloveDataAt(i);
+	        	GloveData right = instance.getRightGloveDataAt(i);
+	        	double time = instance.getTimeAt(i);
+	        	
+			    writer.append(Double.toString(left.getGyroData().getX()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getGyroData().getY()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getGyroData().getZ()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getMagnetoData().getX()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getMagnetoData().getY()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getMagnetoData().getZ()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getAccelData().getX()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getAccelData().getY()));
+			    writer.append(", ");
+			    writer.append(Double.toString(left.getAccelData().getZ()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getGyroData().getX()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getGyroData().getY()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getGyroData().getZ()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getMagnetoData().getX()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getMagnetoData().getY()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getMagnetoData().getZ()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getAccelData().getX()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getAccelData().getY()));
+			    writer.append(", ");
+			    writer.append(Double.toString(right.getAccelData().getZ()));
+			    writer.append(", ");
+			    writer.append(Double.toString(time));
+			    writer.append("\n");
+	        }
+	 
+		    writer.flush();
+		    writer.close();
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	// Save the data to a file that can be read by GestureRecognizer's fromDataString() method
+	public void exportToRecognizer(GestureInstance instance){
+		try
+		{	
+			int iteration = 0;
+			
+	        // If the file exists, check if the next iteration of the file exists until we can make a new one
+	        while (isNewFile && new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt").exists())
+	        {
+	        	iteration++;
+	        }
+	       
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt"), !isNewFile);
+        	
+	        // Save the data to a file readable by the GestureRecognizer
+	        writer.write(instance.toDataString());
 	 
 		    writer.flush();
 		    writer.close();
