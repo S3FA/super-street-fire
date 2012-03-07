@@ -6,7 +6,10 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
+
+import ca.site3.ssf.gesturerecognizer.GestureType;
 
 class FormLayoutHelper {
     /**
@@ -101,4 +104,18 @@ class FormLayoutHelper {
         gbl.setConstraints(c, middleConstraints);
         parent.add(c);
     }
+    
+	public JComboBox constructGestureComboBox()
+	{
+		JComboBox comboBox = new JComboBox<GestureType>();
+		comboBox.addItem(GestureType.LEFT_JAB);
+		comboBox.addItem(GestureType.LEFT_HOOK);
+		comboBox.addItem(GestureType.RIGHT_JAB);
+		comboBox.addItem(GestureType.RIGHT_HOOK);
+		comboBox.addItem(GestureType.BLOCK);
+		comboBox.addItem(GestureType.HADOUKEN);
+		comboBox.addItem(GestureType.SONIC_BOOM);
+		
+		return comboBox;
+	}
 }
