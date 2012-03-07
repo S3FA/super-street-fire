@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 
@@ -68,6 +69,21 @@ class RecognizerManager {
 		}
 		
 		return bestGesture;
+	}
+	
+	/**
+	 * Performs gesture recognition on the given gesture instance for all gestures and
+	 * places the full result into the returned data.
+	 * @param inst The gesture instance to identify/recognize.
+	 * @return The full result of the recognition procedure, with data for all gestures.
+	 */
+	GestureRecognitionResult recognizeWithFullResult(GestureInstance inst) {
+		Map<GestureType, Double> resultMapping = new HashMap<GestureType, Double>();
+		for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
+			resultMapping.put(entry.getKey(), entry.getValue().probability(inst));
+		}
+		
+		return new GestureRecognitionResult(resultMapping);
 	}
 	
 	/**

@@ -92,6 +92,20 @@ public class GestureRecognizer {
 				result.getActionFactoryType(), result.getUsesLeftHand(), result.getUsesRightHand()));
 	}
 	
+	/**
+	 * Use the gesture recognizer to recognize the given gesture and produce a full gesture recognition
+	 * result for every gesture that was tested.
+	 * @param gestureInstance The gesture instance data to recognize.
+	 * @return The full result data from the recognition process.
+	 */
+	public GestureRecognitionResult recognizePlayerGesture(GestureInstance gestureInstance) {
+		assert(gestureInstance != null);
+
+		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
+		GestureRecognitionResult result = this.recognizerMgr.recognizeWithFullResult(gestureInstance);
+		return result;
+	}
+
 	public static void main(String[] args) {
 		
 		// Build a nonsense test data set
