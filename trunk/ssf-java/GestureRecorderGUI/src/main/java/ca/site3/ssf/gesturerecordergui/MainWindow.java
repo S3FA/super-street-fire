@@ -12,7 +12,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +30,6 @@ import ca.site3.ssf.ioserver.GloveEvent;
 public class MainWindow extends JFrame {
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
 	private static final long serialVersionUID = 1L;
 	
 	private GestureInstance gestureInstance;
@@ -39,6 +41,8 @@ public class MainWindow extends JFrame {
 	private RecorderPanel recorderPanel   = null;
 	private ControlPanel controlPanel = null;
 	private LoggerPanel loggerPanel = null;
+	private TrainingPanel trainingPanel = null;
+	private TestingPanel testingPanel = null;
 	private boolean IsRecordMode = false;
 	
 	private volatile boolean isListeningForEvents = true;
@@ -46,6 +50,8 @@ public class MainWindow extends JFrame {
 	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(31337, eventQueue);
 	private Thread consumerThread;
 	private Runnable doUpdateInterface;
+	
+	private JTabbedPane tabbedPane = null;
 	
 	public MainWindow() {
 		super();
@@ -55,32 +61,31 @@ public class MainWindow extends JFrame {
 		this.setPreferredSize(new Dimension(900, 500));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
+
+		// Create and instantiate the recording, training and testing tab
+		JPanel recordingTab = createRecordingTab();
+		JPanel trainingTab = createTrainingTab();
+		JPanel testingTab = createTestingTab();
+		
+		// Create the tabbed pane
+		this.tabbedPane = new JTabbedPane(); 
+		this.tabbedPane.addTab("Recording", null, recordingTab);
+		this.tabbedPane.addTab("Training", null, trainingTab);
+		this.tabbedPane.addTab("Testing", null, testingTab);
 		
 		// Setup the frame's contents...
 		Container contentPane = this.getContentPane();
-		
-		JPanel wrapperPanel = new JPanel();
-		wrapperPanel.setLayout(new BorderLayout());
-		
-		this.recorderPanel = new RecorderPanel();
-		this.controlPanel = new ControlPanel();
-		this.loggerPanel = new LoggerPanel();
-		
-		wrapperPanel.add(this.recorderPanel, BorderLayout.NORTH);
-		wrapperPanel.add(this.controlPanel, BorderLayout.CENTER);
-		wrapperPanel.add(this.loggerPanel, BorderLayout.SOUTH);
-		contentPane.add(wrapperPanel, BorderLayout.NORTH);
+		contentPane.add(this.tabbedPane, BorderLayout.NORTH);
 		
 		this.pack();
 		this.setLocationRelativeTo(null);
 		
-		// Kick off the hardware event listener in the IOServer 
+		// Kick off the hardware event listener in the IOServer. To stop this call gloveListener.stop()
 		Thread producerThread = new Thread(gloveListener);
-		
-		// To stop this call gloveListener.stop()
 		producerThread.start();
 		
-		// To stop this set isListeningForEvents false and call consumerThread.interrupt()
+		// To stop this set isListeningForEvents false and call consumerThread.interrupt()\
+		//TODO: Start or stop this based on which tab we're in. 
 		consumerThread = new Thread(new Runnable() {
 			public void run() {
 				DeviceEvent e;
@@ -123,8 +128,10 @@ public class MainWindow extends JFrame {
         SwingUtilities.invokeLater(doCreateAndShowGUI);
 	}
 
+	//TODO: move recorder specific logic to the recorder panel
 	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
 	public void hardwareEventListener(GloveEvent gloveEvent) {
+		//TODO: Use this.tabbedPane.getSelectedIndex(); to determine what to do with hardware input
 		if (gloveEvent.isButtonPressed())
 		{
 			// If we just started recording, mark the start time. This will be a brand new gesture and file.
@@ -175,7 +182,7 @@ public class MainWindow extends JFrame {
 		this.rightGloveData.add(gloveData);
 		this.timeData.add(time);
 		
-		// Set up a UI updating thread
+		// Update the UI with the glove data
 		doUpdateInterface = new Runnable() {       	
             public void run() {
             	displayAndLogData(gloveData, gestureName, time);
@@ -238,5 +245,46 @@ public class MainWindow extends JFrame {
 	public double getElapsedTime()
 	{
 		return (double)(System.nanoTime() - this.startTime) / 1000000;
+	}
+	
+	// Creates and instantiates the recorder panel 
+	public JPanel createRecordingTab()
+	{
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		
+		this.recorderPanel = new RecorderPanel();
+		this.controlPanel = new ControlPanel();
+		this.loggerPanel = new LoggerPanel("Log");
+		
+		panel.add(this.recorderPanel, BorderLayout.NORTH);
+		panel.add(this.controlPanel, BorderLayout.CENTER);
+		panel.add(this.loggerPanel, BorderLayout.SOUTH);
+		
+		return panel;
+	}
+	
+	// Creates and instantiates the training panel 
+	public JPanel createTrainingTab()
+	{
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		
+		this.trainingPanel = new TrainingPanel();
+		panel.add(this.trainingPanel, BorderLayout.NORTH);
+				
+		return panel;
+	}
+	
+	// Creates and instantiates the testing panel 
+	public JPanel createTestingTab()
+	{
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		
+		this.testingPanel = new TestingPanel();
+		panel.add(this.testingPanel, BorderLayout.NORTH);
+				
+		return panel;
 	}
 }

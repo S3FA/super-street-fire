@@ -20,7 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import ca.site3.ssf.gesturerecognizer.GestureDataSet;
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.gesturerecognizer.GestureType;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 
@@ -38,7 +40,7 @@ class FileInfoPanel extends JPanel {
 	public JComboBox gestureName;
 	public Checkbox exportRecognizer;
 	public Checkbox exportCsv;
-
+	
 	FileInfoPanel() {
 		super();
 		
@@ -53,15 +55,7 @@ class FileInfoPanel extends JPanel {
 
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
 		
-		this.gestureName = new JComboBox<GestureType>();
-		this.gestureName.addItem(GestureType.LEFT_JAB);
-		this.gestureName.addItem(GestureType.LEFT_HOOK);
-		this.gestureName.addItem(GestureType.RIGHT_JAB);
-		this.gestureName.addItem(GestureType.RIGHT_HOOK);
-		this.gestureName.addItem(GestureType.BLOCK);
-		this.gestureName.addItem(GestureType.HADOUKEN);
-		this.gestureName.addItem(GestureType.SONIC_BOOM);
-		
+		this.gestureName = formLayoutHelper.constructGestureComboBox();		
 		this.exportRecognizer = new Checkbox();
 		this.exportCsv = new Checkbox();
 		
@@ -165,15 +159,40 @@ class FileInfoPanel extends JPanel {
 			int iteration = 0;
 			
 	        // If the file exists, check if the next iteration of the file exists until we can make a new one
-	        while (isNewFile && new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt").exists())
+	        while (new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt").exists())
 	        {
 	        	iteration++;
 	        }
 	       
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt"), !isNewFile);
-        	
 	        // Save the data to a file readable by the GestureRecognizer
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt"), false);
 	        writer.write(instance.toDataString());
+	 
+		    writer.flush();
+		    writer.close();
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	// Save a recognizer engine file
+	public void exportToRecognizerEngine(GestureRecognizer gestureRecognizer)
+	{
+		try
+		{	
+			int iteration = 0;
+			
+	        // If the file exists, check if the next iteration of the file exists until we can make a new one
+	        while (new File("Data/" + gestureName + Integer.toString(iteration) + "_RecognizerEngine.txt").exists())
+	        {
+	        	iteration++;
+	        }
+	       	        
+	        // Save the data to a file readable by the Gesture Tester
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_RecognizerEngine.txt"), false);
+	        gestureRecognizer.saveRecognizerEngine(writer);
 	 
 		    writer.flush();
 		    writer.close();
