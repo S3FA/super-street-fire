@@ -11,6 +11,10 @@ import javax.swing.JLabel;
 
 import ca.site3.ssf.gesturerecognizer.GestureType;
 
+/**
+ * A class to help with the UI layout (shamelessly stolen from the devGUI)
+ *
+ */
 class FormLayoutHelper {
     /**
      * Grid bag constraints for fields and labels

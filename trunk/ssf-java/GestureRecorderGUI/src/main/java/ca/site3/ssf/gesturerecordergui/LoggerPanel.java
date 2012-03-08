@@ -2,40 +2,26 @@ package ca.site3.ssf.gesturerecordergui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridBagLayout;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-// A container panel for the file and gesture info to save
+/**
+ * A container for the output log of each tab 
+ * @author Mike
+ *
+ */
 class LoggerPanel extends JPanel implements ActionListener {
 	
 	private static final long serialVersionUID = 1L;
 	private JButton clearLogButton;
-	public TextArea log = null;
+	private TextArea log = null;
 
 	LoggerPanel(String logTitle) {
 		super();
@@ -61,7 +47,7 @@ class LoggerPanel extends JPanel implements ActionListener {
 	{
 		if(e.getSource() == this.clearLogButton)
 		{
-			this.log.setText("");
+			this.clearLog();
 		}
 	}
 	
@@ -107,5 +93,29 @@ class LoggerPanel extends JPanel implements ActionListener {
 	    this.log.append(", ");
 	    this.log.append(Double.toString(time));
 	    this.log.append("\n");
+	}
+	
+	// Retrieves the log's text
+	public String getLogText()
+	{
+		return this.log.getText();
+	}
+	
+	// Sets the log's text
+	public void setLogText(String text)
+	{
+		this.log.setText(text);
+	}
+	
+	// Appends to the log
+	public void appendLogText(String text)
+	{
+		this.log.append(text);
+	}
+	
+	// Clears the log
+	public void clearLog()
+	{
+		this.log.setText("");
 	}
 }
