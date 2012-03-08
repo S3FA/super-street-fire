@@ -122,16 +122,16 @@ class TestingPanel extends JPanel implements ActionListener {
 		{
 			reader = new FileReader(file);
 			gestureRecognizer.loadRecognizerEngine(reader);
+			
+			this.gestureRecognizer = gestureRecognizer;
+			this.isEngineLoaded = true;
+			this.loggerPanel.appendLogText("Engine '" + file.getName() + "' loaded successfully!\n");
 		} 
 		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			this.loggerPanel.appendLogText("Attempted to load invalid engine.\n");
 		}
-		
-		this.gestureRecognizer = gestureRecognizer;
-		this.isEngineLoaded = true;
-		this.loggerPanel.appendLogText("Engine '" + file.getName() + "' loaded successfully!\n");
 	}
 	
 	// Tests a gesture instance against the loaded engine
