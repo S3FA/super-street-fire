@@ -1,0 +1,33 @@
+package guiprotocol;
+
+option java_package = "ca.site3.ssf.guiprotocol";
+
+
+message Command {
+  
+  enum CommandType {
+    EXECUTE_ACTION = 0;
+    TOGGLE_PAUSE = 1;
+    KILL_GAME = 2;
+    NEXT_STATE = 3;
+  }
+  
+  enum PlayerAction {
+    BLOCK = 0;
+    JAB_ATTACK = 1;
+    HOOK_ATTACK = 2;
+    HADOUKEN_ATTACK = 3;
+    SONIC_BOOM_ATTACK = 4;
+  }
+  
+  enum Player {
+    P1 = 1;
+    P2 = 2;
+  }
+  
+  
+  required CommandType type = 1;
+  optional PlayerAction playerAction = 2;
+  optional Player player = 3;
+  
+}

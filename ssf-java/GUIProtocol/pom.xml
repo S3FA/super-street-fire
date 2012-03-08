@@ -9,4 +9,70 @@
   <artifactId>GUIProtocol</artifactId>
   <name>GUI Protocol</name>
   <description>Defines the protocol for serialization and representation of data, contains interfaces/classes for the various GUI events and the routines for serialization of those classes etc.</description>
+  
+  
+  <pluginRepositories>
+	<pluginRepository>
+		<id>dtrott</id>
+		<url>http://maven.davidtrott.com/repository</url>
+	</pluginRepository>
+  </pluginRepositories>
+    
+  <build>
+	<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<configuration>
+				<source>1.5</source>
+				<target>1.5</target>
+			</configuration>
+		</plugin>
+		
+		<plugin>
+			<groupId>com.google.protobuf.tools</groupId>
+			<artifactId>maven-protoc-plugin</artifactId>
+			<configuration>
+				<checkStaleness>true</checkStaleness>
+				<protocExecutable>/usr/local/bin/protoc</protocExecutable>
+			</configuration>
+			<executions>
+				<execution>
+					<goals>
+						<goal>compile</goal>
+						<goal>testCompile</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+		
+		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>build-helper-maven-plugin</artifactId>
+			<executions>
+				<execution>
+					<id>add-source</id>
+					<phase>generate-sources</phase>
+					<goals>
+						<goal>add-source</goal>
+					</goals>
+					<configuration>
+						<sources>
+							<source>${project.build.directory}/generated-sources/protoc/</source>
+						</sources>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+    </plugins>
+  </build>
+
+<dependencies>
+    <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>2.4.1</version>
+    </dependency>
+</dependencies>
+  
 </project>
