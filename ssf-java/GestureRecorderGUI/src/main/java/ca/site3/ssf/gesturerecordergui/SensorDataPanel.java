@@ -11,14 +11,18 @@ import javax.swing.border.TitledBorder;
 
 import ca.site3.ssf.gesturerecognizer.GloveData;
 
-// A container panel for the hardware data displays
+/**
+ * A container to display the glove coordinates in real time
+ * @author Mike
+ *
+ */
 class SensorDataPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 
-	public JTextField gyroscopeData;
-	public JTextField magnetometerData;
-	public JTextField accelerometerData;
+	private JTextField gyroscopeData;
+	private JTextField magnetometerData;
+	private JTextField accelerometerData;
 	
 	SensorDataPanel(String title) {
 		super();

@@ -1,45 +1,36 @@
 package ca.site3.ssf.gesturerecordergui;
 
-import java.awt.BorderLayout;
 import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import ca.site3.ssf.gesturerecognizer.GestureDataSet;
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
-import ca.site3.ssf.gesturerecognizer.GestureType;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-// A container panel for the file and gesture info to save
+/**
+ * A class to manage the loading and saving of files
+ * @author Mike
+ *
+ */
 class FileInfoPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	
-	public boolean isNewFile = false;
-	
-	public JComboBox gestureName;
-	public Checkbox exportRecognizer;
-	public Checkbox exportCsv;
+	private boolean isNewFile = false;
+	private JComboBox gestureName;
+	private Checkbox exportRecognizer;
+	private Checkbox exportCsv;
 	
 	FileInfoPanel() {
 		super();
@@ -82,15 +73,15 @@ class FileInfoPanel extends JPanel {
 			int iteration = 0;
 			
 	        // If the file exists, check if the next iteration of the file exists until we can make a new one
-	        while (isNewFile && new File("Data/" + gestureName + Integer.toString(iteration) + ".csv").exists())
+	        while (this.isNewFile && new File("Data/" + gestureName + Integer.toString(iteration) + ".csv").exists())
 	        {
 	        	iteration++;
 	        }
 	       
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + ".csv"), !isNewFile);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + ".csv"), !this.isNewFile);
         	
 	        // If we just created the file, 
-	        if(isNewFile)
+	        if(this.isNewFile)
 	        {
 	        	writer.write("GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,Time");
 	        	writer.append("\n");
@@ -201,5 +192,35 @@ class FileInfoPanel extends JPanel {
 		{
 			ex.printStackTrace();
 		}
+	}
+	
+	// Sets the new file status
+	public void setNewFile(boolean isNewFile)
+	{
+		this.isNewFile = isNewFile;
+	}
+	
+	// Gets the new file status
+	public boolean getNewFile()
+	{
+		return this.isNewFile;
+	}
+	
+	// Gets the state of the csv export checkbox
+	public boolean getCsvExportState()
+	{
+		return this.exportCsv.getState();
+	}
+	
+	// Gets the state of the recognizer export checkbox
+	public boolean getRecognizerExportState()
+	{
+		return this.exportRecognizer.getState();
+	}
+	
+	// Retrieves the selected gesture name
+	public String getGestureName()
+	{
+		return this.gestureName.getSelectedItem().toString();
 	}
 }

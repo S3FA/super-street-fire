@@ -1,9 +1,7 @@
 package ca.site3.ssf.gesturerecordergui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,29 +10,37 @@ import java.io.FileReader;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GestureRecognitionResult;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 
-// A container panel for the sensor data and the file info panels
+/**
+ * A container for testing incoming gesture data against a gesture recognition engine
+ * @author Mike
+ *
+ */
 class TestingPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	public JTextField fileName;
-	public JButton selectFileButton;
-	public JButton testButton;
+	private JTextField fileName;
+	private JButton selectFileButton;
+	private JButton testButton;
 	
-	public LoggerPanel loggerPanel;
+	private LoggerPanel loggerPanel;
+	private ControlPanel controlPanel;
+	private GestureRecognizer gestureRecognizer;
+	private boolean isEngineLoaded;
 	private JFileChooser fileChooser;
 	
 	TestingPanel() {
-super();
+		super();
 		
 		Color borderColour = Color.black;
 		
@@ -54,6 +60,7 @@ super();
 		wrapperPanel.setBorder(fileBorder);
 		wrapperPanel.setLayout(layout);
 		
+		this.controlPanel = new ControlPanel();
 		this.fileChooser = new JFileChooser();
 		this.fileName = new JTextField(25);
 		this.fileName.setEditable(false);
@@ -61,7 +68,7 @@ super();
 		this.selectFileButton = new JButton("Choose File...");
 		this.selectFileButton.addActionListener(this);
 		
-		this.testButton = new JButton("Test!");
+		this.testButton = new JButton("Load Selected Engine");
 		this.testButton.addActionListener(this);
 		
 		this.loggerPanel = new LoggerPanel("Recognizer Results");
@@ -74,7 +81,10 @@ super();
 		formLayoutHelper.addLastField(new JLabel(""), wrapperPanel);
 		
 		formLayoutHelper.addLastField(wrapperPanel, this);
+		formLayoutHelper.addLastField(this.controlPanel, this);
 		formLayoutHelper.addLastField(this.loggerPanel, this);
+		
+		this.isEngineLoaded = false;
 	}
 	
 	// Handles button events
@@ -116,8 +126,25 @@ super();
 		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			this.loggerPanel.appendLogText("Attempted to load invalid engine.\n");
 		}
 		
-		//TODO: What now?
+		this.gestureRecognizer = gestureRecognizer;
+		this.isEngineLoaded = true;
+		this.loggerPanel.appendLogText("Engine '" + file.getName() + "' loaded successfully!\n");
+	}
+	
+	// Tests a gesture instance against the loaded engine
+	public void testGestureInstance(GestureInstance instance)
+	{
+		GestureRecognitionResult result = this.gestureRecognizer.recognizePlayerGesture(instance);  
+		this.loggerPanel.appendLogText(result.toString() + "\n");
+	}
+	
+	
+	// Returns whether a recognition engine has been loaded 
+	public boolean isEngineLoaded()
+	{
+		return this.isEngineLoaded;
 	}
 }

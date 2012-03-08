@@ -1,9 +1,7 @@
 package ca.site3.ssf.gesturerecordergui;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,17 +23,20 @@ import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.gesturerecognizer.GestureType;
 
-// A container panel for the sensor data and the file info panels
+/**
+ * A class to transform gesture instance files into a gesture recognition engine and save them to file
+ * @author Mike
+ *
+ */
 class TrainingPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	public JComboBox gestureType; 
-	public JTextField fileName;
-	public JButton selectFileButton;
-	public JButton trainFilesButton;
-	
-	public LoggerPanel loggerPanel;
+	private JTextField fileName;
+	private JButton selectFileButton;
+	private JButton trainFilesButton;
+	private JComboBox gestureType;
+	private LoggerPanel loggerPanel;
 	private JFileChooser fileChooser;
 	
 	TrainingPanel() {
@@ -97,7 +98,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		}
 		else if(e.getSource() == this.trainFilesButton)
 		{
-			GestureRecognizer gestureRecognizer = buildGestureRecognitionEngineFromFileList(this.loggerPanel.log.getText());
+			GestureRecognizer gestureRecognizer = buildGestureRecognitionEngineFromFileList(this.loggerPanel.getLogText());
 			exportGestureRecognizerEnginer(gestureRecognizer);
 		}
 	}
@@ -109,7 +110,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		
 		if (fileStatus == JFileChooser.APPROVE_OPTION) {
             File file = this.fileChooser.getSelectedFile();
-            this.loggerPanel.log.append(file.getAbsolutePath() + "\n");
+            this.loggerPanel.appendLogText(file.getAbsolutePath() + "\n");
         } 
 	}
 	

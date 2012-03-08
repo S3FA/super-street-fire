@@ -3,10 +3,7 @@ package ca.site3.ssf.gesturerecordergui;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -14,8 +11,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,24 +21,24 @@ import ca.site3.ssf.ioserver.DeviceEvent;
 import ca.site3.ssf.ioserver.DeviceNetworkListener;
 import ca.site3.ssf.ioserver.GloveEvent;
 
-// The main window for the recorder GUI.
+/**
+ * The main GUI class and driver for the gesture recorder
+ * @author Mike
+ *
+ */
 public class MainWindow extends JFrame {
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	private static final long serialVersionUID = 1L;
 	
-	private GestureInstance gestureInstance;
 	private ArrayList<GloveData> leftGloveData;
 	private ArrayList<GloveData> rightGloveData;
 	private ArrayList<Double> timeData;
 	private Long startTime;
 	
-	private RecorderPanel recorderPanel   = null;
-	private ControlPanel controlPanel = null;
-	private LoggerPanel loggerPanel = null;
+	private RecordingPanel recordingPanel  = null;
 	private TrainingPanel trainingPanel = null;
 	private TestingPanel testingPanel = null;
-	private boolean IsRecordMode = false;
 	
 	private volatile boolean isListeningForEvents = true;
 	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
@@ -107,7 +102,7 @@ public class MainWindow extends JFrame {
 		consumerThread.start();
 	}
 
-	
+	// Build the GUI
 	static void createAndShowGUI() {
 		MainWindow mainWindow = new MainWindow();
 		mainWindow.setVisible(true);
@@ -135,47 +130,53 @@ public class MainWindow extends JFrame {
 		if (gloveEvent.isButtonPressed())
 		{
 			// If we just started recording, mark the start time. This will be a brand new gesture and file.
-			if (!this.IsRecordMode)
+			if (!this.recordingPanel.getRecordMode())
 			{
-				this.recorderPanel.fileInfoPanel.isNewFile = true; 
+				this.recordingPanel.setNewFile(true); 
 				this.leftGloveData = new ArrayList<GloveData>();
 				this.rightGloveData = new ArrayList<GloveData>();
 				this.timeData = new ArrayList<Double>();
 				this.startTime = System.nanoTime();
 			}
 			
-			this.IsRecordMode = true;
+			this.recordingPanel.setRecordMode(true);
 		}
 		else
 		{
 			// If we're ending a recording, create and export the gesture instance object
-			if(this.IsRecordMode)
+			if(this.recordingPanel.getRecordMode())
 			{
 				GestureInstance instance = createGestureInstance();
 				
+				//TODO: Check which tab is currently selected, if we're on the trainer and are in training mode then do something else
 				// If export to CSV is selected, perform the export
-				if(this.recorderPanel.fileInfoPanel.exportCsv.getState())
+				if(this.recordingPanel.getCsvExportState())
 				{
-					this.recorderPanel.fileInfoPanel.exportToCsv(instance);
+					this.recordingPanel.exportToCsv(instance);
 				}
 				
 				// If export to the gesture recognizer is selected, export to the GestureRecognizer
-				if(this.recorderPanel.fileInfoPanel.exportRecognizer.getState())
+				if(this.recordingPanel.getRecognizerExportState())
 				{
-					this.recorderPanel.fileInfoPanel.exportToRecognizer(instance);
+					this.recordingPanel.exportToRecognizer(instance);
+				}
+				
+				if(this.testingPanel.isEngineLoaded())
+				{
+					this.testingPanel.testGestureInstance(instance);
 				}
 			}
 			
-			this.IsRecordMode = false;
+			this.recordingPanel.setRecordMode(false);
 		}
 		
 		// Set the recording indicator
-		this.controlPanel.recordingLabel.setVisible(this.IsRecordMode);
+		//this.recordingPanel(this.recordingPanel.getRecordMode());
 		
 		// Build the gesture coordinates object and final vars to use in the UI thread
 		final double time = getElapsedTime();
 		final GloveData gloveData = buildGloveData(gloveEvent);
-		final String gestureName = this.recorderPanel.fileInfoPanel.gestureName.getSelectedItem().toString();
+		final String gestureName = this.recordingPanel.getGestureName();
 		
 		//TODO: Find out which glove we're using and add to the appropriate list
 		this.leftGloveData.add(gloveData);
@@ -183,23 +184,17 @@ public class MainWindow extends JFrame {
 		this.timeData.add(time);
 		
 		// Update the UI with the glove data
-		doUpdateInterface = new Runnable() {       	
+		this.doUpdateInterface = new Runnable() {       	
             public void run() {
             	displayAndLogData(gloveData, gestureName, time);
             }
         };
-		SwingUtilities.invokeLater(doUpdateInterface);
+		SwingUtilities.invokeLater(this.doUpdateInterface);
 	}
 	
-	// Displays the coordinates in the UI and logs anything recorded on screen
-	public void displayAndLogData(GloveData data, String gestureName, double time)
-	{
-		// Populate the displays on the GUI with the data we're sent depending on which glove to display
-		this.recorderPanel.sensorDataPanelLeft.showCurrentData(data);
-		this.recorderPanel.sensorDataPanelRight.showCurrentData(data);
-		
-		// Log the data on the UI
-		this.loggerPanel.logGestureData(data, gestureName, time);
+	// Call the recorder's display and log method
+	public void displayAndLogData(GloveData gloveData, String gestureName, double time){
+		this.recordingPanel.displayAndLogData(gloveData, gestureName, time);
 	}
 	
 	// Construct a glove data object using the gesture recognizer
@@ -241,25 +236,14 @@ public class MainWindow extends JFrame {
 		return new GestureInstance(leftGloveData, rightGloveData, timeData);
 	}
 	
-	// Gets the time elapsed since recording started in milliseconds
-	public double getElapsedTime()
-	{
-		return (double)(System.nanoTime() - this.startTime) / 1000000;
-	}
-	
 	// Creates and instantiates the recorder panel 
 	public JPanel createRecordingTab()
 	{
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		
-		this.recorderPanel = new RecorderPanel();
-		this.controlPanel = new ControlPanel();
-		this.loggerPanel = new LoggerPanel("Log");
-		
-		panel.add(this.recorderPanel, BorderLayout.NORTH);
-		panel.add(this.controlPanel, BorderLayout.CENTER);
-		panel.add(this.loggerPanel, BorderLayout.SOUTH);
+		this.recordingPanel = new RecordingPanel();
+		panel.add(this.recordingPanel, BorderLayout.NORTH);
 		
 		return panel;
 	}
@@ -286,5 +270,11 @@ public class MainWindow extends JFrame {
 		panel.add(this.testingPanel, BorderLayout.NORTH);
 				
 		return panel;
+	}
+	
+	// Gets the time elapsed since recording started in milliseconds
+	public double getElapsedTime()
+	{
+		return (double)(System.nanoTime() - this.startTime) / 1000000;
 	}
 }
