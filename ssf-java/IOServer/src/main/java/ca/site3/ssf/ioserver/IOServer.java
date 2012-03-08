@@ -72,6 +72,7 @@ public class IOServer {
 		
 		deviceListener = new DeviceNetworkListener(arguments.devicePort, new DeviceDataParser(), commManager.getCommInQueue());
 		Thread deviceListenerThread = new Thread(deviceListener);
+		deviceListenerThread.setName("DeviceListener");
 		deviceListenerThread.start();
 		
 		isStopped = false;
