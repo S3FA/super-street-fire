@@ -1,5 +1,6 @@
 package ca.site3.ssf.gesturerecognizer;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 
 import org.apache.commons.math.geometry.Vector3D;
@@ -58,22 +59,23 @@ class JavaMLConverter {
 	}
 	
 	public static void main(String[] args) {
-		GloveData[] leftGloveData = new GloveData[10];
-		GloveData[] rightGloveData = new GloveData[10];
-		double[] timeData = new double[10];
+
+		ArrayList<GloveData> leftGloveData  = new ArrayList<GloveData>(10);
+		ArrayList<GloveData> rightGloveData = new ArrayList<GloveData>(10);
+		ArrayList<Double> timeData          = new ArrayList<Double>(10);
 		
-		for (int i = 0; i < 10; i++) {
-			leftGloveData[i] = new GloveData(
-					Math.random(), Math.random(), Math.random(),
-					Math.random(), Math.random(), Math.random(),
-					Math.random(), Math.random(), Math.random());
-			rightGloveData[i] = new GloveData(
-					Math.random(), Math.random(), Math.random(),
-					Math.random(), Math.random(), Math.random(),
-					Math.random(), Math.random(), Math.random());
-			timeData[i] = i*0.1;
+		for (int j = 0; j < 10; j++) {
+			leftGloveData.add(new GloveData(
+					j, j, j,
+					(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random(),
+					j, j, j));
+			rightGloveData.add(new GloveData(
+					j, j, j,
+					(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
+					j, j, j));
+			timeData.add(new Double(j*0.1));
 		}
-		
+			
 		GestureInstance instanceBothHands = new GestureInstance(leftGloveData, rightGloveData, timeData);
 		GestureInstance instanceLeftHand = new GestureInstance(leftGloveData, null, timeData);
 		GestureInstance instanceRightHand = new GestureInstance(null, rightGloveData, timeData);

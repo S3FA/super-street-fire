@@ -1,7 +1,10 @@
 package ca.site3.ssf.gesturerecognizer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 import net.sf.javaml.distance.fastdtw.timeseries.TimeSeriesPoint;
@@ -31,66 +34,64 @@ public class GestureInstance {
 	static final private String RIGHT_GLOVE_DATA_STR = "RIGHT_GLOVE_DATA";
 	static final private String TIME_PTS_DATA_STR    = "TIME_PTS";
 	
-	private GloveData[] leftGloveData;
-	private GloveData[] rightGloveData;
-	private double[] timePts;
+	private List<GloveData> leftGloveData  = null;
+	private List<GloveData> rightGloveData = null;
+	private List<Double>    timePts        = null;
 	
 	public GestureInstance() {
 		super();
-		this.leftGloveData  = new GloveData[1];
-		this.leftGloveData[0] = new GloveData();
-		this.rightGloveData = null;
-		this.timePts = new double[1];
+		this.leftGloveData  = new ArrayList<GloveData>();
+		this.leftGloveData.add(new GloveData());
+		this.rightGloveData = new ArrayList<GloveData>();
+		this.timePts = new ArrayList<Double>();
+		this.timePts.add(new Double(0.0));
 	}
-	
-	public GestureInstance(GloveData[] leftGloveData, GloveData[] rightGloveData, double[] timePts) {
+
+	public GestureInstance(List<GloveData> leftGloveData, List<GloveData> rightGloveData, List<Double> timePts) {
 		super();
 		this.leftGloveData  = leftGloveData;
 		this.rightGloveData = rightGloveData;
 		this.timePts = timePts;
 		assert(this.isValid());
 	}
-	
+		
 
 	public int getNumDataPts() {
 		assert(this.timePts != null);
-		return this.timePts.length;
+		return this.timePts.size();
 	}
 	public GloveData getLeftGloveDataAt(int index) {
-		assert(this.hasLeftGloveData());
-		assert(index >= 0 && index < this.leftGloveData.length);
-		return this.leftGloveData[index];
+		assert(index >= 0 && index < this.leftGloveData.size());
+		return this.leftGloveData.get(index);
 	}
 	public GloveData getRightGloveDataAt(int index) {
-		assert(this.hasRightGloveData());
-		assert(index >= 0 && index < this.rightGloveData.length);
-		return this.rightGloveData[index];
+		assert(index >= 0 && index < this.rightGloveData.size());
+		return this.rightGloveData.get(index);
 	}
 	public double getTimeAt(int index) {
-		assert(this.timePts != null);
-		assert(index >= 0 && index < this.timePts.length);
-		return this.timePts[index];
+		assert(index >= 0 && index < this.timePts.size());
+		return this.timePts.get(index);
 	}
 	
 	public boolean hasLeftGloveData() {
-		return this.leftGloveData != null;
+		return !this.leftGloveData.isEmpty();
 	}
 	public boolean hasRightGloveData() {
-		return this.rightGloveData != null;
+		return !this.rightGloveData.isEmpty();
 	}
 	public boolean isValid() {
-		boolean isValid = (this.hasLeftGloveData() || this.hasRightGloveData()) && this.timePts != null;
+		boolean isValid = (this.hasLeftGloveData() || this.hasRightGloveData()) && !this.timePts.isEmpty();
 		if (this.hasLeftGloveData() && this.hasRightGloveData()) {
-			isValid &= (this.leftGloveData.length == this.rightGloveData.length);
-			isValid &= (this.leftGloveData.length == this.timePts.length);
+			isValid &= (this.leftGloveData.size() == this.rightGloveData.size());
+			isValid &= (this.leftGloveData.size() == this.timePts.size());
 			return isValid;
 		}
 		
 		if (this.hasLeftGloveData()) {
-			isValid &= (this.leftGloveData.length == this.timePts.length);
+			isValid &= (this.leftGloveData.size() == this.timePts.size());
 		}
 		else if (this.hasRightGloveData()) {
-			isValid &= (this.rightGloveData.length == this.timePts.length);
+			isValid &= (this.rightGloveData.size() == this.timePts.size());
 		}
 		
 		return isValid;
@@ -192,13 +193,13 @@ public class GestureInstance {
 		}
 		
 		GestureInstance otherGestureInstance = (GestureInstance)other;
-		if (!Arrays.equals(this.leftGloveData, otherGestureInstance.leftGloveData)) {
+		if (!this.leftGloveData.equals(otherGestureInstance.leftGloveData)) {
 			return false;
 		}
-		if (!Arrays.equals(this.rightGloveData, otherGestureInstance.rightGloveData)) {
+		if (!this.rightGloveData.equals(otherGestureInstance.rightGloveData)) {
 			return false;
 		}
-		if (!Arrays.equals(this.timePts, otherGestureInstance.timePts)) {
+		if (!this.timePts.equals(otherGestureInstance.timePts)) {
 			return false;
 		}
 		return true;
@@ -229,15 +230,18 @@ public class GestureInstance {
 		this.rightGloveData = null;
 		int count = 0;
 		if (header.contains("L")) {
-			this.leftGloveData = new GloveData[amtOfData];
+			this.leftGloveData = new ArrayList<GloveData>(amtOfData);
+			for (int i = 0; i < amtOfData; i++) { this.leftGloveData.add(null); }
 			count++;
 		}
 		if (header.contains("R")) {
-			this.rightGloveData = new GloveData[amtOfData];
+			this.rightGloveData = new ArrayList<GloveData>(amtOfData);
+			for (int i = 0; i < amtOfData; i++) { this.rightGloveData.add(null); }
 			count++;
 		}
 		
-		this.timePts = new double[amtOfData];
+		this.timePts = new ArrayList<Double>(amtOfData);
+		for (int i = 0; i < amtOfData; i++) { this.timePts.add(null); }
 		count++;
 		
 		for (int i = 0; i < count; i++) {
@@ -256,7 +260,7 @@ public class GestureInstance {
 		int amtOfData = 0;
 		if (this.hasLeftGloveData()) {
 			result += "L";
-			amtOfData = this.leftGloveData.length;
+			amtOfData = this.leftGloveData.size();
 			
 			if (this.hasRightGloveData()) {
 				result += "R";
@@ -264,7 +268,7 @@ public class GestureInstance {
 		}
 		else {
 			result += "R";
-			amtOfData = this.rightGloveData.length;
+			amtOfData = this.rightGloveData.size();
 		}
 		
 		result += " " + amtOfData + "\n";
@@ -280,14 +284,14 @@ public class GestureInstance {
 	}
 	
 	
-	private String gloveDataToString(String gloveTitle, GloveData[] data) {
+	private String gloveDataToString(String gloveTitle, List<GloveData> data) {
 		if (data == null) {
 			return "";
 		}
 		
 		String result = gloveTitle + "\n";
-		for (int i = 0; i < data.length; i++) {
-			result += data[i].toDataString() + "\n";
+		for (int i = 0; i < data.size(); i++) {
+			result += data.get(i).toDataString() + "\n";
 		}
 		return result;
 	}
@@ -297,8 +301,8 @@ public class GestureInstance {
 			return "";
 		}
 		String result = timeTitle + "\n";
-		for (int i = 0; i < this.timePts.length; i++) {
-			result += this.timePts[i] + "\n";
+		for (int i = 0; i < this.timePts.size(); i++) {
+			result += this.timePts.get(i) + "\n";
 		}
 		return result;
 	}
@@ -337,21 +341,22 @@ public class GestureInstance {
 		return false;
 	}
 	
-	private boolean gloveDataFromString(Scanner scanner, GloveData[] data) {
-		for (int i = 0; i < data.length; i++) {
+	private boolean gloveDataFromString(Scanner scanner, List<GloveData> data) {
+		for (int i = 0; i < data.size(); i++) {
 			String nextLine = scanner.nextLine();
-			data[i] = new GloveData();
-			if (!data[i].fromDataString(nextLine)) {
+			GloveData gloveData = new GloveData();
+			data.set(i, gloveData);
+			if (!gloveData.fromDataString(nextLine)) {
 				return false;
 			}
 		}
 		return true;
 	}
-	private boolean timeDataFromString(Scanner scanner, double[] data) {
+	private boolean timeDataFromString(Scanner scanner, List<Double> data) {
 		try {
-			for (int i = 0; i < data.length; i++) {
+			for (int i = 0; i < data.size(); i++) {
 				String nextLine = scanner.nextLine();
-				data[i] = Double.parseDouble(nextLine);
+				data.set(i, Double.parseDouble(nextLine));
 			}
 		}
 		catch (NumberFormatException ex) {
@@ -361,20 +366,20 @@ public class GestureInstance {
 	}
 
 	public static void main(String[] args) {
-		GloveData[] leftGloveData = new GloveData[10];
-		GloveData[] rightGloveData = new GloveData[10];
-		double[] timeData = new double[10];
+		ArrayList<GloveData> leftGloveData  = new ArrayList<GloveData>(10);
+		ArrayList<GloveData> rightGloveData = new ArrayList<GloveData>(10);
+		ArrayList<Double> timeData = new ArrayList<Double>(10);
 		
 		for (int i = 0; i < 10; i++) {
-			leftGloveData[i] = new GloveData(
+			leftGloveData.add(new GloveData(
 					Math.random(), Math.random(), Math.random(),
 					Math.random(), Math.random(), Math.random(),
-					Math.random(), Math.random(), Math.random());
-			rightGloveData[i] = new GloveData(
+					Math.random(), Math.random(), Math.random()));
+			rightGloveData.add(new GloveData(
 					Math.random(), Math.random(), Math.random(),
 					Math.random(), Math.random(), Math.random(),
-					Math.random(), Math.random(), Math.random());
-			timeData[i] = i;
+					Math.random(), Math.random(), Math.random()));
+			timeData.add(new Double(i));
 		}
 		
 		GestureInstance toStrInstance = new GestureInstance(leftGloveData, rightGloveData, timeData);
@@ -385,18 +390,6 @@ public class GestureInstance {
 		fromStrInstance.fromDataString(dataStr);
 		
 		System.out.println(fromStrInstance.equals(toStrInstance));
-		
-		System.out.println(JavaMLConverter.gestureInstanceToTimeSeries(fromStrInstance, 10).toString());
-		System.out.println();
-		
-		double[][] trainingSeq = fromStrInstance.getTrainingSequence();
-		for (int i = 0; i < trainingSeq.length; i++) {
-			for (int j = 0; j < trainingSeq[i].length; j++) {
-				System.out.print(trainingSeq[i][j] + " ");
-			}
-			System.out.println();
-		}
-		
 	}
 
 }
