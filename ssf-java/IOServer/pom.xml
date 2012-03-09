@@ -45,5 +45,10 @@
   		<artifactId>GestureRecognizer</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
+  	
+  	<dependency>
+          <groupId>be.ac.ulg.montefiore.run.jahmm</groupId>
+          <artifactId>jahmm</artifactId>
+    </dependency>
   </dependencies>
 </project>
