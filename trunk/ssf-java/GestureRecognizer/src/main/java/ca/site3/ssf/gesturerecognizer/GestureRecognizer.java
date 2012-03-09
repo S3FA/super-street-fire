@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 
 import ca.site3.ssf.gamemodel.IGameModel;
 
@@ -111,20 +112,20 @@ public class GestureRecognizer {
 		// Build a nonsense test data set
 		GestureInstance[] gestureInstances = new GestureInstance[20];
 		for (int i = 0; i < 20; i++) {
-			GloveData[] leftGloveData = new GloveData[10];
-			GloveData[] rightGloveData = new GloveData[10];
-			double[] timeData = new double[10];
+			ArrayList<GloveData> leftGloveData  = new ArrayList<GloveData>(10);
+			ArrayList<GloveData> rightGloveData = new ArrayList<GloveData>(10);
+			ArrayList<Double> timeData          = new ArrayList<Double>(10);
 			
 			for (int j = 0; j < 10; j++) {
-				leftGloveData[j] = new GloveData(
+				leftGloveData.add(new GloveData(
 						j, j, j,
 						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random(),
-						j, j, j);
-				rightGloveData[j] = new GloveData(
+						j, j, j));
+				rightGloveData.add(new GloveData(
 						j, j, j,
 						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
-						j, j, j);
-				timeData[j] = j*0.1;
+						j, j, j));
+				timeData.add(new Double(j*0.1));
 			}
 			
 			gestureInstances[i] = new GestureInstance(leftGloveData, rightGloveData, timeData);
