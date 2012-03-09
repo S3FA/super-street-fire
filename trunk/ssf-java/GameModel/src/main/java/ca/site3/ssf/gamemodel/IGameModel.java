@@ -1,5 +1,7 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.EnumSet;
+
 /**
  * Interface representing the game model for Super Street Fire.
  * This is the only interface that the gamemodel package offers to other
@@ -20,6 +22,9 @@ public interface IGameModel {
 	void initiateNextState();				   // Or use the InitiateNextStateCommand class
 	void togglePauseGame();					   // Or use the TogglePauseGameCommand class
 
+	void touchFireEmitter(FireEmitter.Location location, int index,
+			float intensity, EnumSet<Entity> contributors);
+	
 	void addGameModelListener(IGameModelListener l);
 	void removeGameModelListener(IGameModelListener l);
 	

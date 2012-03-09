@@ -1,7 +1,11 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.EnumSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
 
 /**
  * Default implementation of GameModel.
@@ -81,6 +85,11 @@ public class GameModel implements IGameModel {
 
 	public void togglePauseGame() {
 		this.currState.togglePause();
+	}
+	
+	public void touchFireEmitter(FireEmitter.Location location, int index,
+								 float intensity, EnumSet<Entity> contributors) {
+		// TODO
 	}
 	
 	public ActionFactory getActionFactory() {

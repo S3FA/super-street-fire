@@ -12,7 +12,7 @@ import java.util.Map;
  * @author Callum
  *
  */
-class FireEmitter {
+public class FireEmitter {
 	
 	public enum Location  { LEFT_RAIL, RIGHT_RAIL, OUTER_RING };
 	public enum FlameType { ATTACK_FLAME, BLOCK_FLAME, NON_GAME_FLAME };
