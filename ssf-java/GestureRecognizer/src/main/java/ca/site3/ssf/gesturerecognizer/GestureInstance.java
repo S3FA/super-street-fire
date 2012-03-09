@@ -1,13 +1,9 @@
 package ca.site3.ssf.gesturerecognizer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-
-import net.sf.javaml.distance.fastdtw.timeseries.TimeSeriesPoint;
 
 import org.apache.commons.math.geometry.Vector3D;
 
