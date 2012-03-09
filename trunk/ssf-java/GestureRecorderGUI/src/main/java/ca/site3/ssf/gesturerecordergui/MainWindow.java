@@ -45,7 +45,7 @@ public class MainWindow extends JFrame {
 	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(31337, eventQueue);
 	private Thread consumerThread;
 	private Runnable doUpdateInterface;
-	
+
 	private JTabbedPane tabbedPane = null;
 	
 	public MainWindow() {
@@ -57,16 +57,11 @@ public class MainWindow extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 
-		// Create and instantiate the recording, training and testing tab
-		JPanel recordingTab = createRecordingTab();
-		JPanel trainingTab = createTrainingTab();
-		JPanel testingTab = createTestingTab();
-		
 		// Create the tabbed pane
 		this.tabbedPane = new JTabbedPane(); 
-		this.tabbedPane.addTab("Recording", null, recordingTab);
-		this.tabbedPane.addTab("Training", null, trainingTab);
-		this.tabbedPane.addTab("Testing", null, testingTab);
+		this.tabbedPane.addTab("Recording", null, createRecordingTab());
+		this.tabbedPane.addTab("Training", null, createTrainingTab());
+		this.tabbedPane.addTab("Testing", null, createTestingTab());
 		
 		// Setup the frame's contents...
 		Container contentPane = this.getContentPane();
@@ -123,10 +118,11 @@ public class MainWindow extends JFrame {
         SwingUtilities.invokeLater(doCreateAndShowGUI);
 	}
 
-	//TODO: move recorder specific logic to the recorder panel
 	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
 	public void hardwareEventListener(GloveEvent gloveEvent) {
-		//TODO: Use this.tabbedPane.getSelectedIndex(); to determine what to do with hardware input
+		// Grab the currently selected tab, we do different things with the data stream based on the tab
+		int selectedTab = this.tabbedPane.getSelectedIndex();
+		
 		if (gloveEvent.isButtonPressed())
 		{
 			// If we just started recording, mark the start time. This will be a brand new gesture and file.
@@ -139,6 +135,7 @@ public class MainWindow extends JFrame {
 				this.startTime = System.nanoTime();
 			}
 			
+			this.recordingPanel.setNewFile(false);
 			this.recordingPanel.setRecordMode(true);
 		}
 		else
@@ -146,32 +143,32 @@ public class MainWindow extends JFrame {
 			// If we're ending a recording, create and export the gesture instance object
 			if(this.recordingPanel.getRecordMode())
 			{
-				GestureInstance instance = createGestureInstance();
+				GestureInstance instance = new GestureInstance(this.leftGloveData, this.rightGloveData, this.timeData);
 				
-				//TODO: Check which tab is currently selected, if we're on the trainer and are in training mode then do something else
-				// If export to CSV is selected, perform the export
-				if(this.recordingPanel.getCsvExportState())
+				// selectedTab == 0 is recording, == 1 is Training, == 2 is Testing
+				if (selectedTab == 0)
 				{
-					this.recordingPanel.exportToCsv(instance);
+					// If export to CSV is selected, perform the export
+					if(this.recordingPanel.getCsvExportState())
+					{
+						this.recordingPanel.exportToCsv(instance);
+					}
+					
+					// If export to the gesture recognizer is selected, export to the GestureRecognizer
+					if(this.recordingPanel.getRecognizerExportState())
+					{
+						this.recordingPanel.exportToRecognizer(instance);
+					}
 				}
-				
-				// If export to the gesture recognizer is selected, export to the GestureRecognizer
-				if(this.recordingPanel.getRecognizerExportState())
+				else if (selectedTab == 2 && this.testingPanel.isEngineLoaded())
 				{
-					this.recordingPanel.exportToRecognizer(instance);
-				}
-				
-				if(this.testingPanel.isEngineLoaded())
-				{
+					// If we're on the testing
 					this.testingPanel.testGestureInstance(instance);
 				}
 			}
 			
-			this.recordingPanel.setRecordMode(false);
+			this.recordingPanel.setRecordMode(false); 
 		}
-		
-		// Set the recording indicator
-		//this.recordingPanel(this.recordingPanel.getRecordMode());
 		
 		// Build the gesture coordinates object and final vars to use in the UI thread
 		final double time = getElapsedTime();
@@ -210,30 +207,6 @@ public class MainWindow extends JFrame {
 								 Double.toString(mag[0]) + "," + Double.toString(mag[1]) + "," + Double.toString(mag[2]));
 		
 		return gloveData;
-	}
-	
-	// Create a gesture instance from a list of left glove, right glove and time objects
-	public GestureInstance createGestureInstance()
-	{
-		GloveData[] leftGloveData = new GloveData[this.leftGloveData.size()];
-		GloveData[] rightGloveData = new GloveData[this.rightGloveData.size()];
-		double[] timeData = new double[this.timeData.size()];
-		
-		int count = 0;
-		for (GloveData data : this.leftGloveData)
-		{
-			data.toDataString();
-			leftGloveData[count] = data;
-			count++;
-		}
-		
-		count = 0;
-		for (GloveData data : this.rightGloveData)
-		{
-			rightGloveData[count] = data;
-		}
-		
-		return new GestureInstance(leftGloveData, rightGloveData, timeData);
 	}
 	
 	// Creates and instantiates the recorder panel 

@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognitionResult;
@@ -62,6 +63,7 @@ class TestingPanel extends JPanel implements ActionListener {
 		
 		this.controlPanel = new ControlPanel();
 		this.fileChooser = new JFileChooser();
+		this.fileChooser.setFileFilter(new FileNameExtensionFilter("recognition engine files (*.eng)", "eng"));
 		this.fileName = new JTextField(25);
 		this.fileName.setEditable(false);
 		

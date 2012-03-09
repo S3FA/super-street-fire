@@ -70,15 +70,10 @@ class FileInfoPanel extends JPanel {
 	public void exportToCsv(GestureInstance instance){
 		try
 		{	
-			int iteration = 0;
-			
-	        // If the file exists, check if the next iteration of the file exists until we can make a new one
-	        while (this.isNewFile && new File("Data/" + gestureName + Integer.toString(iteration) + ".csv").exists())
-	        {
-	        	iteration++;
-	        }
+			String suffix = ".ins";
+			int iteration = getNextFileIteration(suffix);
 	       
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + ".csv"), !this.isNewFile);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + suffix), !this.isNewFile);
         	
 	        // If we just created the file, 
 	        if(this.isNewFile)
@@ -147,16 +142,11 @@ class FileInfoPanel extends JPanel {
 	public void exportToRecognizer(GestureInstance instance){
 		try
 		{	
-			int iteration = 0;
-			
-	        // If the file exists, check if the next iteration of the file exists until we can make a new one
-	        while (new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt").exists())
-	        {
-	        	iteration++;
-	        }
+			String suffix = "_Recognizer.engine";
+			int iteration = getNextFileIteration(suffix);
 	       
 	        // Save the data to a file readable by the GestureRecognizer
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.txt"), false);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.engine"), false);
 	        writer.write(instance.toDataString());
 	 
 		    writer.flush();
@@ -173,16 +163,11 @@ class FileInfoPanel extends JPanel {
 	{
 		try
 		{	
-			int iteration = 0;
-			
-	        // If the file exists, check if the next iteration of the file exists until we can make a new one
-	        while (new File("Data/" + gestureName + Integer.toString(iteration) + "_RecognizerEngine.txt").exists())
-	        {
-	        	iteration++;
-	        }
+			String suffix = "_RecognizerResults.txt";
+			int iteration = getNextFileIteration(suffix);
 	       	        
 	        // Save the data to a file readable by the Gesture Tester
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_RecognizerEngine.txt"), false);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + suffix), false);
 	        gestureRecognizer.saveRecognizerEngine(writer);
 	 
 		    writer.flush();
@@ -200,10 +185,18 @@ class FileInfoPanel extends JPanel {
 		this.isNewFile = isNewFile;
 	}
 	
-	// Gets the new file status
-	public boolean getNewFile()
+	// Gets the next valid version # of a file 
+	public int getNextFileIteration(String fileName)
 	{
-		return this.isNewFile;
+		int iteration = 0;
+		
+        // If the file exists, check if the next iteration of the file exists until we can make a new one
+        while (new File("Data/" + gestureName + Integer.toString(iteration) + fileName).exists())
+        {
+        	iteration++;
+        }
+        
+        return iteration;
 	}
 	
 	// Gets the state of the csv export checkbox

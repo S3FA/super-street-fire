@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ca.site3.ssf.gesturerecognizer.GestureDataSet;
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
@@ -61,6 +62,9 @@ class TrainingPanel extends JPanel implements ActionListener {
 		wrapperPanel.setLayout(layout);
 		
 		this.fileChooser = new JFileChooser();
+		this.fileChooser.setMultiSelectionEnabled(true);
+		this.fileChooser.setFileFilter(new FileNameExtensionFilter("gesture instance files (*.ins)", "ins"));
+		
 		this.gestureType = formLayoutHelper.constructGestureComboBox();
 		this.fileName = new JTextField(25);
 		this.fileName.setEditable(false);
@@ -109,8 +113,12 @@ class TrainingPanel extends JPanel implements ActionListener {
 		int fileStatus = this.fileChooser.showOpenDialog(this.selectFileButton);
 		
 		if (fileStatus == JFileChooser.APPROVE_OPTION) {
-            File file = this.fileChooser.getSelectedFile();
-            this.loggerPanel.appendLogText(file.getAbsolutePath() + "\n");
+            File[] selectedFiles = this.fileChooser.getSelectedFiles();
+            
+            for(File file : selectedFiles)
+            {
+            	this.loggerPanel.appendLogText(file.getAbsolutePath() + "\n");
+            }
         } 
 	}
 	
