@@ -15,9 +15,7 @@ public class GloveEvent extends DeviceEvent {
 	
 	private final double[] magnetometer;
 	
-	private final boolean buttonPressed;
-	
-	
+	private final boolean buttonPressed;	
 	
 	public GloveEvent(Source src, Device dvc,
 			long timestamp, boolean buttonDown,

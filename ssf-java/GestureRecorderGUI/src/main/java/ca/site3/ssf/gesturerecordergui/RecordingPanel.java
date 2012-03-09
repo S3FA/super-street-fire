@@ -91,12 +91,6 @@ class RecordingPanel extends JPanel {
 		this.fileInfoPanel.setNewFile(isNewFile);
 	}
 	
-	// Gets whether we're making a new file
-	public boolean getNewFile()
-	{
-		return this.fileInfoPanel.getNewFile();
-	}
-	
 	public boolean getCsvExportState()
 	{
 		return this.fileInfoPanel.getCsvExportState();
