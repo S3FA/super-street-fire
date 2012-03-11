@@ -1,24 +1,22 @@
 package ca.site3.ssf.gamemodel;
 
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
+
 class RingmasterAction extends Action {
 	
 	public RingmasterAction(FireEmitterModel fireEmitterModel) {
 		super(fireEmitterModel);
 	}
-
+	
 	@Override
 	FireEmitter.FlameType getActionFlameType() {
 		return FireEmitter.FlameType.NON_GAME_FLAME;
 	}
-	
-	@Override
-	GameModel.Entity getContributorEntity() {
-		return GameModel.Entity.RINGMASTER_ENTITY;
-	}
 
 	@Override
-	void tickSimulator(double dT, FireEmitterSimulator simulator) {
+	boolean tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
+		return simulator.isFinished();
 	}
 
 	@Override
@@ -27,5 +25,10 @@ class RingmasterAction extends Action {
 		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
 		assert(actionSignaller != null);
 		actionSignaller.fireOnRingmasterAction();
+	}
+
+	@Override
+	Entity getContributorEntity() {
+		return GameModel.Entity.RINGMASTER_ENTITY;
 	}
 }

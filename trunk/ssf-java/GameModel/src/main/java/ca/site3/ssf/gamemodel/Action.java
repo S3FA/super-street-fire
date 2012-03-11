@@ -1,6 +1,7 @@
 package ca.site3.ssf.gamemodel;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 import ca.site3.ssf.common.MultiLerp;
@@ -30,10 +31,8 @@ abstract class Action {
 			return false;
 		}
 		
-		ArrayList<FireEmitterSimulator> newSimWave = new ArrayList<FireEmitterSimulator>(width);
+		ArrayList<FireEmitterSimulator> newBurstSims = new ArrayList<FireEmitterSimulator>(width);
 		
-		int count = 0;
-
 		// Go through the full wave of simulations required for what has been specified
 		// by the parameters and add a simulator for each emitter in the wave
 		for (int i = 0; i < width; i++) {
@@ -44,12 +43,12 @@ abstract class Action {
 				return false;
 			}
 			
-			newSimWave.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(),
-					count, 0.0, numBursts, (MultiLerp)intensityLerp.clone()));
+			newBurstSims.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(),
+					i, 0.0, numBursts, (MultiLerp)intensityLerp.clone()));
 		}
 
 		// Successfully generated a new wave of fire emitter simulators, add it to this action and exit with success!
-		this.wavesOfOrderedFireSims.add(newSimWave);
+		this.wavesOfOrderedFireSims.add(newBurstSims);
 		return true;
 	}
 	
@@ -81,7 +80,6 @@ abstract class Action {
 		
 		ArrayList<FireEmitterSimulator> newSimWave = new ArrayList<FireEmitterSimulator>(travelLength);
 		
-		int count = 0;
 		double initialDelayTimeCounter = 0.0;
 		
 		// Go through the full wave of simulations required for what has been specified
@@ -95,7 +93,7 @@ abstract class Action {
 			}
 			
 			newSimWave.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(),
-					count, initialDelayTimeCounter, width, (MultiLerp)intensityLerp.clone()));
+					i, initialDelayTimeCounter, width, (MultiLerp)intensityLerp.clone()));
 			
 			initialDelayTimeCounter += intensityLerp.getTotalTimeLength();
 		}
@@ -104,6 +102,7 @@ abstract class Action {
 		this.wavesOfOrderedFireSims.add(newSimWave);
 		return true;
 	}
+	
 	
 	FireEmitterModel getFireEmitterModel() {
 		return this.fireEmitterModel;
@@ -143,14 +142,36 @@ abstract class Action {
 			this.firstTickDone = true;
 		}
 		
+		// Go through every simulator
+		Iterator<ArrayList<FireEmitterSimulator>> arrayIter = this.wavesOfOrderedFireSims.iterator();
+		while (arrayIter.hasNext()) {
+			
+			ArrayList<FireEmitterSimulator> currArray = arrayIter.next();
+			Iterator<FireEmitterSimulator> simIter    = currArray.iterator();
+			
+			while (simIter.hasNext()) {
+				FireEmitterSimulator currSimulator = simIter.next();
+				if (this.tickSimulator(dT, currSimulator)) {
+					simIter.remove();
+				}
+			}
+			
+			if (currArray.isEmpty()) {
+				arrayIter.remove();
+			}
+			
+		}
+		
+		/*
 		for (ArrayList<FireEmitterSimulator> simulatorWave : this.wavesOfOrderedFireSims) {
 			for (FireEmitterSimulator simulator : simulatorWave) {
 				this.tickSimulator(dT, simulator);
 			}
 		}
+		*/
 	}
 	
-	abstract void tickSimulator(double dT, FireEmitterSimulator simulator);
+	abstract boolean tickSimulator(double dT, FireEmitterSimulator simulator);
 	abstract void onFirstTick();
 	abstract GameModel.Entity getContributorEntity();
 	abstract FireEmitter.FlameType getActionFlameType();

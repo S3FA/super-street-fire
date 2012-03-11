@@ -1,5 +1,8 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.ArrayList;
+
+import ca.site3.ssf.common.MultiLerp;
 
 /**
  * Builds a versatile action for pleasing the crowd - has no effect on the game whatsoever,
@@ -17,10 +20,33 @@ class CrowdPleaserAction extends Action {
 		super(fireEmitterModel);
 		this.colourEntity = colourEntity;
 	}
-
+	
+	/**
+	 * Allows the appending of fire bursts to the existing action.
+	 * @param fireEmitter The fire emitter that will be emitting flames.
+	 * @param numBursts The number of bursts of the given intensity lerp to perform.
+	 * @param intensityLerp The intensity interpolation(s) to perform.
+	 * @return true on success, false on failure.
+	 */
+	boolean addFireBursts(FireEmitter fireEmitter, int numBursts, MultiLerp intensityLerp) {
+		// Make sure the parameters are at least moderately correct
+		if (intensityLerp == null || fireEmitter == null || numBursts <= 0) {
+			assert(false);
+			return false;
+		}
+		
+		if (this.wavesOfOrderedFireSims.isEmpty()) {
+			this.wavesOfOrderedFireSims.add(new ArrayList<FireEmitterSimulator>(10));
+		}
+		ArrayList<FireEmitterSimulator> fireSims = this.wavesOfOrderedFireSims.get(0);
+		fireSims.add(new FireEmitterSimulator(this, fireEmitter, 0, 0, 0.0, numBursts, (MultiLerp)intensityLerp.clone()));
+		return true;
+	}	
+	
 	@Override
-	void tickSimulator(double dT, FireEmitterSimulator simulator) {
+	boolean tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
+		return simulator.isFinished();
 	}
 
 	@Override
