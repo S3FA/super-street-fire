@@ -23,7 +23,7 @@ public interface IGameModel {
 	void togglePauseGame();					   // Or use the TogglePauseGameCommand class
 
 	void touchFireEmitter(FireEmitter.Location location, int index,
-			float intensity, EnumSet<Entity> contributors);
+			float intensity, EnumSet<Entity> contributors);  // Or use the TouchFireEmitterCommand class
 	
 	void addGameModelListener(IGameModelListener l);
 	void removeGameModelListener(IGameModelListener l);

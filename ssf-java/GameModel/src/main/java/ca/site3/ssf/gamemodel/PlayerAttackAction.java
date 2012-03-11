@@ -74,8 +74,9 @@ public class PlayerAttackAction extends Action {
 	}
 	
 	@Override
-	void tickSimulator(double dT, FireEmitterSimulator simulator) {
+	boolean tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
+		return simulator.isFinished();
 	}
 	
 	@Override

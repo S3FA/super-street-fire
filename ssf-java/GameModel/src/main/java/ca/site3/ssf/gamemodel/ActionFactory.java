@@ -111,6 +111,7 @@ final public class ActionFactory {
 	//final public Action buildRingmasterAction(double totalDurationInSecs, int width, int startEmitterIdx) {
 	//}
 	
+	
 	// Crowd-Pleasing Actions (internal package use only) *******************************************************
 	
 	/**
@@ -154,6 +155,34 @@ final public class ActionFactory {
 		return action;
 	}
 
+	
+	final Action buildCrowdPleaserTouchAction(GameModel.Entity colourEntity, FireEmitter.Location location,
+											  int index, double totalDurationInSecs, int numBursts) {
+		
+		final double MAX_INTENSITY_DELAY = 0.05;
+		if (totalDurationInSecs <= 2*MAX_INTENSITY_DELAY) {
+			assert(false);
+			return null;
+		}
+		
+		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
+		FireEmitter emitter = fireEmitterModel.getEmitter(location, index);
+		if (emitter == null) {
+			assert(false);
+			return null;
+		}
+		
+		CrowdPleaserAction action = new CrowdPleaserAction(fireEmitterModel, colourEntity);
+		MultiLerp intensityLerp = this.buildIntensityMultiLerp(
+				MAX_INTENSITY_DELAY, totalDurationInSecs - MAX_INTENSITY_DELAY,
+				totalDurationInSecs, totalDurationInSecs);
+		assert(intensityLerp != null);
+		action.addFireBursts(emitter, numBursts, intensityLerp);
+		
+		return action;
+	}
+	
+	
 	// *************************************************************************************************
 	
 	/**
