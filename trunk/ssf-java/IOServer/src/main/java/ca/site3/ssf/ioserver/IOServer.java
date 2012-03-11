@@ -60,12 +60,13 @@ public class IOServer {
 		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
 												args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage);
 		game = new GameModel(gameConfig);
+		commManager  = new CommunicationsManager();
 		
-		mainFrame = new MainWindow(game);
+		
+		mainFrame = new MainWindow(game, commManager.getCommandQueue());
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 		
-		commManager  = new CommunicationsManager();
 		
 		gameEventRouter = new GameEventRouter(commManager.getCommOutQueue(), commManager.getGuiOutQueue());
 		game.addGameModelListener(gameEventRouter);
@@ -100,6 +101,10 @@ public class IOServer {
 			deltaFrameTime = currentTime - lastFrameTime;
 			lastFrameTime = currentTime;
 			millisSinceStart = currentTime - startTime;
+			
+			while ( ! commManager.getCommandQueue().isEmpty() ) {
+				game.executeCommand(commManager.getCommandQueue().remove());
+			}
 			
 			try {
 				game.tick(deltaFrameTime/1000.0);
