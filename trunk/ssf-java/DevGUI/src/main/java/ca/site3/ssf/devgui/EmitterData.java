@@ -1,10 +1,15 @@
 package ca.site3.ssf.devgui;
 
 import java.awt.Color;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 
-final class EmitterData {
+class EmitterData {
+	
 	final float maxIntensity;
 	final Color colour;
+	private Ellipse2D.Float shape = null;
+	
 	
 	EmitterData() {
 		this.colour = Color.black;
@@ -35,4 +40,17 @@ final class EmitterData {
 			this.colour = new Color(totalRed, totalGreen, totalBlue);
 		}
 	}
+	
+	void setShape(Ellipse2D.Float shape) {
+		assert(shape != null);
+		this.shape = shape;
+	}
+	
+	boolean contains(float x, float y) {
+		if (this.shape == null) {
+			return false;
+		}
+		return this.shape.contains(x, y);
+	}
+	
 }

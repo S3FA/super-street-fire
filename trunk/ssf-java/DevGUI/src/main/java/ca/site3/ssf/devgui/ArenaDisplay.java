@@ -10,20 +10,28 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.util.EnumSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import ca.site3.ssf.gamemodel.FireEmitter;
+import ca.site3.ssf.gamemodel.FireEmitter.Location;
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameConfig;
+import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
-class ArenaDisplay extends JPanel {
+class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = 7000442714767712317L;
 
@@ -44,6 +52,7 @@ class ArenaDisplay extends JPanel {
 	final static Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
 	final static Color RINGMASTER_COLOUR = Color.orange;
 	
+	final private IGameModel gameModel;
 	final private FireEmitterConfig fireEmitterConfig;
 	
 	// Emitter data is stored in the same orderings as the FireEmitterModel in the gamemodel
@@ -55,7 +64,7 @@ class ArenaDisplay extends JPanel {
 	
 	RoundResult[] roundResults = null;
 	
-	public ArenaDisplay(GameConfig gameConfig, FireEmitterConfig fireEmitterConfig) {
+	public ArenaDisplay(IGameModel gameModel, FireEmitterConfig fireEmitterConfig) {
 		super();
 
 		this.setBorder(BorderFactory.createLineBorder(Color.black, 2));
@@ -63,9 +72,10 @@ class ArenaDisplay extends JPanel {
 		
 		this.fireEmitterConfig = fireEmitterConfig;
 		assert(fireEmitterConfig != null);
-		assert(gameConfig != null);
+		this.gameModel = gameModel;
+		assert(gameModel != null);
 		
-		this.roundResults = new RoundResult[gameConfig.getNumRoundsPerMatch()];
+		this.roundResults = new RoundResult[gameModel.getConfiguration().getNumRoundsPerMatch()];
 		for (int i = 0; i < this.roundResults.length; i++) {
 			this.roundResults[i] = null;
 		}
@@ -81,6 +91,9 @@ class ArenaDisplay extends JPanel {
 		for (int i = 0; i < fireEmitterConfig.getNumOuterRingEmitters(); i++) {
 			this.outerRingEmitterData[i] = new EmitterData();
 		}
+		
+		this.addMouseListener(this);
+		this.addMouseMotionListener(this);
 	}
 	
 	public void setRoundResult(int roundNum, RoundResult roundResult) {
@@ -166,6 +179,9 @@ class ArenaDisplay extends JPanel {
 			Ellipse2D.Float rightRailEmitterShape = new Ellipse2D.Float(rightRailEmitterPos.x,
 					rightRailEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 			
+			this.leftRailEmitterData[i].setShape(leftRailEmitterShape);
+			this.rightRailEmitterData[i].setShape(rightRailEmitterShape);
+			
 			g2.setPaint(this.leftRailEmitterData[i].colour);
 			g2.fill(leftRailEmitterShape);
 			g2.setPaint(this.rightRailEmitterData[i].colour);
@@ -212,6 +228,8 @@ class ArenaDisplay extends JPanel {
 			Ellipse2D.Float outerRingEmitterShape  = 
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 			
+			this.outerRingEmitterData[i].setShape(outerRingEmitterShape);
+			
 			g2.setPaint(this.outerRingEmitterData[i].colour);
 			g2.fill(outerRingEmitterShape);
 			g2.setPaint(Color.black);
@@ -233,6 +251,8 @@ class ArenaDisplay extends JPanel {
 			Ellipse2D.Float outerRingEmitterShape  =
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
 		
+			this.outerRingEmitterData[i].setShape(outerRingEmitterShape);
+			
 			g2.setPaint(this.outerRingEmitterData[i].colour);
 			g2.fill(outerRingEmitterShape);
 			g2.setPaint(Color.black);
@@ -323,6 +343,73 @@ class ArenaDisplay extends JPanel {
 			xPos += ROUND_SHAPE_SIZE + DISTANCE_BETWEEN_ROUND_SHAPES;
 		}
 		
+	}
+
+	public void mouseClicked(MouseEvent event) {
+		this.mouseTouchEmitters(event);
+	}
+
+	public void mouseEntered(MouseEvent event) {
+	}
+
+	public void mouseExited(MouseEvent event) {
+	}
+
+	public void mousePressed(MouseEvent event) {
+		this.mouseTouchEmitters(event);
+	}
+
+	public void mouseReleased(MouseEvent event) {
+	}
+
+	public void mouseDragged(MouseEvent event) {
+		this.mouseTouchEmitters(event);
+	}
+
+	public void mouseMoved(MouseEvent event) {
+		this.mouseTouchEmitters(event);
+	}
+	
+	/**
+	 * Private helper that will take a mouse event and then update the emitters so that it simulates
+	 * what the AndroidGUI will eventually be doing by having the Ringmaster 'touch' fire emitters in order
+	 * to turn them on and create crowd-pleasing displays of fire.
+	 * @param event
+	 */
+	private void mouseTouchEmitters(MouseEvent event) {
+		EnumSet<IGameModel.Entity> contributors = EnumSet.noneOf(IGameModel.Entity.class);
+		if ((event.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK) {
+			contributors.add(Entity.PLAYER1_ENTITY);
+		}
+		if ((event.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK) == MouseEvent.BUTTON2_DOWN_MASK) {
+			contributors.add(Entity.PLAYER2_ENTITY);
+		}
+		if ((event.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) == MouseEvent.BUTTON3_DOWN_MASK) {
+			contributors.add(Entity.RINGMASTER_ENTITY);
+		}
+		
+		if (contributors.isEmpty()) {
+			return;
+		}
+		
+		for (int i = 0; i < this.leftRailEmitterData.length; i++) {
+			if (this.leftRailEmitterData[i].contains(event.getX(), event.getY())) {
+				this.gameModel.touchFireEmitter(Location.LEFT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors);
+				return;
+			}
+		}
+		for (int i = 0; i < this.rightRailEmitterData.length; i++) {
+			if (this.rightRailEmitterData[i].contains(event.getX(), event.getY())) {
+				this.gameModel.touchFireEmitter(Location.RIGHT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors);
+				return;
+			}
+		}
+		for (int i = 0; i < this.outerRingEmitterData.length; i++) {
+			if (this.outerRingEmitterData[i].contains(event.getX(), event.getY())) {
+				this.gameModel.touchFireEmitter(Location.OUTER_RING, i, FireEmitter.MAX_INTENSITY, contributors);
+				return;
+			}
+		}
 	}
 
 }

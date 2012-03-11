@@ -44,10 +44,7 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	private ArenaDisplay arenaDisplay = null;
 	private GameInfoPanel infoPanel   = null;
 	private ControlPanel controlPanel = null;
-	
-	
-    private IGameModel gameModel;	
-	
+    private IGameModel gameModel      = null;	
 	
 	public MainWindow(IGameModel gameModel) {
 		this.gameModel = gameModel;
@@ -60,7 +57,7 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		this.setLayout(new BorderLayout());
 		
 		// Setup the frame's contents...
-		this.arenaDisplay = new ArenaDisplay(gameModel.getConfiguration(), new FireEmitterConfig(true, 16, 8));
+		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8));
 		Container contentPane = this.getContentPane();
 		contentPane.add(this.arenaDisplay, BorderLayout.CENTER);
 		
