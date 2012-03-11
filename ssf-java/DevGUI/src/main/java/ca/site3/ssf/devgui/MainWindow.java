@@ -4,11 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.util.Queue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
@@ -46,8 +48,12 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	private ControlPanel controlPanel = null;
     private IGameModel gameModel      = null;	
 	
-	public MainWindow(IGameModel gameModel) {
+    private Queue<AbstractGameModelCommand> commandQueue;
+    
+    
+	public MainWindow(IGameModel gameModel, Queue<AbstractGameModelCommand> commandQueue) {
 		this.gameModel = gameModel;
+		this.commandQueue = commandQueue;
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
@@ -67,7 +73,7 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		this.infoPanel = new GameInfoPanel();
 		infoAndControlPanel.add(this.infoPanel, BorderLayout.NORTH);
 		
-		this.controlPanel = new ControlPanel(this.gameModel);
+		this.controlPanel = new ControlPanel(gameModel.getActionFactory(), commandQueue);
 		infoAndControlPanel.add(this.controlPanel, BorderLayout.CENTER);
 		
 		contentPane.add(infoAndControlPanel, BorderLayout.SOUTH);

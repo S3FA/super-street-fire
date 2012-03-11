@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 
 /**
@@ -20,7 +21,7 @@ public class CommunicationsManager {
 	
 	private BlockingQueue<IGameModelEvent> guiOutQueue = new LinkedBlockingQueue<IGameModelEvent>();
 	
-	private BlockingQueue<GUIEvent> guiInQueue = new LinkedBlockingQueue<GUIEvent>();
+	private BlockingQueue<AbstractGameModelCommand> commandQueue = new LinkedBlockingQueue<AbstractGameModelCommand>();
 	
 	
 	private Thread commOutConsumer;
@@ -39,7 +40,7 @@ public class CommunicationsManager {
 	
 	@SuppressWarnings("unchecked")
 	public void shutdown() {
-		for (BlockingQueue<?> q : Arrays.asList(commOutQueue,commInQueue,guiOutQueue,guiInQueue)) {
+		for (BlockingQueue<?> q : Arrays.asList(commOutQueue,commInQueue,guiOutQueue,commandQueue)) {
 			q.clear();
 		}
 		for (Thread t : Arrays.asList(commOutConsumer, commInConsumer, guiOutConsumer, guiInConsumer)) {
@@ -62,7 +63,7 @@ public class CommunicationsManager {
 	}
 
 
-	BlockingQueue<GUIEvent> getGuiInQueue() {
-		return guiInQueue;
+	BlockingQueue<AbstractGameModelCommand> getCommandQueue() {
+		return commandQueue;
 	}
 }

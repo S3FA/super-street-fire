@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Queue;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -12,15 +13,18 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import ca.site3.ssf.gamemodel.IGameModel;
-import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
-import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
+import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
+import ca.site3.ssf.gamemodel.Action;
+import ca.site3.ssf.gamemodel.ActionFactory;
+import ca.site3.ssf.gamemodel.ExecuteGenericActionCommand;
+import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gesturerecognizer.GestureType;
 
 @SuppressWarnings("serial")
 class ControlPanel extends JPanel implements ActionListener {
 	
-	private IGameModel gameModel    = null;
+	private ActionFactory actionFactory = null;
+	private Queue<AbstractGameModelCommand> commandQueue = null;
 	
 	private JButton nextStateButton = null;
 	
@@ -35,11 +39,12 @@ class ControlPanel extends JPanel implements ActionListener {
 	
 	
 	
-	ControlPanel(IGameModel gameModel) {
+	ControlPanel(ActionFactory actionFactory, Queue<AbstractGameModelCommand> commandQueue) {
 		super();
 		
-		this.gameModel = gameModel;
-		assert(gameModel != null);
+		this.actionFactory = actionFactory;
+		this.commandQueue = commandQueue;
+		assert(actionFactory != null && commandQueue != null);
 		
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Controls");
 		border.setTitleColor(Color.black);
@@ -75,7 +80,7 @@ class ControlPanel extends JPanel implements ActionListener {
 
 	public void actionPerformed(ActionEvent event) {
 		if (event.getSource() == this.nextStateButton) {
-			this.gameModel.initiateNextState();
+			this.commandQueue.add(new InitiateNextStateCommand());
 		}
 		else if (event.getSource() == this.executeP1ActionButton) {
 			this.executePlayerAction(1);
@@ -92,8 +97,9 @@ class ControlPanel extends JPanel implements ActionListener {
 			GestureType gesture = GestureType.valueOf(GestureType.class,
 				this.playerActionComboBox.getSelectedItem().toString());
 			
-			this.gameModel.executeGenericAction(this.gameModel.getActionFactory().buildPlayerAction(
-					playerNum, gesture.getActionFactoryType(), gesture.getUsesLeftHand(), gesture.getUsesRightHand()));
+			Action action = actionFactory.buildPlayerAction(
+					playerNum, gesture.getActionFactoryType(), gesture.getUsesLeftHand(), gesture.getUsesRightHand());
+			this.commandQueue.add(new ExecuteGenericActionCommand(action));
 					
 		}
 		catch (IllegalArgumentException ex) {

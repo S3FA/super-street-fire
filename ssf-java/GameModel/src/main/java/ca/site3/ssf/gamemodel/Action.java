@@ -12,7 +12,7 @@ import ca.site3.ssf.common.MultiLerp;
  * @author Callum
  *
  */
-abstract class Action {
+public abstract class Action {
 	
 	private boolean firstTickDone = false;
 	protected FireEmitterModel fireEmitterModel = null;
