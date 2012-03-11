@@ -88,6 +88,12 @@ public class GameModel implements IGameModel {
 	public void touchFireEmitter(FireEmitter.Location location, int index,
 								 float intensity, EnumSet<Entity> contributors) {
 		
+		// Make sure the game is in the ringmaster control state, otherwise
+		// this ability should not be allowed!
+		if (this.currState.getStateType() != GameState.GameStateType.RINGMASTER_STATE) {
+			return;
+		}
+		
 		final double TOTAL_EMITTER_ON_LENGTH_IN_SECS = 0.5;
 		
 		ActionFactory actionFactory = this.getActionFactory();
