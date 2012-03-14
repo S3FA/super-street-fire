@@ -2,7 +2,7 @@
 
 = Glove Data Layout =
 
-|| *Byte Starting Address* || *Size* || Description ||
+|| *Byte Starting Address* || *Size (in bytes)* || Description ||
 || 0 || 6 || MAC address of AP that we are Associated with (for location) ||
 || 6 || 1 || Channel we are on. ||
 || 7 || 1 || RSSI ||
