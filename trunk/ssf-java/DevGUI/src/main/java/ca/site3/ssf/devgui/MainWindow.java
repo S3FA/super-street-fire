@@ -57,8 +57,8 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
-		this.setPreferredSize(new Dimension(1000, 900));
-		this.setMinimumSize(new Dimension(800, 800));
+		this.setPreferredSize(new Dimension(1000, 750));
+		this.setMinimumSize(new Dimension(1000, 750));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		
@@ -83,8 +83,6 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		
 		this.gameModel.addGameModelListener(this);
 	}
-
-	
 
 	// GameModel 
 	public void onGameModelEvent(final IGameModelEvent event) {
@@ -151,12 +149,44 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	}
 
 	private void onRoundEnded(RoundEndedEvent event) {
+		
 		this.arenaDisplay.setRoundResult(event.getRoundNumber(), event.getRoundResult());
-		this.arenaDisplay.setInfoText("Time Out");
+		String infoText = "Round " + event.getRoundNumber() + ":\n";
+		if (event.getRoundTimedOut()) {
+			infoText += "Time Out\n";
+		}
+		switch (event.getRoundResult()) {
+		case PLAYER1_VICTORY:
+			infoText += "Player 1 Wins!";
+			break;
+		case PLAYER2_VICTORY:
+			infoText += "Player 2 Wins!";
+			break;
+		case TIE:
+			infoText += "Tie!";
+			break;
+		default:
+			assert(false);
+			break;
+		}
+
+		this.arenaDisplay.setInfoText(infoText);
 	}
 
 	private void onMatchEnded(MatchEndedEvent event) {
-		this.arenaDisplay.setInfoText("Match Over");
+		String infoText = "Match Over\n";
+		switch (event.getMatchResult()) {
+			case PLAYER1_VICTORY:
+				infoText += "Player 1 Wins!";
+				break;
+			case PLAYER2_VICTORY:
+				infoText += "Player 2 Wins!";
+				break;
+			default:
+				assert(false);
+				break;
+		}
+		this.arenaDisplay.setInfoText(infoText);
 	}
 
 	private void onPlayerAttackAction(PlayerAttackActionEvent event) {

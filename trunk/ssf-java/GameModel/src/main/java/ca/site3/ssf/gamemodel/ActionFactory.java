@@ -88,11 +88,11 @@ final public class ActionFactory {
 				break;
 				
 			case HADOUKEN_ATTACK:
-				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.HADOUKEN_ATTACK, playerNum, 4.0, 3, 5.0f);
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.HADOUKEN_ATTACK, playerNum, 4.0, 3, 2.0f);
 				break;
 				
 			case SONIC_BOOM_ATTACK:
-				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum, 4.0, 3, 5.0f);
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum, 4.0, 3, 2.0f);
 				break;
 			
 			default:
