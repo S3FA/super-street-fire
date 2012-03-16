@@ -60,6 +60,10 @@ class RingmasterGameState extends GameState {
 
 	@Override
 	void executeAction(Action action) {
+		if (action instanceof PlayerAttackAction ||
+			action instanceof PlayerBlockAction) {
+			return;
+		}
 		this.activeRingmasterActions.add(action);
 	}
 

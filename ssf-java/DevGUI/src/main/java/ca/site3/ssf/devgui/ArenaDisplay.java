@@ -44,7 +44,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	
 	final static private Font INTENSITY_FONT = new Font("SansSerif", Font.PLAIN, 12);
 	final static private Font PLAYER_FONT    = new Font("SansSerif", Font.BOLD, 16);
-	final static private Font COUNTDOWN_FONT = new Font("SansSerif", Font.ITALIC, 32);
+	final static private Font COUNTDOWN_FONT = new Font("SansSerif", Font.ITALIC, 20);
 	final static private Font ROUND_FONT     = new Font("SansSerif", Font.BOLD, 24);
 	
 	// Colours used when drawing the fire emitters whose flame belongs to a particular entity in the game...
@@ -142,8 +142,8 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final float CENTER_X = size.width/2.0f;
 		final float CENTER_Y = size.height/2.0f;
 		
-		size.setSize(Math.min(950, size.width), Math.min(800, size.height));
-		
+		size.setSize(Math.min(750, size.width), Math.min(750, size.height));
+
 		final float WIDTH_BETWEEN_RAILS       = size.width * 0.2f;
 		final float HALF_WIDTH_BETWEEN_RAILS  = WIDTH_BETWEEN_RAILS / 2.0f;
 		final float FULL_RAIL_LENGTH          = WIDTH_BETWEEN_RAILS * 2.0f; // Number comes from the schematic
@@ -296,7 +296,12 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		// Draw the countdown text...
 		FontMetrics COUNTDOWN_FONT_METRICS = g2.getFontMetrics(ArenaDisplay.COUNTDOWN_FONT);
 		g2.setFont(ArenaDisplay.COUNTDOWN_FONT);
-		g2.drawString(this.infoText, CENTER_X - COUNTDOWN_FONT_METRICS.stringWidth(this.infoText) / 2.0f, CENTER_Y);
+		
+		float tempY = 0;
+		for (String line : this.infoText.split("\n")) {
+            g2.drawString(line, CENTER_X - COUNTDOWN_FONT_METRICS.stringWidth(line) / 2.0f, CENTER_Y + tempY);
+            tempY += COUNTDOWN_FONT_METRICS.getHeight();
+		}
 		
 		// Draw the round display text and fill shapes...
 		FontMetrics ROUND_FONT_METRICS = g2.getFontMetrics(ArenaDisplay.ROUND_FONT);
