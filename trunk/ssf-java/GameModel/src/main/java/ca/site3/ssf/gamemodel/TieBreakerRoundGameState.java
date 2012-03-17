@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
+
 /**
  * State for settling ties in the Super Street Fire game, also aptly referred to
  * as a "sudden death state". 
@@ -19,6 +21,8 @@ class TieBreakerGameState extends GameState {
 	
 	private double secsSinceLastP1Action = Double.MAX_VALUE;
 	private double secsSinceLastP2Action = Double.MAX_VALUE;
+	
+	private double roundTime = 0.0;
 	
 	public TieBreakerGameState(GameModel gameModel) {
 		super(gameModel);
@@ -70,17 +74,16 @@ class TieBreakerGameState extends GameState {
 				}
 			}
 			
-			assert(victoryPlayer != null);
-			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, victoryPlayer));
+			this.onPlayerVictory(victoryPlayer);
 			return;
 		}
 		
 		// Check for one player winning or the other...
 		if (p1.isKOed()) {
-			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, p2));
+			this.onPlayerVictory(p2);
 		}
 		else if (p2.isKOed()) {
-			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, p1));
+			this.onPlayerVictory(p1);
 		}
 		
 		// Simulate all of the queued actions...
@@ -101,6 +104,9 @@ class TieBreakerGameState extends GameState {
 		// Update time since last attack counters
 		this.secsSinceLastP1Action += dT;
 		this.secsSinceLastP2Action += dT;
+		
+		this.roundTime += dT;
+		this.gameModel.getActionSignaller().fireOnRoundPlayTimerChanged((int)Math.ceil(this.roundTime));
 	}
 
 	@Override
@@ -153,4 +159,20 @@ class TieBreakerGameState extends GameState {
 		return GameState.GameStateType.TIE_BREAKER_ROUND_STATE;
 	}
 
+	private void onPlayerVictory(Player victoryPlayer) {
+		assert(victoryPlayer != null);
+		
+		victoryPlayer.incrementNumRoundWins();
+		this.gameModel.incrementNumRoundsPlayed();
+		
+		// Signal an event for the round ending in victory for a player...
+		RoundResult result = RoundResult.PLAYER1_VICTORY;
+		if (victoryPlayer.getPlayerNumber() == 2) {
+			result = RoundResult.PLAYER2_VICTORY;
+		}
+		
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, false);
+		this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, victoryPlayer));
+	}
+	
 }
