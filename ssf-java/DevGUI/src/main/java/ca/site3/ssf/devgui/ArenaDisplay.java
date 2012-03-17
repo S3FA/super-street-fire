@@ -345,7 +345,15 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			g2.fill(roundShape);
 			g2.setPaint(Color.black);
 			g2.draw(roundShape);
-			xPos += ROUND_SHAPE_SIZE + DISTANCE_BETWEEN_ROUND_SHAPES;
+			
+			if (i == this.roundResults.length-2) {
+				xPos += ROUND_SHAPE_SIZE + DISTANCE_BETWEEN_ROUND_SHAPES;
+				g2.draw(new Line2D.Float(xPos, yPos, xPos, yPos + ROUND_SHAPE_SIZE));
+				xPos += DISTANCE_BETWEEN_ROUND_SHAPES;
+			}
+			else {
+				xPos += ROUND_SHAPE_SIZE + DISTANCE_BETWEEN_ROUND_SHAPES;
+			}
 		}
 		
 	}

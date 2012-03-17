@@ -87,10 +87,10 @@ class PlayerInfoPanel extends JPanel {
 		}
 		
 		this.lastAction.setText(actionType.toString());
-		this.timeOfLastAction.setText("T-" + clockTime);
+		this.timeOfLastAction.setText("" + clockTime);
 	}
 	void setLastActionAsBlock(double clockTime) {
 		this.lastAction.setText("BLOCK");
-		this.timeOfLastAction.setText("T-" + clockTime);
+		this.timeOfLastAction.setText("" + clockTime);
 	}	
 }
