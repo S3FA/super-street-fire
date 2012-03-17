@@ -59,7 +59,7 @@ class RoundBeginningGameState extends GameState {
 		
 		// NOTE: We use a number slightly less than zero because there's the 'FIGHT' portion
 		// of the count down.
-		if (this.fightCounter <= -1.0) {
+		if (this.fightCounter <= -0.25) {
 			// Change to the next state...
 			this.goToNextState();
 			return;
@@ -105,30 +105,31 @@ class RoundBeginningGameState extends GameState {
 	 * are executed on all gamemodel listeners.
 	 */
 	private void updateCountState() {
+		int roundNumber = this.gameModel.getNumRoundsPlayed()+1;
 		switch (this.currState) {
 		
 			case BEFORE_THREE:
-				this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.THREE);
+				this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.THREE, roundNumber);
 				this.currState = RoundBeginningGameState.CountState.THREE;
 				break;
 				
 			case THREE:
 				if (this.fightCounter <= 2.0) {
-					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.TWO);
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.TWO, roundNumber);
 					this.currState = RoundBeginningGameState.CountState.TWO;
 				}
 				break;
 				
 			case TWO:
 				if (this.fightCounter <= 1.0) {
-					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.ONE);
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.ONE, roundNumber);
 					this.currState = RoundBeginningGameState.CountState.ONE;
 				}
 				break;
 				
 			case ONE:
 				if (this.fightCounter <= 0.0) {
-					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.FIGHT);
+					this.gameModel.getActionSignaller().fireOnRoundBeginFightTimerChanged(RoundBeginCountdownType.FIGHT, roundNumber);
 					this.currState = RoundBeginningGameState.CountState.FIGHT;
 				}
 				break;
@@ -161,14 +162,11 @@ class RoundBeginningGameState extends GameState {
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
 		assert(p1 != null && p2 != null);
-		
-		final int NUM_WINS_FOR_VICTORY = gameConfig.getNumRequiredVictoryRoundsForMatchVictory();
-		assert(p1.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
-		assert(p2.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
-		
-		// Check for a complete match tie (i.e., over the entire match there has
-		// been a full tie between players) - this should almost never happen...
-		return (p1.getNumRoundWins() == NUM_WINS_FOR_VICTORY && p2.getNumRoundWins() == NUM_WINS_FOR_VICTORY);
+
+		// Check for a complete match tie: Each player has the same number of wins and the
+		// number of rounds per match has been reached
+		return (p1.getNumRoundWins() == p2.getNumRoundWins() &&
+				this.gameModel.getNumRoundsPlayed() == gameConfig.getNumRoundsPerMatch());
 	}
 	
 }

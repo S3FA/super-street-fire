@@ -99,8 +99,8 @@ class GameModelActionSignaller {
 	 * Triggers each of the listener's callbacks for a round begin fight timer change.
 	 * @param threeTwoOneFightTime The latest/current value of the timer.
 	 */
-	void fireOnRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent.RoundBeginCountdownType threeTwoOneFightTime) {
-		RoundBeginTimerChangedEvent event = new RoundBeginTimerChangedEvent(threeTwoOneFightTime);
+	void fireOnRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent.RoundBeginCountdownType threeTwoOneFightTime, int roundNumber) {
+		RoundBeginTimerChangedEvent event = new RoundBeginTimerChangedEvent(threeTwoOneFightTime, roundNumber);
 		for (IGameModelListener listener : this.listeners) {
 			try {
 				listener.onGameModelEvent(event);

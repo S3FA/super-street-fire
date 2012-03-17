@@ -194,20 +194,27 @@ class RoundInPlayState extends GameState {
 		}
 		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, this.countdownTimeInSecs <= 0.0);
 		
-		// Check to see if the match is over...
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);
 		
 		final int NUM_WINS_FOR_VICTORY = gameConfig.getNumRequiredVictoryRoundsForMatchVictory();
 		assert(victoryPlayer.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
-		if (victoryPlayer.getNumRoundWins() == NUM_WINS_FOR_VICTORY) {
+		
+		Player nonVictoryPlayer = this.gameModel.getPlayer(Player.getOpposingPlayerNum(victoryPlayer.getPlayerNumber()));
+		assert(nonVictoryPlayer != null && nonVictoryPlayer != victoryPlayer);
+		
+		// Check special case of a player match victory on win...
+		// The match will be over if the player who won this round has enough wins to beat a match or
+		// if they have more wins than the other player and the total number of rounds played is equal
+		// to the number of rounds in a match
+		if (victoryPlayer.getNumRoundWins() == NUM_WINS_FOR_VICTORY ||
+			(victoryPlayer.getNumRoundWins() > nonVictoryPlayer.getNumRoundWins() &&
+			 this.gameModel.getNumRoundsPlayed() == gameConfig.getNumRoundsPerMatch())) {
+			
 			// The player who won this round just won the match as well
 			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, victoryPlayer));
 			return;
 		}
-		
-		// The match should still have rounds left to play
-		assert(this.gameModel.getNumRoundsPlayed() < gameConfig.getNumRoundsPerMatch());
 
 		// The round is over but the match isn't
 		this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, victoryPlayer));
@@ -221,29 +228,30 @@ class RoundInPlayState extends GameState {
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
 		
-		p1.incrementNumRoundWins();
-		p2.incrementNumRoundWins();
+		// We don't increment the number of wins for either player on a tie... 
 		
 		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), RoundResult.TIE, this.countdownTimeInSecs <= 0.0);
 		
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);
 		
-		final int NUM_WINS_FOR_VICTORY = gameConfig.getNumRequiredVictoryRoundsForMatchVictory();
-		assert(p1.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
-		assert(p2.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
-		
-		// Check for a complete match tie (i.e., over the entire match there has
-		// been a full tie between players) - this should almost never happen...
-		if (p1.getNumRoundWins() == NUM_WINS_FOR_VICTORY && p2.getNumRoundWins() == NUM_WINS_FOR_VICTORY) {
-			// The round is over, it looks like the match will be settled in a tie-breaker,
-			// but that state won't happen until the next round begins (see RoundBeginningGameState)...
-			this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, null));
-			return;
-		}
-		
-		// Check to see if either player won the game...
-		if (this.checkForMatchOverVictory(p1) || this.checkForMatchOverVictory(p2)) {
+		// Check for the special case of a player match victory on a tie:
+		// If one player has won more rounds than the other and the number of rounds in a match has been played then
+		// the player with the most round victories has won the match...
+		if (p1.getNumRoundWins() != p2.getNumRoundWins() &&
+			this.gameModel.getNumRoundsPlayed() == gameConfig.getNumRoundsPerMatch()) {
+			
+			// There was a tie but the match is nevertheless over because one of the players had more wins than the other...
+			Player matchWinner = null;
+			if (p1.getNumRoundWins() > p2.getNumRoundWins()) {
+				matchWinner = p1;
+			}
+			else {
+				assert(p1.getNumRoundWins() < p2.getNumRoundWins());
+				matchWinner = p2;
+			}
+			
+			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, matchWinner));
 			return;
 		}
 		
@@ -251,26 +259,4 @@ class RoundInPlayState extends GameState {
 		this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, null));
 	}
 	
-	/**
-	 * Helper function, used to check if the given player has won the entire match.
-	 * @param playerToCheck The player to check.
-	 */
-	private boolean checkForMatchOverVictory(Player playerToCheck) {
-		
-		// Check to see if the match is over...
-		GameConfig gameConfig = this.gameModel.getConfig();
-		assert(gameConfig != null);
-		
-		final int NUM_WINS_FOR_VICTORY = gameConfig.getNumRequiredVictoryRoundsForMatchVictory();
-		assert(playerToCheck.getNumRoundWins() <= NUM_WINS_FOR_VICTORY);
-		if (playerToCheck.getNumRoundWins() == NUM_WINS_FOR_VICTORY) {
-			// The player who won this round just won the match as well
-			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, playerToCheck));
-			return true;
-		}
-		
-		return false;
-	}
-	
-
 }

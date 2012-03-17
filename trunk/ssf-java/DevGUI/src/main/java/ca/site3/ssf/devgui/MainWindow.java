@@ -145,11 +145,16 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	}
 
 	private void onRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent event) {
+		// Clear the old arena display results on the beginning of a new match...
+		if (event.getRoundNumber() == 1) {
+			this.arenaDisplay.clearRoundResults();
+		}
+		
 		this.arenaDisplay.setInfoText(event.getThreeTwoOneFightTime().toString());
 	}
 
 	private void onRoundEnded(RoundEndedEvent event) {
-		
+
 		this.arenaDisplay.setRoundResult(event.getRoundNumber(), event.getRoundResult());
 		String infoText = "Round " + event.getRoundNumber() + ":\n";
 		if (event.getRoundTimedOut()) {
