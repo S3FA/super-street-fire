@@ -1,18 +1,106 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
+/**
+ * State for settling ties in the Super Street Fire game, also aptly referred to
+ * as a "sudden death state". 
+ * Players will attack each other until one depletes the life of the other first - there
+ * is ALWAYS a victor in this state - if both players knock each other out simultaneously
+ * then the victory will go 
+ * @author Callum
+ *
+ */
 class TieBreakerGameState extends GameState {
 
+	private Collection<Action> activeActions = new ArrayList<Action>();
+	
+	private double secsSinceLastP1Action = Double.MAX_VALUE;
+	private double secsSinceLastP2Action = Double.MAX_VALUE;
+	
 	public TieBreakerGameState(GameModel gameModel) {
 		super(gameModel);
-		// TODO Auto-generated constructor stub
+		
+		// Clear the complete fire emitter state, just for good measure
+		this.gameModel.getFireEmitterModel().resetAllEmitters();
+		
+		// Make sure both players health is at full
+		Player p1 = this.gameModel.getPlayer1();
+		Player p2 = this.gameModel.getPlayer2();
+		assert(p1 != null && p2 != null);
+		p1.resetHealth();
+		p2.resetHealth();
 	}
 
 	@Override
 	void tick(double dT) {
-		// TODO Auto-generated method stub
-
-		// TODO: this.gameModel.getActionSignaller().fireOnRoundEnded(result, true);
+		// Check to see if a player has won/lost the match...
+		Player p1 = this.gameModel.getPlayer1();
+		Player p2 = this.gameModel.getPlayer2();
 		
+		if (p1.isKOed() && p2.isKOed()) {
+			Player victoryPlayer = null;
+			
+			// Check to see which player took the most damage...
+			if (p1.getNonTruncatedHealth() < p2.getNonTruncatedHealth()) {
+				victoryPlayer = p2;
+			}
+			else if (p2.getNonTruncatedHealth() < p1.getNonTruncatedHealth()) {
+				victoryPlayer = p1;
+			}
+			else {
+				// Check to see which player took the most damage last...
+				if (p1.getLastDamageAmount() > p2.getLastDamageAmount()) {
+					victoryPlayer = p2;
+				}
+				else if (p2.getLastDamageAmount() > p1.getLastDamageAmount()) {
+					victoryPlayer = p1;
+				}
+				else {
+					// Desperation... Randomly choose a winner in the most absurd of dire circumstances...
+					int result = ((int)(Math.random() * Integer.MAX_VALUE)) % 2;
+					if (result == 0) {
+						victoryPlayer = p1;
+					}
+					else {
+						victoryPlayer = p2;
+					}
+				}
+			}
+			
+			assert(victoryPlayer != null);
+			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, victoryPlayer));
+			return;
+		}
+		
+		// Check for one player winning or the other...
+		if (p1.isKOed()) {
+			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, p2));
+		}
+		else if (p2.isKOed()) {
+			this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, p1));
+		}
+		
+		// Simulate all of the queued actions...
+		Iterator<Action> iter = this.activeActions.iterator();
+		while (iter.hasNext()) {
+			
+			Action currAction = iter.next();
+			if (currAction.isFinished()) {
+				iter.remove();
+				continue;
+			}
+			currAction.tick(dT);
+		}
+		
+		// Send event to update all the fire emitters...
+		this.gameModel.getFireEmitterModel().fireAllEmitterChangedEvent();
+		
+		// Update time since last attack counters
+		this.secsSinceLastP1Action += dT;
+		this.secsSinceLastP2Action += dT;
 	}
 
 	@Override
@@ -27,8 +115,32 @@ class TieBreakerGameState extends GameState {
 
 	@Override
 	void executeAction(Action action) {
-		// TODO Auto-generated method stub
-
+		switch (action.getContributorEntity()) {
+			case PLAYER1_ENTITY:
+				if (this.secsSinceLastP1Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+					// Player 1 has already made an action recently, exit without counting the current action
+					return;
+				}
+				
+				this.secsSinceLastP1Action = 0.0;
+				break;
+				
+			case PLAYER2_ENTITY:
+				if (this.secsSinceLastP2Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+					// Player 2 has already made an action recently, exit without counting the current action
+					return;
+				}
+				
+				this.secsSinceLastP2Action = 0.0;
+				break;
+				
+			// We only interpret player actions when the game is in play
+			case RINGMASTER_ENTITY:
+			default:
+				return;
+		}
+		
+		this.activeActions.add(action);
 	}
 
 	@Override

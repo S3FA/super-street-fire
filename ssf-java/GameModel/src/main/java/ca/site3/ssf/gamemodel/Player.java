@@ -14,6 +14,7 @@ class Player {
 	private float health;
 	private int numRoundWins;
 	private boolean isInvincible;
+	private float lastDmgAmount;   // The amount of damage that this player suffered last
 	
 	private GameConfig gameConfig = null;
 	private GameModelActionSignaller actionSignaller = null;
@@ -39,7 +40,7 @@ class Player {
 	 */
 	void reset() {
 		this.resetHealth();
-		this.numRoundWins = 0;
+		this.numRoundWins  = 0;
 	}
 	
 	/**
@@ -47,6 +48,7 @@ class Player {
 	 */
 	void resetHealth() {
 		this.setHealth(Player.FULL_HEALTH);
+		this.lastDmgAmount = 0;
 	}
 	
 	/**
@@ -67,6 +69,7 @@ class Player {
 			return;
 		}
 		this.setHealth(this.health - damageAmt);
+		this.lastDmgAmount = damageAmt;
 	}
 	
 	/**
@@ -76,7 +79,7 @@ class Player {
 	 */
 	void setHealth(float health) {
 		float healthBefore = this.health;
-		this.health = Math.min(Player.FULL_HEALTH, Math.max(health, Player.KO_HEALTH));
+		this.health = Math.min(Player.FULL_HEALTH, health);
 		
 		// If the health actually changed then trigger an event to indicate the change to all gamemodel listeners
 		if (this.health != healthBefore) {
@@ -109,10 +112,19 @@ class Player {
 	}
 	
 	/**
-	 * Gets the health of this player.
+	 * Gets the health of this player, truncated to ensure it's in the domain/interval of [KO_HEALTH, FULL_HEALTH].
 	 * @return The health amount.
 	 */
 	float getHealth() {
+		return Math.max(this.health, Player.KO_HEALTH);
+	}
+	
+	/**
+	 * Gets the health of this player, not truncated to the domain/interval... it can assume any value in
+	 * [-Float.MAX_VALUE, FULL_HEALTH].
+	 * @return The non-truncated health amount.
+	 */
+	float getNonTruncatedHealth() {
 		return this.health;
 	}
 	
@@ -122,6 +134,15 @@ class Player {
 	 */
 	int getNumRoundWins() {
 		return this.numRoundWins;
+	}
+	
+	/**
+	 * Gets the amount of damage that was done to this player during the last damage taking
+	 * it had. This is reset whenever health is reset.
+	 * @return The amount of damage this player took last.
+	 */
+	float getLastDamageAmount() {
+		return this.lastDmgAmount;
 	}
 	
 	/**

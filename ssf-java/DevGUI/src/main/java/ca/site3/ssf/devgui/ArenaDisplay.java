@@ -75,7 +75,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		this.gameModel = gameModel;
 		assert(gameModel != null);
 		
-		this.roundResults = new RoundResult[gameModel.getConfiguration().getNumRoundsPerMatch()];
+		this.roundResults = new RoundResult[gameModel.getConfiguration().getNumRoundsPerMatch() + 1]; // +1 for the tie breaker round...
 		for (int i = 0; i < this.roundResults.length; i++) {
 			this.roundResults[i] = null;
 		}
@@ -409,6 +409,10 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 				return;
 			}
 		}
+		
+		// Outer ring can only have a ringmaster entity contribute to it
+		contributors.clear();
+		contributors.add(Entity.RINGMASTER_ENTITY);
 		for (int i = 0; i < this.outerRingEmitterData.length; i++) {
 			if (this.outerRingEmitterData[i].contains(event.getX(), event.getY())) {
 				this.gameModel.touchFireEmitter(Location.OUTER_RING, i, FireEmitter.MAX_INTENSITY, contributors);
