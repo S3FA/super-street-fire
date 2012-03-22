@@ -71,7 +71,17 @@
     <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>2.4.1</version>
+    </dependency>
+    
+    <dependency>
+    	<groupId>org.slf4j</groupId>
+	  	<artifactId>slf4j-api</artifactId>
+    </dependency>
+    
+    <dependency>
+    	<groupId>ca.site3.ssf</groupId>
+    	<artifactId>GameModel</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
     </dependency>
 </dependencies>
   

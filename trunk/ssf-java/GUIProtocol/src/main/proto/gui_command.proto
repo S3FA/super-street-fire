@@ -5,13 +5,18 @@ option java_package = "ca.site3.ssf.guiprotocol";
 
 message Command {
   
+  // corresponds to AbstractGameModelCommand classes
   enum CommandType {
-    EXECUTE_ACTION = 0;
-    TOGGLE_PAUSE = 1;
-    KILL_GAME = 2;
-    NEXT_STATE = 3;
+    EXECUTE_GENERIC_ACTION = 0; // 
+    EXECUTE_PLAYER_ACTION = 1;
+    TOGGLE_PAUSE = 2;
+    KILL_GAME = 3; // no args
+    NEXT_STATE = 4; // no args
+    TOUCH_EMITTER = 5; // FireEmitterType, emitterIndex, intensity, emitterEntities
   }
   
+  
+  // for EXECUTE_PLAYER_ACTION (PlayerActionType)
   enum PlayerAction {
     BLOCK = 0;
     JAB_ATTACK = 1;
@@ -20,14 +25,33 @@ message Command {
     SONIC_BOOM_ATTACK = 4;
   }
   
+  // for EXECUTE_ACTION or TOUCH_EMITTER
   enum Player {
+    RINGMASTER = 0;
     P1 = 1;
     P2 = 2;
   }
   
+  // for TOUCH_EMITTER
+  enum FireEmitterType {
+    LEFT_RAIL = 0;
+    RIGHT_RAIL = 1;
+    OUTER_RING = 2;
+  }
   
+  
+  // lets deserializer know which fields (if any) to look for
   required CommandType type = 1;
+  
+  // EXECUTE_ACTION
   optional PlayerAction playerAction = 2;
   optional Player player = 3;
+  optional bool leftHand = 4;
+  optional bool rightHand = 5;
   
+  // TOUCH_EMITTER
+  optional FireEmitterType emitterType = 6;
+  optional float intensity = 7;
+  optional int32 emitterIndex = 8;
+  repeated Player emitterEntities = 9;
 }
