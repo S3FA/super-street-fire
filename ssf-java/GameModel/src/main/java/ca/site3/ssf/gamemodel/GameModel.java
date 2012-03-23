@@ -159,7 +159,7 @@ public class GameModel implements IGameModel {
 		this.getFireEmitterModel().resetAllEmitters();
 		this.getPlayer1().reset();
 		this.getPlayer2().reset();
-		assert(this.numRoundsPlayed <= this.getConfig().getNumRoundsPerMatch());
+		assert(this.numRoundsPlayed <= this.getConfig().getMaxNumRoundsPerMatch());
 		this.numRoundsPlayed = 0;
 	}
 	

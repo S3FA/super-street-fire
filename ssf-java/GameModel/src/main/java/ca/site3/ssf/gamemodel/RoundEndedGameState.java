@@ -6,11 +6,13 @@ import java.util.Iterator;
 
 class RoundEndedGameState extends GameState {
 
-	final static private double ROUND_ENDED_LENGTH_IN_SECS = 3.0;
+	final static private double ROUND_ENDED_LENGTH_IN_SECS = 4.0;
 	
 	//final private Player roundVictor;
 	
 	private Collection<Action> roundEndActions = null;
+	
+	private boolean firstTick = true;
 	
 	/**
 	 * Constructor for RoundEndedGameState.
@@ -76,6 +78,13 @@ class RoundEndedGameState extends GameState {
 
 	@Override
 	void tick(double dT) {
+		
+		// Make absolutely sure that before any further flame emitters are turned on that
+		// all of the emitters are initially reset
+		if (this.firstTick) {
+			this.firstTick = false;
+			this.gameModel.getFireEmitterModel().resetAllEmitters();
+		}
 		
 		// Once all the flashy actions are done we move on to the next state...
 		if (this.roundEndActions.isEmpty()) {

@@ -10,6 +10,7 @@ class MatchEndedGameState extends GameState {
 
 	//final private Player victoryPlayer;
 	private Collection<Action> matchEndActions = new ArrayList<Action>(3);
+	private boolean firstTick = true;
 	
 	public MatchEndedGameState(GameModel gameModel, Player victoryPlayer) {
 		super(gameModel);
@@ -34,15 +35,15 @@ class MatchEndedGameState extends GameState {
 		
 		Action tempAction = null;
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 3.0, 1);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 4.0, 1);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 3.0, 5);
+		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 4.0, 4);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 3.0, 5);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 4.0, 4);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
@@ -52,6 +53,13 @@ class MatchEndedGameState extends GameState {
 
 	@Override
 	void tick(double dT) {
+		
+		// Make absolutely sure that before any further flame emitters are turned on that
+		// all of the emitters are initially reset
+		if (this.firstTick) {
+			this.firstTick = false;
+			this.gameModel.getFireEmitterModel().resetAllEmitters();
+		}
 		
 		// Once all the flashy actions are done we move on to the next state...
 		if (this.matchEndActions.isEmpty()) {

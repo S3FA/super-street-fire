@@ -104,6 +104,7 @@ class RoundInPlayState extends GameState {
 	@Override
 	void killToIdle() {
 		// Place the game into the idle state within the next tick
+		this.clearAndResetAllEmitters();
 		this.gameModel.setNextGameState(new IdleGameState(this.gameModel));
 	}
 
@@ -178,11 +179,22 @@ class RoundInPlayState extends GameState {
 	}
 	
 	/**
+	 * Helper function to clear all active actions in this state and reset all fire emitters.
+	 */
+	private void clearAndResetAllEmitters() {
+		this.activeActions.clear();
+		this.gameModel.getFireEmitterModel().resetAllEmitters();
+	}
+	
+	/**
 	 * Helper function, only called when the round has officially been won by one player and
 	 * lost by the other.
 	 */
 	private void roundWasWon(Player victoryPlayer) {
 		assert(victoryPlayer != null);
+		
+		// Stop all emitters immediately
+		this.clearAndResetAllEmitters();
 		
 		victoryPlayer.incrementNumRoundWins();
 		this.gameModel.incrementNumRoundsPlayed();
@@ -224,6 +236,9 @@ class RoundInPlayState extends GameState {
 	 * Helper function, only called when the round has officially been tied by both players.
 	 */
 	private void roundWasTied() {
+		// Stop all emitters immediately
+		this.clearAndResetAllEmitters();
+		
 		this.gameModel.incrementNumRoundsPlayed();
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
