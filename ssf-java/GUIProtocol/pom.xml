@@ -77,6 +77,11 @@
     	<groupId>org.slf4j</groupId>
 	  	<artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
     
     <dependency>
     	<groupId>ca.site3.ssf</groupId>
