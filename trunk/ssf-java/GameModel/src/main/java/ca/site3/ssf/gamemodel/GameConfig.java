@@ -57,6 +57,9 @@ final public class GameConfig {
 	public int getNumRoundsPerMatch() {
 		return this.numRoundsPerMatch;
 	}
+	public int getMaxNumRoundsPerMatch() {
+		return this.getNumRoundsPerMatch() + 1;
+	}
 	public int getNumRequiredVictoryRoundsForMatchVictory() {
 		return (int)(this.numRoundsPerMatch/2) + 1;
 	}

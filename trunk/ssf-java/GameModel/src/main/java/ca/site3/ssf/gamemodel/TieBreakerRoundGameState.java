@@ -111,6 +111,7 @@ class TieBreakerGameState extends GameState {
 
 	@Override
 	void killToIdle() {
+		this.clearAndResetAllEmitters();
 		this.gameModel.setNextGameState(new IdleGameState(this.gameModel));
 	}
 
@@ -159,8 +160,20 @@ class TieBreakerGameState extends GameState {
 		return GameState.GameStateType.TIE_BREAKER_ROUND_STATE;
 	}
 
+	/**
+	 * Helper function to clear all active actions in this state and reset all fire emitters.
+	 */
+	private void clearAndResetAllEmitters() {
+		this.activeActions.clear();
+		this.gameModel.getFireEmitterModel().resetAllEmitters();
+	}
+	
+	
 	private void onPlayerVictory(Player victoryPlayer) {
 		assert(victoryPlayer != null);
+		
+		// Stop all emitters immediately
+		this.clearAndResetAllEmitters();
 		
 		victoryPlayer.incrementNumRoundWins();
 		this.gameModel.incrementNumRoundsPlayed();

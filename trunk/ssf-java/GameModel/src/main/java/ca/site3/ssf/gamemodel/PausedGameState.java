@@ -20,6 +20,7 @@ class PausedGameState extends GameState {
 	@Override
 	void tick(double dT) {
 		// The game is paused...
+		//this.gameModel.getFireEmitterModel().resetAllEmitters();
 	}
 
 	@Override
