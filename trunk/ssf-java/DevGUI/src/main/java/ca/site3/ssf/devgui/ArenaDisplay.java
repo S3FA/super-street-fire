@@ -20,12 +20,10 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Queue;
-import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -36,7 +34,6 @@ import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
-import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
@@ -62,7 +59,6 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	final static Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
 	final static Color RINGMASTER_COLOUR = Color.orange;
 	
-	final private IGameModel gameModel;
 	final private FireEmitterConfig fireEmitterConfig;
 	
 	private Image ssfImage;
@@ -87,8 +83,6 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		
 		this.fireEmitterConfig = fireEmitterConfig;
 		assert(fireEmitterConfig != null);
-		this.gameModel = gameModel;
-		assert(gameModel != null);
 		
 		this.roundResults = new RoundResult[gameModel.getConfiguration().getNumRoundsPerMatch() + 1]; // +1 for the tie breaker round...
 		for (int i = 0; i < this.roundResults.length; i++) {
