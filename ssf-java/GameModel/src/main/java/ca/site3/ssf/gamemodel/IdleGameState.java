@@ -12,7 +12,7 @@ class IdleGameState extends GameState {
 
 	final static private double TIME_BETWEEN_RESETS = 0.1;
 	private double timeSinceLastReset;
-	
+	private boolean firstTick = true;
 	
 	/**
 	 * Constructor for IdleGameState.
@@ -28,6 +28,12 @@ class IdleGameState extends GameState {
 	
 	@Override
 	void tick(double dT) {
+		
+		// Make sure the game is reset when this state is initially ticked
+		if (this.firstTick) {
+			this.gameModel.resetGame();
+			this.firstTick = false;
+		}
 		
 		// Keep a heart beat of constantly resetting/turning-off all of the fire emitters
 		this.timeSinceLastReset += dT;

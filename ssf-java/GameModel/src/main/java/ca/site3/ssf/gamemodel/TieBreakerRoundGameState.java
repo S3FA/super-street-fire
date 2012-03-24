@@ -36,6 +36,8 @@ class TieBreakerGameState extends GameState {
 		assert(p1 != null && p2 != null);
 		p1.resetHealth();
 		p2.resetHealth();
+		
+		this.gameModel.getActionSignaller().fireOnRoundPlayTimerChanged(0);
 	}
 
 	@Override

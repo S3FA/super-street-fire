@@ -91,8 +91,6 @@ class RoundEndedGameState extends GameState {
 			
 			// Turn off all the fire emitters and set the player health to zero...
 			this.gameModel.getFireEmitterModel().resetAllEmitters();
-			this.gameModel.getPlayer1().setHealth(Player.KO_HEALTH);
-			this.gameModel.getPlayer2().setHealth(Player.KO_HEALTH);
 			this.gameModel.setNextGameState(new RingmasterGameState(this.gameModel));
 			return;
 		}

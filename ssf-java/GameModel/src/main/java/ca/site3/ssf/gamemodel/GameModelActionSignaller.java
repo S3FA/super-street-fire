@@ -82,9 +82,9 @@ class GameModelActionSignaller {
 		}
 	}
 	
-	void fireOnRoundPlayTimerChanged(int newCountdownTimeInSecs) {
+	void fireOnRoundPlayTimerChanged(int newTimeInSecs) {
 		
-		RoundPlayTimerChangedEvent event = new RoundPlayTimerChangedEvent(newCountdownTimeInSecs);
+		RoundPlayTimerChangedEvent event = new RoundPlayTimerChangedEvent(newTimeInSecs);
 		for (IGameModelListener listener : this.listeners) {
 			try {
 				listener.onGameModelEvent(event);

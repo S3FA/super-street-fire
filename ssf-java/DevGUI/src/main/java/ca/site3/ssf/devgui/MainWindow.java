@@ -130,9 +130,18 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	private void onGameStateChanged(GameStateChangedEvent event) {
 		this.infoPanel.setPreviousGameState(event.getOldState());
 		this.infoPanel.setCurrentGameState(event.getNewState());
-		if (event.getNewState() != GameStateType.ROUND_IN_PLAY_STATE) {
-			this.infoPanel.setRoundTimer(-1);
+		
+		switch (event.getNewState()) {
+			case IDLE_STATE:
+				this.arenaDisplay.setInfoText("");
+				this.arenaDisplay.clearRoundResults();
+				this.infoPanel.setRoundTimer(-1);
+				break;
+			default:
+				break;
 		}
+
+		this.controlPanel.gameStateChanged(event.getNewState());
 	}
 
 	private void onPlayerHealthChanged(PlayerHealthChangedEvent event) {
@@ -141,7 +150,7 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	}
 
 	private void onRoundPlayTimerChanged(RoundPlayTimerChangedEvent event) {
-		this.infoPanel.setRoundTimer(event.getCountdownTimeInSecs());
+		this.infoPanel.setRoundTimer(event.getTimeInSecs());
 	}
 
 	private void onRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent event) {

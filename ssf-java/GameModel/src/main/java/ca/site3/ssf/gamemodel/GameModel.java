@@ -157,8 +157,15 @@ public class GameModel implements IGameModel {
 		// - All emitters must be turned off
 		// - All players must have full health restored and all record of wins/losses wiped
 		this.getFireEmitterModel().resetAllEmitters();
-		this.getPlayer1().reset();
-		this.getPlayer2().reset();
+		Player p1 = this.getPlayer1();
+		Player p2 = this.getPlayer2();
+		
+		p1.reset();
+		p2.reset();
+		
+		p1.clearHealth();
+		p2.clearHealth();
+		
 		assert(this.numRoundsPlayed <= this.getConfig().getMaxNumRoundsPerMatch());
 		this.numRoundsPlayed = 0;
 	}
