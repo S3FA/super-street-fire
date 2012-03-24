@@ -8,28 +8,38 @@ import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.RescaleOp;
+import java.io.File;
+import java.io.IOException;
 import java.util.EnumSet;
+import java.util.Queue;
+import java.util.ResourceBundle;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import ca.site3.ssf.gamemodel.FireEmitter;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
+import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
 
 class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener {
 
@@ -55,6 +65,8 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	final private IGameModel gameModel;
 	final private FireEmitterConfig fireEmitterConfig;
 	
+	private Image ssfImage;
+	
 	// Emitter data is stored in the same orderings as the FireEmitterModel in the gamemodel
 	private EmitterData[] leftRailEmitterData  = null;
 	private EmitterData[] rightRailEmitterData = null;
@@ -62,9 +74,12 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	
 	private String infoText = "";
 	
-	RoundResult[] roundResults = null;
+	private RoundResult[] roundResults = null;
 	
-	public ArenaDisplay(IGameModel gameModel, FireEmitterConfig fireEmitterConfig) {
+	private Queue<AbstractGameModelCommand> commandQueue;
+	
+	public ArenaDisplay(IGameModel gameModel, FireEmitterConfig fireEmitterConfig,
+						Queue<AbstractGameModelCommand> commandQueue) {
 		super();
 
 		this.setBorder(BorderFactory.createLineBorder(Color.black, 2));
@@ -91,6 +106,16 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		for (int i = 0; i < fireEmitterConfig.getNumOuterRingEmitters(); i++) {
 			this.outerRingEmitterData[i] = new EmitterData();
 		}
+		
+		
+		try {
+			this.ssfImage = ImageIO.read(new File(this.getClass().getResource("/ssfsmall.jpg").getFile()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		assert(commandQueue != null);
+		this.commandQueue = commandQueue;
 		
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
@@ -356,6 +381,16 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			}
 		}
 		
+		// Draw the SSF image in the lower right
+		final float SCALE_AMT = 0.5f;
+		AffineTransform imgTransform = new AffineTransform();
+		imgTransform.translate(this.getWidth() - SCALE_AMT * this.ssfImage.getWidth(null) - 10,
+				this.getHeight() - SCALE_AMT * this.ssfImage.getHeight(null) - 10);		
+		imgTransform.scale(SCALE_AMT, SCALE_AMT);
+
+		
+		g2.drawImage(this.ssfImage, imgTransform, null);
+		
 	}
 
 	public void mouseClicked(MouseEvent event) {
@@ -391,13 +426,16 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	 */
 	private void mouseTouchEmitters(MouseEvent event) {
 		EnumSet<IGameModel.Entity> contributors = EnumSet.noneOf(IGameModel.Entity.class);
+		
 		if ((event.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) == MouseEvent.BUTTON1_DOWN_MASK) {
-			contributors.add(Entity.PLAYER1_ENTITY);
-		}
-		if ((event.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK) == MouseEvent.BUTTON2_DOWN_MASK) {
-			contributors.add(Entity.PLAYER2_ENTITY);
-		}
-		if ((event.getModifiersEx() & MouseEvent.BUTTON3_DOWN_MASK) == MouseEvent.BUTTON3_DOWN_MASK) {
+			
+			if ((event.getModifiersEx() & MouseEvent.SHIFT_DOWN_MASK) == MouseEvent.SHIFT_DOWN_MASK) {
+				contributors.add(Entity.PLAYER1_ENTITY);
+			}
+			if ((event.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) == MouseEvent.CTRL_DOWN_MASK) {
+				contributors.add(Entity.PLAYER2_ENTITY);
+			}
+			
 			contributors.add(Entity.RINGMASTER_ENTITY);
 		}
 		
@@ -407,13 +445,13 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		
 		for (int i = 0; i < this.leftRailEmitterData.length; i++) {
 			if (this.leftRailEmitterData[i].contains(event.getX(), event.getY())) {
-				this.gameModel.touchFireEmitter(Location.LEFT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors);
+				this.commandQueue.add(new TouchFireEmitterCommand(Location.LEFT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors));
 				return;
 			}
 		}
 		for (int i = 0; i < this.rightRailEmitterData.length; i++) {
 			if (this.rightRailEmitterData[i].contains(event.getX(), event.getY())) {
-				this.gameModel.touchFireEmitter(Location.RIGHT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors);
+				this.commandQueue.add(new TouchFireEmitterCommand(Location.RIGHT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors));
 				return;
 			}
 		}
@@ -423,7 +461,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		contributors.add(Entity.RINGMASTER_ENTITY);
 		for (int i = 0; i < this.outerRingEmitterData.length; i++) {
 			if (this.outerRingEmitterData[i].contains(event.getX(), event.getY())) {
-				this.gameModel.touchFireEmitter(Location.OUTER_RING, i, FireEmitter.MAX_INTENSITY, contributors);
+				this.commandQueue.add(new TouchFireEmitterCommand(Location.OUTER_RING, i, FireEmitter.MAX_INTENSITY, contributors));
 				return;
 			}
 		}

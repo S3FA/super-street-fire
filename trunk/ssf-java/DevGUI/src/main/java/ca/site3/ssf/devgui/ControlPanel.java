@@ -55,17 +55,23 @@ class ControlPanel extends JPanel implements ActionListener {
 		
 		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		
+		JPanel generalButtonPanel = new JPanel();
+		generalButtonPanel.setLayout(new FlowLayout());
+		
+		
 		this.nextStateButton = new JButton("Next State");
 		this.nextStateButton.addActionListener(this);
-		this.add(this.nextStateButton);
+		generalButtonPanel.add(this.nextStateButton);
 	
 		this.killButton = new JButton("Kill Game");
 		this.killButton.addActionListener(this);
-		this.add(this.killButton);
+		generalButtonPanel.add(this.killButton);
 		
 		this.pauseButton = new JButton("Pause");
 		this.pauseButton.addActionListener(this);
-		this.add(this.pauseButton);
+		generalButtonPanel.add(this.pauseButton);
+		
+		this.add(generalButtonPanel);
 		
 		String[] playerActionStrs = new String[GestureType.values().length];
 		int count = 0;
@@ -130,11 +136,13 @@ class ControlPanel extends JPanel implements ActionListener {
 			
 			switch (stateType.nextControllableGoToState()) {
 				case RINGMASTER_STATE:
-					this.nextStateButton.setText("Enter Ringmaster State");
+					this.nextStateButton.setText("Enter Ringmaster State");	
 					break;
+				
 				case ROUND_BEGINNING_STATE:
 					this.nextStateButton.setText("Begin Round");
 					break;
+					
 				default:
 					assert(false);
 					return;
@@ -144,6 +152,16 @@ class ControlPanel extends JPanel implements ActionListener {
 		}
 		else {
 			this.nextStateButton.setEnabled(false);
+		}
+		
+		switch (stateType) {
+			case ROUND_IN_PLAY_STATE:
+			case TIE_BREAKER_ROUND_STATE:
+				this.setEnablePlayerActionControls(true);
+				break;
+			default:
+				this.setEnablePlayerActionControls(false);
+				break;
 		}
 		
 	}
@@ -164,5 +182,11 @@ class ControlPanel extends JPanel implements ActionListener {
 		}
 	}
 	
+	
+	private void setEnablePlayerActionControls(boolean enabled) {
+		this.playerActionComboBox.setEnabled(enabled);
+		this.executeP1ActionButton.setEnabled(enabled);
+		this.executeP2ActionButton.setEnabled(enabled);
+	}
 	
 }

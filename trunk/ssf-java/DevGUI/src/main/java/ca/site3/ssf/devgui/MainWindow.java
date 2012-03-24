@@ -63,7 +63,7 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		this.setLayout(new BorderLayout());
 		
 		// Setup the frame's contents...
-		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8));
+		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8), commandQueue);
 		Container contentPane = this.getContentPane();
 		contentPane.add(this.arenaDisplay, BorderLayout.CENTER);
 		
@@ -218,6 +218,7 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	}
 
 	private void onFireEmitterChanged(FireEmitterChangedEvent event) {
+		
 		Color[] colours     = new Color[event.getContributingEntities().size()];
 		float[] intensities = new float[event.getContributingEntities().size()];
 		
@@ -231,7 +232,15 @@ public class MainWindow extends JFrame implements IGameModelListener {
 				colours[i] = ArenaDisplay.PLAYER_2_COLOUR;
 				break;
 			case RINGMASTER_ENTITY:
-				colours[i] = ArenaDisplay.RINGMASTER_COLOUR;
+				// The ringmaster's contribution is the BASE colour of the flame
+				// (i.e., the flame with no colours added), so we don't want to mix the colour
+				// with other colours...
+				if (colours.length > 1) {
+					colours[i] = Color.black;
+				}
+				else {
+					colours[i] = ArenaDisplay.RINGMASTER_COLOUR;
+				}
 				break;
 			default:
 				assert(false);
