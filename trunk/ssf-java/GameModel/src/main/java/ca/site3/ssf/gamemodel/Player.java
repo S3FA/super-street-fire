@@ -51,6 +51,11 @@ class Player {
 		this.lastDmgAmount = 0;
 	}
 	
+	void clearHealth() {
+		this.setHealth(Player.KO_HEALTH);
+		this.lastDmgAmount = 0;
+	}
+	
 	/**
 	 * Do chip damage to a player with the given full damage amount.
 	 * @param beforeChipDmgAmt The total damage of an attack before it is reduced to a chip damage amount.

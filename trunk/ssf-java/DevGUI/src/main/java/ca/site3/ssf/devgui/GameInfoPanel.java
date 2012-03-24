@@ -87,6 +87,9 @@ class GameInfoPanel extends JPanel {
 		}
 	}
 	double getRoundTime() {
+		if (this.currRoundTimeLabel.getText() == "N/A") {
+			return -1;
+		}
 		return Double.parseDouble(this.currRoundTimeLabel.getText());
 	}
 	

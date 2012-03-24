@@ -40,8 +40,8 @@ class RoundBeginningGameState extends GameState {
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
 		assert(p1 != null && p2 != null);
-		p1.resetHealth();
-		p2.resetHealth();
+		p1.clearHealth();
+		p2.clearHealth();
 	}
 
 	@Override
@@ -64,9 +64,6 @@ class RoundBeginningGameState extends GameState {
 			this.goToNextState();
 			return;
 		}
-		
-		// TODO: Have some actions here for fire emitters...?
-		//this.gameModel.getFireEmitterModel().fireAllEmitterChangedEvent();
 		
 		this.fightCounter -= dT;
 	}

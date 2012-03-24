@@ -6,15 +6,15 @@ public final class RoundPlayTimerChangedEvent implements IGameModelEvent {
 	// timer will start at a large time value and count down to zero over the course of a round.
 	// NOTE: These events will stop if the round stops due to a player winning/losing or an abrupt
 	// change in state.
-	final private int countdownTimeInSecs;
+	final private int timeInSecs;
 	
-	public RoundPlayTimerChangedEvent(int countdownTimeInSecs) {
+	public RoundPlayTimerChangedEvent(int timeInSecs) {
 		super();
-		this.countdownTimeInSecs = countdownTimeInSecs;
+		this.timeInSecs = timeInSecs;
 	}
 	
-	public int getCountdownTimeInSecs() {
-		return this.countdownTimeInSecs;
+	public int getTimeInSecs() {
+		return this.timeInSecs;
 	}
 	
 	public Type getType() {
