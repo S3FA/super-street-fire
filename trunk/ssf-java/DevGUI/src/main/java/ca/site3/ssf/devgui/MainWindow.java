@@ -50,7 +50,6 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	
     private Queue<AbstractGameModelCommand> commandQueue;
     
-    
 	public MainWindow(IGameModel gameModel, Queue<AbstractGameModelCommand> commandQueue) {
 		this.gameModel = gameModel;
 		this.commandQueue = commandQueue;

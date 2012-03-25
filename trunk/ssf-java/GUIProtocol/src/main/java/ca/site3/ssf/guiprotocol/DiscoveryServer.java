@@ -104,9 +104,7 @@ public class DiscoveryServer extends Thread {
 			
 				}
 				catch (IOException e) {
-					e.printStackTrace();
-					this.stopped = true;
-					break;
+					continue;
 				}
 				catch (NumberFormatException e) {
 					continue;
@@ -119,7 +117,6 @@ public class DiscoveryServer extends Thread {
 					System.out.println("Discovery Request from: " + discoveryRequestPkg.toString());
 				}
 				catch (InvalidProtocolBufferException e) {
-					System.err.println("Invalid discovery request datagram received: " + e.getMessage());
 					continue;
 				}
 				assert(discoveryRequestPkg != null);
@@ -128,7 +125,11 @@ public class DiscoveryServer extends Thread {
 				int requesterPort = requestPacket.getPort();
 				
 				byte[] sendBuffer = this.discoveryResponsePkg.toByteArray();
-				byte[] bufferLengthBytes = encoder.encode(CharBuffer.wrap("" + sendBuffer.length)).array();
+				
+				byte[] bufferLengthBytes = new byte[32];
+				byte[] temp = encoder.encode(CharBuffer.wrap("" + sendBuffer.length)).array();
+				System.arraycopy(temp, 0, bufferLengthBytes, bufferLengthBytes.length - temp.length, temp.length);
+				
 				DatagramPacket responsePacket1 = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, requesterAddr, requesterPort);
 				DatagramPacket responsePacket2 = new DatagramPacket(sendBuffer, sendBuffer.length, requesterAddr, requesterPort);
 				
@@ -137,9 +138,7 @@ public class DiscoveryServer extends Thread {
 					this.socket.send(responsePacket2);
 				}
 				catch (IOException e) {
-					e.printStackTrace();
-					this.stopped = true;
-					break;
+					continue;
 				}
 			}
 
