@@ -1,5 +1,8 @@
 package ca.site3.ssf.ioserver;
 
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
+
 /**
  * Represents the state of a headset's sensors
  * 
@@ -14,7 +17,7 @@ public class HeadsetEvent extends DeviceEvent {
 	/**
 	 * @param intensity between 0 and 1
 	 */
-	public HeadsetEvent(Source src, Device dvc, long timestamp, double attention, double meditation) {
+	public HeadsetEvent(Entity src, DeviceType dvc, long timestamp, double attention, double meditation) {
 		super(Type.HeadsetEvent, src, dvc, timestamp);
 		
 		if (attention < 0 || attention > 1) {

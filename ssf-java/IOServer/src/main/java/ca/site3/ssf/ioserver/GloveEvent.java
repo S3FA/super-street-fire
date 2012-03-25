@@ -1,5 +1,8 @@
 package ca.site3.ssf.ioserver;
 
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
+
 /**
  * An event that came from a glove peripheral. This comprises
  * the device information (player/device type) plus the
@@ -17,7 +20,7 @@ public class GloveEvent extends DeviceEvent {
 	
 	private final boolean buttonPressed;	
 	
-	public GloveEvent(Source src, Device dvc,
+	public GloveEvent(Entity src, DeviceType dvc,
 			long timestamp, boolean buttonDown,
 			double[] gyro, double[] acceleration, double[] magnetometer) {
 		super(Type.GloveEvent, src, dvc, timestamp);
