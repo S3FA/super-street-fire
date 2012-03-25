@@ -111,7 +111,7 @@ class FormLayoutHelper {
     
 	public JComboBox constructGestureComboBox()
 	{
-		JComboBox comboBox = new JComboBox<GestureType>();
+		JComboBox comboBox = new JComboBox();
 		comboBox.addItem(GestureType.LEFT_JAB);
 		comboBox.addItem(GestureType.LEFT_HOOK);
 		comboBox.addItem(GestureType.RIGHT_JAB);

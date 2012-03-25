@@ -60,7 +60,7 @@ public class MainWindow extends JFrame {
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Gesture Recorder GUI)");
-		this.setPreferredSize(new Dimension(900, 500));
+		this.setPreferredSize(new Dimension(900, 600));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 
