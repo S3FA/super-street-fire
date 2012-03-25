@@ -83,23 +83,25 @@ public class DiscoveryServer extends Thread {
 				return;
 			}
 			
-			byte[] receiveBuffer1 = new byte[32];
+			
 			byte[] receiveBuffer2 = null;
+			byte[] receiveBuffer1 = null;
+			DatagramPacket requestPacket = null;
 			
 			while (!this.stopped) {
 
 				// Block and wait for a discovery request package to be received by this server...
-				DatagramPacket requestPacket = new DatagramPacket(receiveBuffer1, receiveBuffer1.length);
 				try {
-					
+					receiveBuffer1 = new byte[32];
+					requestPacket = new DatagramPacket(receiveBuffer1, receiveBuffer1.length);
 					this.socket.receive(requestPacket);
 					
 					String bufferLengthStr = decoder.decode(ByteBuffer.wrap(receiveBuffer1)).toString();
 					bufferLengthStr = bufferLengthStr.trim();
 					int buffer2Length = Integer.parseInt(bufferLengthStr);
+					
 					receiveBuffer2 = new byte[buffer2Length];
 					requestPacket = new DatagramPacket(receiveBuffer2, receiveBuffer2.length);
-					
 					this.socket.receive(requestPacket);
 			
 				}
@@ -128,6 +130,7 @@ public class DiscoveryServer extends Thread {
 				
 				byte[] bufferLengthBytes = new byte[32];
 				byte[] temp = encoder.encode(CharBuffer.wrap("" + sendBuffer.length)).array();
+				assert(bufferLengthBytes.length - temp.length >= 0);
 				System.arraycopy(temp, 0, bufferLengthBytes, bufferLengthBytes.length - temp.length, temp.length);
 				
 				DatagramPacket responsePacket1 = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, requesterAddr, requesterPort);
