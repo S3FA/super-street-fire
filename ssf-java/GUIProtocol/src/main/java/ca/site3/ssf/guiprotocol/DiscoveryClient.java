@@ -6,6 +6,11 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,6 +41,10 @@ public class DiscoveryClient extends Thread {
 	private final Object socketLock = new Object();
 	
 	private BlockingQueue<Discovery.DiscoveryResponse> responseQueue = new LinkedBlockingQueue<Discovery.DiscoveryResponse>();
+	
+	private Charset charset = Charset.forName("ISO-8859-1");
+	private CharsetEncoder encoder = charset.newEncoder();
+	private CharsetDecoder decoder = charset.newDecoder();
 	
 	public DiscoveryClient(String clientName, Discovery.DiscoveryRequest.DiscoveryAppType type,
 			               int discoveryTimeInMs) {
@@ -134,8 +143,7 @@ public class DiscoveryClient extends Thread {
 			
 			// Request discovery...
 			byte[] requestBuffer = this.discoveryRequestPkg.toByteArray();
-			String bufferLengthStr = "" + requestBuffer.length;
-			byte[] bufferLengthBytes = bufferLengthStr.getBytes();
+			byte[] bufferLengthBytes = encoder.encode(CharBuffer.wrap("" + requestBuffer.length)).array();
 			
 			DatagramPacket requestPacket1 = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
 			DatagramPacket requestPacket2 = new DatagramPacket(requestBuffer, requestBuffer.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
@@ -167,8 +175,9 @@ public class DiscoveryClient extends Thread {
 				try {
 					responsePacket = new DatagramPacket(receiveBuffer1, receiveBuffer1.length);
 					this.socket.receive(responsePacket);
-					bufferLengthStr = new String(receiveBuffer1);
+					String bufferLengthStr = decoder.decode(ByteBuffer.wrap(receiveBuffer1)).toString();
 					bufferLengthStr = bufferLengthStr.trim();
+					
 					int buffer2Length = Integer.parseInt(bufferLengthStr);
 					receiveBuffer2 = new byte[buffer2Length];
 					responsePacket = new DatagramPacket(receiveBuffer2, receiveBuffer2.length);
