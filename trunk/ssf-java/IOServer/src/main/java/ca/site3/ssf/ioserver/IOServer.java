@@ -8,7 +8,6 @@ import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelListener;
-import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
 import ch.qos.logback.classic.Level;
 
