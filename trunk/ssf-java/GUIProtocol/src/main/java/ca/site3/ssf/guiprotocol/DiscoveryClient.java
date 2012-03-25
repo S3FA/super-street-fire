@@ -145,6 +145,7 @@ public class DiscoveryClient extends Thread {
 			byte[] requestBuffer = this.discoveryRequestPkg.toByteArray();
 			byte[] bufferLengthBytes = new byte[32];
 			byte[] temp = encoder.encode(CharBuffer.wrap("" + requestBuffer.length)).array();
+			assert(bufferLengthBytes.length - temp.length >= 0);
 			System.arraycopy(temp, 0, bufferLengthBytes, bufferLengthBytes.length - temp.length, temp.length);
 			
 			DatagramPacket requestPacket1 = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
