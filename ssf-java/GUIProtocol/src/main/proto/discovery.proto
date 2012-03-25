@@ -1,0 +1,18 @@
+package guiprotocol;
+
+option java_package = "ca.site3.ssf.guiprotocol";
+
+message DiscoveryRequest {
+
+  enum DiscoveryAppType {
+    GUI = 0;
+  }
+
+  optional string appName           = 2;  // Name for the application that is attempting to discover the server
+  optional DiscoveryAppType appType = 3;  // Type of application that is attempting to discover the server
+}
+
+message DiscoveryResponse {
+  required string serverIPAddress  = 1;  // TCP/IP address for the server's GUIProtocol communications
+  required int32  serverPortNumber = 2;  // TCP/IP port for the server's GUIProtocol communications
+}
