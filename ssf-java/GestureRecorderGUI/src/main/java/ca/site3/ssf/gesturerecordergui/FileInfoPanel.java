@@ -78,7 +78,7 @@ class FileInfoPanel extends JPanel {
 	        // If we just created the file, 
 	        if(this.isNewFile)
 	        {
-	        	writer.write("GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,Time");
+	        	writer.write("GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,GyroRightX,GyroRightY,GyroRightZ,MagRightX,MagRightY,MagRightZ,AccRightX,AccRightY,AccRightZ,Time");
 	        	writer.append("\n");
 	        }
 	        
