@@ -5,6 +5,11 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
@@ -30,6 +35,10 @@ public class DiscoveryServer extends Thread {
 	private volatile boolean stopped = false;
 	
 	private final Object socketLock = new Object();
+	
+	private Charset charset = Charset.forName("ISO-8859-1");
+	private CharsetEncoder encoder = charset.newEncoder();
+	private CharsetDecoder decoder = charset.newDecoder();
 	
 	public DiscoveryServer(String guiProtocolIpAddr, int guiProtocolPort) {
 		Discovery.DiscoveryResponse.Builder responseBuilder = Discovery.DiscoveryResponse.newBuilder();
@@ -85,7 +94,7 @@ public class DiscoveryServer extends Thread {
 					
 					this.socket.receive(requestPacket);
 					
-					String bufferLengthStr = new String(receiveBuffer1);
+					String bufferLengthStr = decoder.decode(ByteBuffer.wrap(receiveBuffer1)).toString();
 					bufferLengthStr = bufferLengthStr.trim();
 					int buffer2Length = Integer.parseInt(bufferLengthStr);
 					receiveBuffer2 = new byte[buffer2Length];
@@ -116,8 +125,7 @@ public class DiscoveryServer extends Thread {
 				int requesterPort = requestPacket.getPort();
 				
 				byte[] sendBuffer = this.discoveryResponsePkg.toByteArray();
-				String bufferLengthStr = "" + sendBuffer.length;
-				byte[] bufferLengthBytes = bufferLengthStr.getBytes();
+				byte[] bufferLengthBytes = encoder.encode(CharBuffer.wrap("" + sendBuffer.length)).array();
 				DatagramPacket responsePacket1 = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, requesterAddr, requesterPort);
 				DatagramPacket responsePacket2 = new DatagramPacket(sendBuffer, sendBuffer.length, requesterAddr, requesterPort);
 				
