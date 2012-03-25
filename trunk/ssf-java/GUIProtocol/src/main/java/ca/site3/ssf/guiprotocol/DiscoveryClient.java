@@ -156,7 +156,6 @@ public class DiscoveryClient extends Thread {
 				this.socket.send(requestPacket2);
 			}
 			catch (IOException e) {
-				e.printStackTrace();
 				return;
 			}
 			
