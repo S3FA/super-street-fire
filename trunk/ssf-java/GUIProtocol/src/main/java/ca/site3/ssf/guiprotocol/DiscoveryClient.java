@@ -143,17 +143,15 @@ public class DiscoveryClient extends Thread {
 			
 			// Request discovery...
 			byte[] requestBuffer = this.discoveryRequestPkg.toByteArray();
-			byte[] bufferLengthBytes = new byte[32];
+			byte[] bufferLengthBytes = new byte[DiscoveryServer.HEADER_SIZE + requestBuffer.length];
 			byte[] temp = encoder.encode(CharBuffer.wrap("" + requestBuffer.length)).array();
-			assert(bufferLengthBytes.length - temp.length >= 0);
-			System.arraycopy(temp, 0, bufferLengthBytes, bufferLengthBytes.length - temp.length, temp.length);
+			assert(DiscoveryServer.HEADER_SIZE - temp.length >= 0);
+			System.arraycopy(temp, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE - temp.length, temp.length);
+			System.arraycopy(requestBuffer, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE, requestBuffer.length);
 			
-			DatagramPacket requestPacket1 = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
-			DatagramPacket requestPacket2 = new DatagramPacket(requestBuffer, requestBuffer.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
-			
+			DatagramPacket requestPacket = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
 			try {
-				this.socket.send(requestPacket1);
-				this.socket.send(requestPacket2);
+				this.socket.send(requestPacket);
 			}
 			catch (IOException e) {
 				return;
@@ -170,20 +168,23 @@ public class DiscoveryClient extends Thread {
 			boolean responseReceived = false;
 			DatagramPacket responsePacket = null;
 			
-			byte[] receiveBuffer1 = new byte[32];
+			byte[] receiveBuffer1 = new byte[512];
 			byte[] receiveBuffer2 = null; 
 			while (this.isListening) {
 	
 				try {
 					responsePacket = new DatagramPacket(receiveBuffer1, receiveBuffer1.length);
 					this.socket.receive(responsePacket);
-					String bufferLengthStr = decoder.decode(ByteBuffer.wrap(receiveBuffer1)).toString();
+					
+					byte[] headerBytes = new byte[DiscoveryServer.HEADER_SIZE];
+					System.arraycopy(receiveBuffer1, 0, headerBytes, 0, DiscoveryServer.HEADER_SIZE);
+					
+					String bufferLengthStr = decoder.decode(ByteBuffer.wrap(headerBytes)).toString();
 					bufferLengthStr = bufferLengthStr.trim();
 					
-					int buffer2Length = Integer.parseInt(bufferLengthStr);
-					receiveBuffer2 = new byte[buffer2Length];
-					responsePacket = new DatagramPacket(receiveBuffer2, receiveBuffer2.length);
-					this.socket.receive(responsePacket);
+					int bufferLength = Integer.parseInt(bufferLengthStr);
+					receiveBuffer2 = new byte[bufferLength];
+					System.arraycopy(receiveBuffer1, DiscoveryServer.HEADER_SIZE, receiveBuffer2, 0, receiveBuffer2.length);
 				}
 				catch (IOException e) {
 					continue;

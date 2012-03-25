@@ -27,6 +27,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
  */
 public class DiscoveryServer extends Thread {
 
+	public final static int HEADER_SIZE = 32;
+	
 	public final static String DISCOVERY_MULTICAST_IP_ADDRESS = "230.42.0.10";
 	public final static int DISCOVERY_SERVER_PORT = 42010;
 	
@@ -92,17 +94,19 @@ public class DiscoveryServer extends Thread {
 
 				// Block and wait for a discovery request package to be received by this server...
 				try {
-					receiveBuffer1 = new byte[32];
+					receiveBuffer1 = new byte[512];
 					requestPacket = new DatagramPacket(receiveBuffer1, receiveBuffer1.length);
 					this.socket.receive(requestPacket);
 					
-					String bufferLengthStr = decoder.decode(ByteBuffer.wrap(receiveBuffer1)).toString();
-					bufferLengthStr = bufferLengthStr.trim();
-					int buffer2Length = Integer.parseInt(bufferLengthStr);
+					byte[] headerBytes = new byte[DiscoveryServer.HEADER_SIZE];
+					System.arraycopy(receiveBuffer1, 0, headerBytes, 0, DiscoveryServer.HEADER_SIZE);
 					
-					receiveBuffer2 = new byte[buffer2Length];
-					requestPacket = new DatagramPacket(receiveBuffer2, receiveBuffer2.length);
-					this.socket.receive(requestPacket);
+					String bufferLengthStr = decoder.decode(ByteBuffer.wrap(headerBytes)).toString();
+					bufferLengthStr = bufferLengthStr.trim();
+
+					int bufferLength = Integer.parseInt(bufferLengthStr);
+					receiveBuffer2 = new byte[bufferLength];
+					System.arraycopy(receiveBuffer1, DiscoveryServer.HEADER_SIZE, receiveBuffer2, 0, receiveBuffer2.length);
 			
 				}
 				catch (IOException e) {
@@ -126,19 +130,19 @@ public class DiscoveryServer extends Thread {
 				InetAddress requesterAddr = requestPacket.getAddress();
 				int requesterPort = requestPacket.getPort();
 				
-				byte[] sendBuffer = this.discoveryResponsePkg.toByteArray();
+				byte[] pkgBuffer = this.discoveryResponsePkg.toByteArray();
 				
-				byte[] bufferLengthBytes = new byte[32];
-				byte[] temp = encoder.encode(CharBuffer.wrap("" + sendBuffer.length)).array();
-				assert(bufferLengthBytes.length - temp.length >= 0);
-				System.arraycopy(temp, 0, bufferLengthBytes, bufferLengthBytes.length - temp.length, temp.length);
+				byte[] bufferLengthBytes = new byte[DiscoveryServer.HEADER_SIZE + pkgBuffer.length];
+				byte[] temp = encoder.encode(CharBuffer.wrap("" + pkgBuffer.length)).array();
+				assert(DiscoveryServer.HEADER_SIZE - temp.length >= 0);
 				
-				DatagramPacket responsePacket1 = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, requesterAddr, requesterPort);
-				DatagramPacket responsePacket2 = new DatagramPacket(sendBuffer, sendBuffer.length, requesterAddr, requesterPort);
+				System.arraycopy(temp, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE - temp.length, temp.length);
+				System.arraycopy(pkgBuffer, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE, pkgBuffer.length);
 				
+				DatagramPacket responsePacket = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, requesterAddr, requesterPort);
+
 				try {
-					this.socket.send(responsePacket1);
-					this.socket.send(responsePacket2);
+					this.socket.send(responsePacket);
 				}
 				catch (IOException e) {
 					continue;
