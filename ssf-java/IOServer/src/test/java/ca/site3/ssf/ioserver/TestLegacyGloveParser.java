@@ -58,8 +58,13 @@ public class TestLegacyGloveParser {
 			
 			assertEquals("Frame count / event count mismatch",frames.length, q.size());
 			
-			DeviceEvent e = q.peek();
-			
+			// head, accel, gyros
+			// 1L:0.52,0.29,148.84_12,50,8_-2,3,246|
+			assertEquals(GloveEvent.class, q.peek().getClass());
+			GloveEvent e = (GloveEvent) q.peek();
+			assertEquals("Magnetometer mismatch",new float[] { 0.52f, 0.29f, 148.84f }, e.getMagnetometer());
+			assertEquals("Accelerometer mismatch",new float[] { 12, 50, 8 }, e.getAcceleration());
+			assertEquals("Accelerometer mismatch",new float[] { -2f, 3f, 246f }, e.getAcceleration());
 			
 		} catch (UnknownHostException ex) {
 			fail(ex.getMessage());
