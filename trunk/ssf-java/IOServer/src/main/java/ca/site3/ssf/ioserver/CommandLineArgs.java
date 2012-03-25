@@ -32,6 +32,11 @@ public class CommandLineArgs {
 	public Integer tickFrequency = 50;
 	
 	@Parameter(names={"-devicePort","-p"}, description="Port to listen on for peripherals")
-	public Integer devicePort = 31337;
+	public Integer devicePort = 31338;
 	
+	@Parameter(names={"-heartbeatPort","-h"}, description="Port to listen on for heartbeats")
+	public Integer heartbeatPort = 55555;
+	
+	@Parameter(names={"-guiPort","-g"}, description="Port to listen on for GUI connections")
+	public Integer guiPort = 31337;
 }
