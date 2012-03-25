@@ -143,13 +143,13 @@ public class DiscoveryClient extends Thread {
 			
 			// Request discovery...
 			byte[] requestBuffer = this.discoveryRequestPkg.toByteArray();
-			byte[] bufferLengthBytes = new byte[DiscoveryServer.HEADER_SIZE + requestBuffer.length];
+			byte[] fullBuffer = new byte[DiscoveryServer.HEADER_SIZE + requestBuffer.length];
 			byte[] temp = encoder.encode(CharBuffer.wrap("" + requestBuffer.length)).array();
 			assert(DiscoveryServer.HEADER_SIZE - temp.length >= 0);
-			System.arraycopy(temp, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE - temp.length, temp.length);
-			System.arraycopy(requestBuffer, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE, requestBuffer.length);
+			System.arraycopy(temp, 0, fullBuffer, DiscoveryServer.HEADER_SIZE - temp.length, temp.length);
+			System.arraycopy(requestBuffer, 0, fullBuffer, DiscoveryServer.HEADER_SIZE, requestBuffer.length);
 			
-			DatagramPacket requestPacket = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
+			DatagramPacket requestPacket = new DatagramPacket(fullBuffer, fullBuffer.length, multicastAddr, DiscoveryServer.DISCOVERY_SERVER_PORT);
 			try {
 				this.socket.send(requestPacket);
 			}
