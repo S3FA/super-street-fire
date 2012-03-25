@@ -66,13 +66,15 @@ public class DeviceNetworkListener implements Runnable {
 		
 		int bufSize = 1024;
 		byte receivedData[] = new byte[bufSize];
+		DatagramPacket receivedPacket = new DatagramPacket(receivedData, bufSize);
 		
 		while ( ! stop ) {
-			DatagramPacket receivedPacket = new DatagramPacket(receivedData, bufSize);
+			// reset buffer size
+			receivedPacket.setLength(bufSize);
 			try {
 				socket.receive(receivedPacket);
 			} catch (SocketTimeoutException ex) {
-				log.info("Device listener timed out");
+				log.debug("Device listener timed out");
 			} catch (SocketException ex) {
 				log.info("Device listener socket closed",ex);
 				break;

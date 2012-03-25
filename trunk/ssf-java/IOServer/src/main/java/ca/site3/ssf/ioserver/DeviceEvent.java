@@ -1,5 +1,8 @@
 package ca.site3.ssf.ioserver;
 
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
+
 
 
 /**
@@ -21,32 +24,15 @@ public abstract class DeviceEvent {
 		HeadsetEvent
 	};
 	
-	/**
-	 * Which player (or ringmaster) the device corresponds to.
-	 */
-	public enum Source {
-		PLAYER_1,
-		PLAYER_2,
-		RINGMASTER
-	}
-	
-	/**
-	 * Enumerates the types of input devices a player or ringmaster may have
-	 */
-	public enum Device {
-		LEFT_GLOVE,
-		RIGHT_GLOVE,
-		HEADSET
-	}
 	
 	
 	private Type type;
-	private Source source;
-	private Device device;
+	private Entity source;
+	private DeviceType device;
 	
 	private long timestamp;
 
-	protected DeviceEvent(Type type, Source src, Device dvc, long timestamp) {
+	protected DeviceEvent(Type type, Entity src, DeviceType dvc, long timestamp) {
 		this.type = type;
 		this.source = src;
 		this.device = dvc;
@@ -59,11 +45,11 @@ public abstract class DeviceEvent {
 		return type;
 	}
 	
-	public Source getSource() {
+	public Entity getSource() {
 		return source;
 	}
 
-	public Device getDevice() {
+	public DeviceType getDevice() {
 		return device;
 	}
 	
