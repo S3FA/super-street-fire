@@ -29,7 +29,7 @@ public class DiscoveryServer extends Thread {
 
 	public final static int HEADER_SIZE = 32;
 	
-	public final static String DISCOVERY_MULTICAST_IP_ADDRESS = "230.42.0.10";
+	public final static String DISCOVERY_MULTICAST_IP_ADDRESS = "228.42.0.10";
 	public final static int DISCOVERY_SERVER_PORT = 42010;
 	
 	private MulticastSocket socket = null;
@@ -131,15 +131,14 @@ public class DiscoveryServer extends Thread {
 				int requesterPort = requestPacket.getPort();
 				
 				byte[] pkgBuffer = this.discoveryResponsePkg.toByteArray();
-				
-				byte[] bufferLengthBytes = new byte[DiscoveryServer.HEADER_SIZE + pkgBuffer.length];
+				byte[] fullBuffer = new byte[DiscoveryServer.HEADER_SIZE + pkgBuffer.length];
 				byte[] temp = encoder.encode(CharBuffer.wrap("" + pkgBuffer.length)).array();
 				assert(DiscoveryServer.HEADER_SIZE - temp.length >= 0);
 				
-				System.arraycopy(temp, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE - temp.length, temp.length);
-				System.arraycopy(pkgBuffer, 0, bufferLengthBytes, DiscoveryServer.HEADER_SIZE, pkgBuffer.length);
+				System.arraycopy(temp, 0, fullBuffer, DiscoveryServer.HEADER_SIZE - temp.length, temp.length);
+				System.arraycopy(pkgBuffer, 0, fullBuffer, DiscoveryServer.HEADER_SIZE, pkgBuffer.length);
 				
-				DatagramPacket responsePacket = new DatagramPacket(bufferLengthBytes, bufferLengthBytes.length, requesterAddr, requesterPort);
+				DatagramPacket responsePacket = new DatagramPacket(fullBuffer, fullBuffer.length, requesterAddr, requesterPort);
 
 				try {
 					this.socket.send(responsePacket);
