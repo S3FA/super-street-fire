@@ -33,6 +33,7 @@ public class DiscoveryClient extends Thread {
 	private DatagramSocket socket = null;
 	private volatile boolean isListening = false;
 	private Timer listenTimer = null;
+	private final Object socketLock = new Object();
 	
 	private BlockingQueue<Discovery.DiscoveryResponse> responseQueue = new LinkedBlockingQueue<Discovery.DiscoveryResponse>();
 	
@@ -112,7 +113,9 @@ public class DiscoveryClient extends Thread {
 		try {
 			// Setup the socket for the client
 			try {
-				this.socket = new DatagramSocket();
+				synchronized(this.socketLock) {
+					this.socket = new DatagramSocket();
+				}
 			}
 			catch (SocketException e) {
 				e.printStackTrace();
@@ -238,7 +241,9 @@ public class DiscoveryClient extends Thread {
 		@Override
 		public void run() {
 			isListening = false;
-			socket.close();
+			synchronized(socketLock) {
+				socket.close();
+			}
 		}
 	}
 	

@@ -2,7 +2,6 @@ package ca.site3.ssf.guiprotocol;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
@@ -30,6 +29,8 @@ public class DiscoveryServer extends Thread {
 	private Discovery.DiscoveryResponse discoveryResponsePkg = null;
 	private volatile boolean stopped = false;
 	
+	private final Object socketLock = new Object();
+	
 	public DiscoveryServer(String guiProtocolIpAddr, int guiProtocolPort) {
 		Discovery.DiscoveryResponse.Builder responseBuilder = Discovery.DiscoveryResponse.newBuilder();
 		responseBuilder.setServerIPAddress(guiProtocolIpAddr);
@@ -44,7 +45,9 @@ public class DiscoveryServer extends Thread {
 		try {
 			// Create a new multicast socket for receiving requests from discovery clients
 			try {
-				this.socket = new MulticastSocket(DiscoveryServer.DISCOVERY_SERVER_PORT);
+				synchronized(this.socketLock) {
+					this.socket = new MulticastSocket(DiscoveryServer.DISCOVERY_SERVER_PORT);
+				}
 			}
 			catch (IOException e) {
 				e.printStackTrace();
@@ -144,7 +147,13 @@ public class DiscoveryServer extends Thread {
 	 */
 	public void stopServer() {
 		this.stopped = true;
-		this.socket.close();
+		
+		synchronized(this.socketLock) {
+			if (this.socket != null) {
+				this.socket.close();
+			}
+		}
+		
 		try {
 			this.join();
 		}
@@ -165,7 +174,6 @@ public class DiscoveryServer extends Thread {
 		System.out.println("Running discovery server...");
 		DiscoveryServer discoveryServer = new DiscoveryServer(address.getHostAddress(), 45000);
 		discoveryServer.start();
-		discoveryServer.stop();
 	}
 	
 }
