@@ -87,7 +87,7 @@ public class DiscoveryServer extends Thread {
 			byte[] receiveBuffer2 = null;
 			
 			while (!this.stopped) {
-			
+
 				// Block and wait for a discovery request package to be received by this server...
 				DatagramPacket requestPacket = new DatagramPacket(receiveBuffer1, receiveBuffer1.length);
 				try {
@@ -107,6 +107,9 @@ public class DiscoveryServer extends Thread {
 					e.printStackTrace();
 					this.stopped = true;
 					break;
+				}
+				catch (NumberFormatException e) {
+					continue;
 				}
 				
 				// Parse the discovery request package...
@@ -139,9 +142,9 @@ public class DiscoveryServer extends Thread {
 					break;
 				}
 			}
-			
+
 		}
-		catch (Exception e)  {
+		catch (Exception e) {
 		}
 		finally {
 			if (this.socket != null) {
