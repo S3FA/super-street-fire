@@ -93,6 +93,9 @@ public class StreetFireServer implements Runnable {
 	}
 	
 	
+	public void stop() {
+		stop = true;
+	}
 	
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
