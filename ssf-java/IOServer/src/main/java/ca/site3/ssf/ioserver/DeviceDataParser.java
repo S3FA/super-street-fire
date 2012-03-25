@@ -2,7 +2,10 @@ package ca.site3.ssf.ioserver;
 
 import java.net.InetAddress;
 
-import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ca.site3.ssf.ioserver.DeviceConstants.Device;
 import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
 
 /**
@@ -17,12 +20,30 @@ import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
  */
 public class DeviceDataParser implements IDeviceDataParser {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	
+	private DeviceStatus deviceStatus;
+	
+	
+	public DeviceDataParser(DeviceStatus deviceStatus) {
+		this.deviceStatus = deviceStatus;
+	}
+	
+	
+	
 	public DeviceEvent parseDeviceData(byte[] data, InetAddress srcIP) throws Exception {
 		
-		// TODO figure out actual datagram structure and parse it
+		Device d = deviceStatus.getDeviceAtAddress(srcIP);
+		if (d == null) {
+			log.debug("No device at address: {}",srcIP);
+			return null;
+		}
 		
-		Entity src = Entity.PLAYER1_ENTITY;
-		DeviceType device = DeviceType.LEFT_GLOVE;
+		if (d.type == DeviceType.HEADSET) {
+			return null;
+		}
+		
 		long timestamp = -1;
 		boolean buttonDown = false;
 		
@@ -30,7 +51,7 @@ public class DeviceDataParser implements IDeviceDataParser {
 		double[] acc = new double[3];
 		double[] heading = new double[3];
 		
-		return new GloveEvent(src, device, timestamp, buttonDown, rot, acc, heading);
+		return new GloveEvent(d.entity, d.type, timestamp, buttonDown, rot, acc, heading);
 	}
 
 }

@@ -8,6 +8,8 @@ import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelListener;
+import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
+import ca.site3.ssf.guiprotocol.StreetFireServer;
 import ch.qos.logback.classic.Level;
 
 import com.beust.jcommander.JCommander;
@@ -42,6 +44,9 @@ public class IOServer {
 	
 	private DeviceNetworkListener deviceListener;
 	
+	private HeartbeatListener heartbeatListener;
+	
+	
 	/** Developer / test GUI */
 	private MainWindow mainFrame;
 	
@@ -67,14 +72,22 @@ public class IOServer {
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 		
+		DeviceStatus deviceStatus = new DeviceStatus();
+		heartbeatListener = new HeartbeatListener(arguments.heartbeatPort, deviceStatus);
+		Thread heartbeatListenerThread = new Thread(heartbeatListener);
+		heartbeatListenerThread.start();
 		
 		gameEventRouter = new GameEventRouter(commManager.getCommOutQueue(), commManager.getGuiOutQueue());
 		game.addGameModelListener(gameEventRouter);
 		
-		deviceListener = new DeviceNetworkListener(arguments.devicePort, new DeviceDataParser(), commManager.getCommInQueue());
-		Thread deviceListenerThread = new Thread(deviceListener);
-		deviceListenerThread.setName("DeviceListener");
+		deviceListener = new DeviceNetworkListener(arguments.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
+		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
 		deviceListenerThread.start();
+		
+		StreetFireServer guiServer = new StreetFireServer(arguments.guiPort, game.getActionFactory(), commManager.getCommandQueue());
+		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
+		guiServerThread.start();
+		
 		
 		isStopped = false;
 		runLoop();

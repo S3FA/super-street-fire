@@ -19,7 +19,10 @@ import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 import ca.site3.ssf.ioserver.DeviceEvent;
 import ca.site3.ssf.ioserver.DeviceNetworkListener;
+import ca.site3.ssf.ioserver.DeviceStatus;
 import ca.site3.ssf.ioserver.GloveEvent;
+import ca.site3.ssf.ioserver.HeartbeatListener;
+import ca.site3.ssf.ioserver.LegacyGloveDataParser;
 
 /**
  * The main GUI class and driver for the gesture recorder
@@ -42,7 +45,11 @@ public class MainWindow extends JFrame {
 	
 	private volatile boolean isListeningForEvents = true;
 	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
-	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(31337, eventQueue);
+	
+	private DeviceStatus deviceStatus = new DeviceStatus();
+	private HeartbeatListener heartbeatListener = new HeartbeatListener(55555, deviceStatus);
+	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(31337, new LegacyGloveDataParser(), eventQueue);
+	
 	private Thread consumerThread;
 	private Runnable doUpdateInterface;
 
@@ -71,8 +78,11 @@ public class MainWindow extends JFrame {
 		this.setLocationRelativeTo(null);
 		
 		// Kick off the hardware event listener in the IOServer. To stop this call gloveListener.stop()
-		Thread producerThread = new Thread(gloveListener);
+		Thread heartbeatThread = new Thread(heartbeatListener, "Heartbeat Thread");
+		heartbeatThread.start();
+		Thread producerThread = new Thread(gloveListener, "Glove listener Thread");
 		producerThread.start();
+		
 		
 		// To stop this set isListeningForEvents false and call consumerThread.interrupt()\
 		//TODO: Start or stop this based on which tab we're in. 

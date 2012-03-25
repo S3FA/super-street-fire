@@ -58,5 +58,19 @@ public class DeviceConstants {
 			}
 			throw new IllegalArgumentException("Invalid device id: "+deviceid);
 		}
+		
+		
+		public static Device fromLegacyId(String id) {
+			if ("1L".equals(id))
+				return P1_LEFT_GLOVE;
+			else if ("1R".equals(id))
+				return P1_RIGHT_GLOVE;
+			else if ("2L".equals(id))
+				return P2_LEFT_GLOVE;
+			else if ("2R".equals(id))
+				return P2_RIGHT_GLOVE;
+			else
+				return null;
+		}
 	}
 }
