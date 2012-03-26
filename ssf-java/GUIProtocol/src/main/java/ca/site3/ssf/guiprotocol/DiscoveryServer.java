@@ -91,7 +91,8 @@ public class DiscoveryServer extends Thread {
 			DatagramPacket requestPacket = null;
 			
 			while (!this.stopped) {
-
+				boolean successOnRequest = true;
+				
 				// Block and wait for a discovery request package to be received by this server...
 				try {
 					receiveBuffer1 = new byte[512];
@@ -110,22 +111,22 @@ public class DiscoveryServer extends Thread {
 			
 				}
 				catch (IOException e) {
-					continue;
+					successOnRequest = false;
 				}
 				catch (NumberFormatException e) {
-					continue;
+					successOnRequest = false;
 				}
 				
-				// Parse the discovery request package...
-				Discovery.DiscoveryRequest discoveryRequestPkg = null;
-				try {
-					discoveryRequestPkg = Discovery.DiscoveryRequest.parseFrom(receiveBuffer2);
-					System.out.println("Discovery Request from: " + discoveryRequestPkg.toString());
+				if (successOnRequest) {
+					// Parse the discovery request package...
+					Discovery.DiscoveryRequest discoveryRequestPkg = null;
+					try {
+						discoveryRequestPkg = Discovery.DiscoveryRequest.parseFrom(receiveBuffer2);
+						System.out.println("Discovery Request from: " + discoveryRequestPkg.toString());
+					}
+					catch (InvalidProtocolBufferException e) {
+					}
 				}
-				catch (InvalidProtocolBufferException e) {
-					continue;
-				}
-				assert(discoveryRequestPkg != null);
 				
 				InetAddress requesterAddr = requestPacket.getAddress();
 				int requesterPort = requestPacket.getPort();
