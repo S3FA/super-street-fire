@@ -62,9 +62,18 @@ public class TestLegacyGloveParser {
 			// 1L:0.52,0.29,148.84_12,50,8_-2,3,246|
 			assertEquals(GloveEvent.class, q.peek().getClass());
 			GloveEvent e = (GloveEvent) q.peek();
-			assertEquals("Magnetometer mismatch",new float[] { 0.52f, 0.29f, 148.84f }, e.getMagnetometer());
-			assertEquals("Accelerometer mismatch",new float[] { 12, 50, 8 }, e.getAcceleration());
-			assertEquals("Accelerometer mismatch",new float[] { -2f, 3f, 246f }, e.getAcceleration());
+			
+			float[] expectedMagnetometer = new float[] { 0.52f, 0.29f, 148.84f };
+			float[] expectedAccel = new float[] { 12, 50, 8 };
+			float[] expectedGyro = new float[] { -2f, 3f, 246f };
+			
+			float eps = 0.000001f;
+			for (int i=0; i<3; i++) {
+				assertEquals("Magnetometer mismatch",expectedMagnetometer[i], e.getMagnetometer()[i], eps);
+				assertEquals("Accelerometer mismatch",expectedAccel[i], e.getAcceleration()[i], eps);
+				assertEquals("Gyro data mismatch",expectedGyro[i], e.getGyro()[i], eps);
+			}
+			
 			
 		} catch (UnknownHostException ex) {
 			fail(ex.getMessage());
