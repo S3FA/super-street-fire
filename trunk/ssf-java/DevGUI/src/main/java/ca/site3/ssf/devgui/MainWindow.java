@@ -4,10 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Queue;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -16,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.border.TitledBorder;
 
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +65,13 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 	private JMenu windowMenu          = null;
 	private JMenuItem gloveDataWindowMenuItem = null;
 	
+	private GloveDataInfoPanel p1LeftGloveInfoPanel  = null;
+	private GloveDataInfoPanel p1RightGloveInfoPanel = null;
+	private GloveDataInfoPanel p2LeftGloveInfoPanel  = null;
+	private GloveDataInfoPanel p2RightGloveInfoPanel = null;
+	private GloveDataInfoPanel ringmasterLeftGloveInfoPanel  = null;
+	private GloveDataInfoPanel ringmasterRightGloveInfoPanel = null;
+	
 	private ArenaDisplay arenaDisplay = null;
 	private GameInfoPanel infoPanel   = null;
 	private ControlPanel controlPanel = null;
@@ -91,6 +101,13 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		this.menuBar.add(this.windowMenu);
 		
 		this.setJMenuBar(this.menuBar);
+		
+		this.p1LeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
+		this.p1RightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);
+		this.p2LeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
+		this.p2RightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);		
+		this.ringmasterLeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
+		this.ringmasterRightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);	
 		
 		// Setup the frame's contents...
 		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8), commandQueue);
@@ -318,9 +335,47 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		if (arg0.getSource() == this.gloveDataWindowMenuItem) {
+	public void actionPerformed(ActionEvent event) {
+		if (event.getSource() == this.gloveDataWindowMenuItem) {
+			JFrame gloveDataWindow = new JFrame();
 			
+			JPanel basePanel = new JPanel();
+			basePanel.setLayout(new GridLayout(3, 1));
+			
+			JPanel p1GloveDataPanel = new JPanel();
+			TitledBorder border = BorderFactory.createTitledBorder(
+					BorderFactory.createLineBorder(Color.black), "Player 1 Glove Information");
+			border.setTitleColor(Color.black);
+			p1GloveDataPanel.setBorder(border);
+			p1GloveDataPanel.setLayout(new GridLayout(0, 2));
+			p1GloveDataPanel.add(this.p1LeftGloveInfoPanel);
+			p1GloveDataPanel.add(this.p1RightGloveInfoPanel);
+			basePanel.add(p1GloveDataPanel);
+			
+			JPanel p2GloveDataPanel = new JPanel();
+			border = BorderFactory.createTitledBorder(
+					BorderFactory.createLineBorder(Color.black), "Player 2 Glove Information");
+			border.setTitleColor(Color.black);
+			p2GloveDataPanel.setBorder(border);
+			p2GloveDataPanel.setLayout(new GridLayout(0, 2));
+			p2GloveDataPanel.add(this.p2LeftGloveInfoPanel);
+			p2GloveDataPanel.add(this.p2RightGloveInfoPanel);
+			basePanel.add(p2GloveDataPanel);
+			
+			JPanel ringmasterGloveDataPanel = new JPanel();
+			border = BorderFactory.createTitledBorder(
+					BorderFactory.createLineBorder(Color.black), "Ringmaster Glove Information");
+			border.setTitleColor(Color.black);
+			ringmasterGloveDataPanel.setBorder(border);
+			ringmasterGloveDataPanel.setLayout(new GridLayout(0, 2));
+			ringmasterGloveDataPanel.add(this.ringmasterLeftGloveInfoPanel);
+			ringmasterGloveDataPanel.add(this.ringmasterRightGloveInfoPanel);
+			basePanel.add(ringmasterGloveDataPanel);
+			
+			gloveDataWindow.add(basePanel);
+			gloveDataWindow.pack();
+			gloveDataWindow.setLocationRelativeTo(null);
+			gloveDataWindow.setVisible(true);
 		}
 	}
 	
