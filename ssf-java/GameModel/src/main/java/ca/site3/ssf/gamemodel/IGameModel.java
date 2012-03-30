@@ -12,7 +12,21 @@ import java.util.EnumSet;
  */
 public interface IGameModel {
 	
-	public enum Entity { PLAYER1_ENTITY, PLAYER2_ENTITY, RINGMASTER_ENTITY };
+	public enum Entity {
+		PLAYER1_ENTITY("Player 1"),
+		PLAYER2_ENTITY("Player 2"),
+		RINGMASTER_ENTITY("Ringmaster");
+		
+		private final String name;
+		
+		Entity(String name) {
+			this.name = name;
+		}
+	
+		public String toString() {
+			return this.name;
+		}
+	};
 	
 	void tick(double dT);
 	
