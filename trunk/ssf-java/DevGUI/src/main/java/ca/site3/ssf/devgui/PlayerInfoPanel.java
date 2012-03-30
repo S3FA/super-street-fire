@@ -65,17 +65,11 @@ class PlayerInfoPanel extends JPanel {
 		timeLabel.setForeground(Color.black);
 		formLayoutHelper.addLabel(timeLabel, this);
 		formLayoutHelper.addLastField(this.timeOfLastAction, this);
+		
 	}
 	
 	void setLife(float lifePercent) {
-		this.lifeBar.setValue((int)lifePercent);
-		
-		// Linear interpolate the colour of the life bar from green to red
-		float red   = 1.0f + ((float)this.lifeBar.getPercentComplete() - 0.0f) * ((0.0f - 1.0f) / (1.0f - 0.0f));
-		float green = 0.0f + ((float)this.lifeBar.getPercentComplete() - 0.0f) * ((1.0f - 0.0f) / (1.0f - 0.0f));
-		float blue  = 0.0f;
-		
-		this.lifeBar.setForeground(new Color(red, green, blue));
+		ProgressBarColourLerp.setPercentageAndRedToGreenColour(this.lifeBar, lifePercent);
 	}
 	
 	void setLastActionAsAttack(PlayerAttackAction.AttackType actionType, double clockTime) {

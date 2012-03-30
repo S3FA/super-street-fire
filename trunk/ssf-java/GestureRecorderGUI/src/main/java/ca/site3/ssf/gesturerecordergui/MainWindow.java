@@ -89,7 +89,7 @@ public class MainWindow extends JFrame {
 		consumerThread = new Thread(new Runnable() {
 			public void run() {
 				DeviceEvent e;
-				while (isListeningForEvents) {					
+				while (isListeningForEvents) {
 					try {
 						e = eventQueue.take();
 					} catch (InterruptedException ex) {

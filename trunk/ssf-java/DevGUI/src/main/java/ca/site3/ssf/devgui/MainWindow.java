@@ -4,9 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Queue;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -49,15 +54,19 @@ import com.beust.jcommander.JCommander;
  *  
  *  @author Callum
  */
-public class MainWindow extends JFrame implements IGameModelListener {
+public class MainWindow extends JFrame implements IGameModelListener, ActionListener {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private JMenuBar menuBar          = null;
+	private JMenu windowMenu          = null;
+	private JMenuItem gloveDataWindowMenuItem = null;
 	
 	private ArenaDisplay arenaDisplay = null;
 	private GameInfoPanel infoPanel   = null;
 	private ControlPanel controlPanel = null;
     private IGameModel gameModel      = null;	
-    private IOServer ioserver = null;
+    private IOServer ioserver         = null;
     
     private Queue<AbstractGameModelCommand> commandQueue;
     
@@ -73,6 +82,15 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		this.setMinimumSize(new Dimension(1000, 750));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
+		
+		this.menuBar = new JMenuBar();
+		this.windowMenu = new JMenu("Window");
+		this.gloveDataWindowMenuItem = new JMenuItem("Glove Data");
+		this.gloveDataWindowMenuItem.addActionListener(this);
+		this.windowMenu.add(this.gloveDataWindowMenuItem);
+		this.menuBar.add(this.windowMenu);
+		
+		this.setJMenuBar(this.menuBar);
 		
 		// Setup the frame's contents...
 		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8), commandQueue);
@@ -299,7 +317,12 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		
 	}
 
-	
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		if (arg0.getSource() == this.gloveDataWindowMenuItem) {
+			
+		}
+	}
 	
 	public static void main(String[] argv) {
 		
@@ -322,9 +345,6 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		window.getThisPartyStarted();
 			
 	}
-	
-
-	
 
 	private static void configureLogging(int level) {
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
@@ -347,4 +367,5 @@ public class MainWindow extends JFrame implements IGameModelListener {
 				root.setLevel(Level.INFO);
 		}
 	}
+
 }
