@@ -50,7 +50,6 @@ public class DeviceNetworkListener implements Runnable {
 		stop = false;
 		try {
 			socket = new DatagramSocket(port);
-			socket.setSoTimeout(10 * 1000);
 		} catch (SocketException ex) {
 			log.error("Unable to open UDP socket for listening on port "+port, ex);
 			return;
