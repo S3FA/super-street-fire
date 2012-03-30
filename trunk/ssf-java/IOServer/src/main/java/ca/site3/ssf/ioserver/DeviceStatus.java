@@ -3,7 +3,9 @@ package ca.site3.ssf.ioserver;
 import java.net.InetAddress;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -19,6 +21,11 @@ import ca.site3.ssf.ioserver.DeviceConstants.Device;
  */
 public class DeviceStatus {
 	
+	public interface IDeviceStatusListener {
+		void deviceStatusChanged(DeviceStatus status);
+	}
+	
+	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	
@@ -32,6 +39,9 @@ public class DeviceStatus {
 			new EnumMap<Device, Integer>(Device.class);
 	
 	private Map<Device, Long> latestHeartbeats = new EnumMap<Device, Long>(Device.class);
+	
+	private Set<IDeviceStatusListener> listeners = new HashSet<IDeviceStatusListener>();
+	
 	
 	
 	/**
@@ -56,6 +66,9 @@ public class DeviceStatus {
 		
 		latestHeartbeats.put(d, System.currentTimeMillis());
 		log.debug("Device {} at address {} (RSSI={})", new Object[]{d,address,rssi});
+		
+		// blast out a notice regardless of whether the data changed
+		notifyListeners();
 	}
 	
 	
@@ -90,5 +103,23 @@ public class DeviceStatus {
 	 */
 	public int getDeviceBattery(Device d) {
 		return deviceToBattery.get(d);
+	}
+	
+	
+	
+	
+	public void addListener(IDeviceStatusListener l) {
+		listeners.add(l);
+	}
+	
+	public void removeListener(IDeviceStatusListener l) {
+		listeners.remove(l);
+	}
+	
+	
+	private void notifyListeners() {
+		for (IDeviceStatusListener l : listeners) {
+			l.deviceStatusChanged(this);
+		}
 	}
 }

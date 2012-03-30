@@ -41,6 +41,8 @@ public class IOServer {
 	
 	private CommunicationsManager commManager;
 	
+	private DeviceStatus deviceStatus = new DeviceStatus();
+	
 	private DeviceNetworkListener deviceListener;
 	
 	private HeartbeatListener heartbeatListener;
@@ -71,7 +73,7 @@ public class IOServer {
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 		
-		DeviceStatus deviceStatus = new DeviceStatus();
+		
 		heartbeatListener = new HeartbeatListener(arguments.heartbeatPort, deviceStatus);
 		Thread heartbeatListenerThread = new Thread(heartbeatListener);
 		heartbeatListenerThread.start();
@@ -93,6 +95,11 @@ public class IOServer {
 		log.info("I/O server terminating");
 		deviceListener.stop();
 		
+	}
+	
+	
+	public DeviceStatus getDeviceStatus() {
+		return deviceStatus;
 	}
 	
 	
