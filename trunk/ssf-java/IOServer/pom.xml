@@ -32,11 +32,6 @@
   	</dependency>
   	<dependency>
   		<groupId>ca.site3.ssf</groupId>
-  		<artifactId>DevGUI</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>ca.site3.ssf</groupId>
   		<artifactId>GUIProtocol</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
