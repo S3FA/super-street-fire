@@ -9,6 +9,10 @@ import java.util.Queue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+
+import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
@@ -26,9 +30,13 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
+import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceStatus;
 import ca.site3.ssf.ioserver.DeviceStatus.IDeviceStatusListener;
 import ca.site3.ssf.ioserver.IOServer;
+import ch.qos.logback.classic.Level;
+
+import com.beust.jcommander.JCommander;
 
 
 /**
@@ -54,10 +62,10 @@ public class MainWindow extends JFrame implements IGameModelListener {
     private Queue<AbstractGameModelCommand> commandQueue;
     
     
-	public MainWindow(IGameModel gameModel, Queue<AbstractGameModelCommand> commandQueue, IOServer ioserver) {
-		this.ioserver = ioserver;
-		this.gameModel = gameModel;
-		this.commandQueue = commandQueue;
+	public MainWindow(CommandLineArgs args) {
+		this.ioserver = new IOServer(args);
+		this.gameModel = ioserver.getGameModel();
+		this.commandQueue = ioserver.getCommandQueue();
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
@@ -97,7 +105,13 @@ public class MainWindow extends JFrame implements IGameModelListener {
 			}
 		});
 	}
+	
+	
+	private void getThisPartyStarted() {
+		ioserver.start();
+	}
 
+	
 	// GameModel 
 	public void onGameModelEvent(final IGameModelEvent event) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -285,4 +299,52 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		
 	}
 
+	
+	
+	public static void main(String[] argv) {
+		
+		CommandLineArgs args = new CommandLineArgs();
+		// populates args from argv
+		new JCommander(args, argv);
+		
+		configureLogging(args.verbosity);
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception ex) {
+			LoggerFactory.getLogger(MainWindow.class).warn("Couldn't set system look and feel", ex);
+		}
+		
+		final MainWindow window = new MainWindow(args);
+		window.setLocationRelativeTo(null);
+		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		window.setVisible(true);
+		window.getThisPartyStarted();
+			
+	}
+	
+
+	
+
+	private static void configureLogging(int level) {
+		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
+				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+		
+		switch (level) {
+			case 0:
+				root.setLevel(Level.OFF); break;
+			case 1:
+				root.setLevel(Level.TRACE); break;
+			case 2:
+				root.setLevel(Level.DEBUG); break;
+			case 3:
+				root.setLevel(Level.INFO); break;
+			case 4:
+				root.setLevel(Level.WARN); break;
+			case 5:
+				root.setLevel(Level.ERROR); break;
+			default:
+				root.setLevel(Level.INFO);
+		}
+	}
 }

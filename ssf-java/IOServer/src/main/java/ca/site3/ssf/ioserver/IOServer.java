@@ -1,17 +1,16 @@
 package ca.site3.ssf.ioserver;
 
+import java.util.Queue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.devgui.MainWindow;
+import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
-import ch.qos.logback.classic.Level;
-
-import com.beust.jcommander.JCommander;
 
 
 /**
@@ -39,7 +38,7 @@ public class IOServer {
 	/** Flag to indicate whether the server should be stopped */
 	private volatile boolean isStopped = false;
 	
-	private CommunicationsManager commManager;
+	private CommunicationsManager commManager = new CommunicationsManager();
 	
 	private DeviceStatus deviceStatus = new DeviceStatus();
 	
@@ -48,44 +47,36 @@ public class IOServer {
 	private HeartbeatListener heartbeatListener;
 	
 	
-	/** Developer / test GUI */
-	private MainWindow mainFrame;
-	
-	
+	public IOServer(CommandLineArgs args) {
+		this.args = args;
+
+		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
+												args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage);
+		game = new GameModel(gameConfig);
+	}
 	
 	/**
 	 * Configure things and kick off the event loop 
 	 */
-	public void start(CommandLineArgs arguments) {
+	public void start() {
 		
 		log.info("Starting I/O server");
-		args = arguments;
 		
 		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
 		
-		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
-												args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage);
-		game = new GameModel(gameConfig);
-		commManager  = new CommunicationsManager();
 		
-		
-		mainFrame = new MainWindow(game, commManager.getCommandQueue(), this);
-		mainFrame.setLocationRelativeTo(null);
-		mainFrame.setVisible(true);
-		
-		
-		heartbeatListener = new HeartbeatListener(arguments.heartbeatPort, deviceStatus);
+		heartbeatListener = new HeartbeatListener(args.heartbeatPort, deviceStatus);
 		Thread heartbeatListenerThread = new Thread(heartbeatListener);
 		heartbeatListenerThread.start();
 		
 		gameEventRouter = new GameEventRouter(commManager.getCommOutQueue(), commManager.getGuiOutQueue());
 		game.addGameModelListener(gameEventRouter);
 		
-		deviceListener = new DeviceNetworkListener(arguments.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
+		deviceListener = new DeviceNetworkListener(args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
 		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
 		deviceListenerThread.start();
 		
-		StreetFireServer guiServer = new StreetFireServer(arguments.guiPort, game.getActionFactory(), commManager.getCommandQueue());
+		StreetFireServer guiServer = new StreetFireServer(args.guiPort, game.getActionFactory(), commManager.getCommandQueue());
 		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
 		guiServerThread.start();
 		
@@ -98,10 +89,17 @@ public class IOServer {
 	}
 	
 	
+	public IGameModel getGameModel() {
+		return game;
+	}
+	
 	public DeviceStatus getDeviceStatus() {
 		return deviceStatus;
 	}
 	
+	public Queue<AbstractGameModelCommand> getCommandQueue() {
+		return commManager.getCommandQueue();
+	}
 	
 	/**
 	 * Maintains timing information and ticks the game engine
@@ -148,40 +146,4 @@ public class IOServer {
 		isStopped = true;
 	}
 	
-	
-	public static void main(String[] argv) {
-		
-		CommandLineArgs args = new CommandLineArgs();
-		// populates args from argv
-		new JCommander(args, argv);
-		
-		configureLogging(args.verbosity);
-		
-		IOServer server = new IOServer();
-		server.start(args);
-	}
-	
-	
-	
-	private static void configureLogging(int level) {
-		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
-				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-		
-		switch (level) {
-			case 0:
-				root.setLevel(Level.OFF); break;
-			case 1:
-				root.setLevel(Level.TRACE); break;
-			case 2:
-				root.setLevel(Level.DEBUG); break;
-			case 3:
-				root.setLevel(Level.INFO); break;
-			case 4:
-				root.setLevel(Level.WARN); break;
-			case 5:
-				root.setLevel(Level.ERROR); break;
-			default:
-				root.setLevel(Level.INFO);
-		}
-	}
 }
