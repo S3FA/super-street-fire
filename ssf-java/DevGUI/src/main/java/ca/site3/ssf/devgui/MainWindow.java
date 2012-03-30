@@ -13,7 +13,6 @@ import javax.swing.SwingUtilities;
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
-import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
@@ -27,6 +26,9 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
+import ca.site3.ssf.ioserver.DeviceStatus;
+import ca.site3.ssf.ioserver.DeviceStatus.IDeviceStatusListener;
+import ca.site3.ssf.ioserver.IOServer;
 
 
 /**
@@ -47,10 +49,13 @@ public class MainWindow extends JFrame implements IGameModelListener {
 	private GameInfoPanel infoPanel   = null;
 	private ControlPanel controlPanel = null;
     private IGameModel gameModel      = null;	
-	
+    private IOServer ioserver = null;
+    
     private Queue<AbstractGameModelCommand> commandQueue;
     
-	public MainWindow(IGameModel gameModel, Queue<AbstractGameModelCommand> commandQueue) {
+    
+	public MainWindow(IGameModel gameModel, Queue<AbstractGameModelCommand> commandQueue, IOServer ioserver) {
+		this.ioserver = ioserver;
 		this.gameModel = gameModel;
 		this.commandQueue = commandQueue;
 		
@@ -81,6 +86,16 @@ public class MainWindow extends JFrame implements IGameModelListener {
 		this.setLocationRelativeTo(null);
 		
 		this.gameModel.addGameModelListener(this);
+		
+		this.ioserver.getDeviceStatus().addListener(new IDeviceStatusListener() {
+			public void deviceStatusChanged(DeviceStatus status) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						// TODO update GUI based on device status
+					}
+				});
+			}
+		});
 	}
 
 	// GameModel 

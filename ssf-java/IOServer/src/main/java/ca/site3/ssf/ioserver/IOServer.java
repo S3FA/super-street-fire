@@ -69,7 +69,7 @@ public class IOServer {
 		commManager  = new CommunicationsManager();
 		
 		
-		mainFrame = new MainWindow(game, commManager.getCommandQueue());
+		mainFrame = new MainWindow(game, commManager.getCommandQueue(), this);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 		
