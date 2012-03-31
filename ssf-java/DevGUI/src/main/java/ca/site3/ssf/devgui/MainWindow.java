@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.util.Queue;
 
 import javax.swing.BorderFactory;
@@ -39,6 +41,7 @@ import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.ioserver.CommandLineArgs;
+import ca.site3.ssf.ioserver.DeviceConstants.Device;
 import ca.site3.ssf.ioserver.DeviceStatus;
 import ca.site3.ssf.ioserver.DeviceStatus.IDeviceStatusListener;
 import ca.site3.ssf.ioserver.IOServer;
@@ -57,13 +60,13 @@ import com.beust.jcommander.JCommander;
  *  
  *  @author Callum
  */
-public class MainWindow extends JFrame implements IGameModelListener, ActionListener {
+public class MainWindow extends JFrame implements IGameModelListener, ActionListener, IDeviceStatusListener {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private JMenuBar menuBar          = null;
 	private JMenu windowMenu          = null;
-	private JMenuItem gloveDataWindowMenuItem = null;
+	private JMenuItem gloveInfoWindowMenuItem = null;
 	
 	private GloveDataInfoPanel p1LeftGloveInfoPanel  = null;
 	private GloveDataInfoPanel p1RightGloveInfoPanel = null;
@@ -95,9 +98,9 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		
 		this.menuBar = new JMenuBar();
 		this.windowMenu = new JMenu("Window");
-		this.gloveDataWindowMenuItem = new JMenuItem("Glove Data");
-		this.gloveDataWindowMenuItem.addActionListener(this);
-		this.windowMenu.add(this.gloveDataWindowMenuItem);
+		this.gloveInfoWindowMenuItem = new JMenuItem("Glove Information");
+		this.gloveInfoWindowMenuItem.addActionListener(this);
+		this.windowMenu.add(this.gloveInfoWindowMenuItem);
 		this.menuBar.add(this.windowMenu);
 		
 		this.setJMenuBar(this.menuBar);
@@ -336,7 +339,7 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		if (event.getSource() == this.gloveDataWindowMenuItem) {
+		if (event.getSource() == this.gloveInfoWindowMenuItem) {
 			JFrame gloveDataWindow = new JFrame();
 			
 			JPanel basePanel = new JPanel();
@@ -371,6 +374,9 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 			ringmasterGloveDataPanel.add(this.ringmasterLeftGloveInfoPanel);
 			ringmasterGloveDataPanel.add(this.ringmasterRightGloveInfoPanel);
 			basePanel.add(ringmasterGloveDataPanel);
+			
+			gloveDataWindow.setTitle("Glove Information");
+			gloveDataWindow.setResizable(false);
 			
 			gloveDataWindow.add(basePanel);
 			gloveDataWindow.pack();
@@ -420,6 +426,37 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 				root.setLevel(Level.ERROR); break;
 			default:
 				root.setLevel(Level.INFO);
+		}
+	}
+
+	@Override
+	public void deviceStatusChanged(DeviceStatus status) {
+		{
+			InetAddress p1HeadsetAddr    = status.getDeviceAddress(Device.P1_HEADSET);
+			InetAddress p1LeftGloveAddr  = status.getDeviceAddress(Device.P1_LEFT_GLOVE);
+			InetAddress p1RightGloveAddr = status.getDeviceAddress(Device.P1_RIGHT_GLOVE);
+			
+			String p1HeadsetAddrStr    = (p1HeadsetAddr == null)    ? "" : p1HeadsetAddr.getHostAddress();
+			String p1LeftGloveAddrStr  = (p1LeftGloveAddr == null)  ? "" : p1LeftGloveAddr.getHostAddress();
+			String p1RightGloveAddrStr = (p1RightGloveAddr == null) ? "" : p1RightGloveAddr.getHostAddress();
+			
+			//this.p1HeadsetInfoPanel.setIPAddress(p1HeadsetAddrStr);
+			this.p1LeftGloveInfoPanel.setIPAddress(p1LeftGloveAddrStr);
+			this.p1RightGloveInfoPanel.setIPAddress(p1RightGloveAddrStr);
+		}
+		
+		{
+			InetAddress p2HeadsetAddr    = status.getDeviceAddress(Device.P2_HEADSET);
+			InetAddress p2LeftGloveAddr  = status.getDeviceAddress(Device.P2_LEFT_GLOVE);
+			InetAddress p2RightGloveAddr = status.getDeviceAddress(Device.P2_RIGHT_GLOVE);
+			
+			String p2HeadsetAddrStr    = (p2HeadsetAddr == null)    ? "" : p2HeadsetAddr.getHostAddress();
+			String p2LeftGloveAddrStr  = (p2LeftGloveAddr == null)  ? "" : p2LeftGloveAddr.getHostAddress();
+			String p2RightGloveAddrStr = (p2RightGloveAddr == null) ? "" : p2RightGloveAddr.getHostAddress();
+			
+			//this.p2HeadsetInfoPanel.setIPAddress(p2HeadsetAddrStr);
+			this.p2LeftGloveInfoPanel.setIPAddress(p2LeftGloveAddrStr);
+			this.p2RightGloveInfoPanel.setIPAddress(p2RightGloveAddrStr);
 		}
 	}
 

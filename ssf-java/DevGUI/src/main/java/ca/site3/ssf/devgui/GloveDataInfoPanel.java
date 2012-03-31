@@ -41,14 +41,18 @@ class GloveDataInfoPanel extends JPanel {
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 		
-		this.ipAddress = new JLabel(NOT_CONNECTED_STR);
+		this.ipAddress = new JLabel();
+		this.setIPAddress(NOT_CONNECTED_STR);
 		
 		this.rssiMeter = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
 		this.rssiMeter.setBorderPainted(true);
 		this.rssiMeter.setStringPainted(true);
+		this.setSignalPercent(0.0f);
+		
 		this.batteryMeter = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
 		this.batteryMeter.setBorderPainted(true);
 		this.batteryMeter.setStringPainted(true);
+		this.setBatteryPercent(0.0f);
 		
         GridBagLayout layout = new GridBagLayout();
 		this.setLayout(layout);
@@ -68,7 +72,12 @@ class GloveDataInfoPanel extends JPanel {
 	}
 	
 	void setIPAddress(String ipAddressStr) {
-		this.ipAddress.setText(ipAddressStr);
+		if (ipAddressStr == null || ipAddressStr.isEmpty()) {
+			this.ipAddress.setText(NOT_CONNECTED_STR);
+		}
+		else {
+			this.ipAddress.setText(ipAddressStr);
+		}
 	}
 	
 	void setBatteryPercent(float percent) {
