@@ -58,7 +58,7 @@ public class HeartbeatListener implements Runnable {
 		
 		try {
 			socket = new DatagramSocket(port);
-			log.info("Listening for heartbeats on port {} (UDP",port);
+			log.info("Listening for heartbeats on port {} (UDP)",port);
 		} catch (SocketException ex) {
 			log.error("Could not start heartbeat listener",ex);
 			return;

@@ -60,7 +60,9 @@ public class IOServer {
 	 */
 	public void start() {
 		
-		log.info("Starting I/O server");
+		log.info("\n~~~~~~~~~~~~~~~~~~~\nStarting I/O server\n" +
+				  args.toString() +
+				 "\n~~~~~~~~~~~~~~~~~~~");
 		
 		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
 		

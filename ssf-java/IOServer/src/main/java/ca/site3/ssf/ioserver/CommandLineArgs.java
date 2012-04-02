@@ -32,11 +32,33 @@ public class CommandLineArgs {
 	public Integer tickFrequency = 50;
 	
 	@Parameter(names={"-devicePort","-p"}, description="Port to listen on for peripherals")
-	public Integer devicePort = /*31338*/55555;
+	public Integer devicePort = 31338;
 	
 	@Parameter(names={"-heartbeatPort","-h"}, description="Port to listen on for heartbeats")
 	public Integer heartbeatPort = 55555;
 	
 	@Parameter(names={"-guiPort","-g"}, description="Port to listen on for GUI connections")
 	public Integer guiPort = 31337;
+	
+	
+	
+	
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append("Log level: "+verbosity+ "");
+		buf.append("\nChip damage: "+isChipDamage);
+		if (isChipDamage) {
+			buf.append(" (" + chipDamagePercentage +"%)");
+		}
+		buf.append("\nAction gap: "+ minTimeBetweenPlayerActionsInSecs +"s");
+		buf.append("\nRound length: "+ roundTimeInSecs+ "s");
+		buf.append("\nNumber of rounds: "+ numRoundsPerMatch +"s");
+		buf.append("\nTick frequency: "+ tickFrequency + " Hz");
+		buf.append("\nPeripheral port: "+ devicePort);
+		buf.append("\nHeartbeat port: "+ heartbeatPort);
+		buf.append("\nGUI port: "+ guiPort);
+		
+		return buf.toString();
+	}
 }

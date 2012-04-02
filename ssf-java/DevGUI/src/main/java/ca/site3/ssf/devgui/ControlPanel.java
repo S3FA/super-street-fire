@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Queue;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -13,22 +13,21 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
-import ca.site3.ssf.gamemodel.Action;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ca.site3.ssf.gamemodel.ActionFactory;
-import ca.site3.ssf.gamemodel.ExecuteGenericActionCommand;
 import ca.site3.ssf.gamemodel.GameState;
-import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
-import ca.site3.ssf.gamemodel.KillGameCommand;
-import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
-import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gesturerecognizer.GestureType;
+import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 
 @SuppressWarnings("serial")
 class ControlPanel extends JPanel implements ActionListener {
 	
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	private ActionFactory actionFactory = null;
-	private Queue<AbstractGameModelCommand> commandQueue = null;
+	private StreetFireGuiClient client = null;
 	
 	private JButton killButton      = null;
 	private JButton nextStateButton = null;
@@ -41,13 +40,15 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JComboBox playerActionComboBox     = null;
 	//private JComboBox ringmasterActionComboBox = null;
 	
+	
+	
 
-	ControlPanel(ActionFactory actionFactory, Queue<AbstractGameModelCommand> commandQueue) {
+	ControlPanel(ActionFactory actionFactory, StreetFireGuiClient client) {
 		super();
 		
 		this.actionFactory = actionFactory;
-		this.commandQueue = commandQueue;
-		assert(actionFactory != null && commandQueue != null);
+		this.client = client;
+		assert(this.actionFactory != null && this.client != null);
 		
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Controls");
 		border.setTitleColor(Color.black);
@@ -95,22 +96,25 @@ class ControlPanel extends JPanel implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent event) {
-		if (event.getSource() == this.nextStateButton) {
-			this.commandQueue.add(new InitiateNextStateCommand());
+		try {
+			if (event.getSource() == this.nextStateButton) {
+				client.initiateNextState();
+			}
+			else if (event.getSource() == this.killButton) {
+				client.killGame();
+			}
+			else if (event.getSource() == this.pauseButton) {
+				client.togglePauseGame();
+			}
+			else if (event.getSource() == this.executeP1ActionButton) {
+				this.executePlayerAction(1);
+			}
+			else if (event.getSource() == this.executeP2ActionButton) {
+				this.executePlayerAction(2);
+			}
+		} catch (IOException ex) {
+			log.warn("Exception communicating with IOServer",ex);
 		}
-		else if (event.getSource() == this.killButton) {
-			this.commandQueue.add(new KillGameCommand());
-		}
-		else if (event.getSource() == this.pauseButton) {
-			this.commandQueue.add(new TogglePauseGameCommand());
-		}
-		else if (event.getSource() == this.executeP1ActionButton) {
-			this.executePlayerAction(1);
-		}
-		else if (event.getSource() == this.executeP2ActionButton) {
-			this.executePlayerAction(2);
-		}
-		
 	}
 	
 	void gameStateChanged(GameState.GameStateType stateType) {
@@ -171,14 +175,11 @@ class ControlPanel extends JPanel implements ActionListener {
 		try {
 			GestureType gesture = GestureType.valueOf(GestureType.class,
 				this.playerActionComboBox.getSelectedItem().toString());
-			
-			Action action = actionFactory.buildPlayerAction(
-					playerNum, gesture.getActionFactoryType(), gesture.getUsesLeftHand(), gesture.getUsesRightHand());
-			this.commandQueue.add(new ExecuteGenericActionCommand(action));
-					
-		}
-		catch (IllegalArgumentException ex) {
+			client.executePlayerAction(playerNum, gesture.getActionFactoryType(), gesture.getUsesLeftHand(), gesture.getUsesRightHand());
+		} catch (IllegalArgumentException ex) {
 			assert(false);
+		} catch (IOException ex) {
+			log.warn("Could not execute player action",ex);
 		}
 	}
 	
