@@ -7,9 +7,9 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.Inet4Address;
+import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Queue;
+import java.net.UnknownHostException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -22,9 +22,9 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
@@ -40,6 +40,7 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
+import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceConstants.Device;
 import ca.site3.ssf.ioserver.DeviceStatus;
@@ -63,6 +64,7 @@ import com.beust.jcommander.JCommander;
 public class MainWindow extends JFrame implements IGameModelListener, ActionListener, IDeviceStatusListener {
 	
 	private static final long serialVersionUID = 1L;
+	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private JMenuBar menuBar          = null;
 	private JMenu windowMenu          = null;
@@ -81,19 +83,39 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
     private IGameModel gameModel      = null;	
     private IOServer ioserver         = null;
     
-    private Queue<AbstractGameModelCommand> commandQueue;
+    private CommandLineArgs args      = null;
+    private StreetFireGuiClient client = null;
     
     
-	public MainWindow(CommandLineArgs args) {
-		this.ioserver = new IOServer(args);
+    
+	public MainWindow(IOServer ioserver, CommandLineArgs args) {
+		this.args = args;
+		this.ioserver = ioserver;
 		this.gameModel = ioserver.getGameModel();
-		this.commandQueue = ioserver.getCommandQueue();
+	}
+	
+	
+	private void getThisPartyStarted() {
+		
+		InetAddress localhost = null;
+		try {
+			localhost = InetAddress.getLocalHost();
+		} catch (UnknownHostException ex) {
+			log.error("Could not find localhost",ex);
+		}
+		client = new StreetFireGuiClient(localhost, args.guiPort);
+		
+		try {
+			client.connect();
+		} catch (IOException ex) {
+			log.error("DevGUI could not connect to IOServer",ex);
+		}
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
 		this.setPreferredSize(new Dimension(1000, 750));
 		this.setMinimumSize(new Dimension(1000, 750));
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		
 		this.menuBar = new JMenuBar();
@@ -113,7 +135,7 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		this.ringmasterRightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);	
 		
 		// Setup the frame's contents...
-		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8), commandQueue);
+		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8), client);
 		Container contentPane = this.getContentPane();
 		contentPane.add(this.arenaDisplay, BorderLayout.CENTER);
 		
@@ -123,11 +145,11 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		this.infoPanel = new GameInfoPanel();
 		infoAndControlPanel.add(this.infoPanel, BorderLayout.NORTH);
 		
-		this.controlPanel = new ControlPanel(gameModel.getActionFactory(), commandQueue);
+		this.controlPanel = new ControlPanel(gameModel.getActionFactory(), client);
 		infoAndControlPanel.add(this.controlPanel, BorderLayout.CENTER);
 		
 		contentPane.add(infoAndControlPanel, BorderLayout.SOUTH);
-		
+
 		this.pack();
 		this.setLocationRelativeTo(null);
 		
@@ -142,11 +164,7 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 				});
 			}
 		});
-	}
-	
-	
-	private void getThisPartyStarted() {
-		ioserver.start();
+		
 	}
 
 	
@@ -387,7 +405,7 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 	
 	public static void main(String[] argv) {
 		
-		CommandLineArgs args = new CommandLineArgs();
+		final CommandLineArgs args = new CommandLineArgs();
 		// populates args from argv
 		new JCommander(args, argv);
 		
@@ -399,12 +417,17 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 			LoggerFactory.getLogger(MainWindow.class).warn("Couldn't set system look and feel", ex);
 		}
 		
-		final MainWindow window = new MainWindow(args);
-		window.setLocationRelativeTo(null);
-		window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		window.setVisible(true);
+		final IOServer ioserver = new IOServer(args);
+		Thread serverThread = new Thread(new Runnable() {
+			public @Override void run() {
+				ioserver.start();
+			}
+		}, "IOServer main thread");
+		serverThread.start();
+		
+		MainWindow window = new MainWindow(ioserver, args);
 		window.getThisPartyStarted();
-			
+		window.setVisible(true);
 	}
 
 	private static void configureLogging(int level) {

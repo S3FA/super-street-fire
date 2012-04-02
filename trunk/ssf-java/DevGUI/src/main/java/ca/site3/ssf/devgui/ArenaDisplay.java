@@ -23,25 +23,28 @@ import java.awt.geom.RoundRectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
-import java.util.Queue;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ca.site3.ssf.gamemodel.FireEmitter;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
-import ca.site3.ssf.gamemodel.IGameModel.Entity;
-import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.IGameModel;
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
-import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
+import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 
 class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = 7000442714767712317L;
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	final static float DASH_1[] = {10.0f};
 	final static private BasicStroke RAIL_STROKE            = new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	final static private BasicStroke DASHED_STROKE          = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 10.0f, DASH_1, 0.0f);
@@ -72,10 +75,10 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	
 	private RoundResult[] roundResults = null;
 	
-	private Queue<AbstractGameModelCommand> commandQueue;
+	private StreetFireGuiClient client = null;
 	
 	public ArenaDisplay(IGameModel gameModel, FireEmitterConfig fireEmitterConfig,
-						Queue<AbstractGameModelCommand> commandQueue) {
+						StreetFireGuiClient client) {
 		super();
 
 		this.setBorder(BorderFactory.createLineBorder(Color.black, 2));
@@ -108,8 +111,8 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			e.printStackTrace();
 		}
 		
-		assert(commandQueue != null);
-		this.commandQueue = commandQueue;
+		assert(client != null);
+		this.client = client;
 		
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
@@ -439,13 +442,21 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		
 		for (int i = 0; i < this.leftRailEmitterData.length; i++) {
 			if (this.leftRailEmitterData[i].contains(event.getX(), event.getY())) {
-				this.commandQueue.add(new TouchFireEmitterCommand(Location.LEFT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors));
+				try {
+					client.activateEmitter(Location.LEFT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors);
+				} catch (IOException ex) {
+					log.warn("Could not activate left rail emitter",ex);
+				}
 				return;
 			}
 		}
 		for (int i = 0; i < this.rightRailEmitterData.length; i++) {
 			if (this.rightRailEmitterData[i].contains(event.getX(), event.getY())) {
-				this.commandQueue.add(new TouchFireEmitterCommand(Location.RIGHT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors));
+				try {
+					client.activateEmitter(Location.RIGHT_RAIL, i, FireEmitter.MAX_INTENSITY, contributors);
+				} catch (IOException ex) {
+					log.warn("Could not activate right rail emitter",ex);
+				}
 				return;
 			}
 		}
@@ -455,7 +466,11 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		contributors.add(Entity.RINGMASTER_ENTITY);
 		for (int i = 0; i < this.outerRingEmitterData.length; i++) {
 			if (this.outerRingEmitterData[i].contains(event.getX(), event.getY())) {
-				this.commandQueue.add(new TouchFireEmitterCommand(Location.OUTER_RING, i, FireEmitter.MAX_INTENSITY, contributors));
+				try {
+					client.activateEmitter(Location.OUTER_RING, i, FireEmitter.MAX_INTENSITY, contributors);
+				} catch (IOException ex) {
+					log.warn("Could not activate outter rail emitter",ex);
+				}
 				return;
 			}
 		}
