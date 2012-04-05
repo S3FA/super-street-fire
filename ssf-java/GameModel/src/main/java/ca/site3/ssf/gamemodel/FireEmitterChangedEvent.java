@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Callum
  *
  */
-final public class FireEmitterChangedEvent implements IGameModelEvent {
+public class FireEmitterChangedEvent implements IGameModelEvent {
 	
 	final private int index;
 	final private FireEmitter.Location location;

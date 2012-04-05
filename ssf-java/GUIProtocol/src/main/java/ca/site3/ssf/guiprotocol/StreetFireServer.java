@@ -7,9 +7,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +22,27 @@ import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
 import ca.site3.ssf.gamemodel.ExecuteGenericActionCommand;
 import ca.site3.ssf.gamemodel.ExecutePlayerActionCommand;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
+import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
 import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
+import ca.site3.ssf.guiprotocol.Event.GameEvent;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.EventType;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command;
 
 /**
  * Accepts connections from a {@link StreetFireGuiClient} and handles
- * subsequent GUI messages.
+ * subsequent GUI commands, which are placed on the provided
+ * command queue.
+ * 
+ * Also sends along {@link IGameModelEvent} events of interest to any
+ * connected GUIs.
+ * 
+ * This class is thread-safe.
  * 
  * @author greg
  */
@@ -48,7 +60,14 @@ public class StreetFireServer implements Runnable {
 	
 	private Queue<AbstractGameModelCommand> commandQueue;
 	
-	private Set<GuiHandler> activeHandlers = new HashSet<StreetFireServer.GuiHandler>();
+	private BlockingQueue<GameEvent> eventQueue;
+	
+	/** thread to monitor eventQueue and send messages to GUIs */
+	private SendThread sendThread;
+	
+	
+	private Set<GuiHandler> activeHandlers = new CopyOnWriteArraySet<StreetFireServer.GuiHandler>();
+	
 	
 	
 	public StreetFireServer(int port, ActionFactory actionFactory, Queue<AbstractGameModelCommand> commandQueue) {
@@ -71,6 +90,9 @@ public class StreetFireServer implements Runnable {
 			log.error("Could not create server socket",ex);
 			return;
 		}
+		
+		sendThread = new SendThread();
+		sendThread.start();
 		
 		while ( ! stop ) {
 			try {
@@ -98,6 +120,74 @@ public class StreetFireServer implements Runnable {
 	}
 	
 	
+	/**
+	 * Monitors eventQueue and sends commands along to the server
+	 */
+	private class SendThread extends Thread {
+		@Override
+		public void run() {
+			while (true) {
+				try {
+					GameEvent event = eventQueue.take();
+					
+					for (GuiHandler guiHandler : activeHandlers) {
+						try {
+							guiHandler.sendGameEvent(event);
+						} catch (IOException ex) {
+							log.error("Exception sending GameEvent {} to GUI client",event);
+						}
+					}
+				} catch (InterruptedException ex) {
+					log.warn("Interrupted waiting for an event",ex);
+				}
+			}
+		}
+	}
+	
+	public void notifyGUI(IGameModelEvent e) {
+		eventQueue.offer(eventToProtobuf(e));
+	}
+	
+
+	private static GameEvent eventToProtobuf(IGameModelEvent evt) {
+		GameEvent.Builder b = GameEvent.newBuilder();
+		switch (evt.getType()) {
+		case FireEmitterChanged:
+			FireEmitterChangedEvent e = (FireEmitterChangedEvent)evt;
+			FireEmitter emitter = FireEmitter.newBuilder()
+					.setEmitterIndex(e.getIndex())
+					.setEmitterType(SerializationHelper.locationToEventProtobuf(e.getLocation()))
+					.setIntensityPlayer1(e.getIntensity(Entity.PLAYER1_ENTITY))
+					.setIntensityPlayer2(e.getIntensity(Entity.PLAYER2_ENTITY))
+					.setIntensityRingmaster(e.getIntensity(Entity.RINGMASTER_ENTITY)).build();
+			b.setType(EventType.FireEmitterChanged)
+				.setEmitter(emitter);
+			return b.build();
+		case GameStateChanged:
+			break;
+		case MatchEnded:
+			break;
+		case PlayerAttackAction:
+			break;
+		case PlayerBlockAction:
+			break;
+		case PlayerHealthChanged:
+			break;
+		case RingmasterAction:
+			break;
+		case RoundBeginTimerChanged:
+			break;
+		case RoundEnded:
+			break;
+		case RoundPlayTimerChanged:
+			break;
+		}
+		
+		return null;
+	}
+	
+	
+	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// GUI Communication Handler
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,7 +198,6 @@ public class StreetFireServer implements Runnable {
 	 * them for execution.
 	 * 
 	 * Also passes game events to the GUI as appropriate.
-	 * 
 	 * 
 	 * @author greg
 	 */
@@ -148,6 +237,8 @@ public class StreetFireServer implements Runnable {
 					log.warn("Exception closing GuiHandler socket",ex);
 				}
 			}
+			
+			activeHandlers.remove(this);
 		}
 		
 		
@@ -219,6 +310,12 @@ public class StreetFireServer implements Runnable {
 			Location location = SerializationHelper.emitterTypeToGame(cmd.getEmitterType());
 			EnumSet<Entity> contributors = SerializationHelper.playersToGame(cmd.getEmitterEntitiesList());
 			return new TouchFireEmitterCommand(location, cmd.getEmitterIndex(), cmd.getIntensity(), contributors);
+		}
+		
+		
+		
+		private void sendGameEvent(GameEvent event) throws IOException {
+			event.writeDelimitedTo(socket.getOutputStream());
 		}
 	}
 }

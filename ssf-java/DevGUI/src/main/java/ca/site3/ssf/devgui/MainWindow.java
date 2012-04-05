@@ -155,15 +155,7 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		
 		this.gameModel.addGameModelListener(this);
 		
-		this.ioserver.getDeviceStatus().addListener(new IDeviceStatusListener() {
-			public void deviceStatusChanged(DeviceStatus status) {
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// TODO update GUI based on device status
-					}
-				});
-			}
-		});
+		this.ioserver.getDeviceStatus().addListener(this);
 		
 	}
 

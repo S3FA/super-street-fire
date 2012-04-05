@@ -29,7 +29,7 @@ public class FireEmitter {
 			new HashMap<GameModel.Entity, FireEmitterContributor>(GameModel.Entity.values().length);
 	
 	
-	FireEmitter(int globalEmitterID, int index, Location location) {
+	public FireEmitter(int globalEmitterID, int index, Location location) {
 		this.globalEmitterID = globalEmitterID;
 		this.index = index;
 		this.location = location;
@@ -118,7 +118,7 @@ public class FireEmitter {
 		return totalIntensity;
 	}
 	
-	float getContributorIntensity(IGameModel.Entity contributor) {
+	protected float getContributorIntensity(IGameModel.Entity contributor) {
 		FireEmitterContributor fireEmitterContrib = (FireEmitterContributor)this.contributors.get(contributor);
 		assert(fireEmitterContrib != null);
 		return fireEmitterContrib.getResolvedIntensity();

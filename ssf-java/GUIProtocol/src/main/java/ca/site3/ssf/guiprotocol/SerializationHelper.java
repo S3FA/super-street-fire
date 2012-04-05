@@ -6,7 +6,11 @@ import java.util.EnumSet;
 
 import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
+import ca.site3.ssf.guiprotocol.Event.GameEvent;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.GameState;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction;
@@ -155,6 +159,20 @@ class SerializationHelper {
 		}
 	}
 	
+	// ugh duplication here is where java really bogs down
+	static Location eventEmitterTypeToGame(ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitterType t) {
+		switch (t) {
+		case LEFT_RAIL:
+			return Location.LEFT_RAIL;
+		case OUTER_RING:
+			return Location.OUTER_RING;
+		case RIGHT_RAIL:
+			return Location.RIGHT_RAIL;
+		default:
+			throw new IllegalArgumentException("Unknown fire emitter location from event: "+t);
+		}
+	}
+	
 	
 	static FireEmitterType locationToProtobuf(Location l) {
 		switch (l) {
@@ -168,5 +186,63 @@ class SerializationHelper {
 			throw new IllegalArgumentException("Unknown fire emitter location: "+l);
 		}
 	}
+
 	
+	static GameEvent.FireEmitterType locationToEventProtobuf(Location l) {
+		switch (l) {
+		case LEFT_RAIL:
+			return GameEvent.FireEmitterType.LEFT_RAIL;
+		case OUTER_RING:
+			return GameEvent.FireEmitterType.OUTER_RING;
+		case RIGHT_RAIL:
+			return GameEvent.FireEmitterType.RIGHT_RAIL;
+		default:
+			throw new IllegalArgumentException("Unknown fire emitter location: "+l);
+		}
+	}
+	
+	
+	static GameStateType protobufToGameState(GameState gameState) {
+		switch (gameState) {
+		case IDLE_STATE:
+			return GameStateType.IDLE_STATE;
+		case MATCH_ENDED_STATE:
+			return GameStateType.MATCH_ENDED_STATE;
+		case NO_STATE:
+			return GameStateType.NO_STATE;
+		case PAUSED_STATE:
+			return GameStateType.PAUSED_STATE;
+		case RINGMASTER_STATE:
+			return GameStateType.RINGMASTER_STATE;
+		case ROUND_BEGINNING_STATE:
+			return GameStateType.ROUND_BEGINNING_STATE;
+		case ROUND_ENDED_STATE:
+			return GameStateType.ROUND_ENDED_STATE;
+		case ROUND_IN_PLAY_STATE:
+			return GameStateType.ROUND_IN_PLAY_STATE;
+		case TIE_BREAKER_ROUND_STATE:
+			return GameStateType.TIE_BREAKER_ROUND_STATE;
+		default:
+			throw new IllegalArgumentException("Unknown GameStateType: "+gameState);
+		}
+	}
+	
+	static AttackType protobufToAttackType(ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType t) {
+		switch (t) {
+		case HADOUKEN:
+			return AttackType.HADOUKEN_ATTACK;
+		case LEFT_HOOK:
+			return AttackType.LEFT_HOOK_ATTACK;
+		case LEFT_JAB:
+			return AttackType.LEFT_JAB_ATTACK;
+		case RIGHT_HOOK:
+			return AttackType.RIGHT_HOOK_ATTACK;
+		case RIGHT_JAB:
+			return AttackType.RIGHT_JAB_ATTACK;
+		case SONIC_BOOM:
+			return AttackType.SONIC_BOOM_ATTACK;
+		default:
+			throw new IllegalArgumentException("Unrecognized attack type: "+t);
+		}
+	}
 }
