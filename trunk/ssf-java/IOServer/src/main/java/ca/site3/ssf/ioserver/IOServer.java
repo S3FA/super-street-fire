@@ -60,7 +60,8 @@ public class IOServer {
 	 */
 	public void start() {
 		
-		log.info("\n~~~~~~~~~~~~~~~~~~~\nStarting I/O server\n" +
+		log.info("\n~~~~~~~~~~~~~~~~~~~\n" +
+				 "Starting I/O server\n" +
 				  args.toString() +
 				 "\n~~~~~~~~~~~~~~~~~~~");
 		

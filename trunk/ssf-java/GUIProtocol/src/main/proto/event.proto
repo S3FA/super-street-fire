@@ -1,0 +1,117 @@
+package guiprotocol;
+
+option java_package = "ca.site3.ssf.guiprotocol";
+
+
+message GameEvent {
+
+  // corresponds to IGameModelEvent classes
+  enum EventType {
+    FireEmitterChanged = 0;
+	GameStateChanged = 1;
+	PlayerHealthChanged = 2;
+	RoundPlayTimerChanged = 3;
+	RoundBeginTimerChanged = 4;
+	RoundEnded = 5;
+	MatchEnded = 6;
+	PlayerAttackAction = 7;
+	PlayerBlockAction = 8;
+	RingmasterAction = 9;
+  }
+  
+  
+  // for GameStateChanged
+  enum GameState {
+    NO_STATE = 0;
+	ROUND_BEGINNING_STATE = 1;
+	ROUND_IN_PLAY_STATE = 2;
+	ROUND_ENDED_STATE = 3;
+	TIE_BREAKER_ROUND_STATE = 4;
+	MATCH_ENDED_STATE = 5;
+	PAUSED_STATE = 6;
+	RINGMASTER_STATE = 7;
+	IDLE_STATE = 8;
+  }
+  
+  
+  // for PlayerEvents, FireEmitterChanged etc.
+  enum Player {
+    RINGMASTER = 0;
+    P1 = 1;
+    P2 = 2;
+  }
+  
+  // for TOUCH_EMITTER
+  enum FireEmitterType {
+    LEFT_RAIL = 0;
+    RIGHT_RAIL = 1;
+    OUTER_RING = 2;
+  }
+  
+  enum FlameEmitterType { 
+    ATTACK_FLAME = 0;
+    BLOCK_FLAME = 1;
+    NON_GAME_FLAME = 2;
+  }
+  
+  enum AttackType {
+    LEFT_JAB = 0;
+    RIGHT_JAB = 1; 
+    LEFT_HOOK = 2;
+    RIGHT_HOOK = 3;
+    HADOUKEN = 4;
+    SONIC_BOOM = 5;
+  }
+  
+  // needed to reconstruct a FireEmitter (or at impersonate a FireEmitterChangedEvent)
+  message FireEmitter {
+     required int32 emitterIndex = 1;
+     required FireEmitterType emitterType = 2; // like FireEmitter.Location
+     required float intensityRingmaster = 3;
+     required float intensityPlayer1 = 4;
+     required float intensityPlayer2 = 5;
+  }
+  
+  
+  // lets deserializer know which fields to look for
+  required EventType type = 1;
+  
+  // FireEmitterChanged
+  optional FireEmitter emitter = 2;
+  
+  // GameStateChanged
+  optional GameState oldGameState = 3;
+  optional GameState newGameState = 4;
+  
+  // MatchEnded
+  optional Player matchWinner = 5; // ringmaster shouldn't be allowed here but meh
+  
+  
+  // shared between Player{Attack,Block}ActionEvent and PlayerHealthChange
+  optional Player player = 6;
+  
+  // PlayerAttackActionEvent
+  optional AttackType attackType = 7;
+  
+  // PlayerBlockActionEvent
+  // reuse player
+  
+  // PlayerHealthChange
+  optional float oldHealth = 9;
+  optional float newHealth = 10;
+  
+  // RingmasterActionEvent
+  // -- nothing to do here
+  
+  // RoundBeginTimerChangeEvent
+  optional int32 roundNumber = 11;
+  optional int32 beginType = 12; // 3=3, 2=2, 1=1, 0=fight
+  
+  // RoundEndedEvent
+  // share roundNumber
+  optional Player roundWinner = 13; // ringmaster means tie
+  optional bool timedOut = 14;
+  
+  // RoundPlayTimerChangedEvent
+  optional int32 timeInSecs = 15;
+}
