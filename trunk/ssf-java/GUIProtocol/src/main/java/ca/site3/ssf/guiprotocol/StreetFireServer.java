@@ -23,15 +23,26 @@ import ca.site3.ssf.gamemodel.ExecuteGenericActionCommand;
 import ca.site3.ssf.gamemodel.ExecutePlayerActionCommand;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
+import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
+import ca.site3.ssf.gamemodel.MatchEndedEvent;
+import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
+import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
+import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
+import ca.site3.ssf.gamemodel.RoundEndedEvent;
+import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.EventType;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command;
 
 /**
@@ -151,39 +162,61 @@ public class StreetFireServer implements Runnable {
 
 	private static GameEvent eventToProtobuf(IGameModelEvent evt) {
 		GameEvent.Builder b = GameEvent.newBuilder();
-		switch (evt.getType()) {
-		case FireEmitterChanged:
+		if (evt.getType() == Type.FireEmitterChanged) {
 			FireEmitterChangedEvent e = (FireEmitterChangedEvent)evt;
 			FireEmitter emitter = FireEmitter.newBuilder()
-					.setEmitterIndex(e.getIndex())
-					.setEmitterType(SerializationHelper.locationToEventProtobuf(e.getLocation()))
-					.setIntensityPlayer1(e.getIntensity(Entity.PLAYER1_ENTITY))
-					.setIntensityPlayer2(e.getIntensity(Entity.PLAYER2_ENTITY))
-					.setIntensityRingmaster(e.getIntensity(Entity.RINGMASTER_ENTITY)).build();
+				.setEmitterIndex(e.getIndex())
+				.setEmitterType(SerializationHelper.locationToEventProtobuf(e.getLocation()))
+				.setIntensityPlayer1(e.getIntensity(Entity.PLAYER1_ENTITY))
+				.setIntensityPlayer2(e.getIntensity(Entity.PLAYER2_ENTITY))
+				.setIntensityRingmaster(e.getIntensity(Entity.RINGMASTER_ENTITY)).build();
 			b.setType(EventType.FireEmitterChanged)
 				.setEmitter(emitter);
-			return b.build();
-		case GameStateChanged:
-			break;
-		case MatchEnded:
-			break;
-		case PlayerAttackAction:
-			break;
-		case PlayerBlockAction:
-			break;
-		case PlayerHealthChanged:
-			break;
-		case RingmasterAction:
-			break;
-		case RoundBeginTimerChanged:
-			break;
-		case RoundEnded:
-			break;
-		case RoundPlayTimerChanged:
-			break;
+		} else if (evt.getType() == Type.GameStateChanged) {
+			GameStateChangedEvent e = (GameStateChangedEvent)evt;
+			b.setType(EventType.GameStateChanged)
+				.setOldGameState(SerializationHelper.gameStateToProtobuf(e.getOldState()))
+				.setNewGameState(SerializationHelper.gameStateToProtobuf(e.getNewState()));
+		} else if (evt.getType() == Type.MatchEnded) {
+			MatchEndedEvent e = (MatchEndedEvent)evt;
+			b.setType(EventType.MatchEnded)
+				.setMatchWinner(e.getMatchResult() == MatchResult.PLAYER1_VICTORY ? Player.P1 : Player.P2);
+		} else if (evt.getType() == Type.PlayerAttackAction) {
+			PlayerAttackActionEvent e = (PlayerAttackActionEvent)evt;
+			b.setType(EventType.PlayerAttackAction)
+				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2)
+				.setAttackType(SerializationHelper.attackTypeToProtobuf(e.getAttackType()));
+		} else if (evt.getType() == Type.PlayerBlockAction) {
+			PlayerBlockActionEvent e = (PlayerBlockActionEvent)evt;
+			b.setType(EventType.PlayerBlockAction)
+				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2);
+		} else if (evt.getType() == Type.PlayerHealthChanged) {
+			PlayerHealthChangedEvent e = (PlayerHealthChangedEvent)evt;
+			b.setType(EventType.PlayerHealthChanged)
+				.setOldHealth(e.getPrevLifePercentage())
+				.setNewHealth(e.getNewLifePercentage());
+		} else if (evt.getType() == Type.RingmasterAction) {
+			//RingmasterActionEvent e = (RingmasterActionEvent)evt;
+			b.setType(EventType.RingmasterAction);
+		} else if (evt.getType() == Type.RoundBeginTimerChanged) {
+			RoundBeginTimerChangedEvent e = (RoundBeginTimerChangedEvent)evt;
+			b.setType(EventType.RoundBeginTimerChanged)
+				.setRoundNumber(e.getRoundNumber())
+				.setBeginType(SerializationHelper.beginTypeToProtobuf(e.getThreeTwoOneFightTime()));
+		} else if (evt.getType() == Type.RoundEnded) {
+			RoundEndedEvent e = (RoundEndedEvent)evt;
+			b.setType(EventType.RoundEnded)
+				.setRoundNumber(e.getRoundNumber())
+				.setTimedOut(e.getRoundTimedOut())
+				.setRoundWinner(SerializationHelper.roundWinnerProtobuf(e.getRoundResult()));
+		} else if (evt.getType() == Type.RoundPlayTimerChanged) {
+			RoundPlayTimerChangedEvent e = (RoundPlayTimerChangedEvent)evt;
+			b.setType(EventType.RoundPlayTimerChanged)
+				.setTimeInSecs(e.getTimeInSecs());
+		} else {
+			throw new IllegalArgumentException("Unknown game event type: "+evt.getType());
 		}
-		
-		return null;
+		return b.build();
 	}
 	
 	
