@@ -9,6 +9,8 @@ import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
+import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.GameState;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType;
@@ -202,6 +204,9 @@ class SerializationHelper {
 	}
 	
 	
+	
+	
+	
 	static GameStateType protobufToGameState(GameState gameState) {
 		switch (gameState) {
 		case IDLE_STATE:
@@ -223,6 +228,31 @@ class SerializationHelper {
 		case TIE_BREAKER_ROUND_STATE:
 			return GameStateType.TIE_BREAKER_ROUND_STATE;
 		default:
+			throw new IllegalArgumentException("Unknown GameState: "+gameState);
+		}
+	}
+	
+	static GameState gameStateToProtobuf(GameStateType gameState) {
+		switch (gameState) {
+		case IDLE_STATE:
+			return GameState.IDLE_STATE;
+		case MATCH_ENDED_STATE:
+			return GameState.MATCH_ENDED_STATE;
+		case NO_STATE:
+			return GameState.NO_STATE;
+		case PAUSED_STATE:
+			return GameState.PAUSED_STATE;
+		case RINGMASTER_STATE:
+			return GameState.RINGMASTER_STATE;
+		case ROUND_BEGINNING_STATE:
+			return GameState.ROUND_BEGINNING_STATE;
+		case ROUND_ENDED_STATE:
+			return GameState.ROUND_ENDED_STATE;
+		case ROUND_IN_PLAY_STATE:
+			return GameState.ROUND_IN_PLAY_STATE;
+		case TIE_BREAKER_ROUND_STATE:
+			return GameState.TIE_BREAKER_ROUND_STATE;
+		default:
 			throw new IllegalArgumentException("Unknown GameStateType: "+gameState);
 		}
 	}
@@ -242,7 +272,55 @@ class SerializationHelper {
 		case SONIC_BOOM:
 			return AttackType.SONIC_BOOM_ATTACK;
 		default:
-			throw new IllegalArgumentException("Unrecognized attack type: "+t);
+			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
+		}
+	}
+	
+	static ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType attackTypeToProtobuf(AttackType t) {
+		switch (t) {
+		case HADOUKEN_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.HADOUKEN;
+		case LEFT_HOOK_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_HOOK;
+		case LEFT_JAB_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
+		case RIGHT_HOOK_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_HOOK;
+		case RIGHT_JAB_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_JAB;
+		case SONIC_BOOM_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SONIC_BOOM;
+		default:
+			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
+		}
+	}
+	
+	
+	static int beginTypeToProtobuf(RoundBeginCountdownType t) {
+		switch (t) {
+		case FIGHT:
+			return 0;
+		case ONE:
+			return 1;
+		case TWO:
+			return 2;
+		case THREE:
+			return 3;
+		default:
+			throw new IllegalArgumentException("Invalid RoundBeginCountdownType: "+t);
+		}
+	}
+	
+	static ca.site3.ssf.guiprotocol.Event.GameEvent.Player roundWinnerProtobuf(RoundResult r) {
+		switch (r) {
+		case PLAYER1_VICTORY:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.Player.P1;
+		case PLAYER2_VICTORY:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.Player.P2;
+		case TIE:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER; // yes i know this is semantically wonky
+		default:
+			throw new IllegalArgumentException("Can't make sense of RoundResult: "+r);
 		}
 	}
 }
