@@ -66,4 +66,9 @@ public class TestGuiProtocol {
 		assertEquals("Not all commands made it to queue",4, commandQueue.size());
 	}
 
+	
+	@Test
+	public void testEvents() {
+		
+	}
 }

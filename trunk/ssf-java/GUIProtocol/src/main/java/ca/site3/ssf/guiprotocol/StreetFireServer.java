@@ -11,6 +11,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,7 @@ public class StreetFireServer implements Runnable {
 	
 	private Queue<AbstractGameModelCommand> commandQueue;
 	
-	private BlockingQueue<GameEvent> eventQueue;
+	private BlockingQueue<GameEvent> eventQueue = new LinkedBlockingQueue<Event.GameEvent>();
 	
 	/** thread to monitor eventQueue and send messages to GUIs */
 	private SendThread sendThread;
@@ -193,6 +194,7 @@ public class StreetFireServer implements Runnable {
 		} else if (evt.getType() == Type.PlayerHealthChanged) {
 			PlayerHealthChangedEvent e = (PlayerHealthChangedEvent)evt;
 			b.setType(EventType.PlayerHealthChanged)
+				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2)
 				.setOldHealth(e.getPrevLifePercentage())
 				.setNewHealth(e.getNewLifePercentage());
 		} else if (evt.getType() == Type.RingmasterAction) {

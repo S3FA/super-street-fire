@@ -72,17 +72,17 @@ public class IOServer {
 		Thread heartbeatListenerThread = new Thread(heartbeatListener);
 		heartbeatListenerThread.start();
 		
-		gameEventRouter = new GameEventRouter(commManager.getCommOutQueue(), commManager.getGuiOutQueue());
-		game.addGameModelListener(gameEventRouter);
-		
-		deviceListener = new DeviceNetworkListener(args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
-		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
-		deviceListenerThread.start();
 		
 		StreetFireServer guiServer = new StreetFireServer(args.guiPort, game.getActionFactory(), commManager.getCommandQueue());
 		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
 		guiServerThread.start();
 		
+		gameEventRouter = new GameEventRouter(guiServer, commManager.getGuiOutQueue());
+		game.addGameModelListener(gameEventRouter);
+		
+		deviceListener = new DeviceNetworkListener(args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
+		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
+		deviceListenerThread.start();
 		
 		isStopped = false;
 		runLoop();
@@ -138,7 +138,7 @@ public class IOServer {
 					Thread.sleep(frameLengthInMillis - deltaFrameTime);
 				} catch (InterruptedException ex) {
 					// not much to be done about this
-					log.warn("IO/Server interrupted during runLoop",ex);
+					log.warn("IOServer interrupted during runLoop",ex);
 				}
 			}
 		}

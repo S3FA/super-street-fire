@@ -77,7 +77,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	
 	private StreetFireGuiClient client = null;
 	
-	public ArenaDisplay(IGameModel gameModel, FireEmitterConfig fireEmitterConfig,
+	public ArenaDisplay(int roundsPerMatch, FireEmitterConfig fireEmitterConfig,
 						StreetFireGuiClient client) {
 		super();
 
@@ -87,7 +87,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		this.fireEmitterConfig = fireEmitterConfig;
 		assert(fireEmitterConfig != null);
 		
-		this.roundResults = new RoundResult[gameModel.getConfiguration().getNumRoundsPerMatch() + 1]; // +1 for the tie breaker round...
+		this.roundResults = new RoundResult[roundsPerMatch + 1]; // +1 for the tie breaker round...
 		for (int i = 0; i < this.roundResults.length; i++) {
 			this.roundResults[i] = null;
 		}

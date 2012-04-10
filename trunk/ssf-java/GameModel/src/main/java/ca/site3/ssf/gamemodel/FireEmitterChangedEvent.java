@@ -42,6 +42,8 @@ public class FireEmitterChangedEvent implements IGameModelEvent {
 		return this.location;
 	}
 	public float getIntensity(GameModel.Entity entity) {
+		if (intensities.containsKey(entity) == false)
+			return 0f;
 		return this.intensities.get(entity).floatValue();
 	}
 	public float getMaxIntensity() {
