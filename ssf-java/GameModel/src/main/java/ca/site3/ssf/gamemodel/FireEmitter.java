@@ -47,7 +47,7 @@ public class FireEmitter {
 	 * flame intensity for this fire effect.
 	 * @return The set of enumerated contributing game entities.
 	 */
-	EnumSet<GameModel.Entity> getContributingEntities() {
+	protected EnumSet<GameModel.Entity> getContributingEntities() {
 		EnumSet<GameModel.Entity> contributorSet = EnumSet.noneOf(GameModel.Entity.class);
 		
 		for (Map.Entry<GameModel.Entity, FireEmitterContributor> entry : this.contributors.entrySet()) {

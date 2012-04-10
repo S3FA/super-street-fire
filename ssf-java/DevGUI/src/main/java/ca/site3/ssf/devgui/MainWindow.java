@@ -31,7 +31,6 @@ import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
@@ -54,14 +53,10 @@ import com.beust.jcommander.JCommander;
 /**
  * Main frame for the developer GUI. Displays current state of the FireEmitterModel, 
  * player health, game status etc. 
- * 
- *  TODO: get the devgui to be using the guiprotocol to communicate with the ioserver directly
- *  (might be nice to have an option to either directly listen on the game model or else
- *  use the GUIProtocol)
  *  
  *  @author Callum
  */
-public class MainWindow extends JFrame implements IGameModelListener, ActionListener, IDeviceStatusListener {
+public class MainWindow extends JFrame implements ActionListener, IDeviceStatusListener {
 	
 	private static final long serialVersionUID = 1L;
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -86,6 +81,8 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
     private CommandLineArgs args      = null;
     private StreetFireGuiClient client = null;
     
+    /** thread that monitors the queue for game model events */
+    private Thread gameEventThread;
     
     
 	public MainWindow(IOServer ioserver, CommandLineArgs args) {
@@ -135,7 +132,7 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		this.ringmasterRightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);	
 		
 		// Setup the frame's contents...
-		this.arenaDisplay = new ArenaDisplay(gameModel, new FireEmitterConfig(true, 16, 8), client);
+		this.arenaDisplay = new ArenaDisplay(gameModel.getConfiguration().getNumRoundsPerMatch(), new FireEmitterConfig(true, 16, 8), client);
 		Container contentPane = this.getContentPane();
 		contentPane.add(this.arenaDisplay, BorderLayout.CENTER);
 		
@@ -153,15 +150,25 @@ public class MainWindow extends JFrame implements IGameModelListener, ActionList
 		this.pack();
 		this.setLocationRelativeTo(null);
 		
-		this.gameModel.addGameModelListener(this);
+		gameEventThread = new Thread("DevGUI game event listener thread") {
+			public @Override void run() {
+				while (true) {
+					try {
+						IGameModelEvent event = client.getEventQueue().take();
+						handleGameModelEvent(event);
+					} catch (InterruptedException ex) {
+						log.warn("DevGUI interrupted while waiting for game model event",ex);
+					}
+				}
+			}
+		};
+		gameEventThread.start();
 		
 		this.ioserver.getDeviceStatus().addListener(this);
-		
 	}
 
-	
-	// GameModel 
-	public void onGameModelEvent(final IGameModelEvent event) {
+	 
+	private void handleGameModelEvent(final IGameModelEvent event) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				switch (event.getType()) {

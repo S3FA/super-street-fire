@@ -21,16 +21,16 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
-import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
-import ca.site3.ssf.gamemodel.RingmasterActionEvent;
-import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
-import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
+import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
@@ -208,6 +208,10 @@ public class StreetFireGuiClient {
 	 * Monitors commandQueue and sends commands along to the server
 	 */
 	private class SendThread extends Thread {
+		public SendThread() {
+			super("GUI Client command sender");
+		}
+		
 		@Override
 		public void run() {
 			while (true) {
@@ -241,13 +245,17 @@ public class StreetFireGuiClient {
 	 * Listens for events coming from the server and puts then on the event queue.
 	 */
 	private class ReceiveThread extends Thread {
+		public ReceiveThread() {
+			super("GUI Client event receiver");
+		}
+		
 		@Override
 		public void run() {
 			while (true) {
 				try {
 					GameEvent event = GameEvent.parseDelimitedFrom(socket.getInputStream());
 					if (event != null) {
-						IGameModelEvent gameEvent = parseEvent(event); 
+						IGameModelEvent gameEvent = parseEvent(event);
 						if (gameEvent != null) {
 							eventQueue.add(gameEvent);
 						}
@@ -328,7 +336,7 @@ public class StreetFireGuiClient {
 	
 	private FireEmitter createFireEmitter(GameEvent e) {
 		final ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter fe = e.getEmitter();
-		return new FireEmitter(fe.getEmitterIndex(), 0, SerializationHelper.eventEmitterTypeToGame(fe.getEmitterType()) ) {
+		return new FireEmitter(0, fe.getEmitterIndex(), SerializationHelper.eventEmitterTypeToGame(fe.getEmitterType()) ) {
 			@Override
 			protected float getContributorIntensity(Entity contributor) {
 				switch (contributor) {
@@ -341,6 +349,18 @@ public class StreetFireGuiClient {
 				default:
 					throw new IllegalArgumentException("Unknown entity: "+contributor);
 				}
+			}
+
+			@Override
+			protected EnumSet<Entity> getContributingEntities() {
+				EnumSet<Entity> entities = EnumSet.noneOf(Entity.class);
+				if (fe.getIntensityPlayer1() > MIN_INTENSITY)
+					entities.add(Entity.PLAYER1_ENTITY);
+				if (fe.getIntensityPlayer2() > MIN_INTENSITY)
+					entities.add(Entity.PLAYER2_ENTITY);
+				if (fe.getIntensityRingmaster() > MIN_INTENSITY)
+					entities.add(Entity.RINGMASTER_ENTITY);
+				return entities;
 			}
 		};
 	}

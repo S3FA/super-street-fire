@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelListener;
+import ca.site3.ssf.guiprotocol.StreetFireServer;
 
 
 /**
- * Handles notifications coming from the {@link IGameModel} by wrapping them in a IGameModelEvent
- * and shoving them onto the appropriate queue to be consumed by other thread(s). 
+ * Handles notifications coming from the {@link IGameModel} 
  * 
  * @author greg
  */
@@ -21,45 +21,23 @@ public class GameEventRouter implements IGameModelListener {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	private BlockingQueue<IGameModelEvent> commQueue;
-	private BlockingQueue<IGameModelEvent> guiQueue;
+	
+	private StreetFireServer server;
 	
 	
 	/**
 	 * @param commQueue for events of interest to non-GUI game hardware
 	 * @param guiQueue for events that should be passed along to the GUI
 	 */
-	public GameEventRouter(BlockingQueue<IGameModelEvent> commQueue, BlockingQueue<IGameModelEvent> guiQueue) {
+	public GameEventRouter(StreetFireServer server, BlockingQueue<IGameModelEvent> commQueue) {
 		this.commQueue = commQueue;
-		this.guiQueue = guiQueue;
+		this.server = server;
 	}
 
 
 	public void onGameModelEvent(IGameModelEvent event) {
-		switch (event.getType()) {
-		case FireEmitterChanged:
-			break;
-		case GameStateChanged:
-			break;
-		case MatchEnded:
-			break;
-		case PlayerAttackAction:
-			break;
-		case PlayerBlockAction:
-			break;
-		case PlayerHealthChanged:
-			break;
-		case RingmasterAction:
-			break;
-		case RoundBeginTimerChanged:
-			break;
-		case RoundEnded:
-			break;
-		case RoundPlayTimerChanged:
-			break;
-		default:
-			log.warn("Unhandled GameModel event type: "+event.getType());
-			break;
-		}
+		// just blast all events out to GUI for now
+		server.notifyGUI(event);
 	}
 	
 }
