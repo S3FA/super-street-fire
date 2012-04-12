@@ -23,8 +23,8 @@ public class DeviceDataParser implements IDeviceDataParser {
 	
 	private DeviceStatus deviceStatus;
 	
-	private Pattern pattern = Pattern.compile("^AN0:([^,]+),AN1:([^,]+),AN2:([^,]+),AN3:([^,]+),AN4:([^,]+),AN5:([^,]+)\\|$");
-	
+	// gX:69.68,gY:-77.45,gZ:-20.77,aX:-265.64,aY:239.84,aZ:4228.79,RLL:0.69,PCH:-2.46|
+	private Pattern pattern = Pattern.compile("^gX:([^,]+),gY:([^,]+),gZ:([^,]+),aX:([^,]+),aY:([^,]+),aZ:([^,]+),RLL:([^,]+),PCH:([^|]+)\\|$");
 	
 	public DeviceDataParser(DeviceStatus deviceStatus) {
 		this.deviceStatus = deviceStatus;
@@ -46,7 +46,7 @@ public class DeviceDataParser implements IDeviceDataParser {
 		
 		// XXX: currently assuming one line per datagram
 		String dataStr = new String(data);
-		if (dataStr.startsWith("AN0") == false) {
+		if (dataStr.startsWith("gX") == false) {
 			log.warn("Ignoring data: '{}'",dataStr);
 			return null;
 		}
@@ -75,6 +75,8 @@ public class DeviceDataParser implements IDeviceDataParser {
 			}
 		}
 		
+//		double roll = Double.parseDouble(m.group(7));
+//		double pitch = Double.parseDouble(m.group(8));
 		
 		boolean buttonDown = true;
 		return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), buttonDown, gyro, accel, heading);
