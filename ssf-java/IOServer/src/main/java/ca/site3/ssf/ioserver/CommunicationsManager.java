@@ -6,6 +6,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 
 /**
  * Holds queues to be used for passing game events / info to and from the main event thread.
@@ -24,27 +26,12 @@ public class CommunicationsManager {
 	private BlockingQueue<AbstractGameModelCommand> commandQueue = new LinkedBlockingQueue<AbstractGameModelCommand>();
 	
 	
-	private Thread commOutConsumer;
-	private Thread commInConsumer;
-	private Thread guiOutConsumer;
-	private Thread guiInConsumer;
 	
-	
-	/**
-	 * Start the threads that will be the consumers for the queues
-	 */
-	public void startConsumers() {
-		// TODO
-	}
-
 	
 	@SuppressWarnings("unchecked")
 	public void shutdown() {
 		for (BlockingQueue<?> q : Arrays.asList(commOutQueue,commInQueue,guiOutQueue,commandQueue)) {
 			q.clear();
-		}
-		for (Thread t : Arrays.asList(commOutConsumer, commInConsumer, guiOutConsumer, guiInConsumer)) {
-			t.interrupt();
 		}
 	}
 	
@@ -53,6 +40,15 @@ public class CommunicationsManager {
 	}
 
 
+	/**
+	 * Queue for events received from peripherals.
+	 * 
+	 * Populated by the {@link DeviceNetworkListener} / {@link IDeviceDataParser}.
+	 * Listened on by gesture recorder, though there should soon be an intermediate
+	 * common layer in IOServer that aggregates {@link DeviceEvent}s into the 
+	 * {@link GestureInstance} structures expected by the {@link GestureRecognizer}.
+	 * @see whiteboard at site3
+	 */
 	BlockingQueue<DeviceEvent> getCommInQueue() {
 		return commInQueue;
 	}

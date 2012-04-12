@@ -1,6 +1,7 @@
 package ca.site3.ssf.ioserver;
 
 import java.net.InetAddress;
+import java.util.List;
 
 /**
  * Translates raw data from the network into a higher-level DeviceEvent
@@ -16,5 +17,5 @@ public interface IDeviceDataParser {
 	 * @param src IP address the data came from
 	 * @return a DeviceEvent representing the data from the peripheral
 	 */
-	DeviceEvent parseDeviceData(byte[] data, InetAddress src) throws Exception;
+	List<? extends DeviceEvent> parseDeviceData(byte[] data, InetAddress src) throws Exception;
 }

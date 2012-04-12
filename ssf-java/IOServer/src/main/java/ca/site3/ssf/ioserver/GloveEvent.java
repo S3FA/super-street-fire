@@ -1,5 +1,7 @@
 package ca.site3.ssf.ioserver;
 
+import java.util.Arrays;
+
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
 
@@ -59,5 +61,11 @@ public class GloveEvent extends DeviceEvent {
 	 */
 	public boolean isButtonPressed() {
 		return buttonPressed;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "GloveEvent: gyro: " + Arrays.toString(this.gyro) + " acceleration: " + Arrays.toString(this.acceleration);
 	}
 }
