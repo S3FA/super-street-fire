@@ -25,7 +25,7 @@ public class TestGloveDataParser {
 		
 		try {
 			InetAddress localhost = InetAddress.getLocalHost();
-			int port = 31337;
+			int port = 3000;
 			
 			DeviceStatus deviceStatus = new DeviceStatus();
 			deviceStatus.setDeviceInfo(Device.P1_LEFT_GLOVE, localhost, (byte)1, 1);
@@ -55,12 +55,13 @@ public class TestGloveDataParser {
 			fail(ex.getMessage());
 		}
 
-		assertEquals("Frame count / event count mismatch", 7, q.size());
+		assertEquals("Frame count / event count mismatch", 8, q.size());
 		assertEquals(GloveEvent.class, q.peek().getClass());
 		GloveEvent e = (GloveEvent) q.peek();
 		
-		double expectedGyro[] = new double[] { 109.71, 72.51,-97.64 };
-		double expectedAccel[] = new double[] {26.41, -70.77, 4528.14}; 
+		// gX:-34.32,gY:19.55,gZ:85.23,aX:85.36,aY:-244.16,aZ:4362.79,RLL:0.60,PCH:-2.37|
+		double expectedGyro[] = new double[] { -34.32, 19.55, 85.23 };
+		double expectedAccel[] = new double[] { 85.36, -244.16, 4362.79 }; 
 		double epsilon = 0.000001;
 		for (int i=0; i<3; i++) {
 			assertEquals("Gyro mismatch",expectedGyro[i], e.getGyro()[i], epsilon);
