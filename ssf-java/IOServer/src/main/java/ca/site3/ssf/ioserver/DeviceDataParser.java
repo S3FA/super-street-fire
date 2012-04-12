@@ -54,7 +54,7 @@ public class DeviceDataParser implements IDeviceDataParser {
 		String[] strings = rawString.split("\n");
 		List<DeviceEvent> events = new ArrayList<DeviceEvent>(strings.length);
 		for (String dataStr : strings) {
-			GloveEvent gloveEvent = parseSingleLine(d, dataStr);
+			GloveEvent gloveEvent = parseSingleLine(d, dataStr.trim());
 			events.add(gloveEvent);
 		}
 		
