@@ -35,8 +35,8 @@ public class DeviceStatus {
 			new ConcurrentHashMap<InetAddress, DeviceConstants.Device>(EnumSet.allOf(Device.class).size());
 	private Map<Device, Float> deviceToRssi = 
 			new EnumMap<Device, Float>(Device.class);
-	private Map<Device, Integer> deviceToBattery = 
-			new EnumMap<Device, Integer>(Device.class);
+	private Map<Device, Float> deviceToBattery = 
+			new EnumMap<Device, Float>(Device.class);
 	
 	private Map<Device, Long> latestHeartbeats = new EnumMap<Device, Long>(Device.class);
 	
@@ -61,8 +61,8 @@ public class DeviceStatus {
 			}
 		}
 		
-		deviceToRssi.put(d, rssi / (float)Byte.MAX_VALUE);		
-		deviceToBattery.put(d,battery);
+		deviceToRssi.put(d, (float)rssi / (float)Byte.MAX_VALUE);		
+		deviceToBattery.put(d, (float)battery / 5000.0f); // NOTE: If this is constantly too low, then change 5000 to 3700
 		
 		latestHeartbeats.put(d, System.currentTimeMillis());
 		log.debug("Device {} at address {} (RSSI={})", new Object[]{d,address,rssi});
@@ -91,7 +91,7 @@ public class DeviceStatus {
 	
 	/**
 	 * @param d
-	 * @return the most recent RSSI value for d
+	 * @return the most recent RSSI value as a percentage
 	 */
 	public float getDeviceRssi(Device d) {
 		return deviceToRssi.get(d);
@@ -99,14 +99,11 @@ public class DeviceStatus {
 	
 	/**
 	 * @param d
-	 * @return the most recent battery level for d in mV
+	 * @return the most recent battery level for d as a percentage
 	 */
-	public int getDeviceBattery(Device d) {
+	public float getDeviceBattery(Device d) {
 		return deviceToBattery.get(d);
 	}
-	
-	
-	
 	
 	public void addListener(IDeviceStatusListener l) {
 		listeners.add(l);

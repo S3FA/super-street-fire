@@ -454,31 +454,55 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	@Override
 	public void deviceStatusChanged(DeviceStatus status) {
 		{
-			InetAddress p1HeadsetAddr    = status.getDeviceAddress(Device.P1_HEADSET);
+			//InetAddress p1HeadsetAddr    = status.getDeviceAddress(Device.P1_HEADSET);
 			InetAddress p1LeftGloveAddr  = status.getDeviceAddress(Device.P1_LEFT_GLOVE);
 			InetAddress p1RightGloveAddr = status.getDeviceAddress(Device.P1_RIGHT_GLOVE);
 			
-			String p1HeadsetAddrStr    = (p1HeadsetAddr == null)    ? "" : p1HeadsetAddr.getHostAddress();
+			//String p1HeadsetAddrStr    = (p1HeadsetAddr == null)    ? "" : p1HeadsetAddr.getHostAddress();
 			String p1LeftGloveAddrStr  = (p1LeftGloveAddr == null)  ? "" : p1LeftGloveAddr.getHostAddress();
 			String p1RightGloveAddrStr = (p1RightGloveAddr == null) ? "" : p1RightGloveAddr.getHostAddress();
 			
 			//this.p1HeadsetInfoPanel.setIPAddress(p1HeadsetAddrStr);
 			this.p1LeftGloveInfoPanel.setIPAddress(p1LeftGloveAddrStr);
 			this.p1RightGloveInfoPanel.setIPAddress(p1RightGloveAddrStr);
+			
+			float p1LeftGloveSignalPercent = status.getDeviceRssi(Device.P1_LEFT_GLOVE);
+			float p1RightGloveSignalPercent = status.getDeviceRssi(Device.P1_RIGHT_GLOVE);
+			
+			this.p1LeftGloveInfoPanel.setSignalPercent(p1LeftGloveSignalPercent);
+			this.p1RightGloveInfoPanel.setSignalPercent(p1RightGloveSignalPercent);
+			
+			float p1LeftGloveBatteryPercent  = status.getDeviceBattery(Device.P1_LEFT_GLOVE);
+			float p1RightGloveBatteryPercent = status.getDeviceBattery(Device.P1_RIGHT_GLOVE);
+					
+			this.p1LeftGloveInfoPanel.setBatteryPercent(p1LeftGloveBatteryPercent);
+			this.p1RightGloveInfoPanel.setBatteryPercent(p1RightGloveBatteryPercent);
 		}
 		
 		{
-			InetAddress p2HeadsetAddr    = status.getDeviceAddress(Device.P2_HEADSET);
+			//InetAddress p2HeadsetAddr    = status.getDeviceAddress(Device.P2_HEADSET);
 			InetAddress p2LeftGloveAddr  = status.getDeviceAddress(Device.P2_LEFT_GLOVE);
 			InetAddress p2RightGloveAddr = status.getDeviceAddress(Device.P2_RIGHT_GLOVE);
 			
-			String p2HeadsetAddrStr    = (p2HeadsetAddr == null)    ? "" : p2HeadsetAddr.getHostAddress();
+			//String p2HeadsetAddrStr    = (p2HeadsetAddr == null)    ? "" : p2HeadsetAddr.getHostAddress();
 			String p2LeftGloveAddrStr  = (p2LeftGloveAddr == null)  ? "" : p2LeftGloveAddr.getHostAddress();
 			String p2RightGloveAddrStr = (p2RightGloveAddr == null) ? "" : p2RightGloveAddr.getHostAddress();
 			
 			//this.p2HeadsetInfoPanel.setIPAddress(p2HeadsetAddrStr);
 			this.p2LeftGloveInfoPanel.setIPAddress(p2LeftGloveAddrStr);
 			this.p2RightGloveInfoPanel.setIPAddress(p2RightGloveAddrStr);
+			
+			float p2LeftGloveSignalPercent = status.getDeviceRssi(Device.P2_LEFT_GLOVE);
+			float p2RightGloveSignalPercent = status.getDeviceRssi(Device.P2_RIGHT_GLOVE);
+			
+			this.p2LeftGloveInfoPanel.setSignalPercent(p2LeftGloveSignalPercent);
+			this.p2RightGloveInfoPanel.setSignalPercent(p2RightGloveSignalPercent);
+			
+			float p2LeftGloveBatteryPercent  = status.getDeviceBattery(Device.P2_LEFT_GLOVE);
+			float p2RightGloveBatteryPercent = status.getDeviceBattery(Device.P2_RIGHT_GLOVE);
+					
+			this.p2LeftGloveInfoPanel.setBatteryPercent(p2LeftGloveBatteryPercent);
+			this.p2RightGloveInfoPanel.setBatteryPercent(p2RightGloveBatteryPercent);			
 		}
 	}
 
