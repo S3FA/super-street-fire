@@ -1,6 +1,7 @@
 package ca.site3.ssf.ioserver;
 
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
+import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
 
@@ -102,6 +104,11 @@ public class IOServer {
 	
 	public Queue<AbstractGameModelCommand> getCommandQueue() {
 		return commManager.getCommandQueue();
+	}
+	
+	
+	public BlockingQueue<DeviceEvent> getDeviceEventQueue() {
+		return commManager.getCommInQueue();
 	}
 	
 	/**

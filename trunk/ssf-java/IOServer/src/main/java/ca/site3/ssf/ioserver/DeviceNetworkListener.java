@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Queue;
 
 import org.slf4j.Logger;
@@ -77,9 +78,12 @@ public class DeviceNetworkListener implements Runnable {
 				byte[] data = Arrays.copyOfRange(receivedPacket.getData(), receivedPacket.getOffset(), 
 						receivedPacket.getOffset()+receivedPacket.getLength());
 				InetAddress address = receivedPacket.getAddress();
-				DeviceEvent event = dataParser.parseDeviceData(data, address);
-				if (event != null) {
-					eventQueue.add(event);
+				List<? extends DeviceEvent> events = dataParser.parseDeviceData(data, address);
+				for (DeviceEvent e : events) {
+					log.debug("Created DeviceEvent: {}", e);
+					if (e != null) {
+						eventQueue.add(e);
+					}
 				}
 			} catch (Exception ex) {
 				log.warn("Could not parse packet data", ex);

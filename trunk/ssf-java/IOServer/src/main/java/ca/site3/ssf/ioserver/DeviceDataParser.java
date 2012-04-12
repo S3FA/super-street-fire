@@ -1,6 +1,8 @@
 package ca.site3.ssf.ioserver;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +34,7 @@ public class DeviceDataParser implements IDeviceDataParser {
 	
 	
 	
-	public DeviceEvent parseDeviceData(byte[] data, InetAddress srcIP) throws Exception {
+	public List<DeviceEvent> parseDeviceData(byte[] data, InetAddress srcIP) throws Exception {
 		
 		Device d = deviceStatus.getDeviceAtAddress(srcIP);
 		if (d == null) {
@@ -44,8 +46,23 @@ public class DeviceDataParser implements IDeviceDataParser {
 			return null;
 		}
 		
-		// XXX: currently assuming one line per datagram
-		String dataStr = new String(data);
+		/*
+		 *  XXX: currently assuming datagrams break cleanly at | boundaries
+		 *  (though could be multiple lines per datagram)
+		 */
+		String rawString = new String(data).trim();
+		String[] strings = rawString.split("\n");
+		List<DeviceEvent> events = new ArrayList<DeviceEvent>(strings.length);
+		for (String dataStr : strings) {
+			GloveEvent gloveEvent = parseSingleLine(d, dataStr);
+			events.add(gloveEvent);
+		}
+		
+		return events;
+	}
+
+	
+	private GloveEvent parseSingleLine(Device d, String dataStr) {
 		if (dataStr.startsWith("gX") == false) {
 			log.warn("Ignoring data: '{}'",dataStr);
 			return null;
@@ -81,5 +98,4 @@ public class DeviceDataParser implements IDeviceDataParser {
 		boolean buttonDown = true;
 		return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), buttonDown, gyro, accel, heading);
 	}
-
 }
