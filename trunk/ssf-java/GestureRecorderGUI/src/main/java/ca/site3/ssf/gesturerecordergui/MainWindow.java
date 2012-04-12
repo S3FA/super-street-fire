@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GloveData;
+import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceEvent;
 import ca.site3.ssf.ioserver.DeviceNetworkListener;
 import ca.site3.ssf.ioserver.DeviceStatus;
@@ -48,7 +49,7 @@ public class MainWindow extends JFrame {
 	
 	private DeviceStatus deviceStatus = new DeviceStatus();
 	private HeartbeatListener heartbeatListener = new HeartbeatListener(55555, deviceStatus);
-	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(31337, new LegacyGloveDataParser(), eventQueue);
+	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(new CommandLineArgs().devicePort, new LegacyGloveDataParser(), eventQueue);
 	
 	private Thread consumerThread;
 	private Runnable doUpdateInterface;
