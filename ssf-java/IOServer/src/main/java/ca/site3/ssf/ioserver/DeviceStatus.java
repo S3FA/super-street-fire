@@ -94,7 +94,10 @@ public class DeviceStatus {
 	 * @return the most recent RSSI value as a percentage
 	 */
 	public float getDeviceRssi(Device d) {
-		return deviceToRssi.get(d);
+		Float rssi = deviceToRssi.get(d);
+		if (rssi == null)
+			return 0f;
+		return rssi;
 	}
 	
 	/**
@@ -102,7 +105,10 @@ public class DeviceStatus {
 	 * @return the most recent battery level for d as a percentage
 	 */
 	public float getDeviceBattery(Device d) {
-		return deviceToBattery.get(d);
+		Float battery = deviceToBattery.get(d);
+		if (battery == null)
+			return 0f;
+		return battery;
 	}
 	
 	public void addListener(IDeviceStatusListener l) {
