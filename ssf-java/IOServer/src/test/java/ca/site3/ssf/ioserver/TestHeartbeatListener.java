@@ -47,7 +47,9 @@ public class TestHeartbeatListener {
 			assertEquals(deviceStatus.getDeviceAddress(d), localhost);
 			assertEquals(deviceStatus.getDeviceAtAddress(localhost), d);
 			assertEquals(deviceStatus.getDeviceRssi(d), 0.3622, 0.00001);
-			assertEquals(deviceStatus.getDeviceBattery(d), 3061);
+			
+			float batteryMax = 5000f; // might need to change to 3700 or ??
+			assertEquals(deviceStatus.getDeviceBattery(d), 3061 / batteryMax, 0.00001);
 			
 			socket.close();
 			hbl.stop();
