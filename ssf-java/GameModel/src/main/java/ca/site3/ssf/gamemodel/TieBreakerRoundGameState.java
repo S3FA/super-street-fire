@@ -149,7 +149,7 @@ class TieBreakerGameState extends GameState {
 				return;
 		}
 		
-		this.activeActions.add(action);
+		Action.mergeAction(this.activeActions, action);
 	}
 
 	@Override
