@@ -1,10 +1,12 @@
 package ca.site3.ssf.gamemodel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 
 import ca.site3.ssf.common.MultiLerp;
+import ca.site3.ssf.gamemodel.FireEmitter.FlameType;
 
 /**
  * Abstract superclass for any move/action taken by participants
@@ -22,6 +24,54 @@ public abstract class Action {
 	Action(FireEmitterModel fireEmitterModel) {
 		this.fireEmitterModel = fireEmitterModel;
 		assert(this.fireEmitterModel != null);
+	}
+	
+	static void mergeAction(Collection<Action> activeActions, Action actionToMerge) {
+		
+		switch (actionToMerge.getActionFlameType()) {
+		
+			case BLOCK_FLAME: {
+				// Block flames need to be specially merged...
+				Iterator<Action> iter = activeActions.iterator();
+				boolean didMerge = false;
+				while (iter.hasNext()) {
+					Action action = iter.next();
+	
+					if (action.getActionFlameType() == FlameType.BLOCK_FLAME &&
+						action.getContributorEntity() == actionToMerge.getContributorEntity()) {
+						((PlayerBlockAction)action).merge((PlayerBlockAction)actionToMerge);
+						didMerge = true;
+					}
+				}
+				
+				if (!didMerge) {
+					activeActions.add(actionToMerge);
+				}
+				
+				break;
+			}
+			
+			case ATTACK_FLAME: {
+				// An attack flame will cancel out any blocks being made by the player
+				// making the attack
+				Iterator<Action> iter = activeActions.iterator();
+				while (iter.hasNext()) {
+					Action action = iter.next();
+					if (action.getActionFlameType() == FlameType.BLOCK_FLAME &&
+						action.getContributorEntity() == actionToMerge.getContributorEntity()) {
+						
+						action.kill();
+						iter.remove();
+					}
+				}
+				activeActions.add(actionToMerge);
+				break;
+			}
+			
+			default:
+				activeActions.add(actionToMerge);
+				break;
+		}
 	}
 	
 	boolean addFireEmitterBurst(FireEmitterIterator emitterIter, int width, int numBursts, MultiLerp intensityLerp) {

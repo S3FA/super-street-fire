@@ -39,10 +39,15 @@ public class PlayerAttackAction extends Action {
 	 * emitter where a block was simultaneously occurring from the attackee) has occurred on one of 
 	 * its simulators. This function will ensure that the block cancels one of the attack flames in this
 	 * attack action.
-	 * @param simIndex The index of the simulator in this action where the block occurred.
 	 */
 	void blockOccurred(int waveIndex, int simulatorIndex) {
-		assert(waveIndex >= 0 && waveIndex < this.wavesOfOrderedFireSims.size());
+		assert(waveIndex >= 0);
+		
+		// If the waveIndex is out of bounds then just exit, this attack has already
+		// been blocked/finished/cleared
+		if (waveIndex >= this.wavesOfOrderedFireSims.size()) {
+			return;
+		}
 		
 		// Chip damage...
 		this.attackee.doChipDamage(this.damagePerFlame);
@@ -51,7 +56,13 @@ public class PlayerAttackAction extends Action {
 		// of that block to each of the simulators that are after it - this will cancel out
 		// one of the flames on each of the successive simulators
 		ArrayList<FireEmitterSimulator> simulatorWave = this.wavesOfOrderedFireSims.get(waveIndex);
-		assert(simulatorIndex >= 0 && simulatorIndex < simulatorWave.size());
+		
+		// If the simulatorIndex is out of bounds then we just exit, this attack has
+		// already finished
+		assert(simulatorIndex >= 0);
+		if (simulatorIndex >= simulatorWave.size()) {
+			return;
+		}
 		
 		for (int i = simulatorIndex+1; i < simulatorWave.size(); i++) {
 			simulatorWave.get(i).flameBlocked();

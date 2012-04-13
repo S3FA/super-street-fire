@@ -1,5 +1,8 @@
 package ca.site3.ssf.gamemodel;
 
+
+import java.util.List;
+import java.util.ArrayList;
 import ca.site3.ssf.common.MultiLerp;
 
 /**
@@ -55,8 +58,8 @@ final public class ActionFactory {
 			case BLOCK:
 				action = new PlayerBlockAction(fireEmitterModel, blockerOrAttacker);
 
-				success &= this.addBurstToAction(action, emitterIterLeft, 1, 1, 1.0, 0.9, 0.01);
-				success &= this.addBurstToAction(action, emitterIterRight, 1, 1, 1.0, 0.9, 0.01);
+				success &= this.addBurstToAction(action, emitterIterLeft, 1, 1, 3.0, 0.99, 0.01);
+				success &= this.addBurstToAction(action, emitterIterRight, 1, 1, 3.0, 0.99, 0.01);
 				break;
 				
 			case JAB_ATTACK:
@@ -373,15 +376,38 @@ final public class ActionFactory {
 			                                        double startDelayTime, double endDelayTime) {
 		
 		// Make sure the provided parameters are in sequential order from least to greatest
-		if (startMaxIntensityTime <= 0.0 || startMaxIntensityTime > endMaxIntensityTime ||
+		if (startMaxIntensityTime < 0.0 || startMaxIntensityTime > endMaxIntensityTime ||
 		    endMaxIntensityTime > startDelayTime || startDelayTime > endDelayTime) {
 			assert(false);
 			return null;
 		}
 		
-		double[] timeValues      = { 0.0, startMaxIntensityTime, endMaxIntensityTime, startDelayTime, endDelayTime };
-		double[] intensityValues = { 0.0, 1.0, 1.0, 0.0, 0.0 };
+		List<Double> timeValues      = new ArrayList<Double>();
+		List<Double> intensityValues = new ArrayList<Double>();
 		
+		timeValues.add(0.0);
+		if (startMaxIntensityTime != 0.0) {
+			
+			timeValues.add(startMaxIntensityTime);
+			intensityValues.add(0.0);
+		}
+		intensityValues.add(1.0);
+		
+		if (startMaxIntensityTime != endMaxIntensityTime) {
+			timeValues.add(endMaxIntensityTime);
+			intensityValues.add(1.0);
+		}
+		
+		if (startDelayTime != endMaxIntensityTime) {
+			timeValues.add(startDelayTime);
+			intensityValues.add(0.0);
+		}
+		
+		if (startDelayTime != endDelayTime) {
+			timeValues.add(endDelayTime);
+			intensityValues.add(0.0);
+		}
+
 		return new MultiLerp(timeValues, intensityValues);
 	}
 	

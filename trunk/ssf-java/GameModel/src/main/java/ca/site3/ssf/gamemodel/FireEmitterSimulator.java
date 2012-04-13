@@ -45,12 +45,21 @@ class FireEmitterSimulator {
 		
 		this.intensityLerp = intensityLerpPerPlay;
 		assert(intensityLerpPerPlay != null);
-		assert(intensityLerpPerPlay.getFirstInterpolantValue() == 0.0);
 		assert(intensityLerpPerPlay.getLastInterpolantValue()  == 0.0);
 		assert(intensityLerpPerPlay.getFirstTimeValue() == 0.0);
 		
 		this.currNumberOfPlays = 0;
 		this.blockAttackCancellationOccurredOnLastLerp = false;
+	}
+	
+	void merge(FireEmitterSimulator simToMerge) {
+		assert(this.waveIndex == simToMerge.waveIndex);
+		assert(this.simulatorIndex == simToMerge.simulatorIndex);
+		this.intensityLerp = simToMerge.intensityLerp;
+		this.numPlays += (simToMerge.numPlays - 1);
+		if (this.numPlays <= 0) {
+			this.numPlays = 1;
+		}
 	}
 	
 	/**

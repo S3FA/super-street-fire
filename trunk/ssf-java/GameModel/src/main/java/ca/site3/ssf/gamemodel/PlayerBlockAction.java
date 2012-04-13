@@ -1,5 +1,7 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.ArrayList;
+
 class PlayerBlockAction extends Action {
 
 	final private Player blocker;
@@ -16,6 +18,28 @@ class PlayerBlockAction extends Action {
 	
 	void blockOccurred() {
 		// do nothing currently, the block will stay sustained just like in street fire.
+	}
+	
+	void merge(PlayerBlockAction actionToMerge) {
+		if (actionToMerge.blocker != this.blocker) {
+			return;
+		}
+
+		int minSize = Math.min(actionToMerge.wavesOfOrderedFireSims.size(),
+				this.wavesOfOrderedFireSims.size());
+		for (int i = 0; i < minSize; i++) {
+			ArrayList<FireEmitterSimulator> thisWave  = this.wavesOfOrderedFireSims.get(i);
+			ArrayList<FireEmitterSimulator> mergeWave = actionToMerge.wavesOfOrderedFireSims.get(i);
+			int minWaveSize = Math.min(thisWave.size(), mergeWave.size());
+			
+			for (int j = 0; j < minWaveSize; j++) {
+				FireEmitterSimulator thisSim = thisWave.get(j);
+				FireEmitterSimulator mergeSim = mergeWave.get(j);
+				
+				thisSim.merge(mergeSim);
+			}
+		}
+		
 	}
 	
 	@Override
