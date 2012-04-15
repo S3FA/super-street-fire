@@ -20,7 +20,7 @@ public final class PlayerAttackActionEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.PlayerAttackAction;
+		return Type.PLAYER_ATTACK_ACTION;
 	}
 
 }

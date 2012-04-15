@@ -12,6 +12,7 @@ public final class ExecuteGenericActionCommand extends AbstractGameModelCommand 
 	
 	@Override
 	void execute(GameModel gameModel) {
+		assert(gameModel != null);
 		gameModel.executeGenericAction(this.action);
 	}
 

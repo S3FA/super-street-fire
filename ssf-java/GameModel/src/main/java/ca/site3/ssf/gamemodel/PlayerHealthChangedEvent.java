@@ -26,7 +26,7 @@ public final class PlayerHealthChangedEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.PlayerHealthChanged;
+		return Type.PLAYER_HEALTH_CHANGED;
 	}
 
 }

@@ -157,6 +157,10 @@ class RoundInPlayState extends GameState {
 		return GameState.GameStateType.ROUND_IN_PLAY_STATE;
 	}
 	
+	int getLastCountdownValueInSecs() {
+		return this.lastRoundedCountdownValueInSecs;
+	}
+	
 	/**
 	 * Helper function to set the count down timer to the given time. This will not only
 	 * set the count down timer value but also perform other functions required whenever
@@ -196,15 +200,17 @@ class RoundInPlayState extends GameState {
 		// Stop all emitters immediately
 		this.clearAndResetAllEmitters();
 		
-		victoryPlayer.incrementNumRoundWins();
-		this.gameModel.incrementNumRoundsPlayed();
-		
 		// Signal an event for the round ending in victory for a player...
 		RoundResult result = RoundResult.PLAYER1_VICTORY;
 		if (victoryPlayer.getPlayerNumber() == 2) {
 			result = RoundResult.PLAYER2_VICTORY;
 		}
-		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, this.countdownTimeInSecs <= 0.0);
+		
+		victoryPlayer.incrementNumRoundWins();
+		this.gameModel.addRoundResult(result);
+		
+		boolean roundTimedOut = this.roundHasTimedOut();
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, roundTimedOut);
 		
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);
@@ -229,7 +235,7 @@ class RoundInPlayState extends GameState {
 		}
 
 		// The round is over but the match isn't
-		this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, victoryPlayer));
+		this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, victoryPlayer, roundTimedOut));
 	}
 	
 	/**
@@ -239,13 +245,13 @@ class RoundInPlayState extends GameState {
 		// Stop all emitters immediately
 		this.clearAndResetAllEmitters();
 		
-		this.gameModel.incrementNumRoundsPlayed();
+		this.gameModel.addRoundResult(RoundResult.TIE);
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
 		
 		// We don't increment the number of wins for either player on a tie... 
-		
-		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), RoundResult.TIE, this.countdownTimeInSecs <= 0.0);
+		boolean roundTimedOut = this.roundHasTimedOut();
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), RoundResult.TIE, roundTimedOut);
 		
 		GameConfig gameConfig = this.gameModel.getConfig();
 		assert(gameConfig != null);
@@ -271,7 +277,11 @@ class RoundInPlayState extends GameState {
 		}
 		
 		// Round is over but the match isn't
-		this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, null));
+		this.gameModel.setNextGameState(new RoundEndedGameState(this.gameModel, null, roundTimedOut));
+	}
+
+	boolean roundHasTimedOut() {
+		return this.countdownTimeInSecs <= 0.0;
 	}
 	
 }

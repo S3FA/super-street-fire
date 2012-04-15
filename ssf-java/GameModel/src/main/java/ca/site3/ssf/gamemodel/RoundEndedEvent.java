@@ -32,7 +32,7 @@ public final class RoundEndedEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.RoundEnded;
+		return Type.ROUND_ENDED;
 	}
 
 }

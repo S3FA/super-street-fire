@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Callum
  *
  */
-public class FireEmitterChangedEvent implements IGameModelEvent {
+public final class FireEmitterChangedEvent implements IGameModelEvent {
 	
 	final private int index;
 	final private FireEmitter.Location location;
@@ -38,7 +38,7 @@ public class FireEmitterChangedEvent implements IGameModelEvent {
 	public int getIndex() {
 		return this.index;
 	}
-	public FireEmitter.Location getLocation() {
+	public final FireEmitter.Location getLocation() {
 		return this.location;
 	}
 	public float getIntensity(GameModel.Entity entity) {
@@ -49,12 +49,12 @@ public class FireEmitterChangedEvent implements IGameModelEvent {
 	public float getMaxIntensity() {
 		return this.maxIntensity;
 	}
-	public EnumSet<GameModel.Entity> getContributingEntities() {
+	public final EnumSet<GameModel.Entity> getContributingEntities() {
 		return this.contributingEntities;
 	}
 
 	public Type getType() {
-		return Type.FireEmitterChanged;
+		return Type.FIRE_EMITTER_CHANGED;
 	}
 	
 }

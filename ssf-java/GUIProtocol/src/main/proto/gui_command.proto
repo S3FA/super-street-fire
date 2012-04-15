@@ -13,6 +13,7 @@ message Command {
     KILL_GAME = 3; // no args
     NEXT_STATE = 4; // no args
     TOUCH_EMITTER = 5; // FireEmitterType, emitterIndex, intensity, emitterEntities
+    QUERY_GAME_INFO_REFRESH = 6;
   }
   
   

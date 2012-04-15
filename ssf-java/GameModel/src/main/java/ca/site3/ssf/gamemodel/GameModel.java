@@ -1,9 +1,15 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
+import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
 /**
  * Default implementation of GameModel.
@@ -14,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GameModel implements IGameModel {
 
-	GameConfig config;
+	private GameConfig config;
 	
 	private GameState currState = null;
 	private GameState nextState = null;
@@ -28,7 +34,7 @@ public class GameModel implements IGameModel {
 	
 	private Logger logger = null;
 	
-	private int numRoundsPlayed; // The number of rounds that are played
+	private List<RoundResult> roundResults = new ArrayList<RoundResult>(4);
 	
 	public GameModel(GameConfig config) {
 		this.logger = LoggerFactory.getLogger(getClass());
@@ -36,7 +42,6 @@ public class GameModel implements IGameModel {
 		this.config = config;
 		assert(this.config != null);
 		
-		this.numRoundsPlayed = 0;
 		this.actionSignaller = new GameModelActionSignaller();
 		
 		this.player1 = new Player(1, this.actionSignaller, this.config);
@@ -108,6 +113,40 @@ public class GameModel implements IGameModel {
 		return new ActionFactory(this);
 	}
 	
+	public void queryGameInfoRefresh() {
+		
+		int roundInPlayTimer = -1;
+		RoundBeginCountdownType roundBeginCountdown = RoundBeginCountdownType.THREE;
+		boolean roundTimedOut   = false;
+		MatchResult matchResult = MatchResult.PLAYER1_VICTORY;
+		switch (this.currState.getStateType()) {
+			case ROUND_BEGINNING_STATE:
+				roundBeginCountdown = ((RoundBeginningGameState)this.currState).getCountState();
+				break;
+			case ROUND_IN_PLAY_STATE:
+				roundInPlayTimer = ((RoundInPlayState)this.currState).getLastCountdownValueInSecs();
+				break;
+			case ROUND_ENDED_STATE:
+				roundTimedOut = ((RoundEndedGameState)this.currState).getRoundTimedOut();
+				break;
+			case MATCH_ENDED_STATE:
+				matchResult = ((MatchEndedGameState)this.currState).getMatchResult();
+				break;
+			default:
+				break;
+		}
+		
+		// Fire off the info refresh event based on the current game model's information...
+		GameInfoRefreshEvent event = new GameInfoRefreshEvent(
+				this.currState.getStateType(), this.roundResults, matchResult, 
+				this.player1.getHealth(), this.player2.getHealth(),
+				roundBeginCountdown, roundInPlayTimer, roundTimedOut);
+		this.actionSignaller.fireOnQueryGameInfoRefresh(event);
+		
+		// Inform all listeners of the state of all the fire emitters
+		this.fireEmitterModel.fireAllEmitterChangedEvent();
+	}
+	
 	public void executeGenericAction(Action action) {
 		this.currState.executeAction(action);
 	}
@@ -166,17 +205,47 @@ public class GameModel implements IGameModel {
 		p1.clearHealth();
 		p2.clearHealth();
 		
-		assert(this.numRoundsPlayed <= this.getConfig().getMaxNumRoundsPerMatch());
-		this.numRoundsPlayed = 0;
+		assert(this.roundResults.size() <= this.getConfig().getMaxNumRoundsPerMatch());
+		this.roundResults.clear();
 	}
 	
-	void incrementNumRoundsPlayed() {
-		this.numRoundsPlayed++;
+	/**
+	 * Add the result of a round to the list of round results held in this model.
+	 * @param result The round result to add.
+	 */
+	void addRoundResult(RoundResult result) {
+		this.roundResults.add(result);
+		// It should never be the case that we add more results than there are maximum number of rounds
+		assert(this.roundResults.size() <= this.getConfig().getMaxNumRoundsPerMatch());
 	}
+	
+	/**
+	 * Get the total number of rounds that have been played in the current match.
+	 * @return The number of rounds played.
+	 */
 	int getNumRoundsPlayed() {
-		return this.numRoundsPlayed;
+		return this.roundResults.size();
 	}
 	
+	/**
+	 * Get the round result for the given round number.
+	 * @param roundNum The round number in [1, this.getConfig().getMaxNumRoundsPerMatch()].
+	 * @return The result of the round corresponding to the given round number, null if invalid round number.
+	 */
+	RoundResult getRoundResult(int roundNum) {
+		if (roundNum <= 0) {
+			assert(false);
+			return null;
+		}
+		
+		int roundIndex = roundNum - 1;
+		if (roundIndex >= this.roundResults.size()) {
+			assert(false);
+			return null;
+		}
+		
+		return this.roundResults.get(roundIndex);
+	}
 	
 	/**
 	 * Get the player with the given player number.

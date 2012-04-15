@@ -117,7 +117,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 	}
-	
+
 	public void setRoundResult(int roundNum, RoundResult roundResult) {
 		assert(roundNum > 0 && roundNum <= this.roundResults.length);
 		this.roundResults[roundNum-1] = roundResult; 

@@ -8,7 +8,8 @@ class RoundEndedGameState extends GameState {
 
 	final static private double ROUND_ENDED_LENGTH_IN_SECS = 4.0;
 	
-	//final private Player roundVictor;
+	private final Player roundVictor;
+	private final boolean roundTimedOut;
 	
 	private Collection<Action> roundEndActions = null;
 	
@@ -18,10 +19,13 @@ class RoundEndedGameState extends GameState {
 	 * Constructor for RoundEndedGameState.
 	 * @param gameModel The game model.
 	 * @param roundVictor The victor of the round, may be null on a tie.
+	 * @param roundTimedOut Whether the round that ended timed out.
 	 */
-	RoundEndedGameState(GameModel gameModel, Player roundVictor) {
+	RoundEndedGameState(GameModel gameModel, Player roundVictor, boolean roundTimedOut) {
 		super(gameModel);
-		//this.roundVictor = roundVictor;
+		
+		this.roundVictor = roundVictor;
+		this.roundTimedOut = roundTimedOut;
 		
 		if (roundVictor != null) {
 			this.roundEndActions = new ArrayList<Action>(3);
@@ -136,4 +140,11 @@ class RoundEndedGameState extends GameState {
 		return GameState.GameStateType.ROUND_ENDED_STATE;
 	}
 
+	Player getRoundVictor() {
+		return this.roundVictor;
+	}
+	boolean getRoundTimedOut() {
+		return this.roundTimedOut;
+	}
+	
 }

@@ -84,6 +84,7 @@ public final class GuiCommand {
       KILL_GAME(3, 3),
       NEXT_STATE(4, 4),
       TOUCH_EMITTER(5, 5),
+      QUERY_GAME_INFO_REFRESH(6, 6),
       ;
       
       public static final int EXECUTE_GENERIC_ACTION_VALUE = 0;
@@ -92,6 +93,7 @@ public final class GuiCommand {
       public static final int KILL_GAME_VALUE = 3;
       public static final int NEXT_STATE_VALUE = 4;
       public static final int TOUCH_EMITTER_VALUE = 5;
+      public static final int QUERY_GAME_INFO_REFRESH_VALUE = 6;
       
       
       public final int getNumber() { return value; }
@@ -104,6 +106,7 @@ public final class GuiCommand {
           case 3: return KILL_GAME;
           case 4: return NEXT_STATE;
           case 5: return TOUCH_EMITTER;
+          case 6: return QUERY_GAME_INFO_REFRESH;
           default: return null;
         }
       }
@@ -134,7 +137,7 @@ public final class GuiCommand {
       }
       
       private static final CommandType[] VALUES = {
-        EXECUTE_GENERIC_ACTION, EXECUTE_PLAYER_ACTION, TOGGLE_PAUSE, KILL_GAME, NEXT_STATE, TOUCH_EMITTER, 
+        EXECUTE_GENERIC_ACTION, EXECUTE_PLAYER_ACTION, TOGGLE_PAUSE, KILL_GAME, NEXT_STATE, TOUCH_EMITTER, QUERY_GAME_INFO_REFRESH, 
       };
       
       public static CommandType valueOf(
@@ -1230,7 +1233,7 @@ public final class GuiCommand {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021gui_command.proto\022\013guiprotocol\"\275\005\n\007Com" +
+      "\n\021gui_command.proto\022\013guiprotocol\"\332\005\n\007Com" +
       "mand\022.\n\004type\030\001 \002(\0162 .guiprotocol.Command" +
       ".CommandType\0227\n\014playerAction\030\002 \001(\0162!.gui" +
       "protocol.Command.PlayerAction\022+\n\006player\030" +
@@ -1239,17 +1242,17 @@ public final class GuiCommand {
       "erType\030\006 \001(\0162$.guiprotocol.Command.FireE" +
       "mitterType\022\021\n\tintensity\030\007 \001(\002\022\024\n\014emitter" +
       "Index\030\010 \001(\005\0224\n\017emitterEntities\030\t \003(\0162\033.g" +
-      "uiprotocol.Command.Player\"\210\001\n\013CommandTyp",
+      "uiprotocol.Command.Player\"\245\001\n\013CommandTyp",
       "e\022\032\n\026EXECUTE_GENERIC_ACTION\020\000\022\031\n\025EXECUTE" +
       "_PLAYER_ACTION\020\001\022\020\n\014TOGGLE_PAUSE\020\002\022\r\n\tKI" +
       "LL_GAME\020\003\022\016\n\nNEXT_STATE\020\004\022\021\n\rTOUCH_EMITT" +
-      "ER\020\005\"f\n\014PlayerAction\022\t\n\005BLOCK\020\000\022\016\n\nJAB_A" +
-      "TTACK\020\001\022\017\n\013HOOK_ATTACK\020\002\022\023\n\017HADOUKEN_ATT" +
-      "ACK\020\003\022\025\n\021SONIC_BOOM_ATTACK\020\004\"(\n\006Player\022\016" +
-      "\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEm" +
-      "itterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001" +
-      "\022\016\n\nOUTER_RING\020\002B\032\n\030ca.site3.ssf.guiprot" +
-      "ocol"
+      "ER\020\005\022\033\n\027QUERY_GAME_INFO_REFRESH\020\006\"f\n\014Pla" +
+      "yerAction\022\t\n\005BLOCK\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013" +
+      "HOOK_ATTACK\020\002\022\023\n\017HADOUKEN_ATTACK\020\003\022\025\n\021SO" +
+      "NIC_BOOM_ATTACK\020\004\"(\n\006Player\022\016\n\nRINGMASTE" +
+      "R\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r" +
+      "\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_R" +
+      "ING\020\002B\032\n\030ca.site3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

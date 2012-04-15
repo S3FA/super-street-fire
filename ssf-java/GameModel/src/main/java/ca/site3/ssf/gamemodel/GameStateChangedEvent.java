@@ -20,7 +20,7 @@ public final class GameStateChangedEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.GameStateChanged;
+		return Type.GAME_STATE_CHANGED;
 	}
 
 }

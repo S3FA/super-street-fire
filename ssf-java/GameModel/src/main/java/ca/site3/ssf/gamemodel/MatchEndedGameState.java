@@ -8,7 +8,7 @@ import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 
 class MatchEndedGameState extends GameState {
 
-	//final private Player victoryPlayer;
+	final private Player victoryPlayer;
 	private Collection<Action> matchEndActions = new ArrayList<Action>(3);
 	private boolean firstTick = true;
 	
@@ -18,6 +18,7 @@ class MatchEndedGameState extends GameState {
 		//this.victoryPlayer = victoryPlayer;
 		assert(victoryPlayer != null);
 		assert(victoryPlayer == this.gameModel.getPlayer1() || victoryPlayer == this.gameModel.getPlayer2());
+		this.victoryPlayer = victoryPlayer;
 		
 		// Signal the event for the end of the match...
 		GameModelActionSignaller actionSignaller = this.gameModel.getActionSignaller();
@@ -111,4 +112,13 @@ class MatchEndedGameState extends GameState {
 		return GameState.GameStateType.MATCH_ENDED_STATE;
 	}
 
+	MatchResult getMatchResult() {
+		if (this.victoryPlayer.getPlayerNumber() == 1) {
+			return MatchResult.PLAYER1_VICTORY;
+		}
+		else {
+			return MatchResult.PLAYER2_VICTORY;
+		}
+	}
+	
 }

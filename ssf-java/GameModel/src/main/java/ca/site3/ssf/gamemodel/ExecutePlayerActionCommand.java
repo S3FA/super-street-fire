@@ -18,6 +18,7 @@ public final class ExecutePlayerActionCommand extends AbstractGameModelCommand {
 	
 	@Override
 	void execute(GameModel gameModel) {
+		assert(gameModel != null);
 		Action playerAction = gameModel.getActionFactory().buildPlayerAction(
 				this.playerNum, this.playerActionType, this.usesLeftHand, this.usesRightHand);
 		assert(playerAction != null);

@@ -8,6 +8,7 @@ public final class TogglePauseGameCommand extends AbstractGameModelCommand {
 	
 	@Override
 	void execute(GameModel gameModel) {
+		assert(gameModel != null);
 		gameModel.togglePauseGame();
 	}
 

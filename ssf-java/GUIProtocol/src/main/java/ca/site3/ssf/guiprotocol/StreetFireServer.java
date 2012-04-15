@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -32,9 +33,11 @@ import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
 import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
+import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.QueryGameInfoRefreshCommand;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
@@ -108,12 +111,16 @@ public class StreetFireServer implements Runnable {
 		
 		while ( ! stop ) {
 			try {
+				// Accept incoming connections from GUI clients
 				Socket s = socket.accept();
-				log.info("Accepted connection from "+s.getInetAddress());
+				log.info("Accepted connection from " + s.getInetAddress());
+				
+				// A connection has been accepted, build a handler for the new connection and start it up
 				GuiHandler handler = new GuiHandler(s);
 				activeHandlers.add(handler);
 				Thread t = new Thread(handler, "GuiHandler - "+handler.hashCode());
 				t.start();
+				
 			} catch (SocketTimeoutException ex) {
 				log.info("Server socket timeout",ex);
 			} catch (IOException ex) {
@@ -160,10 +167,27 @@ public class StreetFireServer implements Runnable {
 		eventQueue.offer(eventToProtobuf(e));
 	}
 	
-
 	private static GameEvent eventToProtobuf(IGameModelEvent evt) {
 		GameEvent.Builder b = GameEvent.newBuilder();
-		if (evt.getType() == Type.FireEmitterChanged) {
+		
+		switch (evt.getType()) {
+		
+		case GAME_INFO_REFRESH: {
+			GameInfoRefreshEvent e = (GameInfoRefreshEvent)evt;
+			List<RoundEndedEvent.RoundResult> roundResults = e.getCurrentRoundResults();
+			b.setType(EventType.GAME_INFO_REFRESH)
+				.setGameState(SerializationHelper.gameStateToProtobuf(e.getCurrentGameState()))
+				.addAllRoundResults(SerializationHelper.roundResultsToProtobuf(roundResults))
+				.setMatchResult(SerializationHelper.matchResultToProtobuf(e.getMatchResult()))
+				.setPlayer1Health(e.getPlayer1Health())
+				.setPlayer2Health(e.getPlayer2Health())
+				.setRoundBeginTimer(SerializationHelper.roundBeginCountdownTimerToProtobuf(e.getRoundBeginCountdown()))
+				.setRoundInPlayTimer(e.getRoundInPlayTimer())
+				.setTimedOut(e.getRoundTimedOut());
+			break;
+		}
+		
+		case FIRE_EMITTER_CHANGED: {
 			FireEmitterChangedEvent e = (FireEmitterChangedEvent)evt;
 			FireEmitter emitter = FireEmitter.newBuilder()
 				.setEmitterIndex(e.getIndex())
@@ -171,56 +195,85 @@ public class StreetFireServer implements Runnable {
 				.setIntensityPlayer1(e.getIntensity(Entity.PLAYER1_ENTITY))
 				.setIntensityPlayer2(e.getIntensity(Entity.PLAYER2_ENTITY))
 				.setIntensityRingmaster(e.getIntensity(Entity.RINGMASTER_ENTITY)).build();
-			b.setType(EventType.FireEmitterChanged)
+			b.setType(EventType.FIRE_EMITTER_CHANGED)
 				.setEmitter(emitter);
-		} else if (evt.getType() == Type.GameStateChanged) {
+			break;
+		}
+		
+		case GAME_STATE_CHANGED: {
 			GameStateChangedEvent e = (GameStateChangedEvent)evt;
-			b.setType(EventType.GameStateChanged)
+			b.setType(EventType.GAME_STATE_CHANGED)
 				.setOldGameState(SerializationHelper.gameStateToProtobuf(e.getOldState()))
 				.setNewGameState(SerializationHelper.gameStateToProtobuf(e.getNewState()));
-		} else if (evt.getType() == Type.MatchEnded) {
+			break;
+		}
+		
+		case MATCH_ENDED: {
 			MatchEndedEvent e = (MatchEndedEvent)evt;
-			b.setType(EventType.MatchEnded)
-				.setMatchWinner(e.getMatchResult() == MatchResult.PLAYER1_VICTORY ? Player.P1 : Player.P2);
-		} else if (evt.getType() == Type.PlayerAttackAction) {
+			b.setType(EventType.MATCH_ENDED)
+				.setMatchResult(SerializationHelper.matchResultToProtobuf(e.getMatchResult()));
+			break;
+		}
+		
+		case PLAYER_ATTACK_ACTION: {
 			PlayerAttackActionEvent e = (PlayerAttackActionEvent)evt;
-			b.setType(EventType.PlayerAttackAction)
+			b.setType(EventType.PLAYER_ATTACK_ACTION)
 				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2)
 				.setAttackType(SerializationHelper.attackTypeToProtobuf(e.getAttackType()));
-		} else if (evt.getType() == Type.PlayerBlockAction) {
+			break;
+		}
+		
+		case PLAYER_BLOCK_ACTION: {
 			PlayerBlockActionEvent e = (PlayerBlockActionEvent)evt;
-			b.setType(EventType.PlayerBlockAction)
+			b.setType(EventType.PLAYER_BLOCK_ACTION)
 				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2);
-		} else if (evt.getType() == Type.PlayerHealthChanged) {
+			break;
+		}
+		
+		case PLAYER_HEALTH_CHANGED: {
 			PlayerHealthChangedEvent e = (PlayerHealthChangedEvent)evt;
-			b.setType(EventType.PlayerHealthChanged)
+			b.setType(EventType.PLAYER_HEALTH_CHANGED)
 				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2)
 				.setOldHealth(e.getPrevLifePercentage())
 				.setNewHealth(e.getNewLifePercentage());
-		} else if (evt.getType() == Type.RingmasterAction) {
-			//RingmasterActionEvent e = (RingmasterActionEvent)evt;
-			b.setType(EventType.RingmasterAction);
-		} else if (evt.getType() == Type.RoundBeginTimerChanged) {
+			break;
+		}
+		
+		case RINGMASTER_ACTION: {
+			b.setType(EventType.RINGMASTER_ACTION);
+			break;
+		}
+		
+		case ROUND_BEGIN_TIMER_CHANGED: {
 			RoundBeginTimerChangedEvent e = (RoundBeginTimerChangedEvent)evt;
-			b.setType(EventType.RoundBeginTimerChanged)
+			b.setType(EventType.ROUND_BEGIN_TIMER_CHANGED)
 				.setRoundNumber(e.getRoundNumber())
-				.setBeginType(SerializationHelper.beginTypeToProtobuf(e.getThreeTwoOneFightTime()));
-		} else if (evt.getType() == Type.RoundEnded) {
+				.setRoundBeginTimer(SerializationHelper.roundBeginCountdownTimerToProtobuf(e.getThreeTwoOneFightTime()));
+			break;
+		}
+		
+		case ROUND_ENDED: {
 			RoundEndedEvent e = (RoundEndedEvent)evt;
-			b.setType(EventType.RoundEnded)
+			b.setType(EventType.ROUND_ENDED)
 				.setRoundNumber(e.getRoundNumber())
 				.setTimedOut(e.getRoundTimedOut())
-				.setRoundWinner(SerializationHelper.roundWinnerProtobuf(e.getRoundResult()));
-		} else if (evt.getType() == Type.RoundPlayTimerChanged) {
+				.setRoundResult(SerializationHelper.roundResultToProtobuf(e.getRoundResult()));
+			break;
+		}
+		
+		case ROUND_PLAY_TIMER_CHANGED: {
 			RoundPlayTimerChangedEvent e = (RoundPlayTimerChangedEvent)evt;
-			b.setType(EventType.RoundPlayTimerChanged)
+			b.setType(EventType.ROUND_PLAY_TIMER_CHANGED)
 				.setTimeInSecs(e.getTimeInSecs());
-		} else {
+			break;
+		}
+		
+		default:
 			throw new IllegalArgumentException("Unknown game event type: "+evt.getType());
 		}
+		
 		return b.build();
 	}
-	
 	
 	
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -304,12 +357,13 @@ public class StreetFireServer implements Runnable {
 				return createTogglePauseCommand(cmd);
 			case TOUCH_EMITTER:
 				return createFireEmitterCommand(cmd);
+			case QUERY_GAME_INFO_REFRESH:
+				return createQueryGameInfoRefreshCommand(cmd);
 			default:
 				log.warn("Unhandled command type: "+cmd.getType());
 				return null;
 			}
 		}
-		
 		
 		private ExecuteGenericActionCommand createGenericActionCommand(Command cmd) {
 			int playerNum = SerializationHelper.playerToNum(cmd.getPlayer());
@@ -347,7 +401,9 @@ public class StreetFireServer implements Runnable {
 			return new TouchFireEmitterCommand(location, cmd.getEmitterIndex(), cmd.getIntensity(), contributors);
 		}
 		
-		
+		private QueryGameInfoRefreshCommand createQueryGameInfoRefreshCommand(Command cmd) {
+			return new QueryGameInfoRefreshCommand();
+		}
 		
 		private void sendGameEvent(GameEvent event) throws IOException {
 			event.writeDelimitedTo(socket.getOutputStream());

@@ -38,6 +38,25 @@ class GameModelActionSignaller {
 	}	
 	
 	/**
+	 * Helper function for executing the given event for all listeners and dealing with exceptions.
+	 * @param event The event to execute/fire-off for all listeners.
+	 */
+	private void fireGameModelEvent(IGameModelEvent event) {
+		for (IGameModelListener listener : this.listeners) {
+			try {
+				listener.onGameModelEvent(event);
+			}
+			catch (Exception ex) {
+				this.logger.error("Exception occurred while firing event " + event.getClass().getName(), ex);
+			}
+		}
+	}
+	
+	void fireOnQueryGameInfoRefresh(GameInfoRefreshEvent event) {
+		this.fireGameModelEvent(event);
+	}
+	
+	/**
 	 * Triggers each of the listener's callbacks for a GameState change.
 	 * @param oldState The previous/old state that was replaced.
 	 * @param newState The current/new state that was just set.
@@ -53,14 +72,7 @@ class GameModelActionSignaller {
 		}
 		
 		GameStateChangedEvent event = new GameStateChangedEvent(oldStateType, newStateType);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing game state change event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}	
 	
 	/**
@@ -70,29 +82,17 @@ class GameModelActionSignaller {
 	 * @param newLifePercentage The player's new health amount, after the change. 
 	 */
 	void fireOnPlayerHealthChanged(int playerNum, float prevLifePercentage, float newLifePercentage) {
-		
 		PlayerHealthChangedEvent event = new PlayerHealthChangedEvent(playerNum, prevLifePercentage, newLifePercentage);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing player health change event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}
 	
+	/**
+	 * Triggers each of the listener's callbacks for when the round-in-play timer changes.
+	 * @param newTimeInSecs The latest time on the round-in-play timer.
+	 */
 	void fireOnRoundPlayTimerChanged(int newTimeInSecs) {
-		
 		RoundPlayTimerChangedEvent event = new RoundPlayTimerChangedEvent(newTimeInSecs);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing round in-play timer changed event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}
 	
 	/**
@@ -101,14 +101,7 @@ class GameModelActionSignaller {
 	 */
 	void fireOnRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent.RoundBeginCountdownType threeTwoOneFightTime, int roundNumber) {
 		RoundBeginTimerChangedEvent event = new RoundBeginTimerChangedEvent(threeTwoOneFightTime, roundNumber);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing round begin fight timer changed event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}
 	
 	/**
@@ -119,14 +112,7 @@ class GameModelActionSignaller {
 	 */
 	void fireOnRoundEnded(int roundNumber, RoundResult roundResult, boolean roundTimedOut) {
 		RoundEndedEvent event = new RoundEndedEvent(roundNumber, roundResult, roundTimedOut);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing round ended event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}
 	
 	/**
@@ -135,15 +121,7 @@ class GameModelActionSignaller {
 	 */
 	void fireOnMatchEnded(MatchResult matchResult) {
 		MatchEndedEvent event = new MatchEndedEvent(matchResult);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing match ended event", ex);
-			}
-		}
-		
+		this.fireGameModelEvent(event);
 	}
 	
 	/**
@@ -153,14 +131,7 @@ class GameModelActionSignaller {
 	 */
 	void fireOnPlayerAttackAction(int playerNum, PlayerAttackAction.AttackType attackType) {
 		PlayerAttackActionEvent event = new PlayerAttackActionEvent(playerNum, attackType);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing player attack action event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}
 	
 	/**
@@ -169,14 +140,7 @@ class GameModelActionSignaller {
 	 */
 	void fireOnPlayerBlockAction(int playerNum) {
 		PlayerBlockActionEvent event = new PlayerBlockActionEvent(playerNum);
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing player block action event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}
 	
 	/**
@@ -184,14 +148,7 @@ class GameModelActionSignaller {
 	 */
 	void fireOnRingmasterAction() {
 		RingmasterActionEvent event = new RingmasterActionEvent();
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(event);
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing ringmaster action event", ex);
-			}
-		}
+		this.fireGameModelEvent(event);
 	}
 	
 	/**
@@ -199,14 +156,8 @@ class GameModelActionSignaller {
 	 * @param fireEmitter The emitter that changed.
 	 */
 	void fireOnFireEmitterChanged(FireEmitter fireEmitter) {
-		for (IGameModelListener listener : this.listeners) {
-			try {
-				listener.onGameModelEvent(new FireEmitterChangedEvent(fireEmitter));
-			}
-			catch (Exception ex) {
-				this.logger.error("Exception occurred while firing fire emitter changed event", ex);
-			}
-		}
+		FireEmitterChangedEvent event = new FireEmitterChangedEvent(fireEmitter);
+		this.fireGameModelEvent(event);
 	}
 	
 }

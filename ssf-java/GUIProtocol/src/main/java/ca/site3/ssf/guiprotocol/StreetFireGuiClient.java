@@ -15,6 +15,7 @@ import ca.site3.ssf.gamemodel.ExecutePlayerActionCommand;
 import ca.site3.ssf.gamemodel.FireEmitter;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
+import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
@@ -97,6 +98,9 @@ public class StreetFireGuiClient {
 			sendThread.start();
 			receiveThread = new ReceiveThread();
 			receiveThread.start();
+			
+			// Cause an immediate refresh of the game state for this client
+			this.queryGameInfoRefresh();
 		}
 		
 		return socket.isConnected();
@@ -122,8 +126,10 @@ public class StreetFireGuiClient {
 		return eventQueue;
 	}
 	
-	
-	
+	public void queryGameInfoRefresh() throws IOException {
+		Builder b = Command.newBuilder().setType(CommandType.QUERY_GAME_INFO_REFRESH);
+		submitCommand(b.build());
+	}
 	
 	/**
 	 * @see KillGameCommand
@@ -272,57 +278,52 @@ public class StreetFireGuiClient {
 	
 	private IGameModelEvent parseEvent(GameEvent e) {
 		switch (e.getType()) {
-		case FireEmitterChanged:
+		
+		case GAME_INFO_REFRESH:
+			return new GameInfoRefreshEvent(
+				SerializationHelper.protobufToGameState(e.getGameState()),
+				SerializationHelper.protobufToRoundResults(e.getRoundResultsList()),
+				SerializationHelper.protobufToMatchResult(e.getMatchResult()),
+				e.getPlayer1Health(), e.getPlayer2Health(),
+				SerializationHelper.protobufToRoundBeginCountdownTimer(e.getRoundBeginTimer()),
+				e.getRoundInPlayTimer(), e.getTimedOut());
+			
+		case FIRE_EMITTER_CHANGED:
 			return new FireEmitterChangedEvent(createFireEmitter(e));
-		case GameStateChanged:
+			
+		case GAME_STATE_CHANGED:
 			return new GameStateChangedEvent(
-						SerializationHelper.protobufToGameState(e.getOldGameState()), 
-						SerializationHelper.protobufToGameState(e.getNewGameState()));
-		case MatchEnded:
-			switch (e.getMatchWinner()) {
-			case P1:
-				return new MatchEndedEvent(MatchResult.PLAYER1_VICTORY);
-			case P2:
-				return new MatchEndedEvent(MatchResult.PLAYER2_VICTORY);
-			case RINGMASTER:
-				// pass through
-			default:
-				throw new IllegalArgumentException("Only Player 1 or 2 can win a match");
-			}
-		case PlayerAttackAction:
+				SerializationHelper.protobufToGameState(e.getOldGameState()), 
+				SerializationHelper.protobufToGameState(e.getNewGameState()));
+			
+		case MATCH_ENDED:
+			return new MatchEndedEvent(SerializationHelper.protobufToMatchResult(e.getMatchResult()));
+
+		case PLAYER_ATTACK_ACTION:
 			return new PlayerAttackActionEvent(playerNumFromPlayer(e.getPlayer()), 
 					SerializationHelper.protobufToAttackType(e.getAttackType()));
-		case PlayerBlockAction:
+			
+		case PLAYER_BLOCK_ACTION:
 			return new PlayerBlockActionEvent(playerNumFromPlayer(e.getPlayer()));
-		case PlayerHealthChanged:
+			
+		case PLAYER_HEALTH_CHANGED:
 			return new PlayerHealthChangedEvent(playerNumFromPlayer(e.getPlayer()), 
 					e.getOldHealth(), e.getNewHealth());
-		case RingmasterAction:
+			
+		case RINGMASTER_ACTION:
 			return new RingmasterActionEvent();
-		case RoundBeginTimerChanged:
-			if (e.getBeginType() == 0) {
-				return new RoundBeginTimerChangedEvent(RoundBeginCountdownType.FIGHT, e.getRoundNumber());
-			} else if (e.getBeginType() == 1) {
-				return new RoundBeginTimerChangedEvent(RoundBeginCountdownType.ONE, e.getRoundNumber());
-			} else if (e.getBeginType() == 2) {
-				return new RoundBeginTimerChangedEvent(RoundBeginCountdownType.TWO, e.getRoundNumber());
-			} else if (e.getBeginType() == 3) {
-				return new RoundBeginTimerChangedEvent(RoundBeginCountdownType.THREE, e.getRoundNumber());
-			} else {
-				throw new IllegalArgumentException("Bad RoundBeginTimerChanged type"+e.getBeginType());
-			}
-		case RoundEnded:
-			RoundResult result = RoundResult.TIE;
-			if (e.getRoundWinner() == Player.P1) {
-				result = RoundResult.PLAYER1_VICTORY;
-			} else if (e.getRoundWinner() == Player.P2) {
-				result = RoundResult.PLAYER2_VICTORY;
-			}
-			return new RoundEndedEvent(e.getRoundNumber(), result, e.getTimedOut());
-		case RoundPlayTimerChanged:
+			
+		case ROUND_BEGIN_TIMER_CHANGED:
+			return new RoundBeginTimerChangedEvent(SerializationHelper.protobufToRoundBeginCountdownTimer(e.getRoundBeginTimer()), e.getRoundNumber());
+			
+		case ROUND_ENDED:
+			return new RoundEndedEvent(e.getRoundNumber(), SerializationHelper.protobufToRoundResult(e.getRoundResult()), e.getTimedOut());
+			
+		case ROUND_PLAY_TIMER_CHANGED:
 			return new RoundPlayTimerChangedEvent(e.getTimeInSecs());
+			
 		default:
-			log.error("Unknown GameEvent type: "+e.getType());
+			log.error("Unknown GameEvent type: " + e.getType());
 			return null;
 		}
 	}

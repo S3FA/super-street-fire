@@ -96,6 +96,25 @@ class RoundBeginningGameState extends GameState {
 		return GameState.GameStateType.ROUND_BEGINNING_STATE;
 	}
 
+	RoundBeginCountdownType getCountState() {
+		switch (this.currState) {
+			case BEFORE_THREE:
+				return RoundBeginCountdownType.THREE;
+			case THREE:
+				return RoundBeginCountdownType.THREE;
+			case TWO:
+				return RoundBeginCountdownType.TWO;
+			case ONE:
+				return RoundBeginCountdownType.ONE;
+			case FIGHT:
+				return RoundBeginCountdownType.FIGHT;
+			default:
+				assert(false);
+				break;
+		}
+		return null;
+	}
+	
 	/**
 	 * Helper for updating the internal count down state machine within
 	 * this. This method ensures that the proper events for the round begin count down
