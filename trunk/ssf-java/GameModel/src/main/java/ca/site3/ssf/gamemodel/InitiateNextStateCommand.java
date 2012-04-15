@@ -8,6 +8,7 @@ public final class InitiateNextStateCommand extends AbstractGameModelCommand {
 	
 	@Override
 	void execute(GameModel gameModel) {
+		assert(gameModel != null);
 		gameModel.initiateNextState();
 	}
 

@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
+import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
@@ -39,6 +41,7 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
+import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceConstants.Device;
@@ -61,8 +64,8 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	private static final long serialVersionUID = 1L;
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private JMenuBar menuBar          = null;
-	private JMenu windowMenu          = null;
+	private JMenuBar menuBar = null;
+	private JMenu windowMenu = null;
 	private JMenuItem gloveInfoWindowMenuItem = null;
 	
 	private GloveDataInfoPanel p1LeftGloveInfoPanel  = null;
@@ -78,7 +81,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
     private IGameModel gameModel      = null;	
     private IOServer ioserver         = null;
     
-    private CommandLineArgs args      = null;
+    private CommandLineArgs args       = null;
     private StreetFireGuiClient client = null;
     
     /** thread that monitors the queue for game model events */
@@ -172,34 +175,37 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				switch (event.getType()) {
-				case FireEmitterChanged:
+				case GAME_INFO_REFRESH:
+					MainWindow.this.onGameInfoRefresh((GameInfoRefreshEvent)event);
+					break;
+				case FIRE_EMITTER_CHANGED:
 					MainWindow.this.onFireEmitterChanged((FireEmitterChangedEvent)event);
 					break;
-				case GameStateChanged:
+				case GAME_STATE_CHANGED:
 					MainWindow.this.onGameStateChanged((GameStateChangedEvent)event);
 					break;
-				case MatchEnded:
+				case MATCH_ENDED:
 					MainWindow.this.onMatchEnded((MatchEndedEvent)event);
 					break;
-				case PlayerAttackAction:
+				case PLAYER_ATTACK_ACTION:
 					MainWindow.this.onPlayerAttackAction((PlayerAttackActionEvent)event);
 					break;
-				case PlayerBlockAction:
+				case PLAYER_BLOCK_ACTION:
 					MainWindow.this.onPlayerBlockAction((PlayerBlockActionEvent)event);
 					break;
-				case PlayerHealthChanged:
+				case PLAYER_HEALTH_CHANGED:
 					MainWindow.this.onPlayerHealthChanged((PlayerHealthChangedEvent)event);
 					break;
-				case RingmasterAction:
+				case RINGMASTER_ACTION:
 					MainWindow.this.onRingmasterAction((RingmasterActionEvent)event);
 					break;
-				case RoundBeginTimerChanged:
+				case ROUND_BEGIN_TIMER_CHANGED:
 					MainWindow.this.onRoundBeginFightTimerChanged((RoundBeginTimerChangedEvent)event);
 					break;
-				case RoundEnded:
+				case ROUND_ENDED:
 					MainWindow.this.onRoundEnded((RoundEndedEvent)event);
 					break;
-				case RoundPlayTimerChanged:
+				case ROUND_PLAY_TIMER_CHANGED:
 					MainWindow.this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
 					break;
 				default:
@@ -210,21 +216,67 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		});
 	}
 	
+	private void onGameInfoRefresh(GameInfoRefreshEvent event) {
+		this.performOnCurrStateChanges(event.getCurrentGameState());
+		this.infoPanel.getPlayer1Panel().setLife(event.getPlayer1Health());
+		this.infoPanel.getPlayer2Panel().setLife(event.getPlayer2Health());
+		
+		// Update the round results...
+		this.arenaDisplay.setInfoText("");
+		this.arenaDisplay.clearRoundResults();
+		for (int i = 0; i < event.getCurrentRoundResults().size(); i++) {
+			this.arenaDisplay.setRoundResult(i+1, event.getCurrentRoundResults().get(i));
+		}
+		
+		switch (event.getCurrentGameState()) {
+		
+		case ROUND_BEGINNING_STATE:
+			this.onRoundBeginFightTimerChanged(new RoundBeginTimerChangedEvent(event.getRoundBeginCountdown(), event.getRoundNumber()));
+			break;
+		
+		case ROUND_IN_PLAY_STATE:
+		case TIE_BREAKER_ROUND_STATE:
+			this.onRoundPlayTimerChanged(new RoundPlayTimerChangedEvent(event.getRoundInPlayTimer()));
+			break;
+			
+		case ROUND_ENDED_STATE: {
+			List<RoundEndedEvent.RoundResult> roundResults = event.getCurrentRoundResults();
+			assert(!roundResults.isEmpty());
+			
+			int roundNumber = roundResults.size();
+			int roundIndex  = roundNumber - 1;
+			
+			this.onRoundEnded(new RoundEndedEvent(roundNumber, roundResults.get(roundIndex), event.getRoundTimedOut()));
+			break;
+		}
+		
+		case MATCH_ENDED_STATE:
+			this.onMatchEnded(new MatchEndedEvent(event.getMatchResult()));
+			break;
+		
+		default:
+			break;
+		}
+		
+	}
+	
 	private void onGameStateChanged(GameStateChangedEvent event) {
 		this.infoPanel.setPreviousGameState(event.getOldState());
-		this.infoPanel.setCurrentGameState(event.getNewState());
-		
-		switch (event.getNewState()) {
-			case IDLE_STATE:
-				this.arenaDisplay.setInfoText("");
-				this.arenaDisplay.clearRoundResults();
-				this.infoPanel.setRoundTimer(-1);
-				break;
-			default:
-				break;
+		this.performOnCurrStateChanges(event.getNewState());
+	}
+	
+	private void performOnCurrStateChanges(GameState.GameStateType currentState) {
+		this.infoPanel.setCurrentGameState(currentState);
+		switch (currentState) {
+		case IDLE_STATE:
+			this.arenaDisplay.setInfoText("");
+			this.arenaDisplay.clearRoundResults();
+			this.infoPanel.setRoundTimer(-1);
+			break;
+		default:
+			break;
 		}
-
-		this.controlPanel.gameStateChanged(event.getNewState());
+		this.controlPanel.gameStateChanged(currentState);
 	}
 
 	private void onPlayerHealthChanged(PlayerHealthChangedEvent event) {
@@ -252,37 +304,14 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		if (event.getRoundTimedOut()) {
 			infoText += "Time Out\n";
 		}
-		switch (event.getRoundResult()) {
-		case PLAYER1_VICTORY:
-			infoText += "Player 1 Wins!";
-			break;
-		case PLAYER2_VICTORY:
-			infoText += "Player 2 Wins!";
-			break;
-		case TIE:
-			infoText += "Tie!";
-			break;
-		default:
-			assert(false);
-			break;
-		}
-
+		infoText += event.getRoundResult().toString();
+		
 		this.arenaDisplay.setInfoText(infoText);
 	}
 
 	private void onMatchEnded(MatchEndedEvent event) {
 		String infoText = "Match Over\n";
-		switch (event.getMatchResult()) {
-			case PLAYER1_VICTORY:
-				infoText += "Player 1 Wins!";
-				break;
-			case PLAYER2_VICTORY:
-				infoText += "Player 2 Wins!";
-				break;
-			default:
-				assert(false);
-				break;
-		}
+		infoText += event.getMatchResult().toString();
 		this.arenaDisplay.setInfoText(infoText);
 	}
 

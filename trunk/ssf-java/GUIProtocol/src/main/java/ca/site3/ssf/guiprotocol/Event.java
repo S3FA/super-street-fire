@@ -28,9 +28,9 @@ public final class Event {
     boolean hasNewGameState();
     ca.site3.ssf.guiprotocol.Event.GameEvent.GameState getNewGameState();
     
-    // optional .guiprotocol.GameEvent.Player matchWinner = 5;
-    boolean hasMatchWinner();
-    ca.site3.ssf.guiprotocol.Event.GameEvent.Player getMatchWinner();
+    // optional .guiprotocol.GameEvent.MatchResult matchResult = 5;
+    boolean hasMatchResult();
+    ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult getMatchResult();
     
     // optional .guiprotocol.GameEvent.Player player = 6;
     boolean hasPlayer();
@@ -52,13 +52,13 @@ public final class Event {
     boolean hasRoundNumber();
     int getRoundNumber();
     
-    // optional int32 beginType = 12;
-    boolean hasBeginType();
-    int getBeginType();
+    // optional .guiprotocol.GameEvent.RoundBeginCountdownTime roundBeginTimer = 12;
+    boolean hasRoundBeginTimer();
+    ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime getRoundBeginTimer();
     
-    // optional .guiprotocol.GameEvent.Player roundWinner = 13;
-    boolean hasRoundWinner();
-    ca.site3.ssf.guiprotocol.Event.GameEvent.Player getRoundWinner();
+    // optional .guiprotocol.GameEvent.RoundResult roundResult = 13;
+    boolean hasRoundResult();
+    ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult getRoundResult();
     
     // optional bool timedOut = 14;
     boolean hasTimedOut();
@@ -67,6 +67,27 @@ public final class Event {
     // optional int32 timeInSecs = 15;
     boolean hasTimeInSecs();
     int getTimeInSecs();
+    
+    // optional .guiprotocol.GameEvent.GameState gameState = 16;
+    boolean hasGameState();
+    ca.site3.ssf.guiprotocol.Event.GameEvent.GameState getGameState();
+    
+    // repeated .guiprotocol.GameEvent.RoundResult roundResults = 17;
+    java.util.List<ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult> getRoundResultsList();
+    int getRoundResultsCount();
+    ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult getRoundResults(int index);
+    
+    // optional float player1Health = 18;
+    boolean hasPlayer1Health();
+    float getPlayer1Health();
+    
+    // optional float player2Health = 19;
+    boolean hasPlayer2Health();
+    float getPlayer2Health();
+    
+    // optional int32 roundInPlayTimer = 20;
+    boolean hasRoundInPlayTimer();
+    int getRoundInPlayTimer();
   }
   public static final class GameEvent extends
       com.google.protobuf.GeneratedMessage
@@ -98,44 +119,47 @@ public final class Event {
     
     public enum EventType
         implements com.google.protobuf.ProtocolMessageEnum {
-      FireEmitterChanged(0, 0),
-      GameStateChanged(1, 1),
-      PlayerHealthChanged(2, 2),
-      RoundPlayTimerChanged(3, 3),
-      RoundBeginTimerChanged(4, 4),
-      RoundEnded(5, 5),
-      MatchEnded(6, 6),
-      PlayerAttackAction(7, 7),
-      PlayerBlockAction(8, 8),
-      RingmasterAction(9, 9),
+      GAME_INFO_REFRESH(0, 0),
+      FIRE_EMITTER_CHANGED(1, 1),
+      GAME_STATE_CHANGED(2, 2),
+      PLAYER_HEALTH_CHANGED(3, 3),
+      ROUND_PLAY_TIMER_CHANGED(4, 4),
+      ROUND_BEGIN_TIMER_CHANGED(5, 5),
+      ROUND_ENDED(6, 6),
+      MATCH_ENDED(7, 7),
+      PLAYER_ATTACK_ACTION(8, 8),
+      PLAYER_BLOCK_ACTION(9, 9),
+      RINGMASTER_ACTION(10, 10),
       ;
       
-      public static final int FireEmitterChanged_VALUE = 0;
-      public static final int GameStateChanged_VALUE = 1;
-      public static final int PlayerHealthChanged_VALUE = 2;
-      public static final int RoundPlayTimerChanged_VALUE = 3;
-      public static final int RoundBeginTimerChanged_VALUE = 4;
-      public static final int RoundEnded_VALUE = 5;
-      public static final int MatchEnded_VALUE = 6;
-      public static final int PlayerAttackAction_VALUE = 7;
-      public static final int PlayerBlockAction_VALUE = 8;
-      public static final int RingmasterAction_VALUE = 9;
+      public static final int GAME_INFO_REFRESH_VALUE = 0;
+      public static final int FIRE_EMITTER_CHANGED_VALUE = 1;
+      public static final int GAME_STATE_CHANGED_VALUE = 2;
+      public static final int PLAYER_HEALTH_CHANGED_VALUE = 3;
+      public static final int ROUND_PLAY_TIMER_CHANGED_VALUE = 4;
+      public static final int ROUND_BEGIN_TIMER_CHANGED_VALUE = 5;
+      public static final int ROUND_ENDED_VALUE = 6;
+      public static final int MATCH_ENDED_VALUE = 7;
+      public static final int PLAYER_ATTACK_ACTION_VALUE = 8;
+      public static final int PLAYER_BLOCK_ACTION_VALUE = 9;
+      public static final int RINGMASTER_ACTION_VALUE = 10;
       
       
       public final int getNumber() { return value; }
       
       public static EventType valueOf(int value) {
         switch (value) {
-          case 0: return FireEmitterChanged;
-          case 1: return GameStateChanged;
-          case 2: return PlayerHealthChanged;
-          case 3: return RoundPlayTimerChanged;
-          case 4: return RoundBeginTimerChanged;
-          case 5: return RoundEnded;
-          case 6: return MatchEnded;
-          case 7: return PlayerAttackAction;
-          case 8: return PlayerBlockAction;
-          case 9: return RingmasterAction;
+          case 0: return GAME_INFO_REFRESH;
+          case 1: return FIRE_EMITTER_CHANGED;
+          case 2: return GAME_STATE_CHANGED;
+          case 3: return PLAYER_HEALTH_CHANGED;
+          case 4: return ROUND_PLAY_TIMER_CHANGED;
+          case 5: return ROUND_BEGIN_TIMER_CHANGED;
+          case 6: return ROUND_ENDED;
+          case 7: return MATCH_ENDED;
+          case 8: return PLAYER_ATTACK_ACTION;
+          case 9: return PLAYER_BLOCK_ACTION;
+          case 10: return RINGMASTER_ACTION;
           default: return null;
         }
       }
@@ -166,7 +190,7 @@ public final class Event {
       }
       
       private static final EventType[] VALUES = {
-        FireEmitterChanged, GameStateChanged, PlayerHealthChanged, RoundPlayTimerChanged, RoundBeginTimerChanged, RoundEnded, MatchEnded, PlayerAttackAction, PlayerBlockAction, RingmasterAction, 
+        GAME_INFO_REFRESH, FIRE_EMITTER_CHANGED, GAME_STATE_CHANGED, PLAYER_HEALTH_CHANGED, ROUND_PLAY_TIMER_CHANGED, ROUND_BEGIN_TIMER_CHANGED, ROUND_ENDED, MATCH_ENDED, PLAYER_ATTACK_ACTION, PLAYER_BLOCK_ACTION, RINGMASTER_ACTION, 
       };
       
       public static EventType valueOf(
@@ -351,6 +375,147 @@ public final class Event {
       // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.Player)
     }
     
+    public enum RoundResult
+        implements com.google.protobuf.ProtocolMessageEnum {
+      ROUND_TIE(0, 0),
+      PLAYER_1_ROUND_WIN(1, 1),
+      PLAYER_2_ROUND_WIN(2, 2),
+      ;
+      
+      public static final int ROUND_TIE_VALUE = 0;
+      public static final int PLAYER_1_ROUND_WIN_VALUE = 1;
+      public static final int PLAYER_2_ROUND_WIN_VALUE = 2;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static RoundResult valueOf(int value) {
+        switch (value) {
+          case 0: return ROUND_TIE;
+          case 1: return PLAYER_1_ROUND_WIN;
+          case 2: return PLAYER_2_ROUND_WIN;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<RoundResult>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<RoundResult>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<RoundResult>() {
+              public RoundResult findValueByNumber(int number) {
+                return RoundResult.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(3);
+      }
+      
+      private static final RoundResult[] VALUES = {
+        ROUND_TIE, PLAYER_1_ROUND_WIN, PLAYER_2_ROUND_WIN, 
+      };
+      
+      public static RoundResult valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private RoundResult(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.RoundResult)
+    }
+    
+    public enum MatchResult
+        implements com.google.protobuf.ProtocolMessageEnum {
+      PLAYER_1_MATCH_WIN(0, 0),
+      PLAYER_2_MATCH_WIN(1, 1),
+      ;
+      
+      public static final int PLAYER_1_MATCH_WIN_VALUE = 0;
+      public static final int PLAYER_2_MATCH_WIN_VALUE = 1;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static MatchResult valueOf(int value) {
+        switch (value) {
+          case 0: return PLAYER_1_MATCH_WIN;
+          case 1: return PLAYER_2_MATCH_WIN;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<MatchResult>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<MatchResult>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<MatchResult>() {
+              public MatchResult findValueByNumber(int number) {
+                return MatchResult.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(4);
+      }
+      
+      private static final MatchResult[] VALUES = {
+        PLAYER_1_MATCH_WIN, PLAYER_2_MATCH_WIN, 
+      };
+      
+      public static MatchResult valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private MatchResult(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.MatchResult)
+    }
+    
     public enum FireEmitterType
         implements com.google.protobuf.ProtocolMessageEnum {
       LEFT_RAIL(0, 0),
@@ -396,7 +561,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(3);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(5);
       }
       
       private static final FireEmitterType[] VALUES = {
@@ -468,7 +633,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(4);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(6);
       }
       
       private static final FlameEmitterType[] VALUES = {
@@ -549,7 +714,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(5);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(7);
       }
       
       private static final AttackType[] VALUES = {
@@ -574,6 +739,81 @@ public final class Event {
       }
       
       // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.AttackType)
+    }
+    
+    public enum RoundBeginCountdownTime
+        implements com.google.protobuf.ProtocolMessageEnum {
+      THREE(0, 0),
+      TWO(1, 1),
+      ONE(2, 2),
+      FIGHT(3, 3),
+      ;
+      
+      public static final int THREE_VALUE = 0;
+      public static final int TWO_VALUE = 1;
+      public static final int ONE_VALUE = 2;
+      public static final int FIGHT_VALUE = 3;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static RoundBeginCountdownTime valueOf(int value) {
+        switch (value) {
+          case 0: return THREE;
+          case 1: return TWO;
+          case 2: return ONE;
+          case 3: return FIGHT;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<RoundBeginCountdownTime>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<RoundBeginCountdownTime>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<RoundBeginCountdownTime>() {
+              public RoundBeginCountdownTime findValueByNumber(int number) {
+                return RoundBeginCountdownTime.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(8);
+      }
+      
+      private static final RoundBeginCountdownTime[] VALUES = {
+        THREE, TWO, ONE, FIGHT, 
+      };
+      
+      public static RoundBeginCountdownTime valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private RoundBeginCountdownTime(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.RoundBeginCountdownTime)
     }
     
     public interface FireEmitterOrBuilder
@@ -1235,14 +1475,14 @@ public final class Event {
       return newGameState_;
     }
     
-    // optional .guiprotocol.GameEvent.Player matchWinner = 5;
-    public static final int MATCHWINNER_FIELD_NUMBER = 5;
-    private ca.site3.ssf.guiprotocol.Event.GameEvent.Player matchWinner_;
-    public boolean hasMatchWinner() {
+    // optional .guiprotocol.GameEvent.MatchResult matchResult = 5;
+    public static final int MATCHRESULT_FIELD_NUMBER = 5;
+    private ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult matchResult_;
+    public boolean hasMatchResult() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
-    public ca.site3.ssf.guiprotocol.Event.GameEvent.Player getMatchWinner() {
-      return matchWinner_;
+    public ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult getMatchResult() {
+      return matchResult_;
     }
     
     // optional .guiprotocol.GameEvent.Player player = 6;
@@ -1295,24 +1535,24 @@ public final class Event {
       return roundNumber_;
     }
     
-    // optional int32 beginType = 12;
-    public static final int BEGINTYPE_FIELD_NUMBER = 12;
-    private int beginType_;
-    public boolean hasBeginType() {
+    // optional .guiprotocol.GameEvent.RoundBeginCountdownTime roundBeginTimer = 12;
+    public static final int ROUNDBEGINTIMER_FIELD_NUMBER = 12;
+    private ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime roundBeginTimer_;
+    public boolean hasRoundBeginTimer() {
       return ((bitField0_ & 0x00000400) == 0x00000400);
     }
-    public int getBeginType() {
-      return beginType_;
+    public ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime getRoundBeginTimer() {
+      return roundBeginTimer_;
     }
     
-    // optional .guiprotocol.GameEvent.Player roundWinner = 13;
-    public static final int ROUNDWINNER_FIELD_NUMBER = 13;
-    private ca.site3.ssf.guiprotocol.Event.GameEvent.Player roundWinner_;
-    public boolean hasRoundWinner() {
+    // optional .guiprotocol.GameEvent.RoundResult roundResult = 13;
+    public static final int ROUNDRESULT_FIELD_NUMBER = 13;
+    private ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult roundResult_;
+    public boolean hasRoundResult() {
       return ((bitField0_ & 0x00000800) == 0x00000800);
     }
-    public ca.site3.ssf.guiprotocol.Event.GameEvent.Player getRoundWinner() {
-      return roundWinner_;
+    public ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult getRoundResult() {
+      return roundResult_;
     }
     
     // optional bool timedOut = 14;
@@ -1335,21 +1575,79 @@ public final class Event {
       return timeInSecs_;
     }
     
+    // optional .guiprotocol.GameEvent.GameState gameState = 16;
+    public static final int GAMESTATE_FIELD_NUMBER = 16;
+    private ca.site3.ssf.guiprotocol.Event.GameEvent.GameState gameState_;
+    public boolean hasGameState() {
+      return ((bitField0_ & 0x00004000) == 0x00004000);
+    }
+    public ca.site3.ssf.guiprotocol.Event.GameEvent.GameState getGameState() {
+      return gameState_;
+    }
+    
+    // repeated .guiprotocol.GameEvent.RoundResult roundResults = 17;
+    public static final int ROUNDRESULTS_FIELD_NUMBER = 17;
+    private java.util.List<ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult> roundResults_;
+    public java.util.List<ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult> getRoundResultsList() {
+      return roundResults_;
+    }
+    public int getRoundResultsCount() {
+      return roundResults_.size();
+    }
+    public ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult getRoundResults(int index) {
+      return roundResults_.get(index);
+    }
+    
+    // optional float player1Health = 18;
+    public static final int PLAYER1HEALTH_FIELD_NUMBER = 18;
+    private float player1Health_;
+    public boolean hasPlayer1Health() {
+      return ((bitField0_ & 0x00008000) == 0x00008000);
+    }
+    public float getPlayer1Health() {
+      return player1Health_;
+    }
+    
+    // optional float player2Health = 19;
+    public static final int PLAYER2HEALTH_FIELD_NUMBER = 19;
+    private float player2Health_;
+    public boolean hasPlayer2Health() {
+      return ((bitField0_ & 0x00010000) == 0x00010000);
+    }
+    public float getPlayer2Health() {
+      return player2Health_;
+    }
+    
+    // optional int32 roundInPlayTimer = 20;
+    public static final int ROUNDINPLAYTIMER_FIELD_NUMBER = 20;
+    private int roundInPlayTimer_;
+    public boolean hasRoundInPlayTimer() {
+      return ((bitField0_ & 0x00020000) == 0x00020000);
+    }
+    public int getRoundInPlayTimer() {
+      return roundInPlayTimer_;
+    }
+    
     private void initFields() {
-      type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.FireEmitterChanged;
+      type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.GAME_INFO_REFRESH;
       emitter_ = ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter.getDefaultInstance();
       oldGameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
       newGameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
-      matchWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+      matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
       player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
       attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
       oldHealth_ = 0F;
       newHealth_ = 0F;
       roundNumber_ = 0;
-      beginType_ = 0;
-      roundWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+      roundBeginTimer_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime.THREE;
+      roundResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.ROUND_TIE;
       timedOut_ = false;
       timeInSecs_ = 0;
+      gameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
+      roundResults_ = java.util.Collections.emptyList();
+      player1Health_ = 0F;
+      player2Health_ = 0F;
+      roundInPlayTimer_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1386,7 +1684,7 @@ public final class Event {
         output.writeEnum(4, newGameState_.getNumber());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeEnum(5, matchWinner_.getNumber());
+        output.writeEnum(5, matchResult_.getNumber());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeEnum(6, player_.getNumber());
@@ -1404,16 +1702,31 @@ public final class Event {
         output.writeInt32(11, roundNumber_);
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
-        output.writeInt32(12, beginType_);
+        output.writeEnum(12, roundBeginTimer_.getNumber());
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
-        output.writeEnum(13, roundWinner_.getNumber());
+        output.writeEnum(13, roundResult_.getNumber());
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         output.writeBool(14, timedOut_);
       }
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         output.writeInt32(15, timeInSecs_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        output.writeEnum(16, gameState_.getNumber());
+      }
+      for (int i = 0; i < roundResults_.size(); i++) {
+        output.writeEnum(17, roundResults_.get(i).getNumber());
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        output.writeFloat(18, player1Health_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        output.writeFloat(19, player2Health_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        output.writeInt32(20, roundInPlayTimer_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1442,7 +1755,7 @@ public final class Event {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(5, matchWinner_.getNumber());
+          .computeEnumSize(5, matchResult_.getNumber());
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1466,11 +1779,11 @@ public final class Event {
       }
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(12, beginType_);
+          .computeEnumSize(12, roundBeginTimer_.getNumber());
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(13, roundWinner_.getNumber());
+          .computeEnumSize(13, roundResult_.getNumber());
       }
       if (((bitField0_ & 0x00001000) == 0x00001000)) {
         size += com.google.protobuf.CodedOutputStream
@@ -1479,6 +1792,31 @@ public final class Event {
       if (((bitField0_ & 0x00002000) == 0x00002000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(15, timeInSecs_);
+      }
+      if (((bitField0_ & 0x00004000) == 0x00004000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(16, gameState_.getNumber());
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < roundResults_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeEnumSizeNoTag(roundResults_.get(i).getNumber());
+        }
+        size += dataSize;
+        size += 2 * roundResults_.size();
+      }
+      if (((bitField0_ & 0x00008000) == 0x00008000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(18, player1Health_);
+      }
+      if (((bitField0_ & 0x00010000) == 0x00010000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(19, player2Health_);
+      }
+      if (((bitField0_ & 0x00020000) == 0x00020000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(20, roundInPlayTimer_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1605,7 +1943,7 @@ public final class Event {
       
       public Builder clear() {
         super.clear();
-        type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.FireEmitterChanged;
+        type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.GAME_INFO_REFRESH;
         bitField0_ = (bitField0_ & ~0x00000001);
         if (emitterBuilder_ == null) {
           emitter_ = ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter.getDefaultInstance();
@@ -1617,7 +1955,7 @@ public final class Event {
         bitField0_ = (bitField0_ & ~0x00000004);
         newGameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
         bitField0_ = (bitField0_ & ~0x00000008);
-        matchWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+        matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
         bitField0_ = (bitField0_ & ~0x00000010);
         player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -1629,14 +1967,24 @@ public final class Event {
         bitField0_ = (bitField0_ & ~0x00000100);
         roundNumber_ = 0;
         bitField0_ = (bitField0_ & ~0x00000200);
-        beginType_ = 0;
+        roundBeginTimer_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime.THREE;
         bitField0_ = (bitField0_ & ~0x00000400);
-        roundWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+        roundResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.ROUND_TIE;
         bitField0_ = (bitField0_ & ~0x00000800);
         timedOut_ = false;
         bitField0_ = (bitField0_ & ~0x00001000);
         timeInSecs_ = 0;
         bitField0_ = (bitField0_ & ~0x00002000);
+        gameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
+        bitField0_ = (bitField0_ & ~0x00004000);
+        roundResults_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00008000);
+        player1Health_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00010000);
+        player2Health_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00020000);
+        roundInPlayTimer_ = 0;
+        bitField0_ = (bitField0_ & ~0x00040000);
         return this;
       }
       
@@ -1698,7 +2046,7 @@ public final class Event {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.matchWinner_ = matchWinner_;
+        result.matchResult_ = matchResult_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
@@ -1722,11 +2070,11 @@ public final class Event {
         if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
           to_bitField0_ |= 0x00000400;
         }
-        result.beginType_ = beginType_;
+        result.roundBeginTimer_ = roundBeginTimer_;
         if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
           to_bitField0_ |= 0x00000800;
         }
-        result.roundWinner_ = roundWinner_;
+        result.roundResult_ = roundResult_;
         if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
           to_bitField0_ |= 0x00001000;
         }
@@ -1735,6 +2083,27 @@ public final class Event {
           to_bitField0_ |= 0x00002000;
         }
         result.timeInSecs_ = timeInSecs_;
+        if (((from_bitField0_ & 0x00004000) == 0x00004000)) {
+          to_bitField0_ |= 0x00004000;
+        }
+        result.gameState_ = gameState_;
+        if (((bitField0_ & 0x00008000) == 0x00008000)) {
+          roundResults_ = java.util.Collections.unmodifiableList(roundResults_);
+          bitField0_ = (bitField0_ & ~0x00008000);
+        }
+        result.roundResults_ = roundResults_;
+        if (((from_bitField0_ & 0x00010000) == 0x00010000)) {
+          to_bitField0_ |= 0x00008000;
+        }
+        result.player1Health_ = player1Health_;
+        if (((from_bitField0_ & 0x00020000) == 0x00020000)) {
+          to_bitField0_ |= 0x00010000;
+        }
+        result.player2Health_ = player2Health_;
+        if (((from_bitField0_ & 0x00040000) == 0x00040000)) {
+          to_bitField0_ |= 0x00020000;
+        }
+        result.roundInPlayTimer_ = roundInPlayTimer_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1763,8 +2132,8 @@ public final class Event {
         if (other.hasNewGameState()) {
           setNewGameState(other.getNewGameState());
         }
-        if (other.hasMatchWinner()) {
-          setMatchWinner(other.getMatchWinner());
+        if (other.hasMatchResult()) {
+          setMatchResult(other.getMatchResult());
         }
         if (other.hasPlayer()) {
           setPlayer(other.getPlayer());
@@ -1781,17 +2150,39 @@ public final class Event {
         if (other.hasRoundNumber()) {
           setRoundNumber(other.getRoundNumber());
         }
-        if (other.hasBeginType()) {
-          setBeginType(other.getBeginType());
+        if (other.hasRoundBeginTimer()) {
+          setRoundBeginTimer(other.getRoundBeginTimer());
         }
-        if (other.hasRoundWinner()) {
-          setRoundWinner(other.getRoundWinner());
+        if (other.hasRoundResult()) {
+          setRoundResult(other.getRoundResult());
         }
         if (other.hasTimedOut()) {
           setTimedOut(other.getTimedOut());
         }
         if (other.hasTimeInSecs()) {
           setTimeInSecs(other.getTimeInSecs());
+        }
+        if (other.hasGameState()) {
+          setGameState(other.getGameState());
+        }
+        if (!other.roundResults_.isEmpty()) {
+          if (roundResults_.isEmpty()) {
+            roundResults_ = other.roundResults_;
+            bitField0_ = (bitField0_ & ~0x00008000);
+          } else {
+            ensureRoundResultsIsMutable();
+            roundResults_.addAll(other.roundResults_);
+          }
+          onChanged();
+        }
+        if (other.hasPlayer1Health()) {
+          setPlayer1Health(other.getPlayer1Health());
+        }
+        if (other.hasPlayer2Health()) {
+          setPlayer2Health(other.getPlayer2Health());
+        }
+        if (other.hasRoundInPlayTimer()) {
+          setRoundInPlayTimer(other.getRoundInPlayTimer());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1878,12 +2269,12 @@ public final class Event {
             }
             case 40: {
               int rawValue = input.readEnum();
-              ca.site3.ssf.guiprotocol.Event.GameEvent.Player value = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult value = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(5, rawValue);
               } else {
                 bitField0_ |= 0x00000010;
-                matchWinner_ = value;
+                matchResult_ = value;
               }
               break;
             }
@@ -1925,18 +2316,24 @@ public final class Event {
               break;
             }
             case 96: {
-              bitField0_ |= 0x00000400;
-              beginType_ = input.readInt32();
+              int rawValue = input.readEnum();
+              ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime value = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(12, rawValue);
+              } else {
+                bitField0_ |= 0x00000400;
+                roundBeginTimer_ = value;
+              }
               break;
             }
             case 104: {
               int rawValue = input.readEnum();
-              ca.site3.ssf.guiprotocol.Event.GameEvent.Player value = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult value = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(13, rawValue);
               } else {
                 bitField0_ |= 0x00000800;
-                roundWinner_ = value;
+                roundResult_ = value;
               }
               break;
             }
@@ -1950,6 +2347,57 @@ public final class Event {
               timeInSecs_ = input.readInt32();
               break;
             }
+            case 128: {
+              int rawValue = input.readEnum();
+              ca.site3.ssf.guiprotocol.Event.GameEvent.GameState value = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(16, rawValue);
+              } else {
+                bitField0_ |= 0x00004000;
+                gameState_ = value;
+              }
+              break;
+            }
+            case 136: {
+              int rawValue = input.readEnum();
+              ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult value = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(17, rawValue);
+              } else {
+                addRoundResults(value);
+              }
+              break;
+            }
+            case 138: {
+              int length = input.readRawVarint32();
+              int oldLimit = input.pushLimit(length);
+              while(input.getBytesUntilLimit() > 0) {
+                int rawValue = input.readEnum();
+                ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult value = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.valueOf(rawValue);
+                if (value == null) {
+                  unknownFields.mergeVarintField(17, rawValue);
+                } else {
+                  addRoundResults(value);
+                }
+              }
+              input.popLimit(oldLimit);
+              break;
+            }
+            case 149: {
+              bitField0_ |= 0x00010000;
+              player1Health_ = input.readFloat();
+              break;
+            }
+            case 157: {
+              bitField0_ |= 0x00020000;
+              player2Health_ = input.readFloat();
+              break;
+            }
+            case 160: {
+              bitField0_ |= 0x00040000;
+              roundInPlayTimer_ = input.readInt32();
+              break;
+            }
           }
         }
       }
@@ -1957,7 +2405,7 @@ public final class Event {
       private int bitField0_;
       
       // required .guiprotocol.GameEvent.EventType type = 1;
-      private ca.site3.ssf.guiprotocol.Event.GameEvent.EventType type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.FireEmitterChanged;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.EventType type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.GAME_INFO_REFRESH;
       public boolean hasType() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
@@ -1975,7 +2423,7 @@ public final class Event {
       }
       public Builder clearType() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.FireEmitterChanged;
+        type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.GAME_INFO_REFRESH;
         onChanged();
         return this;
       }
@@ -2118,26 +2566,26 @@ public final class Event {
         return this;
       }
       
-      // optional .guiprotocol.GameEvent.Player matchWinner = 5;
-      private ca.site3.ssf.guiprotocol.Event.GameEvent.Player matchWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
-      public boolean hasMatchWinner() {
+      // optional .guiprotocol.GameEvent.MatchResult matchResult = 5;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
+      public boolean hasMatchResult() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
-      public ca.site3.ssf.guiprotocol.Event.GameEvent.Player getMatchWinner() {
-        return matchWinner_;
+      public ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult getMatchResult() {
+        return matchResult_;
       }
-      public Builder setMatchWinner(ca.site3.ssf.guiprotocol.Event.GameEvent.Player value) {
+      public Builder setMatchResult(ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult value) {
         if (value == null) {
           throw new NullPointerException();
         }
         bitField0_ |= 0x00000010;
-        matchWinner_ = value;
+        matchResult_ = value;
         onChanged();
         return this;
       }
-      public Builder clearMatchWinner() {
+      public Builder clearMatchResult() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        matchWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+        matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
         onChanged();
         return this;
       }
@@ -2253,47 +2701,50 @@ public final class Event {
         return this;
       }
       
-      // optional int32 beginType = 12;
-      private int beginType_ ;
-      public boolean hasBeginType() {
+      // optional .guiprotocol.GameEvent.RoundBeginCountdownTime roundBeginTimer = 12;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime roundBeginTimer_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime.THREE;
+      public boolean hasRoundBeginTimer() {
         return ((bitField0_ & 0x00000400) == 0x00000400);
       }
-      public int getBeginType() {
-        return beginType_;
+      public ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime getRoundBeginTimer() {
+        return roundBeginTimer_;
       }
-      public Builder setBeginType(int value) {
+      public Builder setRoundBeginTimer(ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
         bitField0_ |= 0x00000400;
-        beginType_ = value;
+        roundBeginTimer_ = value;
         onChanged();
         return this;
       }
-      public Builder clearBeginType() {
+      public Builder clearRoundBeginTimer() {
         bitField0_ = (bitField0_ & ~0x00000400);
-        beginType_ = 0;
+        roundBeginTimer_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundBeginCountdownTime.THREE;
         onChanged();
         return this;
       }
       
-      // optional .guiprotocol.GameEvent.Player roundWinner = 13;
-      private ca.site3.ssf.guiprotocol.Event.GameEvent.Player roundWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
-      public boolean hasRoundWinner() {
+      // optional .guiprotocol.GameEvent.RoundResult roundResult = 13;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult roundResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.ROUND_TIE;
+      public boolean hasRoundResult() {
         return ((bitField0_ & 0x00000800) == 0x00000800);
       }
-      public ca.site3.ssf.guiprotocol.Event.GameEvent.Player getRoundWinner() {
-        return roundWinner_;
+      public ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult getRoundResult() {
+        return roundResult_;
       }
-      public Builder setRoundWinner(ca.site3.ssf.guiprotocol.Event.GameEvent.Player value) {
+      public Builder setRoundResult(ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult value) {
         if (value == null) {
           throw new NullPointerException();
         }
         bitField0_ |= 0x00000800;
-        roundWinner_ = value;
+        roundResult_ = value;
         onChanged();
         return this;
       }
-      public Builder clearRoundWinner() {
+      public Builder clearRoundResult() {
         bitField0_ = (bitField0_ & ~0x00000800);
-        roundWinner_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+        roundResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.ROUND_TIE;
         onChanged();
         return this;
       }
@@ -2340,6 +2791,144 @@ public final class Event {
         return this;
       }
       
+      // optional .guiprotocol.GameEvent.GameState gameState = 16;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.GameState gameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
+      public boolean hasGameState() {
+        return ((bitField0_ & 0x00004000) == 0x00004000);
+      }
+      public ca.site3.ssf.guiprotocol.Event.GameEvent.GameState getGameState() {
+        return gameState_;
+      }
+      public Builder setGameState(ca.site3.ssf.guiprotocol.Event.GameEvent.GameState value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00004000;
+        gameState_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearGameState() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        gameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
+        onChanged();
+        return this;
+      }
+      
+      // repeated .guiprotocol.GameEvent.RoundResult roundResults = 17;
+      private java.util.List<ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult> roundResults_ =
+        java.util.Collections.emptyList();
+      private void ensureRoundResultsIsMutable() {
+        if (!((bitField0_ & 0x00008000) == 0x00008000)) {
+          roundResults_ = new java.util.ArrayList<ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult>(roundResults_);
+          bitField0_ |= 0x00008000;
+        }
+      }
+      public java.util.List<ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult> getRoundResultsList() {
+        return java.util.Collections.unmodifiableList(roundResults_);
+      }
+      public int getRoundResultsCount() {
+        return roundResults_.size();
+      }
+      public ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult getRoundResults(int index) {
+        return roundResults_.get(index);
+      }
+      public Builder setRoundResults(
+          int index, ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRoundResultsIsMutable();
+        roundResults_.set(index, value);
+        onChanged();
+        return this;
+      }
+      public Builder addRoundResults(ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureRoundResultsIsMutable();
+        roundResults_.add(value);
+        onChanged();
+        return this;
+      }
+      public Builder addAllRoundResults(
+          java.lang.Iterable<? extends ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult> values) {
+        ensureRoundResultsIsMutable();
+        super.addAll(values, roundResults_);
+        onChanged();
+        return this;
+      }
+      public Builder clearRoundResults() {
+        roundResults_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00008000);
+        onChanged();
+        return this;
+      }
+      
+      // optional float player1Health = 18;
+      private float player1Health_ ;
+      public boolean hasPlayer1Health() {
+        return ((bitField0_ & 0x00010000) == 0x00010000);
+      }
+      public float getPlayer1Health() {
+        return player1Health_;
+      }
+      public Builder setPlayer1Health(float value) {
+        bitField0_ |= 0x00010000;
+        player1Health_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearPlayer1Health() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        player1Health_ = 0F;
+        onChanged();
+        return this;
+      }
+      
+      // optional float player2Health = 19;
+      private float player2Health_ ;
+      public boolean hasPlayer2Health() {
+        return ((bitField0_ & 0x00020000) == 0x00020000);
+      }
+      public float getPlayer2Health() {
+        return player2Health_;
+      }
+      public Builder setPlayer2Health(float value) {
+        bitField0_ |= 0x00020000;
+        player2Health_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearPlayer2Health() {
+        bitField0_ = (bitField0_ & ~0x00020000);
+        player2Health_ = 0F;
+        onChanged();
+        return this;
+      }
+      
+      // optional int32 roundInPlayTimer = 20;
+      private int roundInPlayTimer_ ;
+      public boolean hasRoundInPlayTimer() {
+        return ((bitField0_ & 0x00040000) == 0x00040000);
+      }
+      public int getRoundInPlayTimer() {
+        return roundInPlayTimer_;
+      }
+      public Builder setRoundInPlayTimer(int value) {
+        bitField0_ |= 0x00040000;
+        roundInPlayTimer_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearRoundInPlayTimer() {
+        bitField0_ = (bitField0_ & ~0x00040000);
+        roundInPlayTimer_ = 0;
+        onChanged();
+        return this;
+      }
+      
       // @@protoc_insertion_point(builder_scope:guiprotocol.GameEvent)
     }
     
@@ -2370,45 +2959,57 @@ public final class Event {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013event.proto\022\013guiprotocol\"\271\013\n\tGameEvent" +
+      "\n\013event.proto\022\013guiprotocol\"\252\017\n\tGameEvent" +
       "\022.\n\004type\030\001 \002(\0162 .guiprotocol.GameEvent.E" +
       "ventType\0223\n\007emitter\030\002 \001(\0132\".guiprotocol." +
       "GameEvent.FireEmitter\0226\n\014oldGameState\030\003 " +
       "\001(\0162 .guiprotocol.GameEvent.GameState\0226\n" +
       "\014newGameState\030\004 \001(\0162 .guiprotocol.GameEv" +
-      "ent.GameState\0222\n\013matchWinner\030\005 \001(\0162\035.gui" +
-      "protocol.GameEvent.Player\022-\n\006player\030\006 \001(" +
-      "\0162\035.guiprotocol.GameEvent.Player\0225\n\natta" +
-      "ckType\030\007 \001(\0162!.guiprotocol.GameEvent.Att",
-      "ackType\022\021\n\toldHealth\030\t \001(\002\022\021\n\tnewHealth\030" +
-      "\n \001(\002\022\023\n\013roundNumber\030\013 \001(\005\022\021\n\tbeginType\030" +
-      "\014 \001(\005\0222\n\013roundWinner\030\r \001(\0162\035.guiprotocol" +
-      ".GameEvent.Player\022\020\n\010timedOut\030\016 \001(\010\022\022\n\nt" +
-      "imeInSecs\030\017 \001(\005\032\261\001\n\013FireEmitter\022\024\n\014emitt" +
-      "erIndex\030\001 \002(\005\022;\n\013emitterType\030\002 \002(\0162&.gui" +
-      "protocol.GameEvent.FireEmitterType\022\033\n\023in" +
-      "tensityRingmaster\030\003 \002(\002\022\030\n\020intensityPlay" +
-      "er1\030\004 \002(\002\022\030\n\020intensityPlayer2\030\005 \002(\002\"\356\001\n\t" +
-      "EventType\022\026\n\022FireEmitterChanged\020\000\022\024\n\020Gam",
-      "eStateChanged\020\001\022\027\n\023PlayerHealthChanged\020\002" +
-      "\022\031\n\025RoundPlayTimerChanged\020\003\022\032\n\026RoundBegi" +
-      "nTimerChanged\020\004\022\016\n\nRoundEnded\020\005\022\016\n\nMatch" +
-      "Ended\020\006\022\026\n\022PlayerAttackAction\020\007\022\025\n\021Playe" +
-      "rBlockAction\020\010\022\024\n\020RingmasterAction\020\t\"\320\001\n" +
-      "\tGameState\022\014\n\010NO_STATE\020\000\022\031\n\025ROUND_BEGINN" +
-      "ING_STATE\020\001\022\027\n\023ROUND_IN_PLAY_STATE\020\002\022\025\n\021" +
-      "ROUND_ENDED_STATE\020\003\022\033\n\027TIE_BREAKER_ROUND" +
-      "_STATE\020\004\022\025\n\021MATCH_ENDED_STATE\020\005\022\020\n\014PAUSE" +
-      "D_STATE\020\006\022\024\n\020RINGMASTER_STATE\020\007\022\016\n\nIDLE_",
-      "STATE\020\010\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020" +
-      "\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLEFT_RAI" +
-      "L\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I\n\020F" +
-      "lameEmitterType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013BLO" +
-      "CK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"f\n\nAttack" +
-      "Type\022\014\n\010LEFT_JAB\020\000\022\r\n\tRIGHT_JAB\020\001\022\r\n\tLEF" +
-      "T_HOOK\020\002\022\016\n\nRIGHT_HOOK\020\003\022\014\n\010HADOUKEN\020\004\022\016" +
-      "\n\nSONIC_BOOM\020\005B\032\n\030ca.site3.ssf.guiprotoc" +
-      "ol"
+      "ent.GameState\0227\n\013matchResult\030\005 \001(\0162\".gui" +
+      "protocol.GameEvent.MatchResult\022-\n\006player" +
+      "\030\006 \001(\0162\035.guiprotocol.GameEvent.Player\0225\n" +
+      "\nattackType\030\007 \001(\0162!.guiprotocol.GameEven",
+      "t.AttackType\022\021\n\toldHealth\030\t \001(\002\022\021\n\tnewHe" +
+      "alth\030\n \001(\002\022\023\n\013roundNumber\030\013 \001(\005\022G\n\017round" +
+      "BeginTimer\030\014 \001(\0162..guiprotocol.GameEvent" +
+      ".RoundBeginCountdownTime\0227\n\013roundResult\030" +
+      "\r \001(\0162\".guiprotocol.GameEvent.RoundResul" +
+      "t\022\020\n\010timedOut\030\016 \001(\010\022\022\n\ntimeInSecs\030\017 \001(\005\022" +
+      "3\n\tgameState\030\020 \001(\0162 .guiprotocol.GameEve" +
+      "nt.GameState\0228\n\014roundResults\030\021 \003(\0162\".gui" +
+      "protocol.GameEvent.RoundResult\022\025\n\rplayer" +
+      "1Health\030\022 \001(\002\022\025\n\rplayer2Health\030\023 \001(\002\022\030\n\020",
+      "roundInPlayTimer\030\024 \001(\005\032\261\001\n\013FireEmitter\022\024" +
+      "\n\014emitterIndex\030\001 \002(\005\022;\n\013emitterType\030\002 \002(" +
+      "\0162&.guiprotocol.GameEvent.FireEmitterTyp" +
+      "e\022\033\n\023intensityRingmaster\030\003 \002(\002\022\030\n\020intens" +
+      "ityPlayer1\030\004 \002(\002\022\030\n\020intensityPlayer2\030\005 \002" +
+      "(\002\"\230\002\n\tEventType\022\025\n\021GAME_INFO_REFRESH\020\000\022" +
+      "\030\n\024FIRE_EMITTER_CHANGED\020\001\022\026\n\022GAME_STATE_" +
+      "CHANGED\020\002\022\031\n\025PLAYER_HEALTH_CHANGED\020\003\022\034\n\030" +
+      "ROUND_PLAY_TIMER_CHANGED\020\004\022\035\n\031ROUND_BEGI" +
+      "N_TIMER_CHANGED\020\005\022\017\n\013ROUND_ENDED\020\006\022\017\n\013MA",
+      "TCH_ENDED\020\007\022\030\n\024PLAYER_ATTACK_ACTION\020\010\022\027\n" +
+      "\023PLAYER_BLOCK_ACTION\020\t\022\025\n\021RINGMASTER_ACT" +
+      "ION\020\n\"\320\001\n\tGameState\022\014\n\010NO_STATE\020\000\022\031\n\025ROU" +
+      "ND_BEGINNING_STATE\020\001\022\027\n\023ROUND_IN_PLAY_ST" +
+      "ATE\020\002\022\025\n\021ROUND_ENDED_STATE\020\003\022\033\n\027TIE_BREA" +
+      "KER_ROUND_STATE\020\004\022\025\n\021MATCH_ENDED_STATE\020\005" +
+      "\022\020\n\014PAUSED_STATE\020\006\022\024\n\020RINGMASTER_STATE\020\007" +
+      "\022\016\n\nIDLE_STATE\020\010\"(\n\006Player\022\016\n\nRINGMASTER" +
+      "\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"L\n\013RoundResult\022\r\n\tROU" +
+      "ND_TIE\020\000\022\026\n\022PLAYER_1_ROUND_WIN\020\001\022\026\n\022PLAY",
+      "ER_2_ROUND_WIN\020\002\"=\n\013MatchResult\022\026\n\022PLAYE" +
+      "R_1_MATCH_WIN\020\000\022\026\n\022PLAYER_2_MATCH_WIN\020\001\"" +
+      "@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIG" +
+      "HT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I\n\020FlameEmitte" +
+      "rType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013BLOCK_FLAME\020\001" +
+      "\022\022\n\016NON_GAME_FLAME\020\002\"f\n\nAttackType\022\014\n\010LE" +
+      "FT_JAB\020\000\022\r\n\tRIGHT_JAB\020\001\022\r\n\tLEFT_HOOK\020\002\022\016" +
+      "\n\nRIGHT_HOOK\020\003\022\014\n\010HADOUKEN\020\004\022\016\n\nSONIC_BO" +
+      "OM\020\005\"A\n\027RoundBeginCountdownTime\022\t\n\005THREE" +
+      "\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.si",
+      "te3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2420,7 +3021,7 @@ public final class Event {
           internal_static_guiprotocol_GameEvent_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guiprotocol_GameEvent_descriptor,
-              new java.lang.String[] { "Type", "Emitter", "OldGameState", "NewGameState", "MatchWinner", "Player", "AttackType", "OldHealth", "NewHealth", "RoundNumber", "BeginType", "RoundWinner", "TimedOut", "TimeInSecs", },
+              new java.lang.String[] { "Type", "Emitter", "OldGameState", "NewGameState", "MatchResult", "Player", "AttackType", "OldHealth", "NewHealth", "RoundNumber", "RoundBeginTimer", "RoundResult", "TimedOut", "TimeInSecs", "GameState", "RoundResults", "Player1Health", "Player2Health", "RoundInPlayTimer", },
               ca.site3.ssf.guiprotocol.Event.GameEvent.class,
               ca.site3.ssf.guiprotocol.Event.GameEvent.Builder.class);
           internal_static_guiprotocol_GameEvent_FireEmitter_descriptor =

@@ -177,15 +177,14 @@ class TieBreakerGameState extends GameState {
 		// Stop all emitters immediately
 		this.clearAndResetAllEmitters();
 		
-		victoryPlayer.incrementNumRoundWins();
-		this.gameModel.incrementNumRoundsPlayed();
-		
 		// Signal an event for the round ending in victory for a player...
 		RoundResult result = RoundResult.PLAYER1_VICTORY;
 		if (victoryPlayer.getPlayerNumber() == 2) {
 			result = RoundResult.PLAYER2_VICTORY;
 		}
 		
+		victoryPlayer.incrementNumRoundWins();
+		this.gameModel.addRoundResult(result);
 		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, false);
 		this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, victoryPlayer));
 	}

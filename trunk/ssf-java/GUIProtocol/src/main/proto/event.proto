@@ -7,60 +7,79 @@ message GameEvent {
 
   // corresponds to IGameModelEvent classes
   enum EventType {
-    FireEmitterChanged = 0;
-	GameStateChanged = 1;
-	PlayerHealthChanged = 2;
-	RoundPlayTimerChanged = 3;
-	RoundBeginTimerChanged = 4;
-	RoundEnded = 5;
-	MatchEnded = 6;
-	PlayerAttackAction = 7;
-	PlayerBlockAction = 8;
-	RingmasterAction = 9;
+    GAME_INFO_REFRESH         = 0;
+    FIRE_EMITTER_CHANGED      = 1;
+    GAME_STATE_CHANGED        = 2;
+    PLAYER_HEALTH_CHANGED     = 3;
+    ROUND_PLAY_TIMER_CHANGED  = 4;
+    ROUND_BEGIN_TIMER_CHANGED = 5;
+    ROUND_ENDED               = 6;
+    MATCH_ENDED               = 7;
+    PLAYER_ATTACK_ACTION      = 8;
+    PLAYER_BLOCK_ACTION       = 9;
+    RINGMASTER_ACTION         = 10;
   }
   
   
   // for GameStateChanged
   enum GameState {
-    NO_STATE = 0;
-	ROUND_BEGINNING_STATE = 1;
-	ROUND_IN_PLAY_STATE = 2;
-	ROUND_ENDED_STATE = 3;
-	TIE_BREAKER_ROUND_STATE = 4;
-	MATCH_ENDED_STATE = 5;
-	PAUSED_STATE = 6;
-	RINGMASTER_STATE = 7;
-	IDLE_STATE = 8;
+    NO_STATE                = 0;
+    ROUND_BEGINNING_STATE   = 1;
+    ROUND_IN_PLAY_STATE     = 2;
+    ROUND_ENDED_STATE       = 3;
+    TIE_BREAKER_ROUND_STATE = 4;
+    MATCH_ENDED_STATE       = 5;
+    PAUSED_STATE            = 6;
+    RINGMASTER_STATE        = 7;
+    IDLE_STATE              = 8;
   }
   
   
   // for PlayerEvents, FireEmitterChanged etc.
   enum Player {
     RINGMASTER = 0;
-    P1 = 1;
-    P2 = 2;
+    P1         = 1;
+    P2         = 2;
+  }
+  
+  enum RoundResult {
+    ROUND_TIE          = 0;
+    PLAYER_1_ROUND_WIN = 1;
+    PLAYER_2_ROUND_WIN = 2;
+  }
+  
+  enum MatchResult {
+    PLAYER_1_MATCH_WIN = 0;
+    PLAYER_2_MATCH_WIN = 1;
   }
   
   // for TOUCH_EMITTER
   enum FireEmitterType {
-    LEFT_RAIL = 0;
+    LEFT_RAIL  = 0;
     RIGHT_RAIL = 1;
     OUTER_RING = 2;
   }
   
   enum FlameEmitterType { 
-    ATTACK_FLAME = 0;
-    BLOCK_FLAME = 1;
+    ATTACK_FLAME   = 0;
+    BLOCK_FLAME    = 1;
     NON_GAME_FLAME = 2;
   }
   
   enum AttackType {
-    LEFT_JAB = 0;
-    RIGHT_JAB = 1; 
-    LEFT_HOOK = 2;
+    LEFT_JAB   = 0;
+    RIGHT_JAB  = 1; 
+    LEFT_HOOK  = 2;
     RIGHT_HOOK = 3;
-    HADOUKEN = 4;
+    HADOUKEN   = 4;
     SONIC_BOOM = 5;
+  }
+  
+  enum RoundBeginCountdownTime {
+    THREE = 0;
+    TWO   = 1;
+    ONE   = 2;
+    FIGHT = 3;
   }
   
   // needed to reconstruct a FireEmitter (or at impersonate a FireEmitterChangedEvent)
@@ -84,8 +103,7 @@ message GameEvent {
   optional GameState newGameState = 4;
   
   // MatchEnded
-  optional Player matchWinner = 5; // ringmaster shouldn't be allowed here but meh
-  
+  optional MatchResult matchResult = 5;
   
   // shared between Player{Attack,Block}ActionEvent and PlayerHealthChange
   optional Player player = 6;
@@ -105,13 +123,23 @@ message GameEvent {
   
   // RoundBeginTimerChangeEvent
   optional int32 roundNumber = 11;
-  optional int32 beginType = 12; // 3=3, 2=2, 1=1, 0=fight
+  optional RoundBeginCountdownTime roundBeginTimer = 12;
   
   // RoundEndedEvent
   // share roundNumber
-  optional Player roundWinner = 13; // ringmaster means tie
+  optional RoundResult roundResult = 13;
   optional bool timedOut = 14;
   
   // RoundPlayTimerChangedEvent
   optional int32 timeInSecs = 15;
+  
+  
+  // GameInfoRefreshEvent
+  optional GameState gameState       = 16;    
+  repeated RoundResult roundResults  = 17;
+  optional float player1Health       = 18;
+  optional float player2Health       = 19;
+  optional int32 roundInPlayTimer    = 20;
+  // NOTE: The GameInfoRefreshEvent also makes use of timedOut, roundBeginTimer, matchResult
+  
 }

@@ -27,7 +27,7 @@ public final class RoundBeginTimerChangedEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.RoundBeginTimerChanged;
+		return Type.ROUND_BEGIN_TIMER_CHANGED;
 	}
 
 }

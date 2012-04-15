@@ -19,7 +19,7 @@ public final class MatchEndedEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.MatchEnded;
+		return Type.MATCH_ENDED;
 	}
 
 }

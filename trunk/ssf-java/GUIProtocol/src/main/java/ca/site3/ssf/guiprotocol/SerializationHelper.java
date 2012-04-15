@@ -3,16 +3,21 @@ package ca.site3.ssf.guiprotocol;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 
 import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
+import ca.site3.ssf.gamemodel.MatchEndedEvent;
+import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
+import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.GameState;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction;
@@ -204,10 +209,127 @@ class SerializationHelper {
 	}
 	
 	
+	static List<RoundEndedEvent.RoundResult> protobufToRoundResults(List<GameEvent.RoundResult> results) {
+		List<RoundEndedEvent.RoundResult> returnVal = new ArrayList<RoundEndedEvent.RoundResult>(results.size());
+		for (GameEvent.RoundResult currRoundResult : results) {
+			returnVal.add(SerializationHelper.protobufToRoundResult(currRoundResult));
+		}
+		
+		return returnVal;
+	}
 	
+	static List<GameEvent.RoundResult> roundResultsToProtobuf(List<RoundEndedEvent.RoundResult> results) {
+		List<GameEvent.RoundResult> returnVal = new ArrayList<GameEvent.RoundResult>(results.size());
+		for (RoundEndedEvent.RoundResult currRoundResult : results) {
+			returnVal.add(SerializationHelper.roundResultToProtobuf(currRoundResult));
+		}
+		
+		return returnVal;
+	}
 	
+	static RoundEndedEvent.RoundResult protobufToRoundResult(GameEvent.RoundResult result) {
+		assert(result != null);
+		
+		switch (result) {
+		case PLAYER_1_ROUND_WIN:
+			return RoundEndedEvent.RoundResult.PLAYER1_VICTORY;
+		case PLAYER_2_ROUND_WIN:
+			return RoundEndedEvent.RoundResult.PLAYER2_VICTORY;
+		case ROUND_TIE:
+			return RoundEndedEvent.RoundResult.TIE;
+		default:
+			assert(false);
+			throw new IllegalArgumentException("Unknown round result: " + result);
+		}
+	}
+	
+	static GameEvent.RoundResult roundResultToProtobuf(RoundEndedEvent.RoundResult result) {
+		assert(result != null);
+		
+		switch (result) {
+		case PLAYER1_VICTORY:
+			return GameEvent.RoundResult.PLAYER_1_ROUND_WIN;
+		case PLAYER2_VICTORY:
+			return GameEvent.RoundResult.PLAYER_2_ROUND_WIN;
+		case TIE:
+			return GameEvent.RoundResult.ROUND_TIE;
+		default:
+			assert(false);
+			throw new IllegalArgumentException("Unknown round result: " + result);
+		}
+	}
+	
+	static MatchEndedEvent.MatchResult protobufToMatchResult(GameEvent.MatchResult result) {
+		assert(result != null);
+		
+		switch (result) {
+		case PLAYER_1_MATCH_WIN:
+			return MatchEndedEvent.MatchResult.PLAYER1_VICTORY;
+		case PLAYER_2_MATCH_WIN:
+			return MatchEndedEvent.MatchResult.PLAYER2_VICTORY;
+		default:
+			assert(false);
+			throw new IllegalArgumentException("Unknown match result: " + result);
+		}
+	}
+	
+	static GameEvent.MatchResult matchResultToProtobuf(MatchEndedEvent.MatchResult result) {
+		assert(result != null);
+		
+		switch (result) {
+		case PLAYER1_VICTORY:
+			return GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
+		case PLAYER2_VICTORY:
+			return GameEvent.MatchResult.PLAYER_2_MATCH_WIN;
+		default:
+			assert(false);
+			break;
+		}
+		
+		return null;
+	}
+	
+	static RoundBeginTimerChangedEvent.RoundBeginCountdownType protobufToRoundBeginCountdownTimer(GameEvent.RoundBeginCountdownTime countdownTime) {
+		assert(countdownTime != null);
+		
+		switch (countdownTime) {
+		case THREE:
+			return RoundBeginTimerChangedEvent.RoundBeginCountdownType.THREE;
+		case TWO:
+			return RoundBeginTimerChangedEvent.RoundBeginCountdownType.TWO;
+		case ONE:
+			return RoundBeginTimerChangedEvent.RoundBeginCountdownType.ONE;
+		case FIGHT:
+			return RoundBeginTimerChangedEvent.RoundBeginCountdownType.FIGHT;
+		default:
+			assert(false);
+			throw new IllegalArgumentException("Unknown RoundBeginCountdownType: " + countdownTime);
+		}
+	}
+	
+	static GameEvent.RoundBeginCountdownTime roundBeginCountdownTimerToProtobuf(RoundBeginTimerChangedEvent.RoundBeginCountdownType countdownTime) {
+		if (countdownTime == null) {
+			return null;
+		}
+		
+		switch (countdownTime) {
+		case FIGHT:
+			return GameEvent.RoundBeginCountdownTime.FIGHT;
+		case ONE:
+			return GameEvent.RoundBeginCountdownTime.ONE;
+		case TWO:
+			return GameEvent.RoundBeginCountdownTime.TWO;
+		case THREE:
+			return GameEvent.RoundBeginCountdownTime.THREE;
+		default:
+			assert(false);
+			throw new IllegalArgumentException("Unknown RoundBeginCountdownType: " + countdownTime);
+		}
+	}
 	
 	static GameStateType protobufToGameState(GameState gameState) {
+		assert(gameState != null);
+		
 		switch (gameState) {
 		case IDLE_STATE:
 			return GameStateType.IDLE_STATE;
@@ -228,11 +350,14 @@ class SerializationHelper {
 		case TIE_BREAKER_ROUND_STATE:
 			return GameStateType.TIE_BREAKER_ROUND_STATE;
 		default:
+			assert(false);
 			throw new IllegalArgumentException("Unknown GameState: "+gameState);
 		}
 	}
 	
 	static GameState gameStateToProtobuf(GameStateType gameState) {
+		assert(gameState != null);
+		
 		switch (gameState) {
 		case IDLE_STATE:
 			return GameState.IDLE_STATE;
@@ -253,6 +378,7 @@ class SerializationHelper {
 		case TIE_BREAKER_ROUND_STATE:
 			return GameState.TIE_BREAKER_ROUND_STATE;
 		default:
+			assert(false);
 			throw new IllegalArgumentException("Unknown GameStateType: "+gameState);
 		}
 	}
@@ -295,32 +421,4 @@ class SerializationHelper {
 		}
 	}
 	
-	
-	static int beginTypeToProtobuf(RoundBeginCountdownType t) {
-		switch (t) {
-		case FIGHT:
-			return 0;
-		case ONE:
-			return 1;
-		case TWO:
-			return 2;
-		case THREE:
-			return 3;
-		default:
-			throw new IllegalArgumentException("Invalid RoundBeginCountdownType: "+t);
-		}
-	}
-	
-	static ca.site3.ssf.guiprotocol.Event.GameEvent.Player roundWinnerProtobuf(RoundResult r) {
-		switch (r) {
-		case PLAYER1_VICTORY:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.Player.P1;
-		case PLAYER2_VICTORY:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.Player.P2;
-		case TIE:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER; // yes i know this is semantically wonky
-		default:
-			throw new IllegalArgumentException("Can't make sense of RoundResult: "+r);
-		}
-	}
 }

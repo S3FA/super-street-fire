@@ -31,6 +31,7 @@ public interface IGameModel {
 	void tick(double dT);
 	
 	ActionFactory getActionFactory();
+	void queryGameInfoRefresh();			   // Or use the QueryGameInfoRefreshCommand class
 	void executeGenericAction(Action action);  // Or use the ExecuteGenericActionCommand class
 	void killGame();						   // Or use the KillGameCommand class
 	void initiateNextState();				   // Or use the InitiateNextStateCommand class

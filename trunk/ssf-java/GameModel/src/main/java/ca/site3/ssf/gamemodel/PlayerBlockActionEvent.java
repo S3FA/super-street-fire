@@ -14,7 +14,7 @@ public final class PlayerBlockActionEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.PlayerBlockAction;
+		return Type.PLAYER_BLOCK_ACTION;
 	}
 
 }

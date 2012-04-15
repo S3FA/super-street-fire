@@ -16,6 +16,8 @@ class GameInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final String EMPTY_STATE_TEXT = "N/A";
+	
 	private JLabel prevStateLabel;
 	private JLabel currStateLabel;
 	private JLabel currRoundTimeLabel;
@@ -43,14 +45,14 @@ class GameInfoPanel extends JPanel {
 		JLabel prevStateLabel = new JLabel("Previous State:");
 		prevStateLabel.setForeground(Color.black);
 		formLayoutHelper.addLabel(prevStateLabel, stateInfoPanel);
-		this.prevStateLabel = new JLabel("N/A");
+		this.prevStateLabel = new JLabel(EMPTY_STATE_TEXT);
 		this.prevStateLabel.setForeground(Color.black);
 		formLayoutHelper.addLastField(this.prevStateLabel, stateInfoPanel);
 		
 		JLabel currStateLabel = new JLabel("Current State:");
 		currStateLabel.setForeground(Color.black);
 		formLayoutHelper.addLabel(currStateLabel, stateInfoPanel);
-		this.currStateLabel = new JLabel("N/A");
+		this.currStateLabel = new JLabel(EMPTY_STATE_TEXT);
 		this.currStateLabel.setForeground(Color.black);
 		formLayoutHelper.addLastField(this.currStateLabel, stateInfoPanel);
 		
@@ -58,7 +60,7 @@ class GameInfoPanel extends JPanel {
 		roundTimeLabel.setForeground(Color.black);
 		formLayoutHelper.addLabel(roundTimeLabel, stateInfoPanel);
 		
-		this.currRoundTimeLabel = new JLabel("N/A");
+		this.currRoundTimeLabel = new JLabel(EMPTY_STATE_TEXT);
 		this.currRoundTimeLabel.setForeground(Color.black);
 		Font tempFont = this.currRoundTimeLabel.getFont();
 		this.currRoundTimeLabel.setFont(new Font(tempFont.getFontName(), tempFont.getStyle(), 32));
@@ -80,24 +82,34 @@ class GameInfoPanel extends JPanel {
 
 	void setRoundTimer(double time) {
 		if (time < 0.0) {
-			this.currRoundTimeLabel.setText("N/A");
+			this.currRoundTimeLabel.setText(EMPTY_STATE_TEXT);
 		}
 		else {
 			this.currRoundTimeLabel.setText("" + (int)time);
 		}
 	}
 	double getRoundTime() {
-		if (this.currRoundTimeLabel.getText() == "N/A") {
+		if (this.currRoundTimeLabel.getText() == EMPTY_STATE_TEXT) {
 			return -1;
 		}
 		return Double.parseDouble(this.currRoundTimeLabel.getText());
 	}
 	
 	void setPreviousGameState(GameState.GameStateType state) {
-		this.prevStateLabel.setText(state.toString());
+		if (state == null) {
+			this.prevStateLabel.setText(EMPTY_STATE_TEXT);
+		}
+		else {
+			this.prevStateLabel.setText(state.toString());
+		}
 	}
 	void setCurrentGameState(GameState.GameStateType state) {
-		this.currStateLabel.setText(state.toString());
+		if (state == null) {
+			this.currStateLabel.setText(EMPTY_STATE_TEXT);
+		}
+		else {
+			this.currStateLabel.setText(state.toString());
+		}
 	}
 
 	PlayerInfoPanel getPlayer1Panel() {

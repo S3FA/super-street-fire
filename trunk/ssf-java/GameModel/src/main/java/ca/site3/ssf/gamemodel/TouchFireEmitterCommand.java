@@ -21,6 +21,7 @@ public final class TouchFireEmitterCommand extends AbstractGameModelCommand {
 	
 	@Override
 	void execute(GameModel gameModel) {
+		assert(gameModel != null);
 		gameModel.touchFireEmitter(this.location, this.index, this.intensity, this.contributors);
 	}
 

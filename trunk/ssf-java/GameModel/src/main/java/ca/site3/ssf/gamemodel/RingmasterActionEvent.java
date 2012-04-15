@@ -7,7 +7,7 @@ public final class RingmasterActionEvent implements IGameModelEvent {
 	}
 	
 	public Type getType() {
-		return Type.RingmasterAction;
+		return Type.RINGMASTER_ACTION;
 	}
 
 }
