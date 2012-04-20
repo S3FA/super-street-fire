@@ -97,7 +97,7 @@ public class JahmmConverter {
 		catch (IllegalArgumentException e) {
 			logger.warn("Failed to learn from gesture data set: " + e.getMessage());
 		}
-		return null;
+		return hmm;
 	}
 	
 	
@@ -138,7 +138,7 @@ public class JahmmConverter {
 		System.out.println(observationSeqs.toString());
 		System.out.println();
 		
-		Hmm<ObservationVector> hmm = JahmmConverter.buildKMeansHMMWithTraining(dataSet, 6);
+		Hmm<ObservationVector> hmm = JahmmConverter.buildKMeansHMMWithTraining(dataSet, 3);
 		if (hmm == null) {
 			System.out.print("Failed to build HMM.");
 			return;
