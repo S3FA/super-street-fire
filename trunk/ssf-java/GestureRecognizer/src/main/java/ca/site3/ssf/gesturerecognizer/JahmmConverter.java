@@ -3,6 +3,9 @@ package ca.site3.ssf.gesturerecognizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
 import be.ac.ulg.montefiore.run.jahmm.OpdfMultiGaussianFactory;
@@ -19,6 +22,8 @@ import be.ac.ulg.montefiore.run.jahmm.toolbox.MarkovGenerator;
  */
 public class JahmmConverter {
 
+	private static Logger logger = LoggerFactory.getLogger(JahmmConverter.class);
+	
 	private JahmmConverter() {
 	}
 	
@@ -72,16 +77,27 @@ public class JahmmConverter {
 		KMeansLearner<ObservationVector> kMeansLearner =
 				new KMeansLearner<ObservationVector>(numStates, 
 						new OpdfMultiGaussianFactory(sequences.get(0).get(0).dimension()), sequences);
-		
-		Hmm<ObservationVector> kMeansHmm = kMeansLearner.learn();
-		BaumWelchLearner bwl = new BaumWelchLearner();
-		return bwl.learn(kMeansHmm, sequences);
+		try {
+			Hmm<ObservationVector> kMeansHmm = kMeansLearner.learn();
+			BaumWelchLearner bwl = new BaumWelchLearner();
+			return bwl.learn(kMeansHmm, sequences);
+		}
+		catch (IllegalArgumentException e) {
+			logger.warn("Failed to learn from gesture data set: " + e.getMessage());
+		}
+		return null;
 	}
 	
 	public static Hmm<ObservationVector> trainHMM(Hmm<ObservationVector> hmm, GestureDataSet dataSet) {
 		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
-		BaumWelchLearner bwl = new BaumWelchLearner();
-		return bwl.learn(hmm, sequences);
+		try {
+			BaumWelchLearner bwl = new BaumWelchLearner();
+			return bwl.learn(hmm, sequences);
+		}
+		catch (IllegalArgumentException e) {
+			logger.warn("Failed to learn from gesture data set: " + e.getMessage());
+		}
+		return null;
 	}
 	
 	
@@ -94,6 +110,7 @@ public class JahmmConverter {
 			ArrayList<Double> timeData          = new ArrayList<Double>(10);
 			
 			for (int j = 0; j < 10; j++) {
+				/*
 				leftGloveData.add(new GloveData(
 						j, j, j,
 						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random(),
@@ -102,6 +119,17 @@ public class JahmmConverter {
 						j, j, j,
 						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
 						j, j, j));
+				*/
+				leftGloveData.add(new GloveData(
+						j, j, j,
+						(j+1), (j+1), (j+1),
+						j, j, j));
+				rightGloveData.add(new GloveData(
+						j, j, j,
+						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
+						j, j, j));
+				
+				
 				timeData.add(new Double(j*0.1));
 			}
 			
@@ -113,8 +141,11 @@ public class JahmmConverter {
 		System.out.println(observationSeqs.toString());
 		System.out.println();
 		
-		
 		Hmm<ObservationVector> hmm = JahmmConverter.buildKMeansHMMWithTraining(dataSet, 6);
+		if (hmm == null) {
+			System.out.print("Failed to build HMM.");
+			return;
+		}
 		System.out.println();
 		System.out.println(hmm);
 		System.out.println();

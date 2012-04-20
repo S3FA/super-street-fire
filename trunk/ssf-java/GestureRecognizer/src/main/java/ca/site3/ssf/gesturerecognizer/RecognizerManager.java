@@ -36,11 +36,12 @@ class RecognizerManager {
 	 * Train the given gesture's recognizer with the given data set.
 	 * @param gesture The gesture whose recognizer will be trained.
 	 * @param dataSet The data set to train the gesture's recognizer with.
+	 * @return true on successful training, false on failure to train.
 	 */
-	void train(GestureType gesture, GestureDataSet dataSet) {
+	boolean train(GestureType gesture, GestureDataSet dataSet) {
 		Recognizer gestureRecog = this.recognizerMap.get(gesture);
 		assert(gestureRecog != null);
-		gestureRecog.train(dataSet);
+		return gestureRecog.train(dataSet);
 	}
 	
 	/**
