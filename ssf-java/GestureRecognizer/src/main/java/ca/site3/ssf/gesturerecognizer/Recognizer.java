@@ -151,5 +151,6 @@ class Recognizer {
 	private void trainMore(GestureDataSet dataSet) {
 		assert(this.recognizer != null);
 		this.recognizer = JahmmConverter.trainHMM(this.recognizer, dataSet);
+		assert(this.recognizer != null);
 	}
 }
