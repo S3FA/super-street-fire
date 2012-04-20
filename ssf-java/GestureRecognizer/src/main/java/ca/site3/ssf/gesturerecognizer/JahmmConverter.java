@@ -110,25 +110,22 @@ public class JahmmConverter {
 			ArrayList<Double> timeData          = new ArrayList<Double>(10);
 			
 			for (int j = 0; j < 10; j++) {
-				/*
-				leftGloveData.add(new GloveData(
-						j, j, j,
-						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random(),
-						j, j, j));
-				rightGloveData.add(new GloveData(
-						j, j, j,
-						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
-						j, j, j));
-				*/
-				leftGloveData.add(new GloveData(
-						j, j, j,
-						(j+1), (j+1), (j+1),
-						j, j, j));
-				rightGloveData.add(new GloveData(
-						j, j, j,
-						(j+1) + Math.random(), (j+1) + Math.random(), (j+1) + Math.random() * Math.random(),
-						j, j, j));
 				
+				double aX = (j+1) + Math.random();
+				double aY = (j+1) + Math.random();
+				double aZ = (j+1) + Math.random() * Math.random();
+				
+				// doesn't work when you use the same data for both left and right glove....
+				// need to be able to define null glove data!!!
+				
+				leftGloveData.add(new GloveData(
+						j, j, j,
+						aX, aY, aZ,
+						j, j, j));
+				//rightGloveData.add(new GloveData(
+				//		j, j, j,
+				//		aX, aY, aZ,
+				//		j, j, j));
 				
 				timeData.add(new Double(j*0.1));
 			}
