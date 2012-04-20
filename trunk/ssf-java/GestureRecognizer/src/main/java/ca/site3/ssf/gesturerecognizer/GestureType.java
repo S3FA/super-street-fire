@@ -17,9 +17,9 @@ public enum GestureType {
 	LEFT_HOOK(5, PlayerActionType.HOOK_ATTACK, true, false),
 	RIGHT_JAB(5, PlayerActionType.JAB_ATTACK, false, true),
 	RIGHT_HOOK(5, PlayerActionType.HOOK_ATTACK, false, true),
-	BLOCK(2, PlayerActionType.BLOCK, true, true),
-	HADOUKEN(10, PlayerActionType.HADOUKEN_ATTACK, true, true),
-	SONIC_BOOM(10, PlayerActionType.SONIC_BOOM_ATTACK, true, true);
+	BLOCK(3, PlayerActionType.BLOCK, true, true),
+	HADOUKEN(6, PlayerActionType.HADOUKEN_ATTACK, true, true),
+	SONIC_BOOM(6, PlayerActionType.SONIC_BOOM_ATTACK, true, true);
 	
 	final private PlayerActionType actionFactoryType; // The corresponding gamemodel factory type for when
 													  // it comes time to build the gesture for the gamemodel
