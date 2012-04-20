@@ -10,9 +10,11 @@ import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
-import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
+import ch.qos.logback.classic.Level;
+
+import com.beust.jcommander.JCommander;
 
 
 /**
@@ -156,4 +158,39 @@ public class IOServer {
 		isStopped = true;
 	}
 	
+	
+	
+	public static void main(String... argv) {
+		final CommandLineArgs args = new CommandLineArgs();
+		// populates args from argv
+		new JCommander(args, argv);
+		
+		configureLogging(args.verbosity);
+		
+		final IOServer ioserver = new IOServer(args);
+		ioserver.runLoop();
+	}
+	
+
+	private static void configureLogging(int level) {
+		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
+				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+		
+		switch (level) {
+			case 0:
+				root.setLevel(Level.OFF); break;
+			case 1:
+				root.setLevel(Level.TRACE); break;
+			case 2:
+				root.setLevel(Level.DEBUG); break;
+			case 3:
+				root.setLevel(Level.INFO); break;
+			case 4:
+				root.setLevel(Level.WARN); break;
+			case 5:
+				root.setLevel(Level.ERROR); break;
+			default:
+				root.setLevel(Level.INFO);
+		}
+	}
 }
