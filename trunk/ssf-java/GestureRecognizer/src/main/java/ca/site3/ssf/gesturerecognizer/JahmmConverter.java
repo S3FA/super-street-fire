@@ -71,6 +71,12 @@ public class JahmmConverter {
 		return result;
 	}
 	
+	/**
+	 * Builds a HMM using a K-Means seperation algorithm combined with Baum-Welch Learning.
+	 * @param dataSet The data set used to build the initial HMM.
+	 * @param numStates The number of states to use in the built HMM.
+	 * @return The newly built HMM, null on failure to build (dataSet is invalid: linear or constant).
+	 */
 	public static Hmm<ObservationVector> buildKMeansHMMWithTraining(GestureDataSet dataSet, int numStates) {
 		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
 		
@@ -88,6 +94,12 @@ public class JahmmConverter {
 		return null;
 	}
 	
+	/**
+	 * Train an existing HMM with the given data set.
+	 * @param hmm The existing HMM to train.
+	 * @param dataSet The new data set used to add training/learning to the given HMM.
+	 * @return The HMM, now smarter than ever before! (or not, if learning failed)
+	 */
 	public static Hmm<ObservationVector> trainHMM(Hmm<ObservationVector> hmm, GestureDataSet dataSet) {
 		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
 		try {
@@ -99,7 +111,6 @@ public class JahmmConverter {
 		}
 		return hmm;
 	}
-	
 	
 	public static void main(String[] args) {
 		

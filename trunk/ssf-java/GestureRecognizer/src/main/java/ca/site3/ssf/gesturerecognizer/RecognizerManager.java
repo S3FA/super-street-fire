@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 
 /**
@@ -22,10 +25,15 @@ class RecognizerManager {
 	
 	private final static double MINIMUM_PROBABILITY_THRESHOLD = 0.1;
 	
+	private Logger logger = null;
+	
+	
 	private Map<GestureType, Recognizer> recognizerMap =
 			new HashMap<GestureType, Recognizer>(GestureType.values().length);
 	
 	RecognizerManager() {
+		this.logger = LoggerFactory.getLogger(this.getClass());
+		
 		// Initialize the map of gesture recognizers
 		for (GestureType gesture : GestureType.values()) {
 			this.recognizerMap.put(gesture, new Recognizer(gesture));
@@ -63,9 +71,13 @@ class RecognizerManager {
 			}
 		}
 		
+		this.logger.info("Best found matching gesture: " + bestGesture.toString() +
+				" (" + (100*bestProbability) + "% probability)"); 
+		
 		// Test for some minimum threshold on the probability
 		// for this to actually be a proper gesture...
 		if (bestProbability < RecognizerManager.MINIMUM_PROBABILITY_THRESHOLD) {
+			this.logger.info("Failed to recognize gesture, did not meet minimum threshold.");
 			return null;
 		}
 		
