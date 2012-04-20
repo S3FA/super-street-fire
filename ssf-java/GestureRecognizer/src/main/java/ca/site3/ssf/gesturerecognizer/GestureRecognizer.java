@@ -41,9 +41,10 @@ public class GestureRecognizer {
 	 * Adds training using the given data set for the given gesture to the gesture recognition engine.
 	 * @param gestureType The gesture type to train.
 	 * @param gestureDataSet The gesture data that will be used for training.
+	 * @return true on successful training, false on failure.
 	 */
-	public void trainGesture(GestureType gestureType, GestureDataSet gestureDataSet) {
-		this.recognizerMgr.train(gestureType, gestureDataSet);
+	public boolean trainGesture(GestureType gestureType, GestureDataSet gestureDataSet) {
+		return this.recognizerMgr.train(gestureType, gestureDataSet);
 	}
 	
 	// GESTURE RECOGNIZER I/O (LOADING/SAVING) FUNCTIONALITY ************************************************

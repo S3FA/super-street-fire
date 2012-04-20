@@ -50,8 +50,9 @@ class Recognizer {
 	/**
 	 * Trains the recognizer for this gesture with the given data set.
 	 * @param dataSet The data set used to train the recognizer.
+	 * @return true on successful training, false on failure.
 	 */
-	void train(GestureDataSet dataSet) {
+	boolean train(GestureDataSet dataSet) {
 		assert(dataSet != null);
 		assert(dataSet.getGestureInstanceAt(0).getTrainingDataObservationWidth() == this.gestureType.getNumHands()*3);
 		if (this.recognizer != null) {
@@ -59,8 +60,12 @@ class Recognizer {
 		}
 		else {
 			this.recognizer = JahmmConverter.buildKMeansHMMWithTraining(dataSet, this.gestureType.getNumHmmNodes());
-			assert(this.recognizer != null);
+			if (this.recognizer == null) {
+				return false;
+			}
 		}
+		
+		return true;
 	}
 	
 	/**
