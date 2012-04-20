@@ -84,21 +84,42 @@ public class MainWindow extends JFrame {
 		Thread producerThread = new Thread(gloveListener, "Glove listener Thread");
 		producerThread.start();
 		
-		
 		// To stop this set isListeningForEvents false and call consumerThread.interrupt()\
 		//TODO: Start or stop this based on which tab we're in. 
 		consumerThread = new Thread(new Runnable() {
 			public void run() {
 				DeviceEvent e;
+				long timeout = 0;
+				long startTime = 0;
+				boolean recording = false;
+				
 				while (isListeningForEvents) {
-					try {
-						e = eventQueue.take();
-					} catch (InterruptedException ex) {
-						log.info("Glove event consumer interrupted",ex);
-						e = null;
-					}
+					//try {
+						e = eventQueue.poll();//.take();
+					//} catch (InterruptedException ex) {
+					//	log.info("Glove event consumer interrupted",ex);
+					//	e = null;
+					//}
+					
+					timeout = System.currentTimeMillis() - startTime;
+					
+					// If we find an event then fire off the event listener and reset the timeout
 					if (null != e && e.getType() == DeviceEvent.Type.GloveEvent) {
+						if(!recording)
+						{
+							startTime = System.currentTimeMillis();
+						}
+						
+						timeout = 0;
+						recording = true;
 						hardwareEventListener((GloveEvent)e);
+					}
+					
+					// Timeout greater than 1 second means a gesture has stopped so export
+					if(recording && timeout > 1000)
+					{
+						recording = false;
+						exportGatheredData();
 					}
 				}
 			}
@@ -129,56 +150,52 @@ public class MainWindow extends JFrame {
         SwingUtilities.invokeLater(doCreateAndShowGUI);
 	}
 
-	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
-	public void hardwareEventListener(GloveEvent gloveEvent) {
-		// Grab the currently selected tab, we do different things with the data stream based on the tab
+	public void exportGatheredData()
+	{
 		int selectedTab = this.tabbedPane.getSelectedIndex();
+		GestureInstance instance = new GestureInstance(this.leftGloveData, this.rightGloveData, this.timeData);
 		
-		if (gloveEvent.isButtonPressed())
+		// selectedTab == 0 is recording, == 1 is Training, == 2 is Testing
+		if (selectedTab == 0)
 		{
-			// If we just started recording, mark the start time. This will be a brand new gesture and file.
-			if (!this.recordingPanel.getRecordMode())
+			// If export to CSV is selected, perform the export
+			if(this.recordingPanel.getCsvExportState())
 			{
-				this.recordingPanel.setNewFile(true); 
-				this.leftGloveData = new ArrayList<GloveData>();
-				this.rightGloveData = new ArrayList<GloveData>();
-				this.timeData = new ArrayList<Double>();
-				this.startTime = System.nanoTime();
+				this.recordingPanel.exportToCsv(instance);
 			}
 			
-			this.recordingPanel.setNewFile(false);
+			// If export to the gesture recognizer is selected, export to the GestureRecognizer
+			if(this.recordingPanel.getRecognizerExportState())
+			{
+				this.recordingPanel.exportToRecognizer(instance);
+			}
+		}
+		else if (selectedTab == 2 && this.testingPanel.isEngineLoaded())
+		{
+			// If we're on the testing
+			this.testingPanel.testGestureInstance(instance);
+		}
+		
+		this.recordingPanel.setRecordMode(false); 
+	}
+	
+	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
+	public void hardwareEventListener(GloveEvent gloveEvent) {
+		
+		if (!this.recordingPanel.getRecordMode())
+		{
 			this.recordingPanel.setRecordMode(true);
+			
+			// If we just started recording, mark the start time. This will be a brand new gesture and file.
+			this.recordingPanel.setNewFile(true); 
+			this.leftGloveData = new ArrayList<GloveData>();
+			this.rightGloveData = new ArrayList<GloveData>();
+			this.timeData = new ArrayList<Double>();
+			this.startTime = System.nanoTime();
 		}
 		else
 		{
-			// If we're ending a recording, create and export the gesture instance object
-			if(this.recordingPanel.getRecordMode())
-			{
-				GestureInstance instance = new GestureInstance(this.leftGloveData, this.rightGloveData, this.timeData);
-				
-				// selectedTab == 0 is recording, == 1 is Training, == 2 is Testing
-				if (selectedTab == 0)
-				{
-					// If export to CSV is selected, perform the export
-					if(this.recordingPanel.getCsvExportState())
-					{
-						this.recordingPanel.exportToCsv(instance);
-					}
-					
-					// If export to the gesture recognizer is selected, export to the GestureRecognizer
-					if(this.recordingPanel.getRecognizerExportState())
-					{
-						this.recordingPanel.exportToRecognizer(instance);
-					}
-				}
-				else if (selectedTab == 2 && this.testingPanel.isEngineLoaded())
-				{
-					// If we're on the testing
-					this.testingPanel.testGestureInstance(instance);
-				}
-			}
-			
-			this.recordingPanel.setRecordMode(false); 
+			this.recordingPanel.setNewFile(false);
 		}
 		
 		// Build the gesture coordinates object and final vars to use in the UI thread
@@ -259,6 +276,6 @@ public class MainWindow extends JFrame {
 	// Gets the time elapsed since recording started in milliseconds
 	public double getElapsedTime()
 	{
-		return (double)(System.nanoTime() - this.startTime) / 1000000;
+		return (double)(System.nanoTime() - this.startTime) * 1000000;
 	}
 }
