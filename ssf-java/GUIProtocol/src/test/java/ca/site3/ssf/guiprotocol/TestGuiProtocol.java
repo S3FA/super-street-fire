@@ -63,7 +63,9 @@ public class TestGuiProtocol {
 		}
 		
 		server.stop();
-		assertEquals("Not all commands made it to queue",4, commandQueue.size());
+		
+		// add 1 to expected number because client automatically sends refresh command
+		assertEquals("Not all commands made it to queue", 4 + 1, commandQueue.size());
 	}
 
 	
