@@ -70,10 +70,10 @@ class FileInfoPanel extends JPanel {
 	public void exportToCsv(GestureInstance instance){
 		try
 		{	
-			String suffix = ".ins";
+			String suffix = ".csv";
 			int iteration = getNextFileIteration(suffix);
 	       
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + suffix), !this.isNewFile);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + suffix), !this.isNewFile);
         	
 	        // If we just created the file, 
 	        if(this.isNewFile)
@@ -142,11 +142,11 @@ class FileInfoPanel extends JPanel {
 	public void exportToRecognizer(GestureInstance instance){
 		try
 		{	
-			String suffix = "_Recognizer.engine";
+			String suffix = ".ins";
 			int iteration = getNextFileIteration(suffix);
 	       
 	        // Save the data to a file readable by the GestureRecognizer
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + "_Recognizer.engine"), false);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + suffix), false);
 	        writer.write(instance.toDataString());
 	 
 		    writer.flush();
@@ -163,11 +163,11 @@ class FileInfoPanel extends JPanel {
 	{
 		try
 		{	
-			String suffix = "_RecognizerResults.txt";
+			String suffix = ".eng";
 			int iteration = getNextFileIteration(suffix);
 	       	        
 	        // Save the data to a file readable by the Gesture Tester
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName + Integer.toString(iteration) + suffix), false);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + suffix), false);
 	        gestureRecognizer.saveRecognizerEngine(writer);
 	 
 		    writer.flush();
