@@ -170,7 +170,10 @@ class TrainingPanel extends JPanel implements ActionListener {
 		
 		GestureRecognizer gestureRecognizer = new GestureRecognizer();
 		boolean success = gestureRecognizer.trainGesture((GestureType)this.gestureType.getSelectedItem(), gestureDataSet);	
-		if(!success) {
+		if(success) {
+			this.loggingPanel.appendLogText("Training succeeded! (yay!)");
+		}
+		else {
 			this.loggingPanel.appendLogText("The gesture instances selected cannot be trained!\n");
 		}
 		
