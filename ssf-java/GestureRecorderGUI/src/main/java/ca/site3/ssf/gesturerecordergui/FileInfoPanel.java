@@ -25,6 +25,9 @@ import ca.site3.ssf.gesturerecognizer.GloveData;
  */
 class FileInfoPanel extends JPanel {
 	
+	public static final String GESTURE_INSTANCE_FILE_EXT = new String("ins");
+	public static final String GESTURE_ENGINE_FILE_EXT   = new String("eng");
+	
 	private static final long serialVersionUID = 1L;
 	
 	private boolean isNewFile = false;
@@ -142,11 +145,11 @@ class FileInfoPanel extends JPanel {
 	public void exportToRecognizer(GestureInstance instance){
 		try
 		{	
-			String suffix = ".ins";
-			int iteration = getNextFileIteration(suffix);
+			int iteration = getNextFileIteration(GESTURE_INSTANCE_FILE_EXT);
 	       
 	        // Save the data to a file readable by the GestureRecognizer
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + suffix), false);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + 
+	        		GESTURE_INSTANCE_FILE_EXT), false);
 	        writer.write(instance.toDataString());
 	 
 		    writer.flush();
@@ -163,11 +166,11 @@ class FileInfoPanel extends JPanel {
 	{
 		try
 		{	
-			String suffix = ".eng";
-			int iteration = getNextFileIteration(suffix);
+			int iteration = getNextFileIteration(GESTURE_ENGINE_FILE_EXT);
 	       	        
 	        // Save the data to a file readable by the Gesture Tester
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + suffix), false);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) +
+	        		GESTURE_ENGINE_FILE_EXT), false);
 	        gestureRecognizer.saveRecognizerEngine(writer);
 	 
 		    writer.flush();

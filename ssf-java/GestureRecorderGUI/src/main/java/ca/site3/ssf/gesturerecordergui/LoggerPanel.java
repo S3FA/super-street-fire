@@ -118,6 +118,10 @@ class LoggerPanel extends JPanel implements ActionListener {
 		this.log.append(text);
 	}
 	
+	public void appendLogTextLine(String line) {
+		this.log.append(line + "\n");
+	}
+	
 	// Clears the log
 	public void clearLog()
 	{
