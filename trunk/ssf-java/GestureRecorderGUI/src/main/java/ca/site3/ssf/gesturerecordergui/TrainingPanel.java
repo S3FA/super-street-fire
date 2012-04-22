@@ -1,6 +1,7 @@
 package ca.site3.ssf.gesturerecordergui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +38,8 @@ class TrainingPanel extends JPanel implements ActionListener {
 	private JButton selectFileButton;
 	private JButton trainFilesButton;
 	private JComboBox gestureType;
-	private LoggerPanel loggerPanel;
+	private LoggerPanel trainingFileListPanel;
+	private LoggerPanel loggingPanel;
 	private JFileChooser fileChooser;
 	
 	TrainingPanel() {
@@ -76,7 +78,9 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.trainFilesButton.addActionListener(this);
 		
 		// Allow the user to edit the file list
-		this.loggerPanel = new LoggerPanel("Training Files");
+		this.trainingFileListPanel = new LoggerPanel("Training Files");
+		this.loggingPanel = new LoggerPanel("Log");
+		this.loggingPanel.setTextAreaSize(5, 65);
 		
 		JLabel gestureTypeLabel = new JLabel("Select Gesture: ");
 		gestureTypeLabel.setForeground(Color.black);
@@ -89,7 +93,9 @@ class TrainingPanel extends JPanel implements ActionListener {
 		formLayoutHelper.addLastField(new JLabel(""), wrapperPanel);
 	
 		formLayoutHelper.addLastField(wrapperPanel, this);
-		formLayoutHelper.addLastField(this.loggerPanel, this);
+		formLayoutHelper.addLastField(this.trainingFileListPanel, this);
+		formLayoutHelper.addLastField(this.loggingPanel, this);
+		
 	}
 	
 	// Handles button events
@@ -102,7 +108,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		}
 		else if(e.getSource() == this.trainFilesButton)
 		{
-			GestureRecognizer gestureRecognizer = buildGestureRecognitionEngineFromFileList(this.loggerPanel.getLogText());
+			GestureRecognizer gestureRecognizer = buildGestureRecognitionEngineFromFileList(this.trainingFileListPanel.getLogText());
 			exportGestureRecognizerEnginer(gestureRecognizer);
 		}
 	}
@@ -117,7 +123,7 @@ class TrainingPanel extends JPanel implements ActionListener {
             
             for(File file : selectedFiles)
             {
-            	this.loggerPanel.appendLogText(file.getAbsolutePath() + "\n");
+            	this.trainingFileListPanel.appendLogText(file.getAbsolutePath() + "\n");
             }
         } 
 	}
@@ -138,7 +144,8 @@ class TrainingPanel extends JPanel implements ActionListener {
 			try 
 			{
 				// Read the file text of each file and reconstruct the data string
-				Scanner fileTextScanner = new Scanner(new FileInputStream(fileList.nextLine()));
+				String filePath = fileList.nextLine();
+				Scanner fileTextScanner = new Scanner(new FileInputStream(filePath));
 				
 				while (fileTextScanner.hasNextLine())
 				{
@@ -146,8 +153,13 @@ class TrainingPanel extends JPanel implements ActionListener {
 				}
 				
 				// Create the gesture instance from the file's string and add it to the data set
-				instance.fromDataString(gestureInstanceString.toString());
-				gestureDataSet.addGestureInstance(instance);
+				boolean success = instance.fromDataString(gestureInstanceString.toString());
+				if (success) {
+					gestureDataSet.addGestureInstance(instance);
+				}
+				else {
+					this.loggingPanel.appendLogText("Failed to load gesture instance from file, bad file format: " + filePath);
+				}
 			} 
 			catch (FileNotFoundException e) 
 			{
@@ -158,10 +170,8 @@ class TrainingPanel extends JPanel implements ActionListener {
 		
 		GestureRecognizer gestureRecognizer = new GestureRecognizer();
 		boolean success = gestureRecognizer.trainGesture((GestureType)this.gestureType.getSelectedItem(), gestureDataSet);	
-		
-		if(!success)
-		{
-			this.loggerPanel.appendLogText("The gesture instances selected cannot be trained!\n");
+		if(!success) {
+			this.loggingPanel.appendLogText("The gesture instances selected cannot be trained!\n");
 		}
 		
 		return gestureRecognizer;
