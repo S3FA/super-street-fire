@@ -8,6 +8,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ca.site3.ssf.gamemodel.IGameModel;
 
 /**
@@ -30,8 +33,10 @@ import ca.site3.ssf.gamemodel.IGameModel;
 public class GestureRecognizer {
 	
 	private RecognizerManager recognizerMgr = null;
+	private Logger logger = null;
 	
 	public GestureRecognizer() {
+		this.logger = LoggerFactory.getLogger(this.getClass());
 		this.recognizerMgr = new RecognizerManager();
 	}
 	
@@ -85,6 +90,7 @@ public class GestureRecognizer {
 		GestureType result = this.recognizerMgr.recognize(gestureInstance);
 		if (result == null) {
 			// No gesture was recognized
+			this.logger.info("Failed to recognize gesture.");
 			return;
 		}
 		
