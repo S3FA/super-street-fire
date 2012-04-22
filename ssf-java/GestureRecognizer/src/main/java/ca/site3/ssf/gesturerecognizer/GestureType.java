@@ -13,13 +13,13 @@ import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
  */
 public enum GestureType {
 	
-	LEFT_JAB(3, PlayerActionType.JAB_ATTACK, true, false),
-	LEFT_HOOK(3, PlayerActionType.HOOK_ATTACK, true, false),
-	RIGHT_JAB(3, PlayerActionType.JAB_ATTACK, false, true),
-	RIGHT_HOOK(3, PlayerActionType.HOOK_ATTACK, false, true),
-	BLOCK(2, PlayerActionType.BLOCK, true, true),
-	HADOUKEN(5, PlayerActionType.HADOUKEN_ATTACK, true, true),
-	SONIC_BOOM(5, PlayerActionType.SONIC_BOOM_ATTACK, true, true);
+	LEFT_JAB(4, PlayerActionType.JAB_ATTACK, true, false),
+	LEFT_HOOK(4, PlayerActionType.HOOK_ATTACK, true, false),
+	RIGHT_JAB(4, PlayerActionType.JAB_ATTACK, false, true),
+	RIGHT_HOOK(4, PlayerActionType.HOOK_ATTACK, false, true),
+	BLOCK(3, PlayerActionType.BLOCK, true, true),
+	HADOUKEN(6, PlayerActionType.HADOUKEN_ATTACK, true, true),
+	SONIC_BOOM(6, PlayerActionType.SONIC_BOOM_ATTACK, true, true);
 	
 	final private PlayerActionType actionFactoryType; // The corresponding gamemodel factory type for when
 													  // it comes time to build the gesture for the gamemodel
