@@ -42,6 +42,11 @@ class LoggerPanel extends JPanel implements ActionListener {
 		
 	}
 	
+	void setTextAreaSize(int rows, int cols) {
+		this.log.setRows(rows);
+		this.log.setColumns(cols);
+	}
+	
 	// Handles button events
 	public void actionPerformed(ActionEvent e)
 	{

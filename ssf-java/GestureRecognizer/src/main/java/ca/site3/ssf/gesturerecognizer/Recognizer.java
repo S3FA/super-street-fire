@@ -53,8 +53,14 @@ class Recognizer {
 	 * @return true on successful training, false on failure.
 	 */
 	boolean train(GestureDataSet dataSet) {
+		if (dataSet.getNumGestureInstances() == 0) {
+			return false;
+		}
+		
 		assert(dataSet != null);
 		assert(dataSet.getGestureInstanceAt(0).getTrainingDataObservationWidth() == this.gestureType.getNumHands()*3);
+		
+		
 		if (this.recognizer != null) {
 			this.trainMore(dataSet);
 		}

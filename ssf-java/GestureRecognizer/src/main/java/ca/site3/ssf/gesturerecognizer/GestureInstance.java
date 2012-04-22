@@ -230,10 +230,16 @@ public class GestureInstance {
 			for (int i = 0; i < amtOfData; i++) { this.leftGloveData.add(null); }
 			count++;
 		}
+		else {
+			this.leftGloveData = new ArrayList<GloveData>(0);
+		}
 		if (header.contains("R")) {
 			this.rightGloveData = new ArrayList<GloveData>(amtOfData);
 			for (int i = 0; i < amtOfData; i++) { this.rightGloveData.add(null); }
 			count++;
+		}
+		else {
+			this.rightGloveData = new ArrayList<GloveData>(0);
 		}
 		
 		this.timePts = new ArrayList<Double>(amtOfData);
@@ -281,7 +287,7 @@ public class GestureInstance {
 	
 	
 	private String gloveDataToString(String gloveTitle, List<GloveData> data) {
-		if (data == null) {
+		if (data == null || data.isEmpty()) {
 			return "";
 		}
 		
