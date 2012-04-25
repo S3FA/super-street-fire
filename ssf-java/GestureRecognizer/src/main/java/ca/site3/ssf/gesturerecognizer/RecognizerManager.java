@@ -100,6 +100,18 @@ class RecognizerManager {
 	}
 	
 	/**
+	 * Clears all of the currently loaded recognizers to blank states.
+	 * WARNING: Clears all loaded training data.
+	 */
+	void clearRecognizers() {
+		this.recognizerMap.clear();
+		// Initialize the map of gesture recognizers
+		for (GestureType gesture : GestureType.values()) {
+			this.recognizerMap.put(gesture, new Recognizer(gesture));
+		}
+	}
+	
+	/**
 	 * Writes/Saves all of the recognizers in this manager.
 	 * @param writer The writer to write the recognizers to.
 	 * @return true on success, false on failure.

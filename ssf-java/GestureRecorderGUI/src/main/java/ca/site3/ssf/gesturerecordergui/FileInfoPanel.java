@@ -3,10 +3,15 @@ package ca.site3.ssf.gesturerecordergui;
 import java.awt.Checkbox;
 import java.awt.Color;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
@@ -23,12 +28,16 @@ import ca.site3.ssf.gesturerecognizer.GloveData;
  * @author Mike
  *
  */
-class FileInfoPanel extends JPanel {
+class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 	
-	public static final String GESTURE_INSTANCE_FILE_EXT = new String("ins");
-	public static final String GESTURE_ENGINE_FILE_EXT   = new String("eng");
+	public static final String GESTURE_INSTANCE_FILE_EXT = "ins";
+	public static final String GESTURE_ENGINE_FILE_EXT   = "eng";
 	
 	private static final long serialVersionUID = 1L;
+	
+	private static final String EXPORT_TO_RECOGNIZER_KEY  = "ExportToRecognizer";
+	private static final String EXPORT_TO_CSV_KEY         = "ExportToCsv";
+	private static final String SELECTED_GESTURE_TYPE_KEY = "SelectedGestureType";
 	
 	private boolean isNewFile = false;
 	private JComboBox gestureName;
@@ -67,6 +76,26 @@ class FileInfoPanel extends JPanel {
 		gestureNameLabel.setForeground(Color.black);
 		formLayoutHelper.addMiddleField(gestureNameLabel, this);
 		formLayoutHelper.addLastField(this.gestureName, this);
+		
+		Preferences userPreferences = Preferences.userRoot();
+		
+		String exportToRecognizerStr = userPreferences.get(EXPORT_TO_RECOGNIZER_KEY, null);
+		this.exportRecognizer.setState(exportToRecognizerStr == null ? true : Boolean.valueOf(exportToRecognizerStr));
+		this.exportRecognizer.addItemListener(this);
+		
+		String exportToCsvStr = userPreferences.get(EXPORT_TO_CSV_KEY, null);
+		this.exportCsv.setState(exportToCsvStr == null ? false : Boolean.valueOf(exportToCsvStr));
+		this.exportCsv.addItemListener(this);
+		
+		String gestureTypeIdxStr = userPreferences.get(SELECTED_GESTURE_TYPE_KEY, "0");
+		try {
+			int idx = Integer.parseInt(gestureTypeIdxStr);
+			this.gestureName.setSelectedIndex(idx);
+		}
+		catch (NumberFormatException e) {
+		}
+		this.gestureName.addActionListener(this);
+		
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
@@ -211,5 +240,24 @@ class FileInfoPanel extends JPanel {
 	public String getGestureName()
 	{
 		return this.gestureName.getSelectedItem().toString();
+	}
+
+	public void actionPerformed(ActionEvent event) {
+		if (event.getSource() == this.gestureName) {
+			Preferences userPreferences = Preferences.userRoot();
+			userPreferences.put(SELECTED_GESTURE_TYPE_KEY, String.valueOf(this.gestureName.getSelectedIndex()));
+		}
+		
+	}
+
+	public void itemStateChanged(ItemEvent event) {
+		Preferences userPreferences = Preferences.userRoot();
+		if (event.getSource() == this.exportRecognizer) {
+			userPreferences.put(EXPORT_TO_RECOGNIZER_KEY, String.valueOf(this.exportRecognizer.getState()));
+		}
+		else if (event.getSource() == this.exportCsv) {
+			userPreferences.put(EXPORT_TO_CSV_KEY, String.valueOf(this.exportCsv.getState()));
+		}
+		
 	}
 }
