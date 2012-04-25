@@ -6,6 +6,7 @@ import java.io.Writer;
 
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
+import be.ac.ulg.montefiore.run.jahmm.OpdfMultiGaussian;
 import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 import be.ac.ulg.montefiore.run.jahmm.io.HmmReader;
 import be.ac.ulg.montefiore.run.jahmm.io.HmmWriter;
@@ -69,6 +70,18 @@ class Recognizer {
 			if (this.recognizer == null) {
 				return false;
 			}
+			else {
+				for (int i = 0; i < this.recognizer.nbStates(); i++) {
+					OpdfMultiGaussian obsvec = (OpdfMultiGaussian)this.recognizer.getOpdf(i);
+					double mean[] = obsvec.mean();
+					for (int j = 0; j < mean.length; j++) {
+						if (Double.isNaN(mean[j]) || Double.isInfinite(mean[j])) {
+							this.recognizer = null;
+							return false;
+						}
+					}
+				}
+			}
 		}
 		
 		return true;
@@ -101,10 +114,14 @@ class Recognizer {
 	void save(Writer writer) throws IOException {
 		assert(this.gestureType != null);
 		
-		writer.write(this.gestureType.name() + "\n");
+		writer.write(this.gestureType.name());
 		
 		if (this.recognizer != null) {
+			writer.write(" 1\n");
 			HmmWriter.write(writer, new OpdfMultiGaussianWriter(), this.recognizer);
+		}
+		else {
+			writer.write(" 0\n");
 		}
 	}
 	
@@ -129,25 +146,35 @@ class Recognizer {
 				if (reader.read(charArray) == -1) {
 					throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
 				}
-				temp += charArray[0];
+				if (!Character.isSpaceChar(charArray[0]) && charArray[0] != '\n') {
+					temp += charArray[0];
+				}
 			}
 		}
 		while (readType == null);
 		this.gestureType = readType;
 		
-		// Skip the newline character
+		// Skip the space character
 		reader.skip(1);
-		
-		// Attempt to read the recognizer...
-		try {
-			this.recognizer = HmmReader.read(reader, new OpdfMultiGaussianReader());
+		// Read whether or not there is a HMM for this recognizer in the file
+		if (reader.read(charArray)== -1) {
+			throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
 		}
-		catch (FileFormatException ex) {
+		reader.skip(1); // skip the newline
+		
+		if (charArray[0] == '0') {
 			this.recognizer = null;
-			return;
 		}
-		
-		assert(this.recognizer  != null);
+		else {
+			// Attempt to read the recognizer...
+			try {
+				this.recognizer = HmmReader.read(reader, new OpdfMultiGaussianReader());
+			}
+			catch (FileFormatException ex) {
+				this.recognizer = null;
+				throw ex;
+			}
+		}
 	}
 	
 	/**

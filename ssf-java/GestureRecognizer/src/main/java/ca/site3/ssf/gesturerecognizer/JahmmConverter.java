@@ -84,9 +84,7 @@ public class JahmmConverter {
 				new KMeansLearner<ObservationVector>(numStates, 
 						new OpdfMultiGaussianFactory(sequences.get(0).get(0).dimension()), sequences);
 		try {
-			Hmm<ObservationVector> kMeansHmm = kMeansLearner.learn();
-			BaumWelchLearner bwl = new BaumWelchLearner();
-			return bwl.learn(kMeansHmm, sequences);
+			return kMeansLearner.learn();
 		}
 		catch (IllegalArgumentException e) {
 			logger.warn("Failed to learn from gesture data set: " + e.getMessage());

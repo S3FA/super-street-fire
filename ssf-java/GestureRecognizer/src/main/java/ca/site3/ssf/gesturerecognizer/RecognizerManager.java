@@ -136,18 +136,20 @@ class RecognizerManager {
 	 * @return true on success, false on failure.
 	 */
 	boolean readRecognizers(Reader reader) {
-		try {
-			Recognizer newRecognizer = new Recognizer();
-			newRecognizer.load(reader);
-			this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
-		}
-		catch (IOException ex) {
-			System.err.println(ex.toString());
-			return false;
-		}
-		catch (FileFormatException ex) {
-			System.err.println(ex.toString());
-			return false;
+		for (int i = 0; i < this.recognizerMap.size(); i++) {
+			try {
+				Recognizer newRecognizer = new Recognizer();
+				newRecognizer.load(reader);
+				this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
+			}
+			catch (IOException ex) {
+				System.err.println(ex.toString());
+				return false;
+			}
+			catch (FileFormatException ex) {
+				System.err.println(ex.toString());
+				return false;
+			}
 		}
 		
 		return true;

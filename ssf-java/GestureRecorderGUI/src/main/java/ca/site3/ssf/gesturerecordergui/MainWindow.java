@@ -193,6 +193,9 @@ public class MainWindow extends JFrame {
 			if (this.recordingPanel.getRecognizerExportState()) {
 				this.recordingPanel.exportToRecognizer(instance);
 			}
+			
+			// Show all of the recorded data in the GUI Log...
+			this.recordingPanel.setLogString(instance.toDataString());
 		}
 		else if (selectedTab == 2 && this.testingPanel.isEngineLoaded()) {
 			// If we're on the testing
@@ -200,9 +203,6 @@ public class MainWindow extends JFrame {
 		}
 		
 		this.recordingPanel.setRecordMode(false);
-		
-		// Show all of the recorded data in the GUI Log...
-		this.recordingPanel.setLogString(instance.toDataString());
 	}
 	
 	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
