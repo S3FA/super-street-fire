@@ -74,6 +74,13 @@ public class GestureRecognizer {
 		return this.recognizerMgr.readRecognizers(reader);
 	}
 	
+	/**
+	 * Clears all of the currently loaded training data.
+	 */
+	public void clearEngine() {
+		this.recognizerMgr.clearRecognizers();
+	}
+	
 	// REAL-TIME GESTURE RECOGNITION FUNCTIONALITY **********************************************************
 	
 	/**

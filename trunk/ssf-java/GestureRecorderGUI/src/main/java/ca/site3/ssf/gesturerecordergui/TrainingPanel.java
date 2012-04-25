@@ -52,6 +52,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 	
 	private JButton loadGestureEngineButton;
 	private JButton saveGestureEngineButton;
+	private JButton clearGestureEngineButton;
 	
 	private LoggerPanel trainingFileListPanel;
 	private LoggerPanel loggingPanel;
@@ -145,12 +146,15 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.loadGestureEngineButton.addActionListener(this);
 		this.saveGestureEngineButton = new JButton("Save Engine");
 		this.saveGestureEngineButton.addActionListener(this);
+		this.clearGestureEngineButton = new JButton("Clear Engine");
+		this.clearGestureEngineButton.addActionListener(this);
 		
 		JPanel engineLoadSavePanel = new JPanel();
 		engineLoadSavePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		engineLoadSavePanel.add(gestureEngineLabel);
 		engineLoadSavePanel.add(this.loadGestureEngineButton);
 		engineLoadSavePanel.add(this.saveGestureEngineButton);
+		engineLoadSavePanel.add(this.clearGestureEngineButton);
 		formLayoutHelper.addLastField(engineLoadSavePanel, wrapperPanel);
 		
 		formLayoutHelper.addLastField(wrapperPanel, this);
@@ -177,6 +181,16 @@ class TrainingPanel extends JPanel implements ActionListener {
 		}
 		else if (e.getSource() == this.saveGestureEngineButton) {
 			this.handleEngineSaveDialog();
+		}
+		else if (e.getSource() == this.clearGestureEngineButton) {
+			int result = JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to clear the currently loaded engine?", "Clear Engine",
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+			if (result != JOptionPane.YES_OPTION) {
+				return;
+			}
+			
+			this.gestureRecognizer.clearEngine();
 		}
 		else if (e.getSource() == this.gestureType) {
 			Preferences userPreferences = Preferences.userRoot();
