@@ -22,7 +22,6 @@ public class DeviceDataParser implements IDeviceDataParser {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	
 	private DeviceStatus deviceStatus;
 	
 	// gX:69.68,gY:-77.45,gZ:-20.77,aX:-265.64,aY:239.84,aZ:4228.79,RLL:0.69,PCH:-2.46|
@@ -31,8 +30,6 @@ public class DeviceDataParser implements IDeviceDataParser {
 	public DeviceDataParser(DeviceStatus deviceStatus) {
 		this.deviceStatus = deviceStatus;
 	}
-	
-	
 	
 	public List<DeviceEvent> parseDeviceData(byte[] data, InetAddress srcIP) throws Exception {
 		
@@ -63,39 +60,49 @@ public class DeviceDataParser implements IDeviceDataParser {
 
 	
 	private GloveEvent parseSingleLine(Device d, String dataStr) {
-		if (dataStr.startsWith("gX") == false) {
-			log.warn("Ignoring data: '{}'",dataStr);
-			return null;
+		if (dataStr.startsWith("start|")) {
+			double[] gyro = new double[] { 0, 0, 0 };
+			double[] accel = new double[] { 0, 0, 0 };
+			double[] heading = new double[] { 0, 0, 0 };
+			return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), GloveEvent.EventType.BUTTON_DOWN_EVENT, gyro, accel, heading);
 		}
-		if (dataStr.endsWith("|") == false) {
-			log.warn("Looks like an incomplete frame: '{}'", dataStr);
-			return null;
+		else if (dataStr.startsWith("end|")) {
+			double[] gyro = new double[] { 0, 0, 0 };
+			double[] accel = new double[] { 0, 0, 0 };
+			double[] heading = new double[] { 0, 0, 0 };
+			return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), GloveEvent.EventType.BUTTON_UP_EVENT, gyro, accel, heading);
 		}
-		
-		Matcher m = pattern.matcher(dataStr);
-		if (m.matches() == false) {
-			log.warn("Input did not match regex: '{}'", dataStr);
-			return null;
-		}
-		
-		double[] gyro = new double[3];
-		double[] accel = new double[3];
-		double[] heading = new double[] { 0, 0, 0 };
-		
-		for (int i=0; i<3; i++) {
-			try {
-				gyro[i] = Double.parseDouble(m.group(i+1));
-				accel[i] = Double.parseDouble(m.group(i+4));
-			} catch (NumberFormatException ex) {
-				log.error("Failed parsing glove data",ex);
+		else {
+			if (dataStr.startsWith("gX") == false) {
+				log.warn("Ignoring data: '{}'",dataStr);
 				return null;
 			}
+			if (dataStr.endsWith("|") == false) {
+				log.warn("Looks like an incomplete frame: '{}'", dataStr);
+				return null;
+			}
+			
+			Matcher m = pattern.matcher(dataStr);
+			if (m.matches() == false) {
+				log.warn("Input did not match regex: '{}'", dataStr);
+				return null;
+			}
+			
+			double[] gyro = new double[3];
+			double[] accel = new double[3];
+			double[] heading = new double[] { 0, 0, 0 };
+			
+			for (int i=0; i<3; i++) {
+				try {
+					gyro[i] = Double.parseDouble(m.group(i+1));
+					accel[i] = Double.parseDouble(m.group(i+4));
+				} catch (NumberFormatException ex) {
+					log.error("Failed parsing glove data",ex);
+					return null;
+				}
+			}
+	
+			return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), GloveEvent.EventType.DATA_EVENT, gyro, accel, heading);
 		}
-		
-//		double roll = Double.parseDouble(m.group(7));
-//		double pitch = Double.parseDouble(m.group(8));
-		
-		boolean buttonDown = true;
-		return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), buttonDown, gyro, accel, heading);
 	}
 }

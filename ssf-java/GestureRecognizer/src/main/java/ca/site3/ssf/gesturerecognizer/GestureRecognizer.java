@@ -32,6 +32,8 @@ import ca.site3.ssf.gamemodel.IGameModel;
  */
 public class GestureRecognizer {
 	
+	public static final int MAX_GESTURE_TIME_MS = 1500;
+	
 	private RecognizerManager recognizerMgr = null;
 	private Logger logger = null;
 	

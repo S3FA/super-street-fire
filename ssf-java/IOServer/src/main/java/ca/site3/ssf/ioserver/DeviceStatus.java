@@ -61,8 +61,8 @@ public class DeviceStatus {
 			}
 		}
 		
-		deviceToRssi.put(d, (float)rssi / (float)Byte.MAX_VALUE);		
-		deviceToBattery.put(d, (float)battery / 5000.0f); // NOTE: If this is constantly too low, then change 5000 to 3700
+		deviceToRssi.put(d, (float)rssi / 100.0f);		
+		deviceToBattery.put(d, (float)battery / 3700.0f); // NOTE: If this is constantly too low, then change 5000 to 3700
 		
 		latestHeartbeats.put(d, System.currentTimeMillis());
 		log.debug("Device {} at address {} (RSSI={})", new Object[]{d,address,rssi});
@@ -91,7 +91,7 @@ public class DeviceStatus {
 	
 	/**
 	 * @param d
-	 * @return the most recent RSSI value as a percentage
+	 * @return the most recent RSSI value as a percentage [0,1].
 	 */
 	public float getDeviceRssi(Device d) {
 		Float rssi = deviceToRssi.get(d);
@@ -102,7 +102,7 @@ public class DeviceStatus {
 	
 	/**
 	 * @param d
-	 * @return the most recent battery level for d as a percentage
+	 * @return the most recent battery level for d as a percentage [0,1]
 	 */
 	public float getDeviceBattery(Device d) {
 		Float battery = deviceToBattery.get(d);

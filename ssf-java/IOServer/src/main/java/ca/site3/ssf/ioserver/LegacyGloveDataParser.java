@@ -64,7 +64,7 @@ public class LegacyGloveDataParser implements IDeviceDataParser {
 			return null;
 		}
 		
-		GloveEvent event = new GloveEvent(d.entity, d.type, System.currentTimeMillis(), true, parsedData[2], parsedData[1], parsedData[0]);
+		GloveEvent event = new GloveEvent(d.entity, d.type, System.currentTimeMillis(), GloveEvent.EventType.DATA_EVENT, parsedData[2], parsedData[1], parsedData[0]);
 		return Arrays.asList(event);
 	}
 }
