@@ -3,8 +3,18 @@ package ca.site3.ssf.gesturerecognizer;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import be.ac.ulg.montefiore.run.jahmm.CentroidObservationVector;
+import be.ac.ulg.montefiore.run.jahmm.ForwardBackwardCalculator;
+import be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
+import be.ac.ulg.montefiore.run.jahmm.KMeansCalculator;
 import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
 import be.ac.ulg.montefiore.run.jahmm.OpdfMultiGaussian;
 import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
@@ -22,6 +32,7 @@ import be.ac.ulg.montefiore.run.jahmm.io.OpdfMultiGaussianWriter;
  */
 class Recognizer {
 
+	private static Logger logger = LoggerFactory.getLogger(JahmmConverter.class);
 	private GestureType gestureType;
 	private Hmm<ObservationVector> recognizer;
 	
@@ -84,6 +95,11 @@ class Recognizer {
 			}
 		}
 		
+		logger.debug("Probabilities of data set in recognizer: ");
+		for (int i = 0; i < dataSet.getNumGestureInstances(); i++) {
+			logger.debug("Index " + i + ": "+ this.probability(dataSet.getGestureInstanceAt(i)));
+		}
+		
 		return true;
 	}
 	
@@ -99,11 +115,27 @@ class Recognizer {
 		if (this.recognizer == null) {
 			return 0.0;
 		}
-		if (inst.getTrainingDataObservationWidth() != this.gestureType.getNumHands()*3) {
+		int observationVecSize = this.gestureType.getNumHands()*3;
+		if (inst.getTrainingDataObservationWidth() != observationVecSize) {
 			return 0.0;
 		}
 		
-		return this.recognizer.probability(JahmmConverter.gestureInstanceToObservationSequence(inst));
+		List<ObservationVector> sequence = JahmmConverter.gestureInstanceToObservationSequence(inst);
+		//return this.recognizer.probability(sequence, this.recognizer.mostLikelyStateSequence(sequence));
+		
+		KMeansCalculator<ObservationVector> kMeansCalc = new KMeansCalculator<ObservationVector>(this.gestureType.getNumHmmNodes(), sequence);
+		List<ObservationVector> centroidSequence = new ArrayList<ObservationVector>(kMeansCalc.nbClusters());
+		for (int i = 0; i < kMeansCalc.nbClusters(); i++) {
+			Collection<ObservationVector> cluster = kMeansCalc.cluster(i);
+			
+			ObservationVector avg = new ObservationVector(observationVecSize);
+			for (ObservationVector v : cluster) {
+				avg = avg.plus(v);
+			}
+			avg = avg.times(1.0 / (double)cluster.size());
+			centroidSequence.add(avg);
+		}
+		return this.recognizer.probability(centroidSequence, this.recognizer.mostLikelyStateSequence(centroidSequence));
 	}
 	
 	/**

@@ -54,6 +54,11 @@ public class GestureRecognizer {
 		return this.recognizerMgr.train(gestureType, gestureDataSet);
 	}
 	
+	// GESTURE VALIDITY FUNCTIONALITY ***********************************************************************
+	public static boolean isAcceptableGesture(GestureInstance gestureInstance) {
+		return RecognizerManager.isAcceptableGesture(gestureInstance);
+	}
+	
 	// GESTURE RECOGNIZER I/O (LOADING/SAVING) FUNCTIONALITY ************************************************
 	
 	/**

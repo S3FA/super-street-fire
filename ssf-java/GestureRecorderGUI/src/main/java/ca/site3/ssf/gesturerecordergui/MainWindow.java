@@ -184,18 +184,25 @@ public class MainWindow extends JFrame {
 		// selectedTab == 0 is recording, == 1 is Training, == 2 is Testing
 		if (selectedTab == 0) {
 			
-			// If export to CSV is selected, perform the export
-			if(this.recordingPanel.getCsvExportState()) {
-				this.recordingPanel.exportToCsv(instance);
+			// Check to see whether the gesture is even long enough to warrent recording...
+			if (GestureRecognizer.isAcceptableGesture(instance)) {
+				
+				// If export to CSV is selected, perform the export
+				if(this.recordingPanel.getCsvExportState()) {
+					this.recordingPanel.exportToCsv(instance);
+				}
+				
+				// If export to the gesture recognizer is selected, export to the GestureRecognizer
+				if (this.recordingPanel.getRecognizerExportState()) {
+					this.recordingPanel.exportToRecognizer(instance);
+				}
+				
+				// Show all of the recorded data in the GUI Log...
+				this.recordingPanel.setLogString(instance.toDataString());
 			}
-			
-			// If export to the gesture recognizer is selected, export to the GestureRecognizer
-			if (this.recordingPanel.getRecognizerExportState()) {
-				this.recordingPanel.exportToRecognizer(instance);
+			else {
+				this.recordingPanel.setLogString("Unacceptable gesture, please try again!");
 			}
-			
-			// Show all of the recorded data in the GUI Log...
-			this.recordingPanel.setLogString(instance.toDataString());
 		}
 		else if (selectedTab == 2 && this.testingPanel.isEngineLoaded()) {
 			// If we're on the testing
