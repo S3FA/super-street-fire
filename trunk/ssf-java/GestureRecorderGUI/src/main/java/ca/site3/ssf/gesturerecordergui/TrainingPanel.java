@@ -40,8 +40,8 @@ class TrainingPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String ENGINE_LOAD_DIALOG_PATH_KEY   = "EngineLoadDlgPath";
-	private static final String ENGINE_SAVE_DIALOG_PATH_KEY   = "EngineSaveDlgPath";
+	private static final String ENGINE_LOAD_DIALOG_PATH_KEY   = "EngineTrainingLoadDlgPath";
+	private static final String ENGINE_SAVE_DIALOG_PATH_KEY   = "EngineTrainingSaveDlgPath";
 	private static final String TRAINING_LOAD_DIALOG_PATH_KEY = "TrainingLoadDlgPath";
 	private static final String SELECTED_GESTURE_TYPE_KEY     = "SelectedGestureType";
 	

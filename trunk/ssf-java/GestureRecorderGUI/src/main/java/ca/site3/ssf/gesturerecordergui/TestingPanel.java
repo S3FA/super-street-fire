@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -29,6 +30,9 @@ import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 class TestingPanel extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static final String ENGINE_FILE_DIALOG_PATH_KEY            = "EngineTestingFileDlgPath";
+	private static final String ENGINE_ABSOLUTE_FILE_NAME_AND_PATH_KEY = "EngineTestingFile";
 	
 	private JTextField fileName;
 	private JButton selectFileButton;
@@ -67,6 +71,14 @@ class TestingPanel extends JPanel implements ActionListener {
 		this.fileName = new JTextField(25);
 		this.fileName.setEditable(false);
 		
+		Preferences userPreferences = Preferences.userRoot();
+		
+		String engineFileChooserPath = userPreferences.get(ENGINE_FILE_DIALOG_PATH_KEY, null);
+		this.fileChooser.setCurrentDirectory(engineFileChooserPath == null ? null : new File(engineFileChooserPath));
+		
+		String engineFileFullPath = userPreferences.get(ENGINE_ABSOLUTE_FILE_NAME_AND_PATH_KEY, null);
+		this.fileName.setText(engineFileFullPath == null ? "" : engineFileFullPath);
+
 		this.selectFileButton = new JButton("Choose File...");
 		this.selectFileButton.addActionListener(this);
 		
@@ -108,8 +120,12 @@ class TestingPanel extends JPanel implements ActionListener {
 		int fileStatus = this.fileChooser.showOpenDialog(this.selectFileButton);
 		
 		if (fileStatus == JFileChooser.APPROVE_OPTION) {
+            Preferences userPreferences = Preferences.userRoot();
+            userPreferences.put(ENGINE_FILE_DIALOG_PATH_KEY, this.fileChooser.getCurrentDirectory().getAbsolutePath());
+			
             File file = this.fileChooser.getSelectedFile();
             this.fileName.setText(file.getAbsolutePath());
+            userPreferences.put(ENGINE_ABSOLUTE_FILE_NAME_AND_PATH_KEY, file.getAbsolutePath());
         } 
 	}
 	
@@ -123,22 +139,25 @@ class TestingPanel extends JPanel implements ActionListener {
 		try 
 		{
 			reader = new FileReader(file);
-			gestureRecognizer.loadRecognizerEngine(reader);
-			
-			this.gestureRecognizer = gestureRecognizer;
-			this.isEngineLoaded = true;
-			this.loggerPanel.appendLogText("Engine '" + file.getName() + "' loaded successfully!\n");
+			boolean success = gestureRecognizer.loadRecognizerEngine(reader);
+			if (success) {
+				this.gestureRecognizer = gestureRecognizer;
+				this.isEngineLoaded = true;
+				this.loggerPanel.appendLogTextLine("Engine '" + file.getName() + "' loaded successfully!");
+			}
+			else {
+				this.loggerPanel.appendLogTextLine("Engine '" + file.getName() + "' failed to load.");
+			}
 		} 
 		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			this.loggerPanel.appendLogText("Attempted to load invalid engine.\n");
+			this.loggerPanel.appendLogTextLine("Attempted to load invalid engine.");
 		}
 	}
 	
 	// Tests a gesture instance against the loaded engine
-	public void testGestureInstance(GestureInstance instance)
-	{
+	public void testGestureInstance(GestureInstance instance) {
 		GestureRecognitionResult result = this.gestureRecognizer.recognizePlayerGesture(instance);  
 		this.loggerPanel.appendLogText(result.toString() + "\n");
 	}
