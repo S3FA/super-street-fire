@@ -71,6 +71,9 @@ class RecordingPanel extends JPanel {
 		// Log the data on the UI
 		this.loggerPanel.logGestureData(data, gestureName, time);
 	}
+	public void setLogString(String str) {
+		this.loggerPanel.setLogText(str);
+	}
 	
 	// Sets recording mode
 	public void setRecordMode(boolean isRecordingMode)

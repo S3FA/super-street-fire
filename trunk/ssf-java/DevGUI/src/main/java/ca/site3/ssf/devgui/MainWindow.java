@@ -498,14 +498,14 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 			float p1LeftGloveSignalPercent = status.getDeviceRssi(Device.P1_LEFT_GLOVE);
 			float p1RightGloveSignalPercent = status.getDeviceRssi(Device.P1_RIGHT_GLOVE);
 			
-			this.p1LeftGloveInfoPanel.setSignalPercent(p1LeftGloveSignalPercent);
-			this.p1RightGloveInfoPanel.setSignalPercent(p1RightGloveSignalPercent);
+			this.p1LeftGloveInfoPanel.setSignalPercent(100.0f * p1LeftGloveSignalPercent);
+			this.p1RightGloveInfoPanel.setSignalPercent(100.0f * p1RightGloveSignalPercent);
 			
 			float p1LeftGloveBatteryPercent  = status.getDeviceBattery(Device.P1_LEFT_GLOVE);
 			float p1RightGloveBatteryPercent = status.getDeviceBattery(Device.P1_RIGHT_GLOVE);
 					
-			this.p1LeftGloveInfoPanel.setBatteryPercent(p1LeftGloveBatteryPercent);
-			this.p1RightGloveInfoPanel.setBatteryPercent(p1RightGloveBatteryPercent);
+			this.p1LeftGloveInfoPanel.setBatteryPercent(100.0f * p1LeftGloveBatteryPercent);
+			this.p1RightGloveInfoPanel.setBatteryPercent(100.0f * p1RightGloveBatteryPercent);
 		}
 		
 		{
@@ -524,14 +524,14 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 			float p2LeftGloveSignalPercent = status.getDeviceRssi(Device.P2_LEFT_GLOVE);
 			float p2RightGloveSignalPercent = status.getDeviceRssi(Device.P2_RIGHT_GLOVE);
 			
-			this.p2LeftGloveInfoPanel.setSignalPercent(p2LeftGloveSignalPercent);
-			this.p2RightGloveInfoPanel.setSignalPercent(p2RightGloveSignalPercent);
+			this.p2LeftGloveInfoPanel.setSignalPercent(100.0f * p2LeftGloveSignalPercent);
+			this.p2RightGloveInfoPanel.setSignalPercent(100.0f * p2RightGloveSignalPercent);
 			
 			float p2LeftGloveBatteryPercent  = status.getDeviceBattery(Device.P2_LEFT_GLOVE);
 			float p2RightGloveBatteryPercent = status.getDeviceBattery(Device.P2_RIGHT_GLOVE);
 					
-			this.p2LeftGloveInfoPanel.setBatteryPercent(p2LeftGloveBatteryPercent);
-			this.p2RightGloveInfoPanel.setBatteryPercent(p2RightGloveBatteryPercent);			
+			this.p2LeftGloveInfoPanel.setBatteryPercent(100.0f * p2LeftGloveBatteryPercent);
+			this.p2RightGloveInfoPanel.setBatteryPercent(100.0f * p2RightGloveBatteryPercent);			
 		}
 	}
 

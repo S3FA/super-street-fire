@@ -70,17 +70,15 @@ class FileInfoPanel extends JPanel {
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
-	public void exportToCsv(GestureInstance instance){
-		try
-		{	
-			String suffix = ".csv";
+	public void exportToCsv(GestureInstance instance) {
+		try {	
+			String suffix = "csv";
 			int iteration = getNextFileIteration(suffix);
 	       
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + suffix), !this.isNewFile);
+	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix), !this.isNewFile);
         	
 	        // If we just created the file, 
-	        if(this.isNewFile)
-	        {
+	        if (this.isNewFile) {
 	        	writer.write("GyroLeftX,GyroLeftY,GyroLeftZ,MagLeftX,MagLeftY,MagLeftZ,AccLeftX,AccLeftY,AccLeftZ,GyroRightX,GyroRightY,GyroRightZ,MagRightX,MagRightY,MagRightZ,AccRightX,AccRightY,AccRightZ,Time");
 	        	writer.append("\n");
 	        }
@@ -149,7 +147,7 @@ class FileInfoPanel extends JPanel {
 	       
 	        // Save the data to a file readable by the GestureRecognizer
 	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + 
-	        		GESTURE_INSTANCE_FILE_EXT), false);
+	        		"." + GESTURE_INSTANCE_FILE_EXT), false);
 	        writer.write(instance.toDataString());
 	 
 		    writer.flush();
@@ -162,15 +160,13 @@ class FileInfoPanel extends JPanel {
 	}
 	
 	// Save a recognizer engine file
-	public void exportToRecognizerEngine(GestureRecognizer gestureRecognizer)
-	{
-		try
-		{	
+	public void exportToRecognizerEngine(GestureRecognizer gestureRecognizer) {
+		try {	
 			int iteration = getNextFileIteration(GESTURE_ENGINE_FILE_EXT);
 	       	        
 	        // Save the data to a file readable by the Gesture Tester
 	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) +
-	        		GESTURE_ENGINE_FILE_EXT), false);
+	        		"." + GESTURE_ENGINE_FILE_EXT), false);
 	        gestureRecognizer.saveRecognizerEngine(writer);
 	 
 		    writer.flush();
@@ -183,19 +179,16 @@ class FileInfoPanel extends JPanel {
 	}
 	
 	// Sets the new file status
-	public void setNewFile(boolean isNewFile)
-	{
+	public void setNewFile(boolean isNewFile){
 		this.isNewFile = isNewFile;
 	}
 	
 	// Gets the next valid version # of a file 
-	public int getNextFileIteration(String fileName)
-	{
+	public int getNextFileIteration(String suffix) {
 		int iteration = 0;
 		
         // If the file exists, check if the next iteration of the file exists until we can make a new one
-        while (new File("Data/" + gestureName + Integer.toString(iteration) + fileName).exists())
-        {
+        while (new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix).exists()) {
         	iteration++;
         }
         

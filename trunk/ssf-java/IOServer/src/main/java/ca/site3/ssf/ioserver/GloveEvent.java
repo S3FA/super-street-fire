@@ -12,60 +12,58 @@ import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
  * 
  * @author greg
  */
-public class GloveEvent extends DeviceEvent {
+public final class GloveEvent extends DeviceEvent {
 
+	public enum EventType { BUTTON_DOWN_EVENT, BUTTON_UP_EVENT, DATA_EVENT };
+	
 	private final double[] gyro;
-	
 	private final double[] acceleration;
-	
 	private final double[] magnetometer;
-	
-	private final boolean buttonPressed;	
+	private final EventType eventType;
 	
 	public GloveEvent(Entity src, DeviceType dvc,
-			long timestamp, boolean buttonDown,
+			long timestamp, EventType eventType, 
 			double[] gyro, double[] acceleration, double[] magnetometer) {
+		
 		super(Type.GloveEvent, src, dvc, timestamp);
 		
 		this.gyro = gyro;
 		this.acceleration = acceleration;
 		this.magnetometer = magnetometer;
-		this.buttonPressed = buttonDown;
+		this.eventType = eventType;
 	}
-
-
 
 	/**
 	 * @return the rotation (an array of length 3)
 	 */
-	public double[] getGyro() {
-		return gyro;
+	public final double[] getGyro() {
+		return this.gyro;
 	}
 
 	/**
 	 * @return the acceleration (an array of length 3)
 	 */
-	public double[] getAcceleration() {
-		return acceleration;
+	public final double[] getAcceleration() {
+		return this.acceleration;
 	}
 
 	/**
 	 * @return the heading (an array of length 3)
 	 */
-	public double[] getMagnetometer() {
-		return magnetometer;
+	public final double[] getMagnetometer() {
+		return this.magnetometer;
 	}
 
 	/**
-	 * @return true if the button is being pressed, false otherwise
+	 * @return The type of glove event.
 	 */
-	public boolean isButtonPressed() {
-		return buttonPressed;
+	public final EventType getEventType() {
+		return this.eventType;
 	}
 	
 	
 	@Override
 	public String toString() {
-		return "GloveEvent: gyro: " + Arrays.toString(this.gyro) + " acceleration: " + Arrays.toString(this.acceleration);
+		return "GloveEvent (" + this.eventType.toString() + ") : gyro: " + Arrays.toString(this.gyro) + " acceleration: " + Arrays.toString(this.acceleration);
 	}
 }

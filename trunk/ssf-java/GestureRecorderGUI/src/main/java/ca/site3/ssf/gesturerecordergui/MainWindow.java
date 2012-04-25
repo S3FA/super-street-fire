@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceDataParser;
@@ -105,21 +106,47 @@ public class MainWindow extends JFrame {
 					
 					// If we find an event then fire off the event listener and reset the timeout
 					if (null != e && e.getType() == DeviceEvent.Type.GloveEvent) {
-						if(!recording)
-						{
-							startTime = System.currentTimeMillis();
+						
+						GloveEvent gloveEvent = (GloveEvent)e;
+						
+						switch (gloveEvent.getEventType()) {
+						
+						case BUTTON_DOWN_EVENT:
+							
+							if (!recording) {
+								recording = true;
+								startTime = System.currentTimeMillis();
+							}
+							timeout = 0;
+							
+							break;
+							
+						case BUTTON_UP_EVENT:
+							if (recording) {
+								recording = false;
+								exportGatheredData();
+							}
+							break;
+							
+						case DATA_EVENT:
+							// Timeout greater than 1 second means a gesture has stopped so export
+							if (recording) {
+								if (timeout > GestureRecognizer.MAX_GESTURE_TIME_MS) {
+									recording = false;
+									exportGatheredData();
+								}
+								else {
+									timeout = 0;
+									hardwareEventListener((GloveEvent)e);
+								}
+							}
+							break;
+							
+						default:
+							assert(false);
+							break;
 						}
 						
-						timeout = 0;
-						recording = true;
-						hardwareEventListener((GloveEvent)e);
-					}
-					
-					// Timeout greater than 1 second means a gesture has stopped so export
-					if(recording && timeout > 1000)
-					{
-						recording = false;
-						exportGatheredData();
 					}
 				}
 			}
@@ -150,40 +177,39 @@ public class MainWindow extends JFrame {
         SwingUtilities.invokeLater(doCreateAndShowGUI);
 	}
 
-	public void exportGatheredData()
-	{
+	public void exportGatheredData() {
 		int selectedTab = this.tabbedPane.getSelectedIndex();
 		GestureInstance instance = new GestureInstance(this.leftGloveData, this.rightGloveData, this.timeData);
 		
 		// selectedTab == 0 is recording, == 1 is Training, == 2 is Testing
-		if (selectedTab == 0)
-		{
+		if (selectedTab == 0) {
+			
 			// If export to CSV is selected, perform the export
-			if(this.recordingPanel.getCsvExportState())
-			{
+			if(this.recordingPanel.getCsvExportState()) {
 				this.recordingPanel.exportToCsv(instance);
 			}
 			
 			// If export to the gesture recognizer is selected, export to the GestureRecognizer
-			if(this.recordingPanel.getRecognizerExportState())
-			{
+			if (this.recordingPanel.getRecognizerExportState()) {
 				this.recordingPanel.exportToRecognizer(instance);
 			}
 		}
-		else if (selectedTab == 2 && this.testingPanel.isEngineLoaded())
-		{
+		else if (selectedTab == 2 && this.testingPanel.isEngineLoaded()) {
 			// If we're on the testing
 			this.testingPanel.testGestureInstance(instance);
 		}
 		
-		this.recordingPanel.setRecordMode(false); 
+		this.recordingPanel.setRecordMode(false);
+		
+		// Show all of the recorded data in the GUI Log...
+		this.recordingPanel.setLogString(instance.toDataString());
 	}
 	
 	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
 	public void hardwareEventListener(GloveEvent gloveEvent) {
 		
-		if (!this.recordingPanel.getRecordMode())
-		{
+		if (!this.recordingPanel.getRecordMode()) {
+			
 			this.recordingPanel.setRecordMode(true);
 			
 			// If we just started recording, mark the start time. This will be a brand new gesture and file.
@@ -193,8 +219,7 @@ public class MainWindow extends JFrame {
 			this.timeData = new ArrayList<Double>();
 			this.startTime = System.nanoTime();
 		}
-		else
-		{
+		else {
 			this.recordingPanel.setNewFile(false);
 		}
 		
@@ -203,18 +228,28 @@ public class MainWindow extends JFrame {
 		final GloveData gloveData = buildGloveData(gloveEvent);
 		final String gestureName = this.recordingPanel.getGestureName();
 		
-		//TODO: Find out which glove we're using and add to the appropriate list
-		this.leftGloveData.add(gloveData);
-		this.rightGloveData.add(gloveData);
+		switch (gloveEvent.getDevice()) {
+		case LEFT_GLOVE:
+			this.leftGloveData.add(gloveData);
+			break;
+		case RIGHT_GLOVE:
+			this.rightGloveData.add(gloveData);
+			break;
+		default:
+			assert(false);
+			return;
+		}
 		this.timeData.add(time);
 		
 		// Update the UI with the glove data
+		/*
 		this.doUpdateInterface = new Runnable() {       	
             public void run() {
             	displayAndLogData(gloveData, gestureName, time);
             }
         };
 		SwingUtilities.invokeLater(this.doUpdateInterface);
+		*/
 	}
 	
 	// Call the recorder's display and log method
@@ -223,18 +258,12 @@ public class MainWindow extends JFrame {
 	}
 	
 	// Construct a glove data object using the gesture recognizer
-	public GloveData buildGloveData(GloveEvent event)
-	{
+	public GloveData buildGloveData(GloveEvent event) {
 		double[] gyro = event.getGyro();
-		double[] mag = event.getMagnetometer();
-		double[] acc = event.getAcceleration();
+		double[] mag  = event.getMagnetometer();
+		double[] acc  = event.getAcceleration();
 		
-		GloveData gloveData = new GloveData();
-		gloveData.fromDataString(Double.toString(gyro[0]) + "," + Double.toString(gyro[1]) + "," + Double.toString(gyro[2]) + "," + 
-								 Double.toString(acc[0]) + "," + Double.toString(acc[1]) + "," + Double.toString(acc[2]) + "," + 
-								 Double.toString(mag[0]) + "," + Double.toString(mag[1]) + "," + Double.toString(mag[2]));
-		
-		return gloveData;
+		return new GloveData(gyro[0], gyro[1], gyro[2], acc[0], acc[1], acc[2], mag[0], mag[1], mag[2]);
 	}
 	
 	// Creates and instantiates the recorder panel 
@@ -273,9 +302,9 @@ public class MainWindow extends JFrame {
 		return panel;
 	}
 	
-	// Gets the time elapsed since recording started in milliseconds
-	public double getElapsedTime()
-	{
-		return (double)(System.nanoTime() - this.startTime) * 1000000;
+	// Gets the time elapsed since recording started in seconds
+	public double getElapsedTime() {
+		double diff = (System.nanoTime() - this.startTime) / (double)(10E9);
+		return diff;
 	}
 }
