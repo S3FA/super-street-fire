@@ -33,7 +33,7 @@ public class GestureInstance {
 	private List<GloveData> leftGloveData  = null;
 	private List<GloveData> rightGloveData = null;
 	private List<Double>    timePts        = null;
-	
+
 	public GestureInstance() {
 		super();
 		this.leftGloveData  = new ArrayList<GloveData>();
@@ -50,7 +50,7 @@ public class GestureInstance {
 		this.timePts = timePts;
 		assert(this.isValid());
 	}
-		
+	
 
 	public int getNumDataPts() {
 		assert(this.timePts != null);
@@ -67,6 +67,12 @@ public class GestureInstance {
 	public double getTimeAt(int index) {
 		assert(index >= 0 && index < this.timePts.size());
 		return this.timePts.get(index);
+	}
+	public double getMaxTimeDiff() {
+		if (this.timePts.isEmpty()) {
+			return 0.0;
+		}
+		return this.timePts.get(this.timePts.size()-1) - this.timePts.get(0);
 	}
 	
 	public boolean hasLeftGloveData() {

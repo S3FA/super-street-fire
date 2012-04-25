@@ -10,6 +10,7 @@ import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
 import be.ac.ulg.montefiore.run.jahmm.OpdfMultiGaussianFactory;
 import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
+import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchScaledLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
 import be.ac.ulg.montefiore.run.jahmm.toolbox.MarkovGenerator;
 
@@ -80,11 +81,15 @@ public class JahmmConverter {
 	public static Hmm<ObservationVector> buildKMeansHMMWithTraining(GestureDataSet dataSet, int numStates) {
 		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
 		
+		int dimension = sequences.get(0).get(0).dimension();
 		KMeansLearner<ObservationVector> kMeansLearner =
 				new KMeansLearner<ObservationVector>(numStates, 
-						new OpdfMultiGaussianFactory(sequences.get(0).get(0).dimension()), sequences);
+						new OpdfMultiGaussianFactory(dimension), sequences);
 		try {
-			return kMeansLearner.learn();
+			Hmm<ObservationVector> kMeansHmm = kMeansLearner.iterate();
+			BaumWelchScaledLearner bwl = new BaumWelchScaledLearner();
+			bwl.setNbIterations(10);
+			return bwl.learn(kMeansHmm, sequences);
 		}
 		catch (IllegalArgumentException e) {
 			logger.warn("Failed to learn from gesture data set: " + e.getMessage());
@@ -101,7 +106,8 @@ public class JahmmConverter {
 	public static Hmm<ObservationVector> trainHMM(Hmm<ObservationVector> hmm, GestureDataSet dataSet) {
 		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
 		try {
-			BaumWelchLearner bwl = new BaumWelchLearner();
+			BaumWelchScaledLearner bwl = new BaumWelchScaledLearner();
+			bwl.setNbIterations(10);
 			return bwl.learn(hmm, sequences);
 		}
 		catch (IllegalArgumentException e) {

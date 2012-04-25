@@ -23,7 +23,8 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
  */
 class RecognizerManager {
 	
-	private final static double MINIMUM_PROBABILITY_THRESHOLD = 0.1;
+	private final static double MINIMUM_PROBABILITY_THRESHOLD    = 0.1;
+	private final static double MINIMUM_GESTURE_RECOGNITION_TIME = 0.012;
 	
 	private Logger logger = null;
 	
@@ -53,12 +54,36 @@ class RecognizerManager {
 	}
 	
 	/**
+	 * Tests whether a gesture would even be REMOTELY considered acceptable for testing.
+	 * @param gestureInstance The gesture to test.
+	 * @return true if acceptable, false if not.
+	 */
+	static boolean isAcceptableGesture(GestureInstance gestureInstance) {
+		if (!gestureInstance.isValid()) {
+			return false;
+		}
+		
+		// The gesture shouldn't be too too short...
+		if (gestureInstance.getMaxTimeDiff() < MINIMUM_GESTURE_RECOGNITION_TIME) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
 	 * Attempts to recongize the given, novel gesture instance among all of the gesture
 	 * recognizers in this manager.
 	 * @param inst The novel gesture instance to identify/recognize.
 	 * @return The gesture type that was recognized, null on no recognized gesture.
 	 */
 	GestureType recognize(GestureInstance inst) {
+		// Weed out strange and anomalous data
+		if (!this.isAcceptableGesture(inst)) {
+			this.logger.info("Ignoring gesture - way too short from beginning to end!");
+			return null;
+		}
+		
 		double currProbability = -1.0;
 		double bestProbability =  0.0;
 		GestureType bestGesture = null;
@@ -92,6 +117,16 @@ class RecognizerManager {
 	 */
 	GestureRecognitionResult recognizeWithFullResult(GestureInstance inst) {
 		Map<GestureType, Double> resultMapping = new HashMap<GestureType, Double>();
+		
+		// Weed out strange and anomalous data
+		if (!this.isAcceptableGesture(inst)) {
+			this.logger.info("Ignoring gesture - way too short from beginning to end!");
+			for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
+				resultMapping.put(entry.getKey(), 0.0);
+			}
+			return new GestureRecognitionResult(resultMapping);
+		}
+		
 		for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
 			resultMapping.put(entry.getKey(), entry.getValue().probability(inst));
 		}
@@ -113,7 +148,7 @@ class RecognizerManager {
 	
 	/**
 	 * Writes/Saves all of the recognizers in this manager.
-	 * @param writer The writer to write the recognizers to.
+	 * @param writer The writer )to write the recognizers to.
 	 * @return true on success, false on failure.
 	 */
 	boolean writeRecognizers(Writer writer) {
