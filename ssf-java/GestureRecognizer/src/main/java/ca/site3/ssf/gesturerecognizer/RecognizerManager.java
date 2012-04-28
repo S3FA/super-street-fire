@@ -23,8 +23,9 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
  */
 class RecognizerManager {
 	
-	private final static double MINIMUM_PROBABILITY_THRESHOLD    = 0.1;
-	private final static double MINIMUM_GESTURE_RECOGNITION_TIME = 0.012;
+	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD   = 1E-280;
+	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD = 1E-75; 
+	private final static double MINIMUM_GESTURE_RECOGNITION_TIME     = 0.012;
 	
 	private Logger logger = null;
 	
@@ -79,7 +80,7 @@ class RecognizerManager {
 	 */
 	GestureType recognize(GestureInstance inst) {
 		// Weed out strange and anomalous data
-		if (!this.isAcceptableGesture(inst)) {
+		if (!RecognizerManager.isAcceptableGesture(inst)) {
 			this.logger.info("Ignoring gesture - way too short from beginning to end!");
 			return null;
 		}
@@ -96,15 +97,23 @@ class RecognizerManager {
 			}
 		}
 		
-		this.logger.info("Best found matching gesture: " + bestGesture.toString() +
-				" (" + (100*bestProbability) + "% probability)"); 
-		
-		// Test for some minimum threshold on the probability
-		// for this to actually be a proper gesture...
-		if (bestProbability < RecognizerManager.MINIMUM_PROBABILITY_THRESHOLD) {
-			this.logger.info("Failed to recognize gesture, did not meet minimum threshold.");
-			return null;
+		if (bestProbability < MINIMUM_BASE_PROBABILITY_THRESHOLD) {
+			for (Recognizer recognizer : this.recognizerMap.values()) {
+				currProbability = recognizer.kMeansProbability(inst);
+				if (currProbability > bestProbability) {
+					bestProbability = currProbability;
+					bestGesture = recognizer.getGestureType();
+				}
+			}
+			
+			if (bestProbability < MINIMUM_KMEANS_PROBABILITY_THRESHOLD) {
+				this.logger.info("Failed to recognize gesture, did not meet minimum threshold.");
+				return null;
+			}
+			
 		}
+		
+		this.logger.info("Best found matching gesture: " + bestGesture.toString()); 
 		
 		return bestGesture;
 	}
@@ -116,19 +125,19 @@ class RecognizerManager {
 	 * @return The full result of the recognition procedure, with data for all gestures.
 	 */
 	GestureRecognitionResult recognizeWithFullResult(GestureInstance inst) {
-		Map<GestureType, Double> resultMapping = new HashMap<GestureType, Double>();
+		Map<GestureType, Probabilities> resultMapping = new HashMap<GestureType, Probabilities>();
 		
 		// Weed out strange and anomalous data
-		if (!this.isAcceptableGesture(inst)) {
+		if (!RecognizerManager.isAcceptableGesture(inst)) {
 			this.logger.info("Ignoring gesture - way too short from beginning to end!");
 			for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
-				resultMapping.put(entry.getKey(), 0.0);
+				resultMapping.put(entry.getKey(), new Probabilities(0.0, 0.0));
 			}
 			return new GestureRecognitionResult(resultMapping);
 		}
 		
 		for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
-			resultMapping.put(entry.getKey(), entry.getValue().probability(inst));
+			resultMapping.put(entry.getKey(), new Probabilities(entry.getValue().probability(inst), entry.getValue().kMeansProbability(inst)));
 		}
 		
 		return new GestureRecognitionResult(resultMapping);

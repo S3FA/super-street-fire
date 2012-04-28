@@ -21,6 +21,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognitionResult;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
+import ca.site3.ssf.gesturerecognizer.GestureType;
 
 /**
  * A container for testing incoming gesture data against a gesture recognition engine
@@ -159,7 +160,14 @@ class TestingPanel extends JPanel implements ActionListener {
 	// Tests a gesture instance against the loaded engine
 	public void testGestureInstance(GestureInstance instance) {
 		GestureRecognitionResult result = this.gestureRecognizer.recognizePlayerGesture(instance);  
-		this.loggerPanel.appendLogText(result.toString() + "\n");
+		this.loggerPanel.appendLogTextLine(result.toString());
+		GestureType winnerInGame = this.gestureRecognizer.recognizerPlayerGestureAsGameWould(instance);
+		if (winnerInGame == null) {
+			this.loggerPanel.appendLogTextLine("No gesture was suitable.");
+		}
+		else {
+			this.loggerPanel.appendLogTextLine("Gesture that would be executed in-game: " + winnerInGame.toString());
+		}
 	}
 	
 	
