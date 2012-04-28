@@ -13,7 +13,7 @@ import ca.site3.ssf.common.MultiLerp;
  */
 final public class ActionFactory {
 	
-	public enum PlayerActionType { BLOCK, JAB_ATTACK, HOOK_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
+	public enum PlayerActionType { BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
 
 	final static private float DEFAULT_FULL_ON_FRACTION  = 0.45f;
 	final static private float DEFAULT_FULL_OFF_FRACTION = 0.25f;
@@ -65,12 +65,12 @@ final public class ActionFactory {
 			case JAB_ATTACK:
 				assert(leftHand || rightHand);
 				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 3.0f);
 					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
 							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 3.0f);
 					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
 							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
@@ -81,12 +81,26 @@ final public class ActionFactory {
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
 					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
-							2, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+							2, 3.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				else {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
 					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
-							2, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+							2, 3.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				break;
+			
+			case UPPERCUT_ATTACK:
+				assert(leftHand || rightHand);
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, 5.0f);
+					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							2, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, 5.0f);
+					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							2, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				break;
 				

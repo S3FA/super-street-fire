@@ -35,7 +35,7 @@ class LoggerPanel extends JPanel implements ActionListener {
 		this.clearLogButton = new JButton("Clear Log");
 		this.clearLogButton.addActionListener(this);
 		
-		this.log = new TextArea(15, 65);
+		this.log = new TextArea(23, 100);
 		this.log.setEditable(false);
 		this.add(this.log, BorderLayout.NORTH);
 		this.add(this.clearLogButton, BorderLayout.SOUTH);

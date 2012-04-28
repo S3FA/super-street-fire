@@ -7,6 +7,7 @@ public class PlayerAttackAction extends Action {
 	public enum AttackType {
 		LEFT_JAB_ATTACK, RIGHT_JAB_ATTACK, 
 		LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK,
+		LEFT_UPPERCUT_ATTACK, RIGHT_UPPERCUT_ATTACK,
 		HADOUKEN_ATTACK, SONIC_BOOM_ATTACK
 	};
 

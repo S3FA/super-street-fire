@@ -15,9 +15,13 @@ import ca.site3.ssf.common.MapUtil;
  */
 final public class GestureRecognitionResult {
 
+	final private GestureInstance gestureInstance;
 	final private Map<GestureType, GestureProbabilities> resultMapping;
 
-	public GestureRecognitionResult(Map<GestureType, GestureProbabilities> resultMapping) {
+	public GestureRecognitionResult(GestureInstance gestureInstance,
+								    Map<GestureType, GestureProbabilities> resultMapping) {
+		
+		this.gestureInstance = gestureInstance;
 		this.resultMapping = resultMapping;
 		assert(resultMapping != null);
 	}
@@ -37,11 +41,16 @@ final public class GestureRecognitionResult {
 		List<Entry<GestureType, Double>> sortedList = MapUtil.sortMapToList(probabilitiesMap);
 		
 		ListIterator<Entry<GestureType, Double>> iter = sortedList.listIterator(sortedList.size());
+		
+		result += "Gesture Fierceness: " + this.gestureInstance.getTotalFierceness() + "\n";
+		result += "Gesture Time (s):   " + this.gestureInstance.getMaxTimeDiff() + "\n";
+		
 		while (iter.hasPrevious()) {
 			Entry<GestureType, Double> entry = iter.previous();
 			GestureProbabilities currProbs = this.resultMapping.get(entry.getKey());
-			result += entry.getKey().toString() + " - Base: " + currProbs.getBaseProbability() + 
-					", KMeans: " + currProbs.getKMeansProbability() + "\n";
+			result += entry.getKey().toString() + "{ " +
+					"Base: " + currProbs.getBaseProbability() + ", KMeans: " + currProbs.getKMeansProbability() + " " +
+					"Required fierceness: " + entry.getKey().getMinFierceDiffThreshold() + "}\n";
 		}
 		
 		return result;

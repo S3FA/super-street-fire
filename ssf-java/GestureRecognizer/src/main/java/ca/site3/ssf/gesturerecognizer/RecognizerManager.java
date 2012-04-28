@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ class RecognizerManager {
 	
 	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD   = 1E-280;
 	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD = 1E-75;
+	private final static double EPSILON_BASE_PROBABILITY_THRESHOLD   = 1E-300;
 	
 	private Logger logger = null;
 	
@@ -99,7 +101,11 @@ class RecognizerManager {
 			}
 		}
 		
-		if (bestProbability < MINIMUM_BASE_PROBABILITY_THRESHOLD) {
+		if (bestProbability < EPSILON_BASE_PROBABILITY_THRESHOLD) {
+			this.logger.info("Failed to recognize gesture, did not meet minimum base epsilon probability threshold.");
+			return null;
+		}
+		else if (bestProbability < MINIMUM_BASE_PROBABILITY_THRESHOLD) {
 			for (Recognizer recognizer : this.recognizerMap.values()) {
 				currProbability = recognizer.kMeansProbability(inst);
 				if (currProbability > bestProbability) {
@@ -109,10 +115,19 @@ class RecognizerManager {
 			}
 			
 			if (bestProbability < MINIMUM_KMEANS_PROBABILITY_THRESHOLD) {
-				this.logger.info("Failed to recognize gesture, did not meet minimum threshold.");
+				this.logger.info("Failed to recognize gesture, did not meet minimum probability threshold of either base or k-means.");
 				return null;
 			}
 			
+		}
+		
+		// Inline: We have a gesture that is a 'best candidate', we still have a bit more checking to
+		// do to see if it is truly worthy of being a proper gesture...
+		double fierceness = inst.getTotalFierceness();
+		if (bestGesture.getMinFierceDiffThreshold() > fierceness) {
+			this.logger.info("Gesture was recognized, but fireceness was not great enough to execute: " +
+					"Required fierceness: " + bestGesture.getMinFierceDiffThreshold() + ", fierceness found: " + fierceness);
+			return null;
 		}
 		
 		this.logger.info("Best found matching gesture: " + bestGesture.toString()); 
@@ -135,14 +150,14 @@ class RecognizerManager {
 			for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
 				resultMapping.put(entry.getKey(), new GestureProbabilities(0.0, 0.0));
 			}
-			return new GestureRecognitionResult(resultMapping);
+			return new GestureRecognitionResult(inst, resultMapping);
 		}
 		
 		for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
 			resultMapping.put(entry.getKey(), new GestureProbabilities(entry.getValue().probability(inst), entry.getValue().kMeansProbability(inst)));
 		}
 		
-		return new GestureRecognitionResult(resultMapping);
+		return new GestureRecognitionResult(inst, resultMapping);
 	}
 	
 	/**
@@ -163,7 +178,9 @@ class RecognizerManager {
 	 * @return true on success, false on failure.
 	 */
 	boolean writeRecognizers(Writer writer) {
+
 		try {
+			writer.write("" + this.recognizerMap.size() + "\n");
 			for (Recognizer recognizer : this.recognizerMap.values()) {
 				recognizer.save(writer);
 			}
@@ -182,20 +199,42 @@ class RecognizerManager {
 	 * @return true on success, false on failure.
 	 */
 	boolean readRecognizers(Reader reader) {
-		for (int i = 0; i < this.recognizerMap.size(); i++) {
+		try {
+			
+			// Begin by reading the number of recognizers to read in from the file...
+
+			char[] charArray = new char[1];
+			int numRecognizers = 0;
+			String numRecognizersStr = "";
+			
+			reader.read(charArray);
+			while (charArray[0] != '\n') {
+				numRecognizersStr += charArray[0];
+				reader.read(charArray);
+			}
 			try {
-				Recognizer newRecognizer = new Recognizer();
-				newRecognizer.load(reader);
-				this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
+				numRecognizers = Integer.valueOf(numRecognizersStr);
 			}
-			catch (IOException ex) {
+			catch (NumberFormatException ex) {
 				System.err.println(ex.toString());
 				return false;
 			}
-			catch (FileFormatException ex) {
-				System.err.println(ex.toString());
-				return false;
+						
+			for (int i = 0; i < numRecognizers; i++) {
+				
+					Recognizer newRecognizer = new Recognizer();
+					newRecognizer.load(reader);
+					this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
+	
 			}
+		}
+		catch (IOException ex) {
+			System.err.println(ex.toString());
+			return false;
+		}
+		catch (FileFormatException ex) {
+			System.err.println(ex.toString());
+			return false;
 		}
 		
 		return true;
