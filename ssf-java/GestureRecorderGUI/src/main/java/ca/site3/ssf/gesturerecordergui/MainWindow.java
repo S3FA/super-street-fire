@@ -129,9 +129,8 @@ public class MainWindow extends JFrame {
 							break;
 							
 						case DATA_EVENT:
-							// Timeout greater than 1 second means a gesture has stopped so export
 							if (recording) {
-								if (timeout > GestureRecognizer.MAX_GESTURE_TIME_MS) {
+								if (timeout > (GestureRecognizer.MAXIMUM_GESTURE_RECOGNITION_TIME_IN_SECS * 1000)) {
 									recording = false;
 									exportGatheredData();
 								}

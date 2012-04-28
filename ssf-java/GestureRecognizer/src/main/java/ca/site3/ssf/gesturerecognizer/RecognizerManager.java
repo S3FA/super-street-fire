@@ -24,8 +24,7 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 class RecognizerManager {
 	
 	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD   = 1E-280;
-	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD = 1E-75; 
-	private final static double MINIMUM_GESTURE_RECOGNITION_TIME     = 0.012;
+	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD = 1E-75;
 	
 	private Logger logger = null;
 	
@@ -65,7 +64,10 @@ class RecognizerManager {
 		}
 		
 		// The gesture shouldn't be too too short...
-		if (gestureInstance.getMaxTimeDiff() < MINIMUM_GESTURE_RECOGNITION_TIME) {
+		if (gestureInstance.getMaxTimeDiff() < GestureRecognizer.MINIMUM_GESTURE_RECOGNITION_TIME_IN_SECS) {
+			return false;
+		}
+		else if (gestureInstance.getMaxTimeDiff() > GestureRecognizer.MAXIMUM_GESTURE_RECOGNITION_TIME_IN_SECS) {
 			return false;
 		}
 		
@@ -125,19 +127,19 @@ class RecognizerManager {
 	 * @return The full result of the recognition procedure, with data for all gestures.
 	 */
 	GestureRecognitionResult recognizeWithFullResult(GestureInstance inst) {
-		Map<GestureType, Probabilities> resultMapping = new HashMap<GestureType, Probabilities>();
+		Map<GestureType, GestureProbabilities> resultMapping = new HashMap<GestureType, GestureProbabilities>();
 		
 		// Weed out strange and anomalous data
 		if (!RecognizerManager.isAcceptableGesture(inst)) {
 			this.logger.info("Ignoring gesture - way too short from beginning to end!");
 			for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
-				resultMapping.put(entry.getKey(), new Probabilities(0.0, 0.0));
+				resultMapping.put(entry.getKey(), new GestureProbabilities(0.0, 0.0));
 			}
 			return new GestureRecognitionResult(resultMapping);
 		}
 		
 		for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
-			resultMapping.put(entry.getKey(), new Probabilities(entry.getValue().probability(inst), entry.getValue().kMeansProbability(inst)));
+			resultMapping.put(entry.getKey(), new GestureProbabilities(entry.getValue().probability(inst), entry.getValue().kMeansProbability(inst)));
 		}
 		
 		return new GestureRecognitionResult(resultMapping);
