@@ -109,16 +109,14 @@ class FormLayoutHelper {
         parent.add(c);
     }
     
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JComboBox constructGestureComboBox()
 	{
 		JComboBox comboBox = new JComboBox();
-		comboBox.addItem(GestureType.LEFT_JAB);
-		comboBox.addItem(GestureType.LEFT_HOOK);
-		comboBox.addItem(GestureType.RIGHT_JAB);
-		comboBox.addItem(GestureType.RIGHT_HOOK);
-		comboBox.addItem(GestureType.BLOCK);
-		comboBox.addItem(GestureType.HADOUKEN);
-		comboBox.addItem(GestureType.SONIC_BOOM);
+		GestureType gestures[] = GestureType.values();
+		for (GestureType gesture : gestures) {
+			comboBox.addItem(gesture);
+		}
 		
 		return comboBox;
 	}

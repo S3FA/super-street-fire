@@ -160,14 +160,20 @@ class TestingPanel extends JPanel implements ActionListener {
 	// Tests a gesture instance against the loaded engine
 	public void testGestureInstance(GestureInstance instance) {
 		GestureRecognitionResult result = this.gestureRecognizer.recognizePlayerGesture(instance);  
+		this.loggerPanel.appendLogTextLine("\n------------------------------------------------------");
 		this.loggerPanel.appendLogTextLine(result.toString());
+		
 		GestureType winnerInGame = this.gestureRecognizer.recognizerPlayerGestureAsGameWould(instance);
 		if (winnerInGame == null) {
 			this.loggerPanel.appendLogTextLine("No gesture was suitable.");
 		}
 		else {
-			this.loggerPanel.appendLogTextLine("Gesture that would be executed in-game: " + winnerInGame.toString());
+			this.loggerPanel.appendLogTextLine("Best matching gesture: " + winnerInGame.toString());
+			this.loggerPanel.appendLogTextLine("Minimum required fierceness: " + winnerInGame.getMinFierceDiffThreshold());
+			this.loggerPanel.appendLogTextLine("Fierceness: " + instance.getTotalFierceness());
 		}
+		
+		this.loggerPanel.appendLogTextLine("------------------------------------------------------\n");
 	}
 	
 	

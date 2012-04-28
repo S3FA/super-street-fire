@@ -181,6 +181,10 @@ public class GestureInstance {
 		return this.getMaxAccel() - this.getMinAccel();
 	}
 	
+	public double getTotalFierceness() {
+		return this.getMinMaxAccelDiff();
+	}
+	
 	public boolean hasLeftGloveData() {
 		return !this.leftGloveData.isEmpty();
 	}
