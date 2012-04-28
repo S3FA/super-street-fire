@@ -11,6 +11,7 @@ import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelListener;
+import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
 import ch.qos.logback.classic.Level;
 
@@ -123,15 +124,56 @@ public class IOServer {
 		long deltaFrameTime = 0; // current frame's delta time (millis)
 		long currentTime = System.currentTimeMillis(); // Temporary variable for the current absolute time
 		long lastFrameTime = currentTime; // Holds the absolute time of the last frame
-		long millisSinceStart = 0; // Milliseconds since the start of the simulation
+		//long millisSinceStart = 0; // Milliseconds since the start of the simulation
 		
 		while (isStopped == false) {
-			currentTime = System.currentTimeMillis();
-			deltaFrameTime = currentTime - lastFrameTime;
-			lastFrameTime = currentTime;
-			millisSinceStart = currentTime - startTime;
+			currentTime      = System.currentTimeMillis();
+			deltaFrameTime   = currentTime - lastFrameTime;
+			lastFrameTime    = currentTime;
+			//millisSinceStart = currentTime - startTime;
 			
-			while ( ! commManager.getCommandQueue().isEmpty() ) {
+			// ********************************************************************************************
+			// TODO: Check for device events and then use the gesture recognizer to place actions into the command queue
+			// NOTE: This could probably be moved into its own class and probably even its own thread...
+			
+			while (!commManager.getCommInQueue().isEmpty()) {
+				DeviceEvent deviceEvent = commManager.getCommInQueue().remove();
+				
+				// TODO: Figure out how to properly combine left and right glove data when both buttons
+				// are pressed (on each of the gloves) ... maybe do this at the DeviceNetworkListener / DeviceDataParser level?
+				
+				switch (deviceEvent.getDevice()) {
+				
+				case HEADSET:
+					HeadsetEvent headsetEvent = (HeadsetEvent)deviceEvent;
+					assert(headsetEvent != null);
+					// TODO
+					break;
+					
+				case LEFT_GLOVE: {
+					GloveEvent leftGloveEvent = (GloveEvent)deviceEvent;
+					assert(leftGloveEvent != null);
+					// TODO
+					break;
+				}
+					
+				case RIGHT_GLOVE:
+					GloveEvent rightGloveEvent = (GloveEvent)deviceEvent;
+					assert(rightGloveEvent != null);
+					// TODO
+					break;
+					
+				default:
+					assert(false);
+					break;
+				}
+				
+			}
+			
+			// ********************************************************************************************
+			
+			
+			while (!commManager.getCommandQueue().isEmpty() ) {
 				game.executeCommand(commManager.getCommandQueue().remove());
 			}
 			

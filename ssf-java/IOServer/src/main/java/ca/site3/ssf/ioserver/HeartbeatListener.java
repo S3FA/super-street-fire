@@ -107,8 +107,8 @@ public class HeartbeatListener implements Runnable {
 				String idString = new String(deviceidBuf);
 				
 				deviceStatus.setDeviceInfo(Device.fromId(idString), 
-											receivedPacket.getAddress(), 
-											rssi, battery);
+					receivedPacket.getAddress(), rssi, battery);
+				
 			} catch (Exception ex) {
 				log.warn("Could not parse packet data", ex);
 			}
