@@ -3,6 +3,7 @@ package ca.site3.ssf.gesturerecognizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,60 +16,37 @@ import ca.site3.ssf.common.MapUtil;
  */
 final public class GestureRecognitionResult {
 
-	final private Map<GestureType, Double> resultMapping;
-	final private ArrayList<GestureType> sortedGestures;
-	final private ArrayList<Double> sortedProbabilities;
+	final private Map<GestureType, Probabilities> resultMapping;
 
-	public GestureRecognitionResult(Map<GestureType, Double> resultMapping) {
+	public GestureRecognitionResult(Map<GestureType, Probabilities> resultMapping) {
 		this.resultMapping = resultMapping;
 		assert(resultMapping != null);
-		
-		List<Entry<GestureType, Double>> sortedEntries = MapUtil.sortMapToList(resultMapping);
-		
-		this.sortedGestures      = new ArrayList<GestureType>(sortedEntries.size());
-		this.sortedProbabilities = new ArrayList<Double>(sortedEntries.size());
-		
-		for (Entry<GestureType, Double> entry : sortedEntries) {
-			this.sortedGestures.add(entry.getKey());
-			this.sortedProbabilities.add(entry.getValue());
-		}
 	}
 	
-	public final double getProbability(GestureType gestureType) {
+	public final Probabilities getProbabilities(GestureType gestureType) {
 		return this.resultMapping.get(gestureType);
-	}
-	
-	public final double getWinnerProbability() {
-		assert(this.sortedProbabilities.size() > 0);
-		return this.sortedProbabilities.get(this.sortedProbabilities.size()-1);
-	}
-	public final GestureType getWinnerGesture() {
-		assert(this.sortedGestures.size() > 0);
-		return this.sortedGestures.get(this.sortedGestures.size()-1);
 	}
 	
 	public String toString() {
 		String result = "";
-
-		assert(this.sortedGestures.size() == this.sortedProbabilities.size());
-		for (int i = this.sortedGestures.size()-1; i >= 0 ; i--) {
-			result += this.sortedGestures.get(i).toString() + " : " + this.sortedProbabilities.get(i).doubleValue() + "\n";
+		
+		Map<GestureType, Double> probabilitiesMap = new HashMap<GestureType, Double>(this.resultMapping.size());
+		for (Entry<GestureType, Probabilities> entry : this.resultMapping.entrySet()) {
+			probabilitiesMap.put(entry.getKey(), Math.max(entry.getValue().getBaseProbability(), entry.getValue().getKMeansProbability()));
+		}
+		
+		List<Entry<GestureType, Double>> sortedList = MapUtil.sortMapToList(probabilitiesMap);
+		
+		ListIterator<Entry<GestureType, Double>> iter = sortedList.listIterator(sortedList.size());
+		while (iter.hasPrevious()) {
+			Entry<GestureType, Double> entry = iter.previous();
+			Probabilities currProbs = this.resultMapping.get(entry.getKey());
+			result += entry.getKey().toString() + " - Base: " + currProbs.getBaseProbability() + 
+					", KMeans: " + currProbs.getKMeansProbability() + "\n";
 		}
 		
 		return result;
 	}
-
-	public static void main(String[] args) {
-		Map<GestureType, Double> resultTemp = new HashMap<GestureType, Double>();
-		for (GestureType type : GestureType.values()) {
-			resultTemp.put(type, Math.random());
-		}
-		
-		GestureRecognitionResult test = new GestureRecognitionResult(resultTemp);
-		System.out.println(test.toString());
-		System.out.println("Winner: " + test.getWinnerGesture().toString());
-	}
-	
 }
 
 

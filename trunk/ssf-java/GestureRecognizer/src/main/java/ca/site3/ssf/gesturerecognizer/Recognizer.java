@@ -103,28 +103,41 @@ class Recognizer {
 		return true;
 	}
 	
+	private boolean failsBasicTestBeforeProbabilityCheck(GestureInstance inst) {
+		assert(inst != null);
+		
+		if (this.recognizer == null) {
+			return true;
+		}
+		if (inst.getNumDataPts() < this.gestureType.getNumHmmNodes()) {
+			return true;
+		}
+
+		if (inst.getTrainingDataObservationWidth() != this.gestureType.getNumHands()*3) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Gets a probability [0,1] of the given gesture instance being the same type of gesture
 	 * as the one recognized by this.
 	 * @param inst The gesture instance to test against.
 	 * @return The [0,1] probability of the gesture being the same as the one recognized by this.
 	 */
-	double probability(GestureInstance inst) {
+	double kMeansProbability(GestureInstance inst) {
 		assert(inst != null);
 		
-		if (this.recognizer == null) {
+		if (this.failsBasicTestBeforeProbabilityCheck(inst)) {
 			return 0.0;
 		}
+
 		int observationVecSize = this.gestureType.getNumHands()*3;
-		if (inst.getTrainingDataObservationWidth() != observationVecSize) {
-			return 0.0;
-		}
-		
 		List<ObservationVector> sequence = JahmmConverter.gestureInstanceToObservationSequence(inst);
-		//return this.recognizer.probability(sequence, this.recognizer.mostLikelyStateSequence(sequence));
-		
 		KMeansCalculator<ObservationVector> kMeansCalc = new KMeansCalculator<ObservationVector>(this.gestureType.getNumHmmNodes(), sequence);
 		List<ObservationVector> centroidSequence = new ArrayList<ObservationVector>(kMeansCalc.nbClusters());
+		
 		for (int i = 0; i < kMeansCalc.nbClusters(); i++) {
 			Collection<ObservationVector> cluster = kMeansCalc.cluster(i);
 			
@@ -136,6 +149,17 @@ class Recognizer {
 			centroidSequence.add(avg);
 		}
 		return this.recognizer.probability(centroidSequence, this.recognizer.mostLikelyStateSequence(centroidSequence));
+	}
+	
+	double probability(GestureInstance inst) {
+		assert(inst != null);
+		
+		if (this.failsBasicTestBeforeProbabilityCheck(inst)) {
+			return 0.0;
+		}
+
+		List<ObservationVector> sequence = JahmmConverter.gestureInstanceToObservationSequence(inst);
+		return this.recognizer.probability(sequence, this.recognizer.mostLikelyStateSequence(sequence));
 	}
 	
 	/**

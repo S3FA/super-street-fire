@@ -128,6 +128,16 @@ public class GestureRecognizer {
 		return result;
 	}
 
+	/**
+	 * Use the gesture recognizer to recognize the given gesture as it would if the game were
+	 * being played.
+	 * @param gestureInstance The gesture instance to recognize.
+	 * @return The winning gesture that would be executed in-game, null if no gesture was suitable.
+	 */
+	public GestureType recognizerPlayerGestureAsGameWould(GestureInstance gestureInstance) {
+		return this.recognizerMgr.recognize(gestureInstance);
+	}
+	
 	public static void main(String[] args) {
 		
 		// Build a nonsense test data set
