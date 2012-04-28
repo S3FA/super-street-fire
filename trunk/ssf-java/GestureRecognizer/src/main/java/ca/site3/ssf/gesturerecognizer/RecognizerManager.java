@@ -24,12 +24,12 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
  */
 class RecognizerManager {
 	
-	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD   = 1E-280;
-	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD = 1E-75;
-	private final static double EPSILON_BASE_PROBABILITY_THRESHOLD   = 1E-300;
+	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD       = 1E-280;
+	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD     = 1E-75;
+	private final static double EPSILON_BASE_PROBABILITY_THRESHOLD       = 1E-300;
+	private final static double LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD = 1E-35;
 	
 	private Logger logger = null;
-	
 	
 	private Map<GestureType, Recognizer> recognizerMap =
 			new HashMap<GestureType, Recognizer>(GestureType.values().length);
@@ -101,11 +101,10 @@ class RecognizerManager {
 			}
 		}
 		
-		if (bestProbability < EPSILON_BASE_PROBABILITY_THRESHOLD) {
-			this.logger.info("Failed to recognize gesture, did not meet minimum base epsilon probability threshold.");
-			return null;
-		}
-		else if (bestProbability < MINIMUM_BASE_PROBABILITY_THRESHOLD) {
+		if (bestProbability < MINIMUM_BASE_PROBABILITY_THRESHOLD) {
+			
+			double bestBaseProbability = bestProbability;
+			
 			for (Recognizer recognizer : this.recognizerMap.values()) {
 				currProbability = recognizer.kMeansProbability(inst);
 				if (currProbability > bestProbability) {
@@ -117,6 +116,12 @@ class RecognizerManager {
 			if (bestProbability < MINIMUM_KMEANS_PROBABILITY_THRESHOLD) {
 				this.logger.info("Failed to recognize gesture, did not meet minimum probability threshold of either base or k-means.");
 				return null;
+			}
+			else if (bestBaseProbability < EPSILON_BASE_PROBABILITY_THRESHOLD) {
+				if (bestProbability < LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD) {
+					this.logger.info("Failed to recognize gesture, did not meet minimum base epsilon probability threshold.");
+					return null;
+				}
 			}
 			
 		}

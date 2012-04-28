@@ -126,8 +126,9 @@ class TrainingPanel extends JPanel implements ActionListener {
 		
 		// Allow the user to edit the file list
 		this.trainingFileListPanel = new LoggerPanel("Training Files");
+		this.trainingFileListPanel.setTextAreaSize(15, 100);
 		this.loggingPanel = new LoggerPanel("Log");
-		this.loggingPanel.setTextAreaSize(5, 65);
+		this.loggingPanel.setTextAreaSize(5, 100);
 		
 		JLabel gestureTypeLabel = new JLabel("Select Gesture: ");
 		gestureTypeLabel.setForeground(Color.black);

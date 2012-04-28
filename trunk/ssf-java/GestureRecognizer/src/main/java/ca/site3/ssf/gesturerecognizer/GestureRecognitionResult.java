@@ -48,9 +48,9 @@ final public class GestureRecognitionResult {
 		while (iter.hasPrevious()) {
 			Entry<GestureType, Double> entry = iter.previous();
 			GestureProbabilities currProbs = this.resultMapping.get(entry.getKey());
-			result += entry.getKey().toString() + "{ " +
-					"Base: " + currProbs.getBaseProbability() + ", KMeans: " + currProbs.getKMeansProbability() + " " +
-					"Required fierceness: " + entry.getKey().getMinFierceDiffThreshold() + "}\n";
+			result += entry.getKey().toString() + " { " +
+					"Base: " + currProbs.getBaseProbability() + ", KMeans: " + currProbs.getKMeansProbability() +
+					", Required fierceness: " + entry.getKey().getMinFierceDiffThreshold() + " }\n";
 		}
 		
 		return result;
