@@ -51,23 +51,26 @@ public class GestureInstance {
 		assert(this.isValid());
 	}
 	
-
 	public int getNumDataPts() {
 		assert(this.timePts != null);
 		return this.timePts.size();
 	}
+	
 	public GloveData getLeftGloveDataAt(int index) {
 		assert(index >= 0 && index < this.leftGloveData.size());
 		return this.leftGloveData.get(index);
 	}
+	
 	public GloveData getRightGloveDataAt(int index) {
 		assert(index >= 0 && index < this.rightGloveData.size());
 		return this.rightGloveData.get(index);
 	}
+	
 	public double getTimeAt(int index) {
 		assert(index >= 0 && index < this.timePts.size());
 		return this.timePts.get(index);
 	}
+	
 	public double getMaxTimeDiff() {
 		if (this.timePts.isEmpty()) {
 			return 0.0;
@@ -75,12 +78,117 @@ public class GestureInstance {
 		return this.timePts.get(this.timePts.size()-1) - this.timePts.get(0);
 	}
 	
+	/**
+	 * Gets the maximum absolute acceleration for this entire gesture instance
+	 * (both gloves if possible). This is meant to be an indicator for how 'fierce'
+	 * this gesture is.
+	 * @return The maximum absolute acceleration.
+	 */
+	public double getMaxAbsAccel() {
+		double maxAbsAccel = 0.0;
+
+		for (GloveData data : this.leftGloveData) {
+			Vector3D accelData = data.getAccelData();
+			maxAbsAccel = Math.max(maxAbsAccel, Math.max(Math.abs(accelData.getX()),
+					Math.max(Math.abs(accelData.getY()), Math.abs(accelData.getZ()))));
+		}
+
+		for (GloveData data : this.rightGloveData) {
+			Vector3D accelData = data.getAccelData();
+			maxAbsAccel = Math.max(maxAbsAccel, Math.max(Math.abs(accelData.getX()),
+					Math.max(Math.abs(accelData.getY()), Math.abs(accelData.getZ()))));
+		}
+
+		return maxAbsAccel;
+	}
+	
+	/**
+	 * Gets the maximum acceleration for this entire gesture instance
+	 * (both gloves if possible). 
+	 * @return The maximum acceleration.
+	 */
+	public double getMaxAccel() {
+		double maxAbsAccel = 0.0;
+
+		for (GloveData data : this.leftGloveData) {
+			Vector3D accelData = data.getAccelData();
+			maxAbsAccel = Math.max(maxAbsAccel, Math.max(accelData.getX(),
+					Math.max(accelData.getY(), accelData.getZ())));
+		}
+
+		for (GloveData data : this.rightGloveData) {
+			Vector3D accelData = data.getAccelData();
+			maxAbsAccel = Math.max(maxAbsAccel, Math.max(accelData.getX(),
+					Math.max(accelData.getY(), accelData.getZ())));
+		}
+
+		return maxAbsAccel;
+	}
+	
+	/**
+	 * Gets the minimum absolute acceleration for this entire gesture instance
+	 * (both gloves if possible).
+	 * @return The minimum absolute acceleration.
+	 */
+	public double getMinAbsAccel() {
+		double minAbsAccel = 0.0;
+
+		for (GloveData data : this.leftGloveData) {
+			Vector3D accelData = data.getAccelData();
+			minAbsAccel = Math.min(minAbsAccel, Math.min(Math.abs(accelData.getX()),
+					Math.min(Math.abs(accelData.getY()), Math.abs(accelData.getZ()))));
+		}
+
+		for (GloveData data : this.rightGloveData) {
+			Vector3D accelData = data.getAccelData();
+			minAbsAccel = Math.min(minAbsAccel, Math.min(Math.abs(accelData.getX()),
+					Math.min(Math.abs(accelData.getY()), Math.abs(accelData.getZ()))));
+		}
+
+		return minAbsAccel;
+	}
+	
+	/**
+	 * Gets the minimum acceleration for this entire gesture instance
+	 * (both gloves if possible). This may also be an indicator of the 'fireceness'
+	 * of a gesture.
+	 * @return The minimum acceleration.
+	 */
+	public double getMinAccel() {
+		double minAbsAccel = 0.0;
+
+		for (GloveData data : this.leftGloveData) {
+			Vector3D accelData = data.getAccelData();
+			minAbsAccel = Math.min(minAbsAccel, Math.min(accelData.getX(),
+					Math.min(accelData.getY(), accelData.getZ())));
+		}
+
+		for (GloveData data : this.rightGloveData) {
+			Vector3D accelData = data.getAccelData();
+			minAbsAccel = Math.min(minAbsAccel, Math.min(accelData.getX(),
+					Math.min(accelData.getY(), accelData.getZ())));
+		}
+
+		return minAbsAccel;
+	}
+	
+	/**
+	 * Get the difference between the highest and lowest acceleration values.
+	 * This is the best determining factor for how 'extreme/fierce' a gesture is.
+	 * @return The positive difference between the highest and lowest acceleration values.
+	 */
+	public double getMinMaxAccelDiff() {
+		return this.getMaxAccel() - this.getMinAccel();
+	}
+	
 	public boolean hasLeftGloveData() {
 		return !this.leftGloveData.isEmpty();
 	}
+	
 	public boolean hasRightGloveData() {
 		return !this.rightGloveData.isEmpty();
 	}
+	
 	public boolean isValid() {
 		boolean isValid = (this.hasLeftGloveData() || this.hasRightGloveData()) && !this.timePts.isEmpty();
 		if (this.hasLeftGloveData() && this.hasRightGloveData()) {

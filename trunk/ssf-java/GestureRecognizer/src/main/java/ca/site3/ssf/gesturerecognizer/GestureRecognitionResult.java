@@ -1,6 +1,5 @@
 package ca.site3.ssf.gesturerecognizer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -16,14 +15,14 @@ import ca.site3.ssf.common.MapUtil;
  */
 final public class GestureRecognitionResult {
 
-	final private Map<GestureType, Probabilities> resultMapping;
+	final private Map<GestureType, GestureProbabilities> resultMapping;
 
-	public GestureRecognitionResult(Map<GestureType, Probabilities> resultMapping) {
+	public GestureRecognitionResult(Map<GestureType, GestureProbabilities> resultMapping) {
 		this.resultMapping = resultMapping;
 		assert(resultMapping != null);
 	}
 	
-	public final Probabilities getProbabilities(GestureType gestureType) {
+	public final GestureProbabilities getProbabilities(GestureType gestureType) {
 		return this.resultMapping.get(gestureType);
 	}
 	
@@ -31,7 +30,7 @@ final public class GestureRecognitionResult {
 		String result = "";
 		
 		Map<GestureType, Double> probabilitiesMap = new HashMap<GestureType, Double>(this.resultMapping.size());
-		for (Entry<GestureType, Probabilities> entry : this.resultMapping.entrySet()) {
+		for (Entry<GestureType, GestureProbabilities> entry : this.resultMapping.entrySet()) {
 			probabilitiesMap.put(entry.getKey(), Math.max(entry.getValue().getBaseProbability(), entry.getValue().getKMeansProbability()));
 		}
 		
@@ -40,7 +39,7 @@ final public class GestureRecognitionResult {
 		ListIterator<Entry<GestureType, Double>> iter = sortedList.listIterator(sortedList.size());
 		while (iter.hasPrevious()) {
 			Entry<GestureType, Double> entry = iter.previous();
-			Probabilities currProbs = this.resultMapping.get(entry.getKey());
+			GestureProbabilities currProbs = this.resultMapping.get(entry.getKey());
 			result += entry.getKey().toString() + " - Base: " + currProbs.getBaseProbability() + 
 					", KMeans: " + currProbs.getKMeansProbability() + "\n";
 		}

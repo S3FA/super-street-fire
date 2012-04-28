@@ -32,7 +32,8 @@ import ca.site3.ssf.gamemodel.IGameModel;
  */
 public class GestureRecognizer {
 	
-	public static final int MAX_GESTURE_TIME_MS = 1500;
+	public final static double MINIMUM_GESTURE_RECOGNITION_TIME_IN_SECS  = 0.012;
+	public final static double MAXIMUM_GESTURE_RECOGNITION_TIME_IN_SECS  = 2.0;
 	
 	private RecognizerManager recognizerMgr = null;
 	private Logger logger = null;
@@ -89,6 +90,16 @@ public class GestureRecognizer {
 	// REAL-TIME GESTURE RECOGNITION FUNCTIONALITY **********************************************************
 	
 	/**
+	 * Use the gesture recognizer to recognize the given gesture as it would if the game were
+	 * being played.
+	 * @param gestureInstance The gesture instance to recognize.
+	 * @return The winning gesture that would be executed in-game, null if no gesture was suitable.
+	 */
+	public GestureType recognizerPlayerGestureAsGameWould(GestureInstance gestureInstance) {
+		return this.recognizerMgr.recognize(gestureInstance);
+	}
+	
+	/**
 	 * Use the gesture recognizer to recognize a given gesture instance executed by the given player.
 	 * This function will both recognize the gesture and, if the gesture is identified, it will execute
 	 * that gesture within the given gamemodel.
@@ -101,7 +112,7 @@ public class GestureRecognizer {
 		assert(gestureInstance != null);
 
 		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
-		GestureType result = this.recognizerMgr.recognize(gestureInstance);
+		GestureType result = this.recognizerPlayerGestureAsGameWould(gestureInstance);
 		if (result == null) {
 			// No gesture was recognized
 			this.logger.info("Failed to recognize gesture.");
@@ -126,16 +137,6 @@ public class GestureRecognizer {
 		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
 		GestureRecognitionResult result = this.recognizerMgr.recognizeWithFullResult(gestureInstance);
 		return result;
-	}
-
-	/**
-	 * Use the gesture recognizer to recognize the given gesture as it would if the game were
-	 * being played.
-	 * @param gestureInstance The gesture instance to recognize.
-	 * @return The winning gesture that would be executed in-game, null if no gesture was suitable.
-	 */
-	public GestureType recognizerPlayerGestureAsGameWould(GestureInstance gestureInstance) {
-		return this.recognizerMgr.recognize(gestureInstance);
 	}
 	
 	public static void main(String[] args) {
