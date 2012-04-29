@@ -44,6 +44,7 @@ class RecordingPanel extends JPanel {
         
 		this.controlPanel = new ControlPanel();
 		this.loggerPanel = new LoggerPanel("Log");
+		this.loggerPanel.setTextAreaSize(20, 100);
 
 		this.sensorDataPanelLeft = new SensorDataPanel("Left");
 		this.sensorDataPanelRight = new SensorDataPanel("Right");
