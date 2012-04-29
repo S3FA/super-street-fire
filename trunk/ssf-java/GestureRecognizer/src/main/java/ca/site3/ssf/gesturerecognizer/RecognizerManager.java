@@ -25,9 +25,9 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 class RecognizerManager {
 	
 	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD       = 1E-280;
-	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD     = 1E-75;
+	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD     = 1E-80;
 	private final static double EPSILON_BASE_PROBABILITY_THRESHOLD       = 1E-300;
-	private final static double LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD = 1E-35;
+	private final static double LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD = 1E-40;
 	
 	private Logger logger = null;
 	
