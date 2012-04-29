@@ -2,6 +2,7 @@ package ca.site3.ssf.gesturerecordergui;
 
 import java.awt.Checkbox;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,9 +15,12 @@ import java.io.IOException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
@@ -38,11 +42,16 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 	private static final String EXPORT_TO_RECOGNIZER_KEY  = "ExportToRecognizer";
 	private static final String EXPORT_TO_CSV_KEY         = "ExportToCsv";
 	private static final String SELECTED_GESTURE_TYPE_KEY = "SelectedGestureType";
+	private static final String EXPORT_DIR_KEY            = "ExportDir";
 	
 	private boolean isNewFile = false;
 	private JComboBox gestureName;
 	private Checkbox exportRecognizer;
 	private Checkbox exportCsv;
+	
+	private JTextField saveDirTextBox;
+	private JButton dirButton;
+	private JFileChooser dirChooser;
 	
 	FileInfoPanel() {
 		super();
@@ -77,6 +86,19 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		formLayoutHelper.addMiddleField(gestureNameLabel, this);
 		formLayoutHelper.addLastField(this.gestureName, this);
 		
+		JLabel dirLabel = new JLabel("Save Directory:");
+		dirLabel.setForeground(Color.black);
+		this.saveDirTextBox = new JTextField(10);
+		this.saveDirTextBox.setEditable(false);
+		this.dirButton = new JButton("...");
+		this.dirButton.addActionListener(this);
+		
+		formLayoutHelper.addMiddleField(dirLabel, this);
+		JPanel dirPanel = new JPanel(new FlowLayout());
+		dirPanel.add(this.saveDirTextBox);
+		dirPanel.add(this.dirButton);
+		formLayoutHelper.addLastField(dirPanel, this);
+		
 		Preferences userPreferences = Preferences.userRoot();
 		
 		String exportToRecognizerStr = userPreferences.get(EXPORT_TO_RECOGNIZER_KEY, null);
@@ -96,6 +118,15 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		}
 		this.gestureName.addActionListener(this);
 		
+		this.dirChooser = new JFileChooser();
+		this.dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+		String exportDirStr = userPreferences.get(EXPORT_DIR_KEY, null);
+		File selectedDir = exportDirStr == null ? null : new File(exportDirStr);
+		this.dirChooser.setCurrentDirectory(selectedDir);
+		if (selectedDir != null) {
+			this.saveDirTextBox.setText(selectedDir.getAbsolutePath());
+		}
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
@@ -103,7 +134,7 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		try {	
 			String suffix = "csv";
 			int iteration = getNextFileIteration(suffix);
-	       
+			
 	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix), !this.isNewFile);
         	
 	        // If we just created the file, 
@@ -169,21 +200,20 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 	}
 	
 	// Save the data to a file that can be read by GestureRecognizer's fromDataString() method
-	public void exportToRecognizer(GestureInstance instance){
-		try
-		{	
+	public void exportToRecognizer(GestureInstance instance) {
+		try {	
 			int iteration = getNextFileIteration(GESTURE_INSTANCE_FILE_EXT);
 	       
 	        // Save the data to a file readable by the GestureRecognizer
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + 
+	        FileWriter writer = new FileWriter(new File(this.saveDirTextBox.getText() +
+	        		"/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + 
 	        		"." + GESTURE_INSTANCE_FILE_EXT), false);
 	        writer.write(instance.toDataString());
 	 
 		    writer.flush();
 		    writer.close();
 		}
-		catch (IOException ex)
-		{
+		catch (IOException ex) {
 			ex.printStackTrace();
 		}
 	}
@@ -194,7 +224,8 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 			int iteration = getNextFileIteration(GESTURE_ENGINE_FILE_EXT);
 	       	        
 	        // Save the data to a file readable by the Gesture Tester
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) +
+	        FileWriter writer = new FileWriter(new File(this.saveDirTextBox.getText() + 
+	        		"/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) +
 	        		"." + GESTURE_ENGINE_FILE_EXT), false);
 	        gestureRecognizer.saveRecognizerEngine(writer);
 	 
@@ -217,7 +248,8 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		int iteration = 0;
 		
         // If the file exists, check if the next iteration of the file exists until we can make a new one
-        while (new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix).exists()) {
+        while (new File(this.saveDirTextBox.getText() + 
+        		"/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix).exists()) {
         	iteration++;
         }
         
@@ -247,7 +279,15 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 			Preferences userPreferences = Preferences.userRoot();
 			userPreferences.put(SELECTED_GESTURE_TYPE_KEY, String.valueOf(this.gestureName.getSelectedIndex()));
 		}
-		
+		else if (event.getSource() == this.dirButton) {
+			int dlgResult = this.dirChooser.showOpenDialog(this);
+			if (dlgResult == JFileChooser.APPROVE_OPTION && this.dirChooser.getSelectedFile() != null) {
+	            Preferences userPreferences = Preferences.userRoot();
+	            String selectedDir = this.dirChooser.getSelectedFile().getAbsolutePath();
+	            userPreferences.put(EXPORT_DIR_KEY, selectedDir);
+	            this.saveDirTextBox.setText(selectedDir);
+			}
+		}
 	}
 
 	public void itemStateChanged(ItemEvent event) {
