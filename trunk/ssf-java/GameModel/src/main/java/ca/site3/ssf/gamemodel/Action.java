@@ -1,8 +1,13 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Stack;
 
 
 import ca.site3.ssf.common.MultiLerp;
@@ -93,8 +98,12 @@ public abstract class Action {
 				return false;
 			}
 			
-			newBurstSims.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(),
-					i, 0.0, numBursts, (MultiLerp)intensityLerp.clone()));
+			Deque<MultiLerp> intensityLerps = new ArrayDeque<MultiLerp>(numBursts);
+			for (int j = 0; j < numBursts; j++) {
+				intensityLerps.add((MultiLerp) intensityLerp.clone());
+			}
+	
+			newBurstSims.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(), i, 0.0, intensityLerps));
 		}
 
 		// Successfully generated a new wave of fire emitter simulators, add it to this action and exit with success!
@@ -120,7 +129,7 @@ public abstract class Action {
 	 * 
 	 * @return true on success, false on failure.
 	 */
-	boolean addFireEmitterWave(FireEmitterIterator emitterIter, int travelLength, int width, MultiLerp intensityLerp) {
+	boolean addConstantVelocityFireEmitterWave(FireEmitterIterator emitterIter, int travelLength, int width, MultiLerp intensityLerp) {
 		
 		// Make sure the parameters are at least moderately correct
 		if (intensityLerp == null || emitterIter == null || travelLength <= 0 || width <= 0 || width > travelLength) {
@@ -137,17 +146,72 @@ public abstract class Action {
 		for (int i = 0; i < travelLength; i++) {
 			assert(emitterIter.hasNext());
 			FireEmitter currEmitter = emitterIter.next();
-			if (currEmitter == null) {
-				assert(false);
-				return false;
-			}
+			assert(currEmitter != null);
 			
+			Deque<MultiLerp> intensityLerps = new ArrayDeque<MultiLerp>(width);
+			for (int j = 0; j < width; j++) {
+				intensityLerps.add((MultiLerp) intensityLerp.clone());
+			}
+	
 			newSimWave.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(),
-					i, initialDelayTimeCounter, width, (MultiLerp)intensityLerp.clone()));
+					i, initialDelayTimeCounter, intensityLerps));
 			
 			initialDelayTimeCounter += intensityLerp.getTotalTimeLength();
 		}
 
+		// Successfully generated a new wave of fire emitter simulators, add it to this action and exit with success!
+		this.wavesOfOrderedFireSims.add(newSimWave);
+		return true;
+	}
+	
+	boolean addFireEmitterWave(FireEmitterIterator emitterIter, int width, List<MultiLerp> intensityLerps) {
+		// Make sure the parameters are at least moderately correct
+		if (emitterIter == null || intensityLerps.isEmpty() || width <= 0 || width > intensityLerps.size()) {
+			assert(false);
+			return false;
+		}
+		
+		// Build the lerp deques for each of the emitter simulators ...
+		List<Deque<MultiLerp>> multiLerpDeques = new ArrayList<Deque<MultiLerp>>(intensityLerps.size());
+		for (int i = 0; i < intensityLerps.size(); i++) {
+			
+			Deque<MultiLerp> lerpDeque = new ArrayDeque<MultiLerp>(width);
+			
+			for (int j = 0; j < width; j++) {
+				if (j + i >= intensityLerps.size()) {
+					MultiLerp currMultiLerp = intensityLerps.get(i);
+					lerpDeque.push((MultiLerp)currMultiLerp.clone());
+				}
+				else {
+					MultiLerp currMultiLerp = intensityLerps.get(i+j);
+					lerpDeque.addLast((MultiLerp)currMultiLerp.clone());
+				}
+			}
+			
+			multiLerpDeques.add(lerpDeque);
+		}
+		
+		ArrayList<FireEmitterSimulator> newSimWave = new ArrayList<FireEmitterSimulator>(intensityLerps.size());
+		double initialDelayTimeCounter = 0.0;
+		int currentEmitterIndex = 0;
+		
+		assert(multiLerpDeques.size() == intensityLerps.size());
+		for (int i = 0; i < multiLerpDeques.size(); i++) {
+			
+			Deque<MultiLerp> currIntensityLerpDeque = multiLerpDeques.get(i);
+			assert(currIntensityLerpDeque != null);
+			
+			assert(emitterIter.hasNext());
+			FireEmitter currEmitter = emitterIter.next();
+			assert(currEmitter != null);
+			
+			newSimWave.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(),
+					currentEmitterIndex, initialDelayTimeCounter, currIntensityLerpDeque));
+			
+			initialDelayTimeCounter += currIntensityLerpDeque.peek().getTotalTimeLength();
+			currentEmitterIndex++;
+		}
+		
 		// Successfully generated a new wave of fire emitter simulators, add it to this action and exit with success!
 		this.wavesOfOrderedFireSims.add(newSimWave);
 		return true;

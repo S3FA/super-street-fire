@@ -158,6 +158,21 @@ public class StreetFireGuiClient {
 		submitCommand(b.build());
 	}
 
+	public void executeGenericAction(int playerNum, boolean usesLeftHand, boolean usesRightHand,
+			                         float damagePerFlame, int flameWidth, double durationInSecs,
+			                         double acceleration) throws IOException {
+		Builder b = Command.newBuilder().setType(CommandType.EXECUTE_GENERIC_ACTION)
+				.setPlayer(SerializationHelper.playerFromNum(playerNum))
+				.setLeftHand(usesLeftHand)
+				.setRightHand(usesRightHand)
+				.setDmgPerFlame(damagePerFlame)
+				.setFlameWidth(flameWidth)
+				.setDurationInSeconds(durationInSecs)
+				.setAcceleration(acceleration);
+		
+		submitCommand(b.build());
+	}
+	
 	/**
 	 * @see ExecutePlayerActionCommand
 	 * @throws IOException

@@ -47,6 +47,22 @@ public final class GuiCommand {
     java.util.List<ca.site3.ssf.guiprotocol.GuiCommand.Command.Player> getEmitterEntitiesList();
     int getEmitterEntitiesCount();
     ca.site3.ssf.guiprotocol.GuiCommand.Command.Player getEmitterEntities(int index);
+    
+    // optional float dmgPerFlame = 10;
+    boolean hasDmgPerFlame();
+    float getDmgPerFlame();
+    
+    // optional int32 flameWidth = 11;
+    boolean hasFlameWidth();
+    int getFlameWidth();
+    
+    // optional double durationInSeconds = 12;
+    boolean hasDurationInSeconds();
+    double getDurationInSeconds();
+    
+    // optional double acceleration = 13;
+    boolean hasAcceleration();
+    double getAcceleration();
   }
   public static final class Command extends
       com.google.protobuf.GeneratedMessage
@@ -165,15 +181,17 @@ public final class GuiCommand {
       BLOCK(0, 0),
       JAB_ATTACK(1, 1),
       HOOK_ATTACK(2, 2),
-      HADOUKEN_ATTACK(3, 3),
-      SONIC_BOOM_ATTACK(4, 4),
+      UPPERCUT_ATTACK(3, 3),
+      HADOUKEN_ATTACK(4, 4),
+      SONIC_BOOM_ATTACK(5, 5),
       ;
       
       public static final int BLOCK_VALUE = 0;
       public static final int JAB_ATTACK_VALUE = 1;
       public static final int HOOK_ATTACK_VALUE = 2;
-      public static final int HADOUKEN_ATTACK_VALUE = 3;
-      public static final int SONIC_BOOM_ATTACK_VALUE = 4;
+      public static final int UPPERCUT_ATTACK_VALUE = 3;
+      public static final int HADOUKEN_ATTACK_VALUE = 4;
+      public static final int SONIC_BOOM_ATTACK_VALUE = 5;
       
       
       public final int getNumber() { return value; }
@@ -183,8 +201,9 @@ public final class GuiCommand {
           case 0: return BLOCK;
           case 1: return JAB_ATTACK;
           case 2: return HOOK_ATTACK;
-          case 3: return HADOUKEN_ATTACK;
-          case 4: return SONIC_BOOM_ATTACK;
+          case 3: return UPPERCUT_ATTACK;
+          case 4: return HADOUKEN_ATTACK;
+          case 5: return SONIC_BOOM_ATTACK;
           default: return null;
         }
       }
@@ -215,7 +234,7 @@ public final class GuiCommand {
       }
       
       private static final PlayerAction[] VALUES = {
-        BLOCK, JAB_ATTACK, HOOK_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, 
+        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, 
       };
       
       public static PlayerAction valueOf(
@@ -476,6 +495,46 @@ public final class GuiCommand {
       return emitterEntities_.get(index);
     }
     
+    // optional float dmgPerFlame = 10;
+    public static final int DMGPERFLAME_FIELD_NUMBER = 10;
+    private float dmgPerFlame_;
+    public boolean hasDmgPerFlame() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    public float getDmgPerFlame() {
+      return dmgPerFlame_;
+    }
+    
+    // optional int32 flameWidth = 11;
+    public static final int FLAMEWIDTH_FIELD_NUMBER = 11;
+    private int flameWidth_;
+    public boolean hasFlameWidth() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    public int getFlameWidth() {
+      return flameWidth_;
+    }
+    
+    // optional double durationInSeconds = 12;
+    public static final int DURATIONINSECONDS_FIELD_NUMBER = 12;
+    private double durationInSeconds_;
+    public boolean hasDurationInSeconds() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    public double getDurationInSeconds() {
+      return durationInSeconds_;
+    }
+    
+    // optional double acceleration = 13;
+    public static final int ACCELERATION_FIELD_NUMBER = 13;
+    private double acceleration_;
+    public boolean hasAcceleration() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    public double getAcceleration() {
+      return acceleration_;
+    }
+    
     private void initFields() {
       type_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType.EXECUTE_GENERIC_ACTION;
       playerAction_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction.BLOCK;
@@ -486,6 +545,10 @@ public final class GuiCommand {
       intensity_ = 0F;
       emitterIndex_ = 0;
       emitterEntities_ = java.util.Collections.emptyList();
+      dmgPerFlame_ = 0F;
+      flameWidth_ = 0;
+      durationInSeconds_ = 0D;
+      acceleration_ = 0D;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -529,6 +592,18 @@ public final class GuiCommand {
       }
       for (int i = 0; i < emitterEntities_.size(); i++) {
         output.writeEnum(9, emitterEntities_.get(i).getNumber());
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeFloat(10, dmgPerFlame_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeInt32(11, flameWidth_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeDouble(12, durationInSeconds_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeDouble(13, acceleration_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -579,6 +654,22 @@ public final class GuiCommand {
         }
         size += dataSize;
         size += 1 * emitterEntities_.size();
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(10, dmgPerFlame_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(11, flameWidth_);
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(12, durationInSeconds_);
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(13, acceleration_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -722,6 +813,14 @@ public final class GuiCommand {
         bitField0_ = (bitField0_ & ~0x00000080);
         emitterEntities_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000100);
+        dmgPerFlame_ = 0F;
+        bitField0_ = (bitField0_ & ~0x00000200);
+        flameWidth_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000400);
+        durationInSeconds_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        acceleration_ = 0D;
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
       
@@ -797,6 +896,22 @@ public final class GuiCommand {
           bitField0_ = (bitField0_ & ~0x00000100);
         }
         result.emitterEntities_ = emitterEntities_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.dmgPerFlame_ = dmgPerFlame_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.flameWidth_ = flameWidth_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.durationInSeconds_ = durationInSeconds_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.acceleration_ = acceleration_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -846,6 +961,18 @@ public final class GuiCommand {
             emitterEntities_.addAll(other.emitterEntities_);
           }
           onChanged();
+        }
+        if (other.hasDmgPerFlame()) {
+          setDmgPerFlame(other.getDmgPerFlame());
+        }
+        if (other.hasFlameWidth()) {
+          setFlameWidth(other.getFlameWidth());
+        }
+        if (other.hasDurationInSeconds()) {
+          setDurationInSeconds(other.getDurationInSeconds());
+        }
+        if (other.hasAcceleration()) {
+          setAcceleration(other.getAcceleration());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -969,6 +1096,26 @@ public final class GuiCommand {
                 }
               }
               input.popLimit(oldLimit);
+              break;
+            }
+            case 85: {
+              bitField0_ |= 0x00000200;
+              dmgPerFlame_ = input.readFloat();
+              break;
+            }
+            case 88: {
+              bitField0_ |= 0x00000400;
+              flameWidth_ = input.readInt32();
+              break;
+            }
+            case 97: {
+              bitField0_ |= 0x00000800;
+              durationInSeconds_ = input.readDouble();
+              break;
+            }
+            case 105: {
+              bitField0_ |= 0x00001000;
+              acceleration_ = input.readDouble();
               break;
             }
           }
@@ -1208,6 +1355,90 @@ public final class GuiCommand {
         return this;
       }
       
+      // optional float dmgPerFlame = 10;
+      private float dmgPerFlame_ ;
+      public boolean hasDmgPerFlame() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      public float getDmgPerFlame() {
+        return dmgPerFlame_;
+      }
+      public Builder setDmgPerFlame(float value) {
+        bitField0_ |= 0x00000200;
+        dmgPerFlame_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearDmgPerFlame() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        dmgPerFlame_ = 0F;
+        onChanged();
+        return this;
+      }
+      
+      // optional int32 flameWidth = 11;
+      private int flameWidth_ ;
+      public boolean hasFlameWidth() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      public int getFlameWidth() {
+        return flameWidth_;
+      }
+      public Builder setFlameWidth(int value) {
+        bitField0_ |= 0x00000400;
+        flameWidth_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearFlameWidth() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        flameWidth_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // optional double durationInSeconds = 12;
+      private double durationInSeconds_ ;
+      public boolean hasDurationInSeconds() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      public double getDurationInSeconds() {
+        return durationInSeconds_;
+      }
+      public Builder setDurationInSeconds(double value) {
+        bitField0_ |= 0x00000800;
+        durationInSeconds_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearDurationInSeconds() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        durationInSeconds_ = 0D;
+        onChanged();
+        return this;
+      }
+      
+      // optional double acceleration = 13;
+      private double acceleration_ ;
+      public boolean hasAcceleration() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      public double getAcceleration() {
+        return acceleration_;
+      }
+      public Builder setAcceleration(double value) {
+        bitField0_ |= 0x00001000;
+        acceleration_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearAcceleration() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        acceleration_ = 0D;
+        onChanged();
+        return this;
+      }
+      
       // @@protoc_insertion_point(builder_scope:guiprotocol.Command)
     }
     
@@ -1233,7 +1464,7 @@ public final class GuiCommand {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021gui_command.proto\022\013guiprotocol\"\332\005\n\007Com" +
+      "\n\021gui_command.proto\022\013guiprotocol\"\311\006\n\007Com" +
       "mand\022.\n\004type\030\001 \002(\0162 .guiprotocol.Command" +
       ".CommandType\0227\n\014playerAction\030\002 \001(\0162!.gui" +
       "protocol.Command.PlayerAction\022+\n\006player\030" +
@@ -1242,17 +1473,20 @@ public final class GuiCommand {
       "erType\030\006 \001(\0162$.guiprotocol.Command.FireE" +
       "mitterType\022\021\n\tintensity\030\007 \001(\002\022\024\n\014emitter" +
       "Index\030\010 \001(\005\0224\n\017emitterEntities\030\t \003(\0162\033.g" +
-      "uiprotocol.Command.Player\"\245\001\n\013CommandTyp",
-      "e\022\032\n\026EXECUTE_GENERIC_ACTION\020\000\022\031\n\025EXECUTE" +
-      "_PLAYER_ACTION\020\001\022\020\n\014TOGGLE_PAUSE\020\002\022\r\n\tKI" +
-      "LL_GAME\020\003\022\016\n\nNEXT_STATE\020\004\022\021\n\rTOUCH_EMITT" +
-      "ER\020\005\022\033\n\027QUERY_GAME_INFO_REFRESH\020\006\"f\n\014Pla" +
-      "yerAction\022\t\n\005BLOCK\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013" +
-      "HOOK_ATTACK\020\002\022\023\n\017HADOUKEN_ATTACK\020\003\022\025\n\021SO" +
-      "NIC_BOOM_ATTACK\020\004\"(\n\006Player\022\016\n\nRINGMASTE" +
-      "R\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r" +
-      "\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_R" +
-      "ING\020\002B\032\n\030ca.site3.ssf.guiprotocol"
+      "uiprotocol.Command.Player\022\023\n\013dmgPerFlame",
+      "\030\n \001(\002\022\022\n\nflameWidth\030\013 \001(\005\022\031\n\021durationIn" +
+      "Seconds\030\014 \001(\001\022\024\n\014acceleration\030\r \001(\001\"\245\001\n\013" +
+      "CommandType\022\032\n\026EXECUTE_GENERIC_ACTION\020\000\022" +
+      "\031\n\025EXECUTE_PLAYER_ACTION\020\001\022\020\n\014TOGGLE_PAU" +
+      "SE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\nNEXT_STATE\020\004\022\021\n\rT" +
+      "OUCH_EMITTER\020\005\022\033\n\027QUERY_GAME_INFO_REFRES" +
+      "H\020\006\"{\n\014PlayerAction\022\t\n\005BLOCK\020\000\022\016\n\nJAB_AT" +
+      "TACK\020\001\022\017\n\013HOOK_ATTACK\020\002\022\023\n\017UPPERCUT_ATTA" +
+      "CK\020\003\022\023\n\017HADOUKEN_ATTACK\020\004\022\025\n\021SONIC_BOOM_" +
+      "ATTACK\020\005\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1",
+      "\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLEFT_RA" +
+      "IL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030" +
+      "ca.site3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1264,7 +1498,7 @@ public final class GuiCommand {
           internal_static_guiprotocol_Command_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guiprotocol_Command_descriptor,
-              new java.lang.String[] { "Type", "PlayerAction", "Player", "LeftHand", "RightHand", "EmitterType", "Intensity", "EmitterIndex", "EmitterEntities", },
+              new java.lang.String[] { "Type", "PlayerAction", "Player", "LeftHand", "RightHand", "EmitterType", "Intensity", "EmitterIndex", "EmitterEntities", "DmgPerFlame", "FlameWidth", "DurationInSeconds", "Acceleration", },
               ca.site3.ssf.guiprotocol.GuiCommand.Command.class,
               ca.site3.ssf.guiprotocol.GuiCommand.Command.Builder.class);
           return null;

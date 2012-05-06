@@ -1,6 +1,8 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 
 import ca.site3.ssf.common.MultiLerp;
 
@@ -39,7 +41,13 @@ class CrowdPleaserAction extends Action {
 			this.wavesOfOrderedFireSims.add(new ArrayList<FireEmitterSimulator>(10));
 		}
 		ArrayList<FireEmitterSimulator> fireSims = this.wavesOfOrderedFireSims.get(0);
-		fireSims.add(new FireEmitterSimulator(this, fireEmitter, 0, 0, 0.0, numBursts, (MultiLerp)intensityLerp.clone()));
+		
+		Deque<MultiLerp> intensityLerps = new ArrayDeque<MultiLerp>(numBursts);
+		for (int j = 0; j < numBursts; j++) {
+			intensityLerps.add((MultiLerp) intensityLerp.clone());
+		}
+		
+		fireSims.add(new FireEmitterSimulator(this, fireEmitter, 0, 0, 0.0, intensityLerps));
 		return true;
 	}	
 	

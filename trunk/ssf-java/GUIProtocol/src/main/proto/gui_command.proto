@@ -19,11 +19,12 @@ message Command {
   
   // for EXECUTE_PLAYER_ACTION (PlayerActionType)
   enum PlayerAction {
-    BLOCK = 0;
-    JAB_ATTACK = 1;
-    HOOK_ATTACK = 2;
-    HADOUKEN_ATTACK = 3;
-    SONIC_BOOM_ATTACK = 4;
+    BLOCK             = 0;
+    JAB_ATTACK        = 1;
+    HOOK_ATTACK       = 2;
+    UPPERCUT_ATTACK   = 3;
+    HADOUKEN_ATTACK   = 4;
+    SONIC_BOOM_ATTACK = 5;
   }
   
   // for EXECUTE_ACTION or TOUCH_EMITTER
@@ -40,11 +41,10 @@ message Command {
     OUTER_RING = 2;
   }
   
-  
-  // lets deserializer know which fields (if any) to look for
+  // Lets the deserializer know which fields (if any) to look for
   required CommandType type = 1;
   
-  // EXECUTE_ACTION
+  // EXECUTE_PLAYER_ACTION
   optional PlayerAction playerAction = 2;
   optional Player player = 3;
   optional bool leftHand = 4;
@@ -55,4 +55,13 @@ message Command {
   optional float intensity = 7;
   optional int32 emitterIndex = 8;
   repeated Player emitterEntities = 9;
+  
+  
+  // EXECUTE_GENERIC_ACTION
+  // Also uses: player, leftHand, rightHand
+  optional float dmgPerFlame        = 10;
+  optional int32 flameWidth         = 11;
+  optional double durationInSeconds = 12;
+  optional double acceleration      = 13;
+  
 }

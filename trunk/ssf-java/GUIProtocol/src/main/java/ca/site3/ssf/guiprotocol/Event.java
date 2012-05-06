@@ -662,32 +662,41 @@ public final class Event {
     
     public enum AttackType
         implements com.google.protobuf.ProtocolMessageEnum {
-      LEFT_JAB(0, 0),
-      RIGHT_JAB(1, 1),
-      LEFT_HOOK(2, 2),
-      RIGHT_HOOK(3, 3),
-      HADOUKEN(4, 4),
-      SONIC_BOOM(5, 5),
+      CUSTOM_UNDEFINED(0, 0),
+      LEFT_JAB(1, 1),
+      RIGHT_JAB(2, 2),
+      LEFT_HOOK(3, 3),
+      RIGHT_HOOK(4, 4),
+      LEFT_UPPERCUT(5, 5),
+      RIGHT_UPPERCUT(6, 6),
+      HADOUKEN(7, 7),
+      SONIC_BOOM(8, 8),
       ;
       
-      public static final int LEFT_JAB_VALUE = 0;
-      public static final int RIGHT_JAB_VALUE = 1;
-      public static final int LEFT_HOOK_VALUE = 2;
-      public static final int RIGHT_HOOK_VALUE = 3;
-      public static final int HADOUKEN_VALUE = 4;
-      public static final int SONIC_BOOM_VALUE = 5;
+      public static final int CUSTOM_UNDEFINED_VALUE = 0;
+      public static final int LEFT_JAB_VALUE = 1;
+      public static final int RIGHT_JAB_VALUE = 2;
+      public static final int LEFT_HOOK_VALUE = 3;
+      public static final int RIGHT_HOOK_VALUE = 4;
+      public static final int LEFT_UPPERCUT_VALUE = 5;
+      public static final int RIGHT_UPPERCUT_VALUE = 6;
+      public static final int HADOUKEN_VALUE = 7;
+      public static final int SONIC_BOOM_VALUE = 8;
       
       
       public final int getNumber() { return value; }
       
       public static AttackType valueOf(int value) {
         switch (value) {
-          case 0: return LEFT_JAB;
-          case 1: return RIGHT_JAB;
-          case 2: return LEFT_HOOK;
-          case 3: return RIGHT_HOOK;
-          case 4: return HADOUKEN;
-          case 5: return SONIC_BOOM;
+          case 0: return CUSTOM_UNDEFINED;
+          case 1: return LEFT_JAB;
+          case 2: return RIGHT_JAB;
+          case 3: return LEFT_HOOK;
+          case 4: return RIGHT_HOOK;
+          case 5: return LEFT_UPPERCUT;
+          case 6: return RIGHT_UPPERCUT;
+          case 7: return HADOUKEN;
+          case 8: return SONIC_BOOM;
           default: return null;
         }
       }
@@ -718,7 +727,7 @@ public final class Event {
       }
       
       private static final AttackType[] VALUES = {
-        LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, HADOUKEN, SONIC_BOOM, 
+        CUSTOM_UNDEFINED, LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, LEFT_UPPERCUT, RIGHT_UPPERCUT, HADOUKEN, SONIC_BOOM, 
       };
       
       public static AttackType valueOf(
@@ -1635,7 +1644,7 @@ public final class Event {
       newGameState_ = ca.site3.ssf.guiprotocol.Event.GameEvent.GameState.NO_STATE;
       matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
       player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
-      attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
+      attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
       oldHealth_ = 0F;
       newHealth_ = 0F;
       roundNumber_ = 0;
@@ -1959,7 +1968,7 @@ public final class Event {
         bitField0_ = (bitField0_ & ~0x00000010);
         player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
         bitField0_ = (bitField0_ & ~0x00000020);
-        attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
+        attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
         bitField0_ = (bitField0_ & ~0x00000040);
         oldHealth_ = 0F;
         bitField0_ = (bitField0_ & ~0x00000080);
@@ -2615,7 +2624,7 @@ public final class Event {
       }
       
       // optional .guiprotocol.GameEvent.AttackType attackType = 7;
-      private ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
       public boolean hasAttackType() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
@@ -2633,7 +2642,7 @@ public final class Event {
       }
       public Builder clearAttackType() {
         bitField0_ = (bitField0_ & ~0x00000040);
-        attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
+        attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
         onChanged();
         return this;
       }
@@ -2959,7 +2968,7 @@ public final class Event {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013event.proto\022\013guiprotocol\"\252\017\n\tGameEvent" +
+      "\n\013event.proto\022\013guiprotocol\"\350\017\n\tGameEvent" +
       "\022.\n\004type\030\001 \002(\0162 .guiprotocol.GameEvent.E" +
       "ventType\0223\n\007emitter\030\002 \001(\0132\".guiprotocol." +
       "GameEvent.FireEmitter\0226\n\014oldGameState\030\003 " +
@@ -3004,12 +3013,14 @@ public final class Event {
       "@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIG" +
       "HT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I\n\020FlameEmitte" +
       "rType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013BLOCK_FLAME\020\001" +
-      "\022\022\n\016NON_GAME_FLAME\020\002\"f\n\nAttackType\022\014\n\010LE" +
-      "FT_JAB\020\000\022\r\n\tRIGHT_JAB\020\001\022\r\n\tLEFT_HOOK\020\002\022\016" +
-      "\n\nRIGHT_HOOK\020\003\022\014\n\010HADOUKEN\020\004\022\016\n\nSONIC_BO" +
-      "OM\020\005\"A\n\027RoundBeginCountdownTime\022\t\n\005THREE" +
-      "\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.si",
-      "te3.ssf.guiprotocol"
+      "\022\022\n\016NON_GAME_FLAME\020\002\"\243\001\n\nAttackType\022\024\n\020C" +
+      "USTOM_UNDEFINED\020\000\022\014\n\010LEFT_JAB\020\001\022\r\n\tRIGHT" +
+      "_JAB\020\002\022\r\n\tLEFT_HOOK\020\003\022\016\n\nRIGHT_HOOK\020\004\022\021\n" +
+      "\rLEFT_UPPERCUT\020\005\022\022\n\016RIGHT_UPPERCUT\020\006\022\014\n\010" +
+      "HADOUKEN\020\007\022\016\n\nSONIC_BOOM\020\010\"A\n\027RoundBegin",
+      "CountdownTime\022\t\n\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE" +
+      "\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.site3.ssf.guiprotoco" +
+      "l"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
