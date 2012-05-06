@@ -15,8 +15,8 @@ final public class ActionFactory {
 	
 	public enum PlayerActionType { BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
 
-	final static private float DEFAULT_FULL_ON_FRACTION  = 0.45f;
-	final static private float DEFAULT_FULL_OFF_FRACTION = 0.25f;
+	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
+	final static public float DEFAULT_FULL_OFF_FRACTION = 0.25f;
 	
 	final private GameModel gameModel;
 	
@@ -66,12 +66,12 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 3.0f);
-					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
 							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				else {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 3.0f);
-					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
 							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				break;
@@ -80,12 +80,12 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
-					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
 							2, 3.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				else {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
-					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
 							2, 3.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				break;
@@ -94,12 +94,12 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, 5.0f);
-					success &= this.addWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
 							2, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				else {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, 5.0f);
-					success &= this.addWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
 							2, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				break;
@@ -128,6 +128,53 @@ final public class ActionFactory {
 	//final public Action buildRingmasterAction(double totalDurationInSecs, int width, int startEmitterIdx) {
 	//}
 	
+	final public Action buildCustomPlayerAttackAction(int playerNum, int flameWidth, float dmgPerFlame, double acceleration,
+											          boolean leftHand, boolean rightHand, double durationInSecs,
+											          double fractionFullOn, double fractionFullOff) {
+		// Player number should be valid
+		if (playerNum != 1 && playerNum != 2) {
+			assert(false);
+			return null;
+		}
+		
+		FireEmitterModel fireEmitterModel    = this.gameModel.getFireEmitterModel();
+		FireEmitterConfig fireEmitterConfig  = fireEmitterModel.getConfig();
+		
+		Player blockerOrAttacker = this.gameModel.getPlayer(playerNum);
+		Player attackee = this.gameModel.getPlayer(Player.getOpposingPlayerNum(playerNum));
+		
+		boolean success = true;
+		
+		Action action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.CUSTOM_UNDEFINED_ATTACK, blockerOrAttacker, attackee, dmgPerFlame);
+		if (leftHand) {
+			FireEmitterIterator emitterIterLeft  = fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum);
+			if (acceleration <= 0.0) {
+				success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+						flameWidth, durationInSecs, fractionFullOn, fractionFullOff); 
+			}
+			else {
+				success &= this.addAcceleratingWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+						flameWidth, durationInSecs, acceleration, fractionFullOn, fractionFullOff);
+			}
+		}
+		if (rightHand) {
+			FireEmitterIterator emitterIterRight = fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum);
+			if (acceleration <= 0.0) {
+				success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+						flameWidth, durationInSecs, fractionFullOn, fractionFullOff); 
+			}
+			else {
+				success &= this.addAcceleratingWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+						flameWidth, durationInSecs, acceleration, fractionFullOn, fractionFullOff);
+			}
+		}
+		
+		if (!success) {
+			return null;
+		}
+		
+		return action;
+	}
 	
 	// Crowd-Pleasing Actions (internal package use only) *******************************************************
 	
@@ -249,11 +296,11 @@ final public class ActionFactory {
 		// Add the left and right handed attacks...
 		boolean success = true;
 		
-		success &= this.addWaveToAction(atkAction, startingLHEmitterIter,
+		success &= this.addConstantVelocityWaveToAction(atkAction, startingLHEmitterIter,
 				fireEmitterModel.getConfig().getNumEmittersPerRail(), width, totalDurationInSecs,
 				ActionFactory.DEFAULT_FULL_ON_FRACTION, ActionFactory.DEFAULT_FULL_OFF_FRACTION);
 
-		success &= this.addWaveToAction(atkAction, startingRHEmitterIter,
+		success &= this.addConstantVelocityWaveToAction(atkAction, startingRHEmitterIter,
 				fireEmitterModel.getConfig().getNumEmittersPerRail(), width, totalDurationInSecs,
 				ActionFactory.DEFAULT_FULL_ON_FRACTION, ActionFactory.DEFAULT_FULL_OFF_FRACTION);
 		
@@ -276,7 +323,7 @@ final public class ActionFactory {
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 		PlayerAttackAction atkAction = new PlayerAttackAction(fireEmitterModel, type, attacker, attackee, baseDmgPerFlame);
 		
-		boolean success = this.addWaveToAction(atkAction, emitterIter,
+		boolean success = this.addConstantVelocityWaveToAction(atkAction, emitterIter,
 				fireEmitterModel.getConfig().getNumEmittersPerRail(), width, totalDurationInSecs,
 				ActionFactory.DEFAULT_FULL_ON_FRACTION, ActionFactory.DEFAULT_FULL_OFF_FRACTION);
 		
@@ -289,7 +336,7 @@ final public class ActionFactory {
 	}
 	
 	/**
-	 * Add a wave of fire emitter simulation to the given action.
+	 * Add a wave of fire emitter simulation (where the fire moves at a constant velocity across the emitters) to the given action.
 	 * @param action The action to add a wave to.
 	 * @param emitterIter The fire emitter iterator for the wave.
 	 * @param travelLength The length of travel of the action.
@@ -299,8 +346,8 @@ final public class ActionFactory {
 	 * @param fullOffFraction The fraction of time that the emitters will be turned completely off.
 	 * @return true on success, false on failure.
 	 */
-	final private boolean addWaveToAction(Action action, FireEmitterIterator emitterIter, int travelLength,
-										  int width, double totalDurationInSecs, double fullOnFraction, double fullOffFraction) {
+	final private boolean addConstantVelocityWaveToAction(Action action, FireEmitterIterator emitterIter, int travelLength,
+										                  int width, double totalDurationInSecs, double fullOnFraction, double fullOffFraction) {
 		
 		// Make sure all the provided parameters are correct
 		if (action == null || emitterIter == null || totalDurationInSecs < 0.001 || travelLength <= 0 || width <= 0 ||
@@ -331,7 +378,86 @@ final public class ActionFactory {
 			return false;
 		}
 		
-		return action.addFireEmitterWave(emitterIter, travelLength, width, intensityLerp);
+		return action.addConstantVelocityFireEmitterWave(emitterIter, travelLength, width, intensityLerp);
+	}
+	
+	/**
+	 * Add a wave of fire emitter simulation (where the fire moves with a given acceleration across the emitters) to the given action.
+	 * @param action The action to add a wave to.
+	 * @param emitterIter The fire emitter iterator for the wave.
+	 * @param travelLength The length of travel of the action.
+	 * @param width The width of the action (i.e., how many simultaneous flames as the wave travels).
+	 * @param totalDurationInSecs Total duration of the wave (length of time it will have fire emitters simulating for, in total).
+	 * @param acceleration The acceleration of the fire as it moves across the emitters.
+	 * @param fullOnFraction The fraction [0,1] of time that the emitters will be turned completely on.
+	 * @param fullOffFraction The fraction of time that the emitters will be turned completely off.
+	 * @return true on success, false on failure.
+	 */
+	final private boolean addAcceleratingWaveToAction(Action action, FireEmitterIterator emitterIter, int travelLength,
+			                                          int width, double totalDurationInSecs, double acceleration, 
+			                                          double fullOnFraction, double fullOffFraction) {
+		
+		// Make sure all the provided parameters are correct
+		if (action == null || emitterIter == null || totalDurationInSecs < 0.001 || travelLength <= 0 || width <= 0 ||
+			fullOnFraction < 0.0 || fullOnFraction > 1.0 || fullOffFraction < 0.0 || fullOffFraction > 1.0 ||
+			(fullOnFraction + fullOffFraction) > 1.0 || acceleration <= 0.0) {
+			
+			assert(false);
+			return false;
+		}
+
+		
+		// First thing we do is calculate what the initial velocity has to be based on the parameters:
+		// We use high-school kinematics to do this... [ d = (Vi * t) + 0.5 * a * t^2 ], switch the formula around to solve for Vi
+		
+		// d = travelLength
+		// t = totalDurationInSecs
+		// a = acceleration (duh)
+		
+		double initialVelocity = (travelLength - 0.5 * acceleration * totalDurationInSecs * totalDurationInSecs) / totalDurationInSecs;
+		if (initialVelocity < 0.0) {
+			initialVelocity = 0.0;
+			acceleration    = (2.0 * travelLength) / (totalDurationInSecs * totalDurationInSecs);
+		}
+
+		// Unlike a constant velocity wave, we need to build a multilerp for each emitter since the acceleration
+		// will cause each emitter's linear interpolation to have different durations
+		List<MultiLerp> intensityLerps = new ArrayList<MultiLerp>(travelLength);
+		for (int i = 0; i < travelLength; i++) {
+			
+			// Using that initial velocity we will feed values back into the equation to solve for each step of the distance,
+			// by doing this we can figure out the time spent on each emitter...
+			double initialDist = i;
+			double finalDist   = i+1;
+			
+			// Solve for time using kinematics and the quadratic equation - since the initial velocity
+			// is positive, the positive square root in the quadratic is always the right choice
+			double initialTime = (-initialVelocity + Math.sqrt(initialVelocity * initialVelocity + 2 * acceleration * initialDist)) / acceleration;
+			double finalTime   = (-initialVelocity + Math.sqrt(initialVelocity * initialVelocity + 2 * acceleration * finalDist))   / acceleration;
+			
+			double lerpDuration  = finalTime - initialTime;
+			assert(lerpDuration > 0.0);
+			
+			double lerpOffTime   = lerpDuration * fullOffFraction;
+			double lerpOnTime    = lerpDuration - lerpOffTime;
+			double lerpMaxOnTime = lerpDuration * fullOnFraction;
+			
+			assert(lerpOnTime >= lerpMaxOnTime);
+			double startMaxIntensityTime = (lerpOnTime - lerpMaxOnTime) / 2.0;
+			double endMaxIntensityTime   = startMaxIntensityTime + lerpMaxOnTime;
+			double startDelayTime        = lerpOnTime;
+			
+			MultiLerp intensityLerp = this.buildIntensityMultiLerp(startMaxIntensityTime,
+					endMaxIntensityTime, startDelayTime, lerpDuration);
+			if (intensityLerp == null) {
+				assert(false);
+				return false;
+			}
+			
+			intensityLerps.add(intensityLerp);
+		}
+		
+		return action.addFireEmitterWave(emitterIter, width, intensityLerps);
 	}
 	
 	final private boolean addBurstToAction(Action action, FireEmitterIterator emitterIter, int width, int numBursts,

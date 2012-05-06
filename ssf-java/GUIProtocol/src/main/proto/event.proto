@@ -67,12 +67,15 @@ message GameEvent {
   }
   
   enum AttackType {
-    LEFT_JAB   = 0;
-    RIGHT_JAB  = 1; 
-    LEFT_HOOK  = 2;
-    RIGHT_HOOK = 3;
-    HADOUKEN   = 4;
-    SONIC_BOOM = 5;
+    CUSTOM_UNDEFINED = 0;
+    LEFT_JAB         = 1;
+    RIGHT_JAB        = 2; 
+    LEFT_HOOK        = 3;
+    RIGHT_HOOK       = 4;
+    LEFT_UPPERCUT    = 5;
+    RIGHT_UPPERCUT   = 6;
+    HADOUKEN         = 7;
+    SONIC_BOOM       = 8;
   }
   
   enum RoundBeginCountdownTime {

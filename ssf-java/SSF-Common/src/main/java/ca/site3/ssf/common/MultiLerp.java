@@ -68,6 +68,10 @@ public class MultiLerp implements Cloneable {
 		return this.timePts.get(this.timePts.size()-1);
 	}
 	
+	public double getTimeLeft() {
+		return Math.max(0.0, this.getTotalTimeLength() - this.x);
+	}
+	
 	/**
 	 * Determine whether the lerp is finished lerping.
 	 * @return true if finished, false otherwise.

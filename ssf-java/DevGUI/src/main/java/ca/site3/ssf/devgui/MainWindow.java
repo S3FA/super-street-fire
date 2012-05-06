@@ -67,6 +67,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	private JMenuBar menuBar = null;
 	private JMenu windowMenu = null;
 	private JMenuItem gloveInfoWindowMenuItem = null;
+	private JMenuItem customActionMenuItem = null;
 	
 	private GloveDataInfoPanel p1LeftGloveInfoPanel  = null;
 	private GloveDataInfoPanel p1RightGloveInfoPanel = null;
@@ -74,6 +75,8 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	private GloveDataInfoPanel p2RightGloveInfoPanel = null;
 	private GloveDataInfoPanel ringmasterLeftGloveInfoPanel  = null;
 	private GloveDataInfoPanel ringmasterRightGloveInfoPanel = null;
+	
+	private CustomActionPanel customActionPanel = null;
 	
 	private ArenaDisplay arenaDisplay = null;
 	private GameInfoPanel infoPanel   = null;
@@ -122,7 +125,10 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		this.windowMenu = new JMenu("Window");
 		this.gloveInfoWindowMenuItem = new JMenuItem("Glove Information");
 		this.gloveInfoWindowMenuItem.addActionListener(this);
+		this.customActionMenuItem = new JMenuItem("Action Prototyping");
+		this.customActionMenuItem.addActionListener(this);
 		this.windowMenu.add(this.gloveInfoWindowMenuItem);
+		this.windowMenu.add(this.customActionMenuItem);
 		this.menuBar.add(this.windowMenu);
 		
 		this.setJMenuBar(this.menuBar);
@@ -133,6 +139,8 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		this.p2RightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);		
 		this.ringmasterLeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
 		this.ringmasterRightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);	
+		
+		this.customActionPanel = new CustomActionPanel(client);
 		
 		// Setup the frame's contents...
 		this.arenaDisplay = new ArenaDisplay(gameModel.getConfiguration().getNumRoundsPerMatch(), new FireEmitterConfig(true, 16, 8), client);
@@ -428,6 +436,17 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 			gloveDataWindow.pack();
 			gloveDataWindow.setLocationRelativeTo(null);
 			gloveDataWindow.setVisible(true);
+		}
+		else if (event.getSource() == this.customActionMenuItem) {
+			JFrame customActionWindow = new JFrame();
+			customActionWindow.setTitle("Action Prototyping");
+			customActionWindow.setResizable(false);
+			customActionWindow.add(this.customActionPanel);
+			customActionWindow.setMinimumSize(new Dimension(500, 1));
+			customActionWindow.pack();
+			
+			customActionWindow.setLocationRelativeTo(null);
+			customActionWindow.setVisible(true);
 		}
 	}
 	

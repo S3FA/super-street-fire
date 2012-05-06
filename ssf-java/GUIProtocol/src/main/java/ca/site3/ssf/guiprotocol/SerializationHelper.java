@@ -127,6 +127,8 @@ class SerializationHelper {
 			return PlayerAction.HOOK_ATTACK;
 		case JAB_ATTACK:
 			return PlayerAction.JAB_ATTACK;
+		case UPPERCUT_ATTACK:
+			return PlayerAction.UPPERCUT_ATTACK;
 		case SONIC_BOOM_ATTACK:
 			return PlayerAction.SONIC_BOOM_ATTACK;
 		default:
@@ -144,6 +146,8 @@ class SerializationHelper {
 			return PlayerActionType.HOOK_ATTACK;
 		case JAB_ATTACK:
 			return PlayerActionType.JAB_ATTACK;
+		case UPPERCUT_ATTACK:
+			return PlayerActionType.UPPERCUT_ATTACK;
 		case SONIC_BOOM_ATTACK:
 			return PlayerActionType.SONIC_BOOM_ATTACK;
 		default:
@@ -385,16 +389,22 @@ class SerializationHelper {
 	
 	static AttackType protobufToAttackType(ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType t) {
 		switch (t) {
+		case CUSTOM_UNDEFINED:
+			return AttackType.CUSTOM_UNDEFINED_ATTACK;
 		case HADOUKEN:
 			return AttackType.HADOUKEN_ATTACK;
 		case LEFT_HOOK:
 			return AttackType.LEFT_HOOK_ATTACK;
 		case LEFT_JAB:
 			return AttackType.LEFT_JAB_ATTACK;
+		case LEFT_UPPERCUT:
+			return AttackType.LEFT_UPPERCUT_ATTACK;
 		case RIGHT_HOOK:
 			return AttackType.RIGHT_HOOK_ATTACK;
 		case RIGHT_JAB:
 			return AttackType.RIGHT_JAB_ATTACK;
+		case RIGHT_UPPERCUT:
+			return AttackType.RIGHT_UPPERCUT_ATTACK;
 		case SONIC_BOOM:
 			return AttackType.SONIC_BOOM_ATTACK;
 		default:
@@ -404,16 +414,22 @@ class SerializationHelper {
 	
 	static ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType attackTypeToProtobuf(AttackType t) {
 		switch (t) {
+		case CUSTOM_UNDEFINED_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
 		case HADOUKEN_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.HADOUKEN;
 		case LEFT_HOOK_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_HOOK;
 		case LEFT_JAB_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
+		case LEFT_UPPERCUT_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_UPPERCUT;
 		case RIGHT_HOOK_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_HOOK;
 		case RIGHT_JAB_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_JAB;
+		case RIGHT_UPPERCUT_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_UPPERCUT;
 		case SONIC_BOOM_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SONIC_BOOM;
 		default:

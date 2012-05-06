@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class PlayerAttackAction extends Action {
 	
 	public enum AttackType {
+		CUSTOM_UNDEFINED_ATTACK,
 		LEFT_JAB_ATTACK, RIGHT_JAB_ATTACK, 
 		LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK,
 		LEFT_UPPERCUT_ATTACK, RIGHT_UPPERCUT_ATTACK,

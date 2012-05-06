@@ -148,6 +148,9 @@ public class GameModel implements IGameModel {
 	}
 	
 	public void executeGenericAction(Action action) {
+		if (action == null) {
+			return;
+		}
 		this.currState.executeAction(action);
 	}
 	
@@ -160,6 +163,7 @@ public class GameModel implements IGameModel {
 	}	
 	
 	public void executeCommand(AbstractGameModelCommand command) {
+		assert(command != null);
 		command.execute(this);
 	}
 	

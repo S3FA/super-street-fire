@@ -366,9 +366,15 @@ public class StreetFireServer implements Runnable {
 		}
 		
 		private ExecuteGenericActionCommand createGenericActionCommand(Command cmd) {
-			int playerNum = SerializationHelper.playerToNum(cmd.getPlayer());
-			PlayerActionType actionType = SerializationHelper.actionToGame(cmd.getPlayerAction());
-			Action a = actionFactory.buildPlayerAction(playerNum, actionType, cmd.getLeftHand(), cmd.getRightHand());
+			int playerNum         = SerializationHelper.playerToNum(cmd.getPlayer());
+			int flameWidth        = cmd.getFlameWidth();
+			float dmgPerFlame     = cmd.getDmgPerFlame();
+			double durationInSecs = cmd.getDurationInSeconds();
+			double acceleration   = cmd.getAcceleration();
+			
+			Action a = actionFactory.buildCustomPlayerAttackAction(playerNum, 
+					flameWidth, dmgPerFlame, acceleration, cmd.getLeftHand(), cmd.getRightHand(),
+					durationInSecs, ActionFactory.DEFAULT_FULL_ON_FRACTION, ActionFactory.DEFAULT_FULL_OFF_FRACTION);
 			return new ExecuteGenericActionCommand(a);
 		}
 		
