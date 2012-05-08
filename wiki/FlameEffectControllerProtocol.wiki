@@ -34,7 +34,7 @@ The possible command/value pairs are:
  * {{{'2' [value]}}} - sets flame effect output 2 to {{{[value]}}} %. {{{[value]}}} should be between 0 and 100 inclusive. Other values are ignored. If PWM is not configured for the flame effect, all non-zero values are considered ON.
  * {{{'3' [value]}}} - sets flame effect output 3 to {{{[value]}}} %. {{{[value]}}} should be between 0 and 100 inclusive. Other values are ignored. If PWM is not configured for the flame effect, all non-zero values are considered ON.
  * {{{'4' [value]}}} - sets flame effect output 4 to {{{[value]}}} %. {{{[value]}}} should be between 0 and 100 inclusive. Other values are ignored. If PWM is not configured for the flame effect, all non-zero values are considered ON.
- * {{{'A' [value]}}} - sets AC output for hot surface igniter to ON if {{[value]}}} == '1', to OFF if {{{[value]}}} == '0'. Other values are ignored.
+ * {{{'A' [value]}}} - sets AC output for hot surface igniter to ON if {{{[value]}}} == '1', to OFF if {{{[value]}}} == '0'. Other values are ignored.
  * 'E' - emergency stop, turns all flame effect outputs and AC output off.
 
 The broadcast address should be used particularly for the hot surface igniter control and the ESTOP command, but might make for some fun "fire everything" effects.
@@ -48,3 +48,16 @@ Flame effect nodes can also be configured to return their status periodically to
  * The source node is the node ID.
  * 'S' {{{[armed status]}}} - sends '0' if solenoid power is not present, '1' if present.
  * 'F' {{{[flame status]}}} - sends '0' if no fire is present, '1' if present.
+
+There will also be other devices on the network:
+
+ * 33 - Air cannon and platform lights for player 1 platform (air cannon on channel 1) - same as flame effect controller
+ * 34 - Air cannon and platform lights for player 2 platform (air cannon on channel 1) - same as flame effect controller
+ * 35 - Life bars and timer for player 1 platform
+ * 36 - Life bars and timer for player 2 platform
+
+The payload format for the life bars and timer is:
+
+{{{[dest node] [2 bytes P1 life] [2 bytes P2 life] [2 bytes timer]}}}
+
+The 2 bytes correspond to the bytes shifted out by the wifire16 boards (modified to use the wired interface).
