@@ -5,6 +5,9 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -18,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.ActionFactory;
 import ca.site3.ssf.gamemodel.GameState;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gesturerecognizer.GestureType;
 import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 
@@ -29,9 +33,10 @@ class ControlPanel extends JPanel implements ActionListener {
 	private ActionFactory actionFactory = null;
 	private StreetFireGuiClient client = null;
 	
-	private JButton killButton      = null;
-	private JButton nextStateButton = null;
-	private JButton pauseButton     = null;
+	private JButton killButton       = null;
+	private JButton nextStateButton1 = null;
+	private JButton nextStateButton2 = null;
+	private JButton pauseButton      = null;
 	
 	private JButton executeP1ActionButton 			= null;
 	private JButton executeP2ActionButton 			= null;
@@ -40,6 +45,7 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JComboBox playerActionComboBox     = null;
 	//private JComboBox ringmasterActionComboBox = null;
 	
+	List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
 	
 	
 
@@ -60,9 +66,14 @@ class ControlPanel extends JPanel implements ActionListener {
 		generalButtonPanel.setLayout(new FlowLayout());
 		
 		
-		this.nextStateButton = new JButton("Next State");
-		this.nextStateButton.addActionListener(this);
-		generalButtonPanel.add(this.nextStateButton);
+		this.nextStateButton1 = new JButton("Next State");
+		this.nextStateButton1.addActionListener(this);
+		generalButtonPanel.add(this.nextStateButton1);
+		
+		this.nextStateButton2 = new JButton("Next State");
+		this.nextStateButton2.addActionListener(this);
+		generalButtonPanel.add(this.nextStateButton2);
+		this.nextStateButton2.setVisible(false);
 	
 		this.killButton = new JButton("Kill Game");
 		this.killButton.addActionListener(this);
@@ -97,8 +108,13 @@ class ControlPanel extends JPanel implements ActionListener {
 
 	public void actionPerformed(ActionEvent event) {
 		try {
-			if (event.getSource() == this.nextStateButton) {
-				client.initiateNextState();
+			if (event.getSource() == this.nextStateButton1) {
+				assert(this.nextStates.size() > 0);
+				client.initiateNextState(this.nextStates.get(0));
+			}
+			else if (event.getSource() == this.nextStateButton2) {
+				assert(this.nextStates.size() > 1);
+				client.initiateNextState(this.nextStates.get(1));
 			}
 			else if (event.getSource() == this.killButton) {
 				client.killGame();
@@ -136,31 +152,54 @@ class ControlPanel extends JPanel implements ActionListener {
 		this.killButton.setEnabled(stateType.isKillable());
 
 		if (stateType.isGoToNextStateControllable()) {
-			assert(stateType.nextControllableGoToState() != null);
+			List<GameStateType> nextGoToStates = stateType.nextControllableGoToStates();
+			assert(nextGoToStates != null);
+			assert(nextGoToStates.size() <= 2);
 			
-			switch (stateType.nextControllableGoToState()) {
+			this.nextStates = new ArrayList<GameStateType>(nextGoToStates);	
+			Collections.copy(this.nextStates, nextGoToStates);
+			
+			switch (nextGoToStates.get(0)) {
 				case RINGMASTER_STATE:
-					this.nextStateButton.setText("Enter Ringmaster State");	
+					this.nextStateButton1.setText("Enter Ringmaster State");	
 					break;
-				
 				case ROUND_BEGINNING_STATE:
-					this.nextStateButton.setText("Begin Round");
+					this.nextStateButton1.setText("Begin Round");
 					break;
 					
 				default:
 					assert(false);
 					return;
 			}
+			this.nextStateButton1.setEnabled(true);
 			
-			this.nextStateButton.setEnabled(true);
+			if (nextGoToStates.size() == 2) {
+				switch (nextGoToStates.get(1)) {
+				case TEST_ROUND_STATE:
+					this.nextStateButton2.setText("Test Round");
+					break;
+				default:
+					assert(false);
+					break;
+				}
+				this.nextStateButton2.setVisible(true);
+				this.nextStateButton2.setEnabled(true);
+			}
+			else {
+				this.nextStateButton2.setVisible(false);
+				this.nextStateButton2.setEnabled(false);
+			}
 		}
 		else {
-			this.nextStateButton.setEnabled(false);
+			this.nextStateButton1.setEnabled(false);
+			this.nextStateButton2.setVisible(false);
+			this.nextStateButton2.setEnabled(false);
 		}
 		
 		switch (stateType) {
 			case ROUND_IN_PLAY_STATE:
 			case TIE_BREAKER_ROUND_STATE:
+			case TEST_ROUND_STATE:
 				this.setEnablePlayerActionControls(true);
 				break;
 			default:

@@ -82,8 +82,8 @@ public class GameModel implements IGameModel {
 		this.currState.killToIdle();
 	}
 
-	public void initiateNextState() {
-		this.currState.initiateNextState();
+	public void initiateNextState(GameState.GameStateType nextState) {
+		this.currState.initiateNextState(nextState);
 	}
 
 	public void togglePauseGame() {
@@ -119,21 +119,24 @@ public class GameModel implements IGameModel {
 		RoundBeginCountdownType roundBeginCountdown = RoundBeginCountdownType.THREE;
 		boolean roundTimedOut   = false;
 		MatchResult matchResult = MatchResult.PLAYER1_VICTORY;
+		
 		switch (this.currState.getStateType()) {
-			case ROUND_BEGINNING_STATE:
-				roundBeginCountdown = ((RoundBeginningGameState)this.currState).getCountState();
-				break;
-			case ROUND_IN_PLAY_STATE:
-				roundInPlayTimer = ((RoundInPlayState)this.currState).getLastCountdownValueInSecs();
-				break;
-			case ROUND_ENDED_STATE:
-				roundTimedOut = ((RoundEndedGameState)this.currState).getRoundTimedOut();
-				break;
-			case MATCH_ENDED_STATE:
-				matchResult = ((MatchEndedGameState)this.currState).getMatchResult();
-				break;
-			default:
-				break;
+		
+		case ROUND_BEGINNING_STATE:
+			roundBeginCountdown = ((RoundBeginningGameState)this.currState).getCountState();
+			break;
+		case ROUND_IN_PLAY_STATE:
+			roundInPlayTimer = ((RoundInPlayState)this.currState).getLastCountdownValueInSecs();
+			break;
+		case ROUND_ENDED_STATE:
+			roundTimedOut = ((RoundEndedGameState)this.currState).getRoundTimedOut();
+			break;
+		case MATCH_ENDED_STATE:
+			matchResult = ((MatchEndedGameState)this.currState).getMatchResult();
+			break;
+		default:
+			break;
+			
 		}
 		
 		// Fire off the info refresh event based on the current game model's information...

@@ -118,7 +118,7 @@ class TieBreakerGameState extends GameState {
 	}
 
 	@Override
-	void initiateNextState() {
+	void initiateNextState(GameState.GameStateType nextState) {
 		// The tie breaker must play out before going to the next state
 	}
 

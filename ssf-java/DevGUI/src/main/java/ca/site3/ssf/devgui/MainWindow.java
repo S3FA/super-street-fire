@@ -246,6 +246,10 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		case TIE_BREAKER_ROUND_STATE:
 			this.onRoundPlayTimerChanged(new RoundPlayTimerChangedEvent(event.getRoundInPlayTimer()));
 			break;
+		
+		case TEST_ROUND_STATE:
+			this.onTestRound();
+			break;
 			
 		case ROUND_ENDED_STATE: {
 			List<RoundEndedEvent.RoundResult> roundResults = event.getCurrentRoundResults();
@@ -275,12 +279,18 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	
 	private void performOnCurrStateChanges(GameState.GameStateType currentState) {
 		this.infoPanel.setCurrentGameState(currentState);
+		
 		switch (currentState) {
 		case IDLE_STATE:
 			this.arenaDisplay.setInfoText("");
 			this.arenaDisplay.clearRoundResults();
 			this.infoPanel.setRoundTimer(-1);
 			break;
+			
+		case TEST_ROUND_STATE:
+			this.onTestRound();
+			break;
+			
 		default:
 			break;
 		}
@@ -391,6 +401,11 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		
 	}
 
+	private void onTestRound() {
+		this.arenaDisplay.clearRoundResults();
+		this.arenaDisplay.setInfoText("Test Round");
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getSource() == this.gloveInfoWindowMenuItem) {

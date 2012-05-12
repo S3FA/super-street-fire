@@ -1,0 +1,18 @@
+
+package guiprotocol;
+
+option java_package = "ca.site3.ssf.guiprotocol";
+
+// for GameStateChanged
+enum GameState {
+  NO_STATE                = 0;
+  ROUND_BEGINNING_STATE   = 1;
+  ROUND_IN_PLAY_STATE     = 2;
+  ROUND_ENDED_STATE       = 3;
+  TIE_BREAKER_ROUND_STATE = 4;
+  MATCH_ENDED_STATE       = 5;
+  PAUSED_STATE            = 6;
+  RINGMASTER_STATE        = 7;
+  IDLE_STATE              = 8;
+  TEST_ROUND_STATE        = 9;
+}

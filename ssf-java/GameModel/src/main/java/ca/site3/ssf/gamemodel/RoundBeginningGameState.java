@@ -74,7 +74,7 @@ class RoundBeginningGameState extends GameState {
 	}
 
 	@Override
-	void initiateNextState() {
+	void initiateNextState(GameState.GameStateType nextState) {
 		// Ignore this - this state will automatically move to the RoundInPlayGameState
 		// when it's ready to.
 	}

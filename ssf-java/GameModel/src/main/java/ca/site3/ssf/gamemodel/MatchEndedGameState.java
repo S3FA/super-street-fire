@@ -92,7 +92,7 @@ class MatchEndedGameState extends GameState {
 	}
 
 	@Override
-	void initiateNextState() {
+	void initiateNextState(GameState.GameStateType nextState) {
 		// Does nothing, have to wait for the match over state to finish on its own
 		// in order to move to the next state.
 	}

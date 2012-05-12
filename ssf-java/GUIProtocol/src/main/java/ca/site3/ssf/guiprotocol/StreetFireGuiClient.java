@@ -16,6 +16,7 @@ import ca.site3.ssf.gamemodel.FireEmitter;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
@@ -144,8 +145,9 @@ public class StreetFireGuiClient {
 	 * @see InitiateNextStateCommand
 	 * @throws IOException
 	 */
-	public void initiateNextState() throws IOException {
-		Builder b = Command.newBuilder().setType(CommandType.NEXT_STATE);
+	public void initiateNextState(GameStateType state) throws IOException {
+		Builder b = Command.newBuilder().setType(CommandType.NEXT_STATE)
+				.setNextState(SerializationHelper.gameStateToProtobuf(state));
 		submitCommand(b.build());
 	}
 	

@@ -120,7 +120,7 @@ class RoundEndedGameState extends GameState {
 	}
 
 	@Override
-	void initiateNextState() {
+	void initiateNextState(GameState.GameStateType nextState) {
 		// Do nothing, we go to the next state after we've spent a certain amount of time
 		// in this state.
 	}
