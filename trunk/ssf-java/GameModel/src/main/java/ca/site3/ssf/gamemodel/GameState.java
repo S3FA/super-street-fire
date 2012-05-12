@@ -1,5 +1,8 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Abstract class for representing a general state of the Super Street Fire game.
  * @author Callum
@@ -14,34 +17,33 @@ public abstract class GameState {
 	 */
 	public enum GameStateType {
 		
-		NO_STATE               ("N/A",                       false, true,  false, null),
-		ROUND_BEGINNING_STATE  ("Round Beginning",           false, true,  true,  null),
-		ROUND_IN_PLAY_STATE    ("Round In-Play",             false, true,  true,  null),
-		ROUND_ENDED_STATE      ("Round Ended",               false, true,  true,  null),
-		TIE_BREAKER_ROUND_STATE("Tie Breaker Round In-Play", false, true,  true,  null),
-		MATCH_ENDED_STATE      ("Match Ended",               false, true,  true,  null),
-		PAUSED_STATE           ("Paused",                    false, true,  true,  null),
-		RINGMASTER_STATE       ("Ringmaster Control",        true,  true,  true,  ROUND_BEGINNING_STATE),
-		IDLE_STATE             ("Idle",                      true,  false, false, RINGMASTER_STATE);
+		NO_STATE               ("N/A",                       true,  false, null),
+		ROUND_BEGINNING_STATE  ("Round Beginning",           true,  true,  null),
+		ROUND_IN_PLAY_STATE    ("Round In-Play",             true,  true,  null),
+		ROUND_ENDED_STATE      ("Round Ended",               true,  true,  null),
+		TIE_BREAKER_ROUND_STATE("Tie Breaker Round In-Play", true,  true,  null),
+		TEST_ROUND_STATE       ("Test Round",                true,  true,  null),
+		MATCH_ENDED_STATE      ("Match Ended",               true,  true,  null),
+		PAUSED_STATE           ("Paused",                    true,  true,  null),
+		RINGMASTER_STATE       ("Ringmaster Control",        true,  true,  Arrays.asList(ROUND_BEGINNING_STATE)),
+		IDLE_STATE             ("Idle",                      false, false, Arrays.asList(RINGMASTER_STATE, TEST_ROUND_STATE));
 		
 		final private String name;
-		final private boolean isGoToNextStateControllable;
 		final private boolean isKillable;
 		final private boolean canPauseToggled;
-		final private GameStateType nextControllableGoToState;
+		final private List<GameStateType> nextControllableGoToStates;
 		
-		GameStateType(String name, boolean isGoToNextStateControllable, boolean isKillable,
-				      boolean canPauseToggled, GameStateType nextControllableGoToState) {
+		GameStateType(String name, boolean isKillable,
+				      boolean canPauseToggled, List<GameStateType> nextControllableGoToStates) {
 			
 			this.name = name;
-			this.isGoToNextStateControllable = isGoToNextStateControllable;
 			this.isKillable = isKillable;
-			this.nextControllableGoToState = nextControllableGoToState;
+			this.nextControllableGoToStates = nextControllableGoToStates;
 			this.canPauseToggled = canPauseToggled;
 		}
 		
 		public boolean isGoToNextStateControllable() {
-			return this.isGoToNextStateControllable;
+			return this.nextControllableGoToStates != null;
 		}
 		public boolean isKillable() {
 			return this.isKillable;
@@ -49,8 +51,8 @@ public abstract class GameState {
 		public boolean canBePausedOrUnpaused() {
 			return this.canPauseToggled;
 		}
-		public GameStateType nextControllableGoToState() {
-			return this.nextControllableGoToState;
+		public List<GameStateType> nextControllableGoToStates() {
+			return this.nextControllableGoToStates;
 		}
 		
 		public String toString() {
@@ -73,7 +75,7 @@ public abstract class GameState {
 	// Event methods that must be implemented by child classes
 	abstract void tick(double dT);
 	abstract void killToIdle();
-	abstract void initiateNextState();
+	abstract void initiateNextState(GameState.GameStateType nextState);
 	abstract void executeAction(Action action);
 	abstract void togglePause();
 	abstract GameState.GameStateType getStateType();

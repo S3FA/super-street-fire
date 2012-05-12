@@ -50,9 +50,25 @@ class IdleGameState extends GameState {
 	}
 	
 	@Override
-	void initiateNextState() {
-		// Starts a new match by changing the current state...
-		this.gameModel.setNextGameState(new RingmasterGameState(this.gameModel));
+	void initiateNextState(GameState.GameStateType nextState) {
+		
+		switch (nextState) {
+		
+		case RINGMASTER_STATE:
+			// Starts a new match by changing the current state...
+			this.gameModel.setNextGameState(new RingmasterGameState(this.gameModel));
+			break;
+			
+		case TEST_ROUND_STATE:
+			// Go to a test round where each player can test out their moves without
+			// a timer or damage
+			this.gameModel.setNextGameState(new TestRoundGameState(this.gameModel));
+			break;
+			
+		default:
+			break;
+		}
+		
 	}
 	
 	@Override

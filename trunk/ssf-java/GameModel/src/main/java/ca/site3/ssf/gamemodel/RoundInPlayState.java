@@ -109,7 +109,7 @@ class RoundInPlayState extends GameState {
 	}
 
 	@Override
-	void initiateNextState() {
+	void initiateNextState(GameState.GameStateType nextState) {
 		// This is ignored while the game is in play - you can't start the next round
 		// until the current one is finished!
 	}

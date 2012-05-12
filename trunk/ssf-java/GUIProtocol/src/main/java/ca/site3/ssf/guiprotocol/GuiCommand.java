@@ -63,6 +63,10 @@ public final class GuiCommand {
     // optional double acceleration = 13;
     boolean hasAcceleration();
     double getAcceleration();
+    
+    // optional .GameState nextState = 14;
+    boolean hasNextState();
+    Common.GameState getNextState();
   }
   public static final class Command extends
       com.google.protobuf.GeneratedMessage
@@ -535,6 +539,16 @@ public final class GuiCommand {
       return acceleration_;
     }
     
+    // optional .GameState nextState = 14;
+    public static final int NEXTSTATE_FIELD_NUMBER = 14;
+    private Common.GameState nextState_;
+    public boolean hasNextState() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    public Common.GameState getNextState() {
+      return nextState_;
+    }
+    
     private void initFields() {
       type_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType.EXECUTE_GENERIC_ACTION;
       playerAction_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction.BLOCK;
@@ -549,6 +563,7 @@ public final class GuiCommand {
       flameWidth_ = 0;
       durationInSeconds_ = 0D;
       acceleration_ = 0D;
+      nextState_ = Common.GameState.NO_STATE;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -604,6 +619,9 @@ public final class GuiCommand {
       }
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeDouble(13, acceleration_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeEnum(14, nextState_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -670,6 +688,10 @@ public final class GuiCommand {
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
           .computeDoubleSize(13, acceleration_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(14, nextState_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -821,6 +843,8 @@ public final class GuiCommand {
         bitField0_ = (bitField0_ & ~0x00000800);
         acceleration_ = 0D;
         bitField0_ = (bitField0_ & ~0x00001000);
+        nextState_ = Common.GameState.NO_STATE;
+        bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
       
@@ -912,6 +936,10 @@ public final class GuiCommand {
           to_bitField0_ |= 0x00000800;
         }
         result.acceleration_ = acceleration_;
+        if (((from_bitField0_ & 0x00002000) == 0x00002000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.nextState_ = nextState_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -973,6 +1001,9 @@ public final class GuiCommand {
         }
         if (other.hasAcceleration()) {
           setAcceleration(other.getAcceleration());
+        }
+        if (other.hasNextState()) {
+          setNextState(other.getNextState());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1116,6 +1147,17 @@ public final class GuiCommand {
             case 105: {
               bitField0_ |= 0x00001000;
               acceleration_ = input.readDouble();
+              break;
+            }
+            case 112: {
+              int rawValue = input.readEnum();
+              Common.GameState value = Common.GameState.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(14, rawValue);
+              } else {
+                bitField0_ |= 0x00002000;
+                nextState_ = value;
+              }
               break;
             }
           }
@@ -1439,6 +1481,30 @@ public final class GuiCommand {
         return this;
       }
       
+      // optional .GameState nextState = 14;
+      private Common.GameState nextState_ = Common.GameState.NO_STATE;
+      public boolean hasNextState() {
+        return ((bitField0_ & 0x00002000) == 0x00002000);
+      }
+      public Common.GameState getNextState() {
+        return nextState_;
+      }
+      public Builder setNextState(Common.GameState value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00002000;
+        nextState_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearNextState() {
+        bitField0_ = (bitField0_ & ~0x00002000);
+        nextState_ = Common.GameState.NO_STATE;
+        onChanged();
+        return this;
+      }
+      
       // @@protoc_insertion_point(builder_scope:guiprotocol.Command)
     }
     
@@ -1464,29 +1530,30 @@ public final class GuiCommand {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021gui_command.proto\022\013guiprotocol\"\311\006\n\007Com" +
-      "mand\022.\n\004type\030\001 \002(\0162 .guiprotocol.Command" +
-      ".CommandType\0227\n\014playerAction\030\002 \001(\0162!.gui" +
-      "protocol.Command.PlayerAction\022+\n\006player\030" +
-      "\003 \001(\0162\033.guiprotocol.Command.Player\022\020\n\010le" +
-      "ftHand\030\004 \001(\010\022\021\n\trightHand\030\005 \001(\010\0229\n\013emitt" +
-      "erType\030\006 \001(\0162$.guiprotocol.Command.FireE" +
-      "mitterType\022\021\n\tintensity\030\007 \001(\002\022\024\n\014emitter" +
-      "Index\030\010 \001(\005\0224\n\017emitterEntities\030\t \003(\0162\033.g" +
-      "uiprotocol.Command.Player\022\023\n\013dmgPerFlame",
-      "\030\n \001(\002\022\022\n\nflameWidth\030\013 \001(\005\022\031\n\021durationIn" +
-      "Seconds\030\014 \001(\001\022\024\n\014acceleration\030\r \001(\001\"\245\001\n\013" +
-      "CommandType\022\032\n\026EXECUTE_GENERIC_ACTION\020\000\022" +
-      "\031\n\025EXECUTE_PLAYER_ACTION\020\001\022\020\n\014TOGGLE_PAU" +
-      "SE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\nNEXT_STATE\020\004\022\021\n\rT" +
-      "OUCH_EMITTER\020\005\022\033\n\027QUERY_GAME_INFO_REFRES" +
-      "H\020\006\"{\n\014PlayerAction\022\t\n\005BLOCK\020\000\022\016\n\nJAB_AT" +
-      "TACK\020\001\022\017\n\013HOOK_ATTACK\020\002\022\023\n\017UPPERCUT_ATTA" +
-      "CK\020\003\022\023\n\017HADOUKEN_ATTACK\020\004\022\025\n\021SONIC_BOOM_" +
-      "ATTACK\020\005\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1",
-      "\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLEFT_RA" +
-      "IL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030" +
-      "ca.site3.ssf.guiprotocol"
+      "\n\021gui_command.proto\022\013guiprotocol\032\014common" +
+      ".proto\"\350\006\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
+      "otocol.Command.CommandType\0227\n\014playerActi" +
+      "on\030\002 \001(\0162!.guiprotocol.Command.PlayerAct" +
+      "ion\022+\n\006player\030\003 \001(\0162\033.guiprotocol.Comman" +
+      "d.Player\022\020\n\010leftHand\030\004 \001(\010\022\021\n\trightHand\030" +
+      "\005 \001(\010\0229\n\013emitterType\030\006 \001(\0162$.guiprotocol" +
+      ".Command.FireEmitterType\022\021\n\tintensity\030\007 " +
+      "\001(\002\022\024\n\014emitterIndex\030\010 \001(\005\0224\n\017emitterEnti" +
+      "ties\030\t \003(\0162\033.guiprotocol.Command.Player\022",
+      "\023\n\013dmgPerFlame\030\n \001(\002\022\022\n\nflameWidth\030\013 \001(\005" +
+      "\022\031\n\021durationInSeconds\030\014 \001(\001\022\024\n\014accelerat" +
+      "ion\030\r \001(\001\022\035\n\tnextState\030\016 \001(\0162\n.GameState" +
+      "\"\245\001\n\013CommandType\022\032\n\026EXECUTE_GENERIC_ACTI" +
+      "ON\020\000\022\031\n\025EXECUTE_PLAYER_ACTION\020\001\022\020\n\014TOGGL" +
+      "E_PAUSE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\nNEXT_STATE\020\004" +
+      "\022\021\n\rTOUCH_EMITTER\020\005\022\033\n\027QUERY_GAME_INFO_R" +
+      "EFRESH\020\006\"{\n\014PlayerAction\022\t\n\005BLOCK\020\000\022\016\n\nJ" +
+      "AB_ATTACK\020\001\022\017\n\013HOOK_ATTACK\020\002\022\023\n\017UPPERCUT" +
+      "_ATTACK\020\003\022\023\n\017HADOUKEN_ATTACK\020\004\022\025\n\021SONIC_",
+      "BOOM_ATTACK\020\005\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022" +
+      "\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLE" +
+      "FT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020" +
+      "\002B\032\n\030ca.site3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1498,7 +1565,7 @@ public final class GuiCommand {
           internal_static_guiprotocol_Command_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guiprotocol_Command_descriptor,
-              new java.lang.String[] { "Type", "PlayerAction", "Player", "LeftHand", "RightHand", "EmitterType", "Intensity", "EmitterIndex", "EmitterEntities", "DmgPerFlame", "FlameWidth", "DurationInSeconds", "Acceleration", },
+              new java.lang.String[] { "Type", "PlayerAction", "Player", "LeftHand", "RightHand", "EmitterType", "Intensity", "EmitterIndex", "EmitterEntities", "DmgPerFlame", "FlameWidth", "DurationInSeconds", "Acceleration", "NextState", },
               ca.site3.ssf.guiprotocol.GuiCommand.Command.class,
               ca.site3.ssf.guiprotocol.GuiCommand.Command.Builder.class);
           return null;
@@ -1507,6 +1574,7 @@ public final class GuiCommand {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          Common.getDescriptor(),
         }, assigner);
   }
   

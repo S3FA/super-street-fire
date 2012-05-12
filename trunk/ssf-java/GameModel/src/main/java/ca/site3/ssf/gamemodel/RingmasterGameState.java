@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ca.site3.ssf.gamemodel.IGameModel.Entity;
-
 /**
  * The RingmasterGameState is a game state that occurs before, between and after
  * rounds and matches of the Super Street Fire game.
@@ -51,11 +49,18 @@ class RingmasterGameState extends GameState {
 	}
 
 	@Override
-	void initiateNextState() {
+	void initiateNextState(GameState.GameStateType nextState) {
 		// This will move the game into a round beginning state and will
 		// incorporate all previous information about whether other rounds have been
 		// played of the current match or not
-		this.gameModel.setNextGameState(new RoundBeginningGameState(this.gameModel));
+		switch (nextState) {
+		case ROUND_BEGINNING_STATE:
+			this.gameModel.setNextGameState(new RoundBeginningGameState(this.gameModel));
+			break;
+		default:
+			break;
+		}
+		
 	}
 
 	@Override

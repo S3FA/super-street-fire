@@ -65,12 +65,12 @@ final public class ActionFactory {
 			case JAB_ATTACK:
 				assert(leftHand || rightHand);
 				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 3.0f);
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_JAB_ATTACK, blockerOrAttacker, attackee, 3.0f);
 					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
 							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 3.0f);
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_JAB_ATTACK, blockerOrAttacker, attackee, 3.0f);
 					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
 							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}

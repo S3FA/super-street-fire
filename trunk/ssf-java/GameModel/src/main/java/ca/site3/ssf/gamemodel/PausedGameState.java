@@ -31,7 +31,7 @@ class PausedGameState extends GameState {
 	}
 
 	@Override
-	void initiateNextState() {
+	void initiateNextState(GameState.GameStateType nextState) {
 		// Ignore this, the game is paused...
 	}
 	

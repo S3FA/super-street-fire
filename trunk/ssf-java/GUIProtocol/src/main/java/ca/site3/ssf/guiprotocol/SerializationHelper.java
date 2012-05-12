@@ -16,7 +16,6 @@ import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownTyp
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
-import ca.site3.ssf.guiprotocol.Event.GameEvent.GameState;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.Player;
@@ -331,7 +330,7 @@ class SerializationHelper {
 		}
 	}
 	
-	static GameStateType protobufToGameState(GameState gameState) {
+	static GameStateType protobufToGameState(Common.GameState gameState) {
 		assert(gameState != null);
 		
 		switch (gameState) {
@@ -351,6 +350,8 @@ class SerializationHelper {
 			return GameStateType.ROUND_ENDED_STATE;
 		case ROUND_IN_PLAY_STATE:
 			return GameStateType.ROUND_IN_PLAY_STATE;
+		case TEST_ROUND_STATE:
+			return GameStateType.TEST_ROUND_STATE;
 		case TIE_BREAKER_ROUND_STATE:
 			return GameStateType.TIE_BREAKER_ROUND_STATE;
 		default:
@@ -359,28 +360,30 @@ class SerializationHelper {
 		}
 	}
 	
-	static GameState gameStateToProtobuf(GameStateType gameState) {
+	static Common.GameState gameStateToProtobuf(GameStateType gameState) {
 		assert(gameState != null);
 		
 		switch (gameState) {
 		case IDLE_STATE:
-			return GameState.IDLE_STATE;
+			return Common.GameState.IDLE_STATE;
 		case MATCH_ENDED_STATE:
-			return GameState.MATCH_ENDED_STATE;
+			return Common.GameState.MATCH_ENDED_STATE;
 		case NO_STATE:
-			return GameState.NO_STATE;
+			return Common.GameState.NO_STATE;
 		case PAUSED_STATE:
-			return GameState.PAUSED_STATE;
+			return Common.GameState.PAUSED_STATE;
 		case RINGMASTER_STATE:
-			return GameState.RINGMASTER_STATE;
+			return Common.GameState.RINGMASTER_STATE;
 		case ROUND_BEGINNING_STATE:
-			return GameState.ROUND_BEGINNING_STATE;
+			return Common.GameState.ROUND_BEGINNING_STATE;
 		case ROUND_ENDED_STATE:
-			return GameState.ROUND_ENDED_STATE;
+			return Common.GameState.ROUND_ENDED_STATE;
 		case ROUND_IN_PLAY_STATE:
-			return GameState.ROUND_IN_PLAY_STATE;
+			return Common.GameState.ROUND_IN_PLAY_STATE;
+		case TEST_ROUND_STATE:
+			return Common.GameState.TEST_ROUND_STATE;
 		case TIE_BREAKER_ROUND_STATE:
-			return GameState.TIE_BREAKER_ROUND_STATE;
+			return Common.GameState.TIE_BREAKER_ROUND_STATE;
 		default:
 			assert(false);
 			throw new IllegalArgumentException("Unknown GameStateType: "+gameState);

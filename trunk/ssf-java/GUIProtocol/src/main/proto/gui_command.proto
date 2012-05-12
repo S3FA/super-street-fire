@@ -1,3 +1,5 @@
+import "common.proto";
+
 package guiprotocol;
 
 option java_package = "ca.site3.ssf.guiprotocol";
@@ -14,8 +16,7 @@ message Command {
     NEXT_STATE = 4; // no args
     TOUCH_EMITTER = 5; // FireEmitterType, emitterIndex, intensity, emitterEntities
     QUERY_GAME_INFO_REFRESH = 6;
-  }
-  
+  }  
   
   // for EXECUTE_PLAYER_ACTION (PlayerActionType)
   enum PlayerAction {
@@ -63,5 +64,8 @@ message Command {
   optional int32 flameWidth         = 11;
   optional double durationInSeconds = 12;
   optional double acceleration      = 13;
+  
+  // NEXT_STATE
+  optional GameState nextState = 14;
   
 }

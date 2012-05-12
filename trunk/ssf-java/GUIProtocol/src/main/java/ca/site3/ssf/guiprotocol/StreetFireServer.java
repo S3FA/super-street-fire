@@ -387,7 +387,7 @@ public class StreetFireServer implements Runnable {
 		
 		
 		private InitiateNextStateCommand createNextStateCommand(Command cmd) {
-			return new InitiateNextStateCommand();
+			return new InitiateNextStateCommand(SerializationHelper.protobufToGameState(cmd.getNextState()));
 		}
 		
 		

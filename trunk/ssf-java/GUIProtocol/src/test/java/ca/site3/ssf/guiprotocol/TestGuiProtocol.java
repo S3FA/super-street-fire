@@ -14,6 +14,7 @@ import org.junit.Test;
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
@@ -48,7 +49,7 @@ public class TestGuiProtocol {
 			
 			// these are very weak tests right now
 			client.activateEmitter(Location.LEFT_RAIL, 3, 0.5f, EnumSet.of(Entity.RINGMASTER_ENTITY));
-			client.initiateNextState();
+			client.initiateNextState(GameStateType.RINGMASTER_STATE);
 			client.executePlayerAction(1, PlayerActionType.HADOUKEN_ATTACK, true, true);
 			client.killGame();
 			
