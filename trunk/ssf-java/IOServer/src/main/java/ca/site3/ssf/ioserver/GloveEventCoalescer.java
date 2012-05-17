@@ -230,8 +230,9 @@ public class GloveEventCoalescer implements Runnable {
 						rightGloveData.add(createGloveData(mainEvent));
 						leftGloveData.add(createGloveData(otherGlove));
 					}
-					gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
 				}
+				gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+				otherCache.clear();
 			}
 		}
 		
