@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The DeviceNetworkListener listens on a UDP socket for events from the game
  * peripherals (gloves, headsets). It passes the data to an {@link IDeviceDataParser}
- * which unpacks the data into a {@link DeviceEvent}. This event is then placed onto
+ * which unpacks the data into {@link DeviceEvent}s. The events are then placed onto
  * a queue to be consumed.
  * 
  * @author greg

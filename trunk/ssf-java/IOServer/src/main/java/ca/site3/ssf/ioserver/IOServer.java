@@ -32,7 +32,10 @@ public class IOServer {
 	
 	private IGameModel game;
 	
+	private GestureRecognizer gestureRecognizer = new GestureRecognizer();
+	
 	private IGameModelListener gameEventRouter;
+	
 	
 	/** Time the event loop started (millis since epoch) */
 	private long startTime;
@@ -48,6 +51,8 @@ public class IOServer {
 	private DeviceStatus deviceStatus = new DeviceStatus();
 	
 	private DeviceNetworkListener deviceListener;
+	
+	private GloveEventCoalescer eventAggregator;
 	
 	private HeartbeatListener heartbeatListener;
 	
@@ -70,6 +75,8 @@ public class IOServer {
 				  args.toString() +
 				 "\n~~~~~~~~~~~~~~~~~~~");
 		
+		startTime = System.currentTimeMillis();
+		
 		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
 		
 		
@@ -84,6 +91,11 @@ public class IOServer {
 		
 		gameEventRouter = new GameEventRouter(guiServer, commManager.getGuiOutQueue());
 		game.addGameModelListener(gameEventRouter);
+		
+
+		eventAggregator = new GloveEventCoalescer(startTime, 2.0/args.tickFrequency, commManager.getCommInQueue(), commManager.getGestureQueue());
+		Thread eventAggregatorThread = new Thread(eventAggregator, "Event aggregator thread");
+		eventAggregatorThread.start();
 		
 		deviceListener = new DeviceNetworkListener(args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
 		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
@@ -132,50 +144,17 @@ public class IOServer {
 			lastFrameTime    = currentTime;
 			//millisSinceStart = currentTime - startTime;
 			
-			// ********************************************************************************************
-			// TODO: Check for device events and then use the gesture recognizer to place actions into the command queue
-			// NOTE: This could probably be moved into its own class and probably even its own thread...
-			
-			while (!commManager.getCommInQueue().isEmpty()) {
-				DeviceEvent deviceEvent = commManager.getCommInQueue().remove();
-				
-				// TODO: Figure out how to properly combine left and right glove data when both buttons
-				// are pressed (on each of the gloves) ... maybe do this at the DeviceNetworkListener / DeviceDataParser level?
-				
-				switch (deviceEvent.getDevice()) {
-				
-				case HEADSET:
-					HeadsetEvent headsetEvent = (HeadsetEvent)deviceEvent;
-					assert(headsetEvent != null);
-					// TODO
-					break;
-					
-				case LEFT_GLOVE: {
-					GloveEvent leftGloveEvent = (GloveEvent)deviceEvent;
-					assert(leftGloveEvent != null);
-					// TODO
-					break;
-				}
-					
-				case RIGHT_GLOVE:
-					GloveEvent rightGloveEvent = (GloveEvent)deviceEvent;
-					assert(rightGloveEvent != null);
-					// TODO
-					break;
-					
-				default:
-					assert(false);
-					break;
-				}
-				
-			}
-			
-			// ********************************************************************************************
-			
-			
+
 			while (!commManager.getCommandQueue().isEmpty() ) {
 				game.executeCommand(commManager.getCommandQueue().remove());
 			}
+			
+			
+			while (!commManager.getGestureQueue().isEmpty()) {
+				PlayerGestureInstance gesture = commManager.getGestureQueue().remove();
+				gestureRecognizer.recognizePlayerGesture(getGameModel(), gesture.getPlayerNum(), gesture);
+			}
+			
 			
 			try {
 				game.tick(deltaFrameTime/1000.0);
