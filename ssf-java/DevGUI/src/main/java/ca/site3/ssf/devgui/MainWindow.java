@@ -69,6 +69,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	private JMenuItem gloveInfoWindowMenuItem = null;
 	private JMenuItem customActionMenuItem = null;
 	
+	private JFrame gloveDataWindow = null;
 	private GloveDataInfoPanel p1LeftGloveInfoPanel  = null;
 	private GloveDataInfoPanel p1RightGloveInfoPanel = null;
 	private GloveDataInfoPanel p2LeftGloveInfoPanel  = null;
@@ -76,6 +77,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	private GloveDataInfoPanel ringmasterLeftGloveInfoPanel  = null;
 	private GloveDataInfoPanel ringmasterRightGloveInfoPanel = null;
 	
+	private JFrame customActionWindow = null;
 	private CustomActionPanel customActionPanel = null;
 	
 	private ArenaDisplay arenaDisplay = null;
@@ -116,8 +118,8 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
-		this.setPreferredSize(new Dimension(1000, 750));
-		this.setMinimumSize(new Dimension(1000, 750));
+		this.setPreferredSize(new Dimension(1200, 750));
+		this.setMinimumSize(new Dimension(1200, 750));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		
@@ -139,8 +141,10 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		this.p2RightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);		
 		this.ringmasterLeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
 		this.ringmasterRightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);	
+		this.setupGloveDataFrame();
 		
 		this.customActionPanel = new CustomActionPanel(client);
+		this.setupCustomActionFrame();
 		
 		// Setup the frame's contents...
 		this.arenaDisplay = new ArenaDisplay(gameModel.getConfiguration().getNumRoundsPerMatch(), new FireEmitterConfig(true, 16, 8), client);
@@ -409,60 +413,74 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (event.getSource() == this.gloveInfoWindowMenuItem) {
-			JFrame gloveDataWindow = new JFrame();
-			
-			JPanel basePanel = new JPanel();
-			basePanel.setLayout(new GridLayout(3, 1));
-			
-			JPanel p1GloveDataPanel = new JPanel();
-			TitledBorder border = BorderFactory.createTitledBorder(
-					BorderFactory.createLineBorder(Color.black), "Player 1 Glove Information");
-			border.setTitleColor(Color.black);
-			p1GloveDataPanel.setBorder(border);
-			p1GloveDataPanel.setLayout(new GridLayout(0, 2));
-			p1GloveDataPanel.add(this.p1LeftGloveInfoPanel);
-			p1GloveDataPanel.add(this.p1RightGloveInfoPanel);
-			basePanel.add(p1GloveDataPanel);
-			
-			JPanel p2GloveDataPanel = new JPanel();
-			border = BorderFactory.createTitledBorder(
-					BorderFactory.createLineBorder(Color.black), "Player 2 Glove Information");
-			border.setTitleColor(Color.black);
-			p2GloveDataPanel.setBorder(border);
-			p2GloveDataPanel.setLayout(new GridLayout(0, 2));
-			p2GloveDataPanel.add(this.p2LeftGloveInfoPanel);
-			p2GloveDataPanel.add(this.p2RightGloveInfoPanel);
-			basePanel.add(p2GloveDataPanel);
-			
-			JPanel ringmasterGloveDataPanel = new JPanel();
-			border = BorderFactory.createTitledBorder(
-					BorderFactory.createLineBorder(Color.black), "Ringmaster Glove Information");
-			border.setTitleColor(Color.black);
-			ringmasterGloveDataPanel.setBorder(border);
-			ringmasterGloveDataPanel.setLayout(new GridLayout(0, 2));
-			ringmasterGloveDataPanel.add(this.ringmasterLeftGloveInfoPanel);
-			ringmasterGloveDataPanel.add(this.ringmasterRightGloveInfoPanel);
-			basePanel.add(ringmasterGloveDataPanel);
-			
-			gloveDataWindow.setTitle("Glove Information");
-			gloveDataWindow.setResizable(false);
-			
-			gloveDataWindow.add(basePanel);
-			gloveDataWindow.pack();
-			gloveDataWindow.setLocationRelativeTo(null);
-			gloveDataWindow.setVisible(true);
+			this.gloveDataWindow.setVisible(true);
 		}
 		else if (event.getSource() == this.customActionMenuItem) {
-			JFrame customActionWindow = new JFrame();
-			customActionWindow.setTitle("Action Prototyping");
-			customActionWindow.setResizable(false);
-			customActionWindow.add(this.customActionPanel);
-			customActionWindow.setMinimumSize(new Dimension(500, 1));
-			customActionWindow.pack();
-			
-			customActionWindow.setLocationRelativeTo(null);
-			customActionWindow.setVisible(true);
+			this.customActionWindow.setVisible(true);
 		}
+	}
+	
+	private void setupCustomActionFrame() {
+		this.customActionWindow = new JFrame();
+		this.customActionWindow.setTitle("Action Prototyping");
+		this.customActionWindow.setResizable(false);
+		assert(this.customActionPanel != null);
+		this.customActionWindow.add(this.customActionPanel);
+		this.customActionWindow.setMinimumSize(new Dimension(500, 1));
+		this.customActionWindow.pack();
+		
+		this.customActionWindow.setLocationRelativeTo(null);
+	}
+	
+	private void setupGloveDataFrame() {
+		assert(this.gloveDataWindow != null);
+		this.gloveDataWindow = new JFrame();
+		
+		JPanel basePanel = new JPanel();
+		basePanel.setLayout(new GridLayout(3, 1));
+		
+		JPanel p1GloveDataPanel = new JPanel();
+		TitledBorder border = BorderFactory.createTitledBorder(
+				BorderFactory.createLineBorder(Color.black), "Player 1 Glove Information");
+		border.setTitleColor(Color.black);
+		p1GloveDataPanel.setBorder(border);
+		p1GloveDataPanel.setLayout(new GridLayout(0, 2));
+		assert(this.p1LeftGloveInfoPanel != null);
+		assert(this.p1RightGloveInfoPanel != null);
+		p1GloveDataPanel.add(this.p1LeftGloveInfoPanel);
+		p1GloveDataPanel.add(this.p1RightGloveInfoPanel);
+		basePanel.add(p1GloveDataPanel);
+		
+		JPanel p2GloveDataPanel = new JPanel();
+		border = BorderFactory.createTitledBorder(
+				BorderFactory.createLineBorder(Color.black), "Player 2 Glove Information");
+		border.setTitleColor(Color.black);
+		p2GloveDataPanel.setBorder(border);
+		p2GloveDataPanel.setLayout(new GridLayout(0, 2));
+		assert(this.p2LeftGloveInfoPanel != null);
+		assert(this.p2RightGloveInfoPanel != null);
+		p2GloveDataPanel.add(this.p2LeftGloveInfoPanel);
+		p2GloveDataPanel.add(this.p2RightGloveInfoPanel);
+		basePanel.add(p2GloveDataPanel);
+		
+		JPanel ringmasterGloveDataPanel = new JPanel();
+		border = BorderFactory.createTitledBorder(
+				BorderFactory.createLineBorder(Color.black), "Ringmaster Glove Information");
+		border.setTitleColor(Color.black);
+		ringmasterGloveDataPanel.setBorder(border);
+		ringmasterGloveDataPanel.setLayout(new GridLayout(0, 2));
+		assert(this.ringmasterLeftGloveInfoPanel  != null);
+		assert(this.ringmasterRightGloveInfoPanel != null);
+		ringmasterGloveDataPanel.add(this.ringmasterLeftGloveInfoPanel);
+		ringmasterGloveDataPanel.add(this.ringmasterRightGloveInfoPanel);
+		basePanel.add(ringmasterGloveDataPanel);
+		
+		this.gloveDataWindow.setTitle("Glove Information");
+		this.gloveDataWindow.setResizable(false);
+		
+		this.gloveDataWindow.add(basePanel);
+		this.gloveDataWindow.pack();
+		this.gloveDataWindow.setLocationRelativeTo(null);
 	}
 	
 	public static void main(String[] argv) {
