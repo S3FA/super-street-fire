@@ -52,8 +52,8 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 	
 	private StreetFireGuiClient client = null;
 	
-	private JComboBox<Integer> playerComboBox = null;
-	private JComboBox<Hands> handsComboBox    = null;
+	private JComboBox playerComboBox = null;
+	private JComboBox handsComboBox    = null;
 	
 	private JSlider durationSlider       = null;
 	private JSlider damagePerFlameSlider = null;
@@ -75,7 +75,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		
 		// Player selection controls -------------------------------------------------
 		JLabel playerLabel = new JLabel("Player:");
-		this.playerComboBox = new JComboBox<Integer>();
+		this.playerComboBox = new JComboBox();
 		this.playerComboBox.addItem(new Integer(1));
 		this.playerComboBox.addItem(new Integer(2));
 		this.playerComboBox.setSelectedIndex(0);
@@ -87,7 +87,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		
 		// Hand selection controls ---------------------------------------------------
 		JLabel handsLabel = new JLabel("Hand(s):");
-		this.handsComboBox = new JComboBox<Hands>();
+		this.handsComboBox = new JComboBox();
 		this.handsComboBox.addItem(Hands.LEFT_HAND);
 		this.handsComboBox.addItem(Hands.RIGHT_HAND);
 		this.handsComboBox.addItem(Hands.BOTH_HANDS);
