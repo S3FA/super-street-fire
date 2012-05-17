@@ -1,0 +1,301 @@
+package ca.site3.ssf.ioserver;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GloveData;
+import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
+import ca.site3.ssf.ioserver.GloveEvent.EventType;
+
+/**
+ * The GloveEventCoalescer consumes the low-level {@link GloveEvent}s
+ * that come in and is responsible for caching them (per-device) and
+ * combining them into {@link GestureInstance}s that are put onto
+ * a queue to be consumed by something else.
+ * 
+ * @author greg
+ */
+public class GloveEventCoalescer implements Runnable {
+
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	private BlockingQueue<DeviceEvent> deviceEventQueue;
+	
+	private BlockingQueue<PlayerGestureInstance> gestureInstanceQueue;
+	
+	/**
+	 * How many {@link GloveEvent}s to cache before aggregating into
+	 * a {@link GestureInstance}.
+	 */
+	private static final int CACHE_SIZE = 128;
+	
+	protected Queue<GloveEvent> p1LeftQueue = new LinkedList<GloveEvent>();
+	protected Queue<GloveEvent> p1RightQueue = new LinkedList<GloveEvent>();
+	
+	protected Queue<GloveEvent> p2LeftQueue = new LinkedList<GloveEvent>();
+	protected Queue<GloveEvent> p2RightQueue = new LinkedList<GloveEvent>();
+	
+	
+	protected boolean p1LeftBtnDown = false;
+	protected boolean p1RightBtnDown = false;
+	protected boolean p2LeftBtnDown = false;
+	protected boolean p2RightBtnDown = false;
+	
+	protected final long startTime;
+	/** in milliseconds */
+	protected final double bothButtonsDownThreshold;
+	
+	/**
+	 * 
+	 * @param startTime the time the event loop for the game started
+	 * @param bothButtonsDownThreshold for two-handed gestures, max time difference allowed for initial button push
+	 * @param deviceEventQueue objects will be consumed from this queue
+	 * @param gestureInstanceQueue this queue will be populated
+	 */
+	public GloveEventCoalescer(long startTime, double bothButtonsDownThreshold,
+								BlockingQueue<DeviceEvent> deviceEventQueue, BlockingQueue<PlayerGestureInstance> gestureInstanceQueue) {
+		this.deviceEventQueue = deviceEventQueue;
+		this.gestureInstanceQueue = gestureInstanceQueue;
+		
+		this.startTime = startTime;
+		this.bothButtonsDownThreshold = bothButtonsDownThreshold * 1000;
+	}
+	
+	
+	public void run() {
+		
+		while (true) {
+			try {
+				DeviceEvent e = deviceEventQueue.take();
+				if (e.getDevice() == DeviceType.HEADSET) {
+					HeadsetEvent headsetEvent = (HeadsetEvent)e;
+					continue;
+				}
+				GloveEvent ge = (GloveEvent)e;
+				
+				if (ge.getEventType() == EventType.DATA_EVENT) {
+					// currently assume we only get these when the button is down.
+					queueForEvent(ge).add(ge);
+					if (queueForEvent(ge).size() > CACHE_SIZE) {
+						log.info("Full GloveEvent queue. Creating GestureInstance.");
+						List<PlayerGestureInstance> gestures = aggregateForPlayer(ge.getSource());
+						if (gestures != null) {
+							gestureInstanceQueue.addAll(gestures);
+						}
+					}
+				} else {
+					changeButtonDownState(ge);
+					
+					/*
+					 * This is where decisions get made about what to do after a change in button
+					 * down state.
+					 */
+					if (ge.getEventType() == EventType.BUTTON_UP_EVENT && isOtherButtonDown(ge) == false) {
+						// button was released and other glove's button is not down.
+						// create one or more GestureInstances.
+						List<PlayerGestureInstance> gestures = aggregateForPlayer(e.getSource());
+						if (gestures != null) {
+							gestureInstanceQueue.addAll(gestures);
+						}
+					}
+				}
+			} catch (InterruptedException ex) {
+				log.warn("Interrupted waiting for DeviceEvent",ex);
+			}
+			
+		}
+	}
+	
+	
+	/**
+	 * Create a GestureInstance for the given player based on the current state of the
+	 * GloveEvent caches.
+	 * 
+	 * @param player the player to create a GestureInstance for
+	 * @return the created {@link PlayerGestureInstance}
+	 */
+	protected List<PlayerGestureInstance> aggregateForPlayer(Entity player) {
+		assert (player == Entity.PLAYER1_ENTITY || player == Entity.PLAYER2_ENTITY);
+		
+		Queue<GloveEvent> left;
+		Queue<GloveEvent> right;
+		int playerNum;
+		if (player == Entity.PLAYER1_ENTITY) {
+			playerNum = 1;
+			left = p1LeftQueue;
+			right = p1RightQueue;
+		} else if (player == Entity.PLAYER2_ENTITY) {
+			playerNum = 2;
+			left = p2LeftQueue;
+			right = p2RightQueue;
+		} else {
+			throw new IllegalArgumentException("Invalid player for glove data aggregation");
+		}
+		
+		List<PlayerGestureInstance> gestures = new ArrayList<PlayerGestureInstance>();
+		
+		List<Double> timePts = null;
+		List<GloveData> leftGloveData = null;
+		List<GloveData> rightGloveData = null;
+		
+		// easy case: one-handed gestures
+		if (right.isEmpty() && left.isEmpty()) {
+			// no data -- this should never happen
+			log.warn("Trying to create GestureInstance without any glove data. What nonsense!");
+		} else if (right.isEmpty() == false && left.isEmpty() == true) {
+			timePts = new ArrayList<Double>(right.size());
+			leftGloveData = Collections.emptyList();
+			rightGloveData = new ArrayList<GloveData>(right.size());
+			while ( ! right.isEmpty()) {
+				GloveEvent ge = right.remove();
+				rightGloveData.add(createGloveData(ge));
+				timePts.add((ge.getTimestamp() - startTime)/1000.);
+			}
+			gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+		} else if (left.isEmpty() == false && right.isEmpty() == true) {
+			timePts = new ArrayList<Double>(left.size());
+			leftGloveData = new ArrayList<GloveData>(left.size());
+			rightGloveData = Collections.emptyList();
+			while ( ! left.isEmpty()) {
+				GloveEvent ge = left.remove();
+				leftGloveData.add(createGloveData(ge));
+				timePts.add((ge.getTimestamp() - startTime)/1000.);
+			}
+			gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+		} else {
+			/*
+			 * We have events in both left and right glove caches.
+			 * This gets mildly tricky. GestureInstances need to have an equal number of
+			 * left/right GloveEvents (unless one of the gloves has no data). Also need to provide a
+			 * single timestamp (as the # of seconds elapsed since game started, Double precision) for
+			 * each glove data pair.
+			 */
+			
+			// get the times of the datapoints at the head of the queue to compare start times
+			long t_left = left.peek().getTimestamp();
+			long t_right = right.peek().getTimestamp();
+			if (Math.abs(t_left - t_right) > bothButtonsDownThreshold) {
+				// if the buttons were not both initially pressed at the same (close enough) time,
+				// split into two single handed gestures
+				timePts = new ArrayList<Double>(left.size());
+				leftGloveData = new ArrayList<GloveData>(left.size());
+				rightGloveData = Collections.emptyList();
+				while ( ! left.isEmpty()) {
+					GloveEvent ge = left.remove();
+					leftGloveData.add(createGloveData(ge));
+					timePts.add((ge.getTimestamp() - startTime)/1000.);
+				}
+				gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+				
+				timePts = new ArrayList<Double>(right.size());
+				leftGloveData = Collections.emptyList();
+				rightGloveData = new ArrayList<GloveData>(right.size());
+				while ( ! right.isEmpty()) {
+					GloveEvent ge = right.remove();
+					leftGloveData.add(createGloveData(ge));
+					timePts.add((ge.getTimestamp() - startTime)/1000.);
+				}
+				gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+			} else {
+				/*
+				 *  two-handed gesture. our approach here (for now at least) is to simply truncate the larger
+				 *  cache and grab the timestamps from the smaller.
+				 */
+				// true if the 'main' (smaller) cache is for the left glove
+				boolean usingLeft = left.size() <= right.size();
+				Queue<GloveEvent> mainCache = usingLeft? left: right;
+				Queue<GloveEvent> otherCache = usingLeft ? right: left;
+				
+				timePts = new ArrayList<Double>(mainCache.size());
+				leftGloveData = new ArrayList<GloveData>(mainCache.size());
+				rightGloveData = new ArrayList<GloveData>(mainCache.size());
+				
+				while ( ! mainCache.isEmpty()) {
+					GloveEvent mainEvent = mainCache.remove();
+					GloveEvent otherGlove = otherCache.remove();
+					timePts.add((mainEvent.getTimestamp() - startTime)/1000.);
+					if (usingLeft) {
+						leftGloveData.add(createGloveData(mainEvent));
+						rightGloveData.add(createGloveData(otherGlove));
+					} else {
+						rightGloveData.add(createGloveData(mainEvent));
+						leftGloveData.add(createGloveData(otherGlove));
+					}
+					gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+				}
+			}
+		}
+		
+		return gestures;
+	}
+	
+	
+	protected GloveData createGloveData(GloveEvent ge) {
+		GloveData gd = new GloveData(ge.getGyro()[0], ge.getGyro()[1], ge.getGyro()[2], 
+									 ge.getAcceleration()[0], ge.getAcceleration()[1], ge.getAcceleration()[2], 
+									 ge.getMagnetometer()[0], ge.getMagnetometer()[1], ge.getMagnetometer()[2]);
+		return gd;
+	}
+	
+	
+	private Queue<GloveEvent> queueForEvent(GloveEvent e) {
+		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
+			return p1LeftQueue;
+		} else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
+			return p1RightQueue;
+		} else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
+			return p2LeftQueue;
+		} else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
+			return p2RightQueue;
+		}
+		
+		log.error("No queue for event with device type: ",e.getDevice());
+		return null;
+	}
+	
+	
+	/**
+	 * Sets the p{1,2}{Left,Right}BtnDown boolean to false if e is a button up event,
+	 * or to true if it's a button down event.
+	 * 
+	 * @param e the GloveEvent used to determine the device/player and event type
+	 */
+	private void changeButtonDownState(GloveEvent e) {
+		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
+			p1LeftBtnDown = e.getEventType() == EventType.BUTTON_DOWN_EVENT;
+		} else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
+			p1RightBtnDown = e.getEventType() == EventType.BUTTON_DOWN_EVENT;
+		} else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
+			p2LeftBtnDown = e.getEventType() == EventType.BUTTON_DOWN_EVENT;
+		} else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
+			p2RightBtnDown = e.getEventType() == EventType.BUTTON_DOWN_EVENT;
+		}
+	}
+	
+	
+	/**
+	 * Returns true if the button corresponding on <code>e</code>'s player's opposite glove is currently down.
+	 * @param e the event
+	 */
+	private boolean isOtherButtonDown(GloveEvent e) {
+		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
+			return p1RightBtnDown;
+		} else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
+			return p1LeftBtnDown;
+		} else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
+			return p2RightBtnDown;
+		} else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
+			return p2LeftBtnDown;
+		}
+		throw new IllegalArgumentException("Non-player GloveEvent passed to isOtherButtonDown");
+	}
+}
