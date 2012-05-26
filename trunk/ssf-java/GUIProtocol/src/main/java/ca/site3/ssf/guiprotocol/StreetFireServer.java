@@ -153,7 +153,7 @@ public class StreetFireServer implements Runnable {
 						try {
 							guiHandler.sendGameEvent(event);
 						} catch (IOException ex) {
-							log.error("Exception sending GameEvent {} to GUI client",event);
+							log.error("Exception sending GameEvent {} to GUI client", ex);
 						}
 					}
 				} catch (InterruptedException ex) {
