@@ -1,5 +1,8 @@
 package ca.site3.ssf.ioserver;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
 
@@ -8,11 +11,10 @@ import ca.site3.ssf.ioserver.DeviceConstants.DeviceType;
  * 
  * @author greg
  */
-public class HeadsetEvent extends DeviceEvent {
+public final class HeadsetEvent extends DeviceEvent {
 
-	private double attention;
-	private double meditation;
-	
+	private final double attention;
+	private final double meditation;
 	
 	/**
 	 * @param intensity between 0 and 1
@@ -30,7 +32,6 @@ public class HeadsetEvent extends DeviceEvent {
 		this.meditation = meditation;
 	}
 
-
 	/**
 	 * @return the attention value, between 0 and 1 inclusive
 	 */
@@ -38,11 +39,33 @@ public class HeadsetEvent extends DeviceEvent {
 		return attention;
 	}
 
-
 	/**
 	 * @return the meditation value, between 0 and 1 inclusive
 	 */
 	public double getMeditation() {
 		return meditation;
 	}
+	
+	public static HeadsetEvent getAverage(Collection<HeadsetEvent> headsetEvents) {
+		
+		// There should be at least one event in the provided collection
+		if (headsetEvents.isEmpty()) {
+			assert(false);
+			return null;
+		}
+		
+		double totalAttention  = 0.0;
+		double totalMeditation = 0.0;
+		
+		for (HeadsetEvent event : headsetEvents) {
+			totalAttention  += event.getAttention();
+			totalMeditation += event.getMeditation();
+		}
+		
+		Iterator<HeadsetEvent> iter = headsetEvents.iterator();
+		HeadsetEvent firstEvent = iter.next();
+		return new HeadsetEvent(firstEvent.getSource(), firstEvent.getDevice(), System.currentTimeMillis(),
+				(totalAttention / (double)headsetEvents.size()), (totalMeditation / (double)headsetEvents.size()));
+	}
+	
 }

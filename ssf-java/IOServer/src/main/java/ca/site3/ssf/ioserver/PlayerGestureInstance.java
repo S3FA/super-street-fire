@@ -13,6 +13,8 @@ import ca.site3.ssf.gesturerecognizer.GloveData;
 public class PlayerGestureInstance extends GestureInstance {
 
 	private final int playerNum;
+	//private final double headsetAttention;
+	//private final double headsetMeditation;
 	
 	public PlayerGestureInstance(int playerNum) {
 		super();

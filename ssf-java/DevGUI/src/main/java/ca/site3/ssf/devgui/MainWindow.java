@@ -421,6 +421,8 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	}
 	
 	private void setupCustomActionFrame() {
+		assert(this.customActionWindow == null);
+		
 		this.customActionWindow = new JFrame();
 		this.customActionWindow.setTitle("Action Prototyping");
 		this.customActionWindow.setResizable(false);
@@ -433,7 +435,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 	}
 	
 	private void setupGloveDataFrame() {
-		assert(this.gloveDataWindow != null);
+		assert(this.gloveDataWindow == null);
 		this.gloveDataWindow = new JFrame();
 		
 		JPanel basePanel = new JPanel();

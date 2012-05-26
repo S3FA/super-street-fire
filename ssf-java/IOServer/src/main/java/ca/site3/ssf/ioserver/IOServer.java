@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
+import ca.site3.ssf.gamemodel.Action;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.IGameModel;
@@ -61,7 +62,7 @@ public class IOServer {
 		this.args = args;
 
 		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
-												args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage);
+											   args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage);
 		game = new GameModel(gameConfig);
 	}
 	
@@ -93,7 +94,7 @@ public class IOServer {
 		game.addGameModelListener(gameEventRouter);
 		
 
-		eventAggregator = new GloveEventCoalescer(startTime, 2.0/args.tickFrequency, commManager.getCommInQueue(), commManager.getGestureQueue());
+		eventAggregator = new GloveEventCoalescer(startTime, (2.0 / args.tickFrequency.doubleValue()), commManager.getCommInQueue(), commManager.getGestureQueue());
 		Thread eventAggregatorThread = new Thread(eventAggregator, "Event aggregator thread");
 		eventAggregatorThread.start();
 		
@@ -144,20 +145,40 @@ public class IOServer {
 			lastFrameTime    = currentTime;
 			//millisSinceStart = currentTime - startTime;
 			
-
+			// Go through our various queues of data that has been aggregated and concentrated from
+			// the various clients of the IOServer, execute that data on the GameModel
+			
+			// Commands to the GameModel
 			while (!commManager.getCommandQueue().isEmpty() ) {
 				game.executeCommand(commManager.getCommandQueue().remove());
 			}
 			
-			
+			// Recognize gestures and execute any recognized gestures on the GameModel
 			while (!commManager.getGestureQueue().isEmpty()) {
 				PlayerGestureInstance gesture = commManager.getGestureQueue().remove();
-				gestureRecognizer.recognizePlayerGesture(getGameModel(), gesture.getPlayerNum(), gesture);
+				
+				// TODO: Forwarding of headset data with the Action to the GameModel as well?
+				Action recognizedAction = gestureRecognizer.recognizePlayerGesture(getGameModel().getActionFactory(), gesture.getPlayerNum(), gesture);
+				if (recognizedAction != null) {
+					getGameModel().executeGenericAction(recognizedAction);
+				}
 			}
 			
+			// Forward the general stream of headset events to the game model - this provides information for affecting
+			// the game in-general as opposed to when the data is submitted via an Action, where it will only affect that action
+			while (!eventAggregator.getP1HeadsetEventQueue().isEmpty()) {
+				HeadsetEvent p1HeadsetEvent = eventAggregator.getP1HeadsetEventQueue().remove();
+				// TODO: Forward the data to the gamemodel
+				//getGameModel().updatePlayerHeadsetData(1, HeadsetData(p1HeadsetEvent.getAttention(), p1HeadsetEvent.getMeditation())); 
+			}
+			while (!eventAggregator.getP2HeadsetEventQueue().isEmpty()) {
+				HeadsetEvent p2HeadsetEvent = eventAggregator.getP2HeadsetEventQueue().remove();
+				// TODO: Forward the data to the gamemodel
+				//getGameModel().updatePlayerHeadsetData(2, HeadsetData(p2HeadsetEvent.getAttention(), p2HeadsetEvent.getMeditation())); 
+			}
 			
 			try {
-				game.tick(deltaFrameTime/1000.0);
+				game.tick(deltaFrameTime / 1000.0);
 			} catch (Exception ex) {
 				log.error("Exception while ticking game", ex);
 			}

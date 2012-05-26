@@ -18,7 +18,7 @@ import org.apache.commons.math.geometry.Vector3D;
  * If a given glove data array is null within this object then the gesture is considered
  * one-handed (NOTE: The gesture is not valid if both arrays are null).
  * 
- * Similar to the GloveData the GestureInstance and be written to and read from string using
+ * Similar to the GloveData, the GestureInstance can be written to and read from string using
  * its toDataString and fromDataString methods.
  * 
  * @author Callum

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.gamemodel.Action;
+import ca.site3.ssf.gamemodel.ActionFactory;
 import ca.site3.ssf.gamemodel.IGameModel;
 
 /**
@@ -101,14 +103,15 @@ public class GestureRecognizer {
 	
 	/**
 	 * Use the gesture recognizer to recognize a given gesture instance executed by the given player.
-	 * This function will both recognize the gesture and, if the gesture is identified, it will execute
-	 * that gesture within the given gamemodel.
-	 * @param gameModel The game model to execute any identified gesture in.
+	 * This function will both recognize the gesture and, if the gesture is identified, it will build
+	 * the approriate Action for the gamemodel to consume.
+	 * @param actionFactory The game model's action factory, used to construct the gesture action if one is identified.
 	 * @param playerNum The player who is executing the gesture.
 	 * @param gestureInstance The gesture instance data to recognize.
+	 * @return The Action for the game model to consume if one was recognized, if not then null is returned.
 	 */
-	public void recognizePlayerGesture(IGameModel gameModel, int playerNum, GestureInstance gestureInstance) {
-		assert(gameModel != null);
+	public Action recognizePlayerGesture(ActionFactory actionFactory, int playerNum, GestureInstance gestureInstance) {
+		assert(actionFactory   != null);
 		assert(gestureInstance != null);
 
 		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
@@ -116,13 +119,13 @@ public class GestureRecognizer {
 		if (result == null) {
 			// No gesture was recognized
 			this.logger.info("Failed to recognize gesture.");
-			return;
+			return null;
 		}
 		
 		// We have a gesture! Tell the gamemodel about it in order to execute that gesture within
 		// the context of the current game
-		gameModel.executeGenericAction(gameModel.getActionFactory().buildPlayerAction(playerNum,
-				result.getActionFactoryType(), result.getUsesLeftHand(), result.getUsesRightHand()));
+		return actionFactory.buildPlayerAction(playerNum, result.getActionFactoryType(),
+				result.getUsesLeftHand(), result.getUsesRightHand());
 	}
 	
 	/**

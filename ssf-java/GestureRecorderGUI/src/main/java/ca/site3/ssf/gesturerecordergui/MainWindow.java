@@ -24,7 +24,9 @@ import ca.site3.ssf.ioserver.DeviceEvent;
 import ca.site3.ssf.ioserver.DeviceNetworkListener;
 import ca.site3.ssf.ioserver.DeviceStatus;
 import ca.site3.ssf.ioserver.GloveEvent;
+import ca.site3.ssf.ioserver.GloveEventCoalescer;
 import ca.site3.ssf.ioserver.HeartbeatListener;
+import ca.site3.ssf.ioserver.PlayerGestureInstance;
 
 /**
  * The main GUI class and driver for the gesture recorder
@@ -36,24 +38,21 @@ public class MainWindow extends JFrame {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	private static final long serialVersionUID = 1L;
 	
-	private ArrayList<GloveData> leftGloveData;
-	private ArrayList<GloveData> rightGloveData;
-	private ArrayList<Double> timeData;
-	private Long startTime;
-	
 	private RecordingPanel recordingPanel  = null;
 	private TrainingPanel trainingPanel = null;
 	private TestingPanel testingPanel = null;
 	
 	private volatile boolean isListeningForEvents = true;
-	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
 	
+	// Pieces of the IOServer that are required to capture glove data and aggregate that data into gesture instances
+	private BlockingQueue<PlayerGestureInstance> gestureQueue = new LinkedBlockingQueue<PlayerGestureInstance>();
+	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
 	private DeviceStatus deviceStatus = new DeviceStatus();
-	private HeartbeatListener heartbeatListener = new HeartbeatListener(55555, deviceStatus);
-	private DeviceNetworkListener gloveListener = new DeviceNetworkListener(new CommandLineArgs().devicePort, new DeviceDataParser(deviceStatus), eventQueue);
+	private HeartbeatListener heartbeatListener  = new HeartbeatListener(55555, deviceStatus);
+	private DeviceNetworkListener gloveListener  = new DeviceNetworkListener(new CommandLineArgs().devicePort, new DeviceDataParser(deviceStatus), eventQueue);
+	private GloveEventCoalescer eventAggregator  = null;
 	
 	private Thread consumerThread;
-	private Runnable doUpdateInterface;
 
 	private JTabbedPane tabbedPane = null;
 	
@@ -62,7 +61,7 @@ public class MainWindow extends JFrame {
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Gesture Recorder GUI)");
-		this.setPreferredSize(new Dimension(900, 600));
+		this.setPreferredSize(new Dimension(1200, 600));
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 
@@ -85,74 +84,39 @@ public class MainWindow extends JFrame {
 		Thread producerThread = new Thread(gloveListener, "Glove listener Thread");
 		producerThread.start();
 		
-		// To stop this set isListeningForEvents false and call consumerThread.interrupt()\
-		//TODO: Start or stop this based on which tab we're in. 
-		consumerThread = new Thread(new Runnable() {
+		final double TWO_HANDED_BUTTON_DOWN_THRESHOLD_IN_SECS = 0.5;
+		this.eventAggregator = new GloveEventCoalescer(System.currentTimeMillis(), TWO_HANDED_BUTTON_DOWN_THRESHOLD_IN_SECS, eventQueue, gestureQueue);
+		Thread eventAggregatorThread = new Thread(this.eventAggregator, "Event aggregator thread");
+		eventAggregatorThread.start();
+		
+		this.consumerThread = new Thread(new Runnable() {
 			public void run() {
-				DeviceEvent e;
-				long timeout = 0;
-				long startTime = 0;
-				boolean recording = false;
+				
+				
+
+				PlayerGestureInstance currGestureInst = null;
 				
 				while (isListeningForEvents) {
-					//try {
-						e = eventQueue.poll();//.take();
-					//} catch (InterruptedException ex) {
-					//	log.info("Glove event consumer interrupted",ex);
-					//	e = null;
-					//}
 					
-					timeout = System.currentTimeMillis() - startTime;
+					// Happily enough, all of the logic for determining the length of gesture, aggregating data for two-handed gestures
+					// and generally dealing with what constitutes the data for a gesture is dealt with by the GloveEventCoalescer, we
+					// just have to wait for one to appear on the queue, yay!
 					
-					// If we find an event then fire off the event listener and reset the timeout
-					if (null != e && e.getType() == DeviceEvent.Type.GloveEvent) {
-						
-						GloveEvent gloveEvent = (GloveEvent)e;
-						
-						switch (gloveEvent.getEventType()) {
-						
-						case BUTTON_DOWN_EVENT:
-							
-							if (!recording) {
-								recording = true;
-								startTime = System.currentTimeMillis();
-							}
-							timeout = 0;
-							
-							break;
-							
-						case BUTTON_UP_EVENT:
-							if (recording) {
-								recording = false;
-								exportGatheredData();
-							}
-							break;
-							
-						case DATA_EVENT:
-							if (recording) {
-								if (timeout > (GestureRecognizer.MAXIMUM_GESTURE_RECOGNITION_TIME_IN_SECS * 1000)) {
-									recording = false;
-									exportGatheredData();
-								}
-								else {
-									timeout = 0;
-									hardwareEventListener((GloveEvent)e);
-								}
-							}
-							break;
-							
-						default:
-							assert(false);
-							break;
-						}
-						
+					try {
+						currGestureInst = gestureQueue.take();
 					}
+					catch (InterruptedException e) {
+						log.warn("Gesture queue blocking was interrupted.", e);
+						continue;
+					}
+					
+					exportGatheredData(currGestureInst);
 				}
 			}
 		});
 		
 		// Start listening for and consuming the data from the gloves
-		consumerThread.start();
+		this.consumerThread.start();
 	}
 
 	// Build the GUI
@@ -176,18 +140,23 @@ public class MainWindow extends JFrame {
         SwingUtilities.invokeLater(doCreateAndShowGUI);
 	}
 
-	public void exportGatheredData() {
-		int selectedTab = this.tabbedPane.getSelectedIndex();
-		GestureInstance instance = new GestureInstance(this.leftGloveData, this.rightGloveData, this.timeData);
+	public void exportGatheredData(PlayerGestureInstance recordedGestureInstance) {
 		
-		// selectedTab == 0 is recording, == 1 is Training, == 2 is Testing
-		if (selectedTab == 0) {
+		int selectedTab = this.tabbedPane.getSelectedIndex();
+		GestureInstance instance = recordedGestureInstance;
+		
+		final int RECORDING_TAB_IDX = 0;
+		//final int TRAINING_TAB_IDX  = 1;
+		final int TESTING_TAB_IDX   = 2;
+		
+		// selectedTab: 0 is recording, 1 is Training, 2 is Testing
+		if (selectedTab == RECORDING_TAB_IDX) {
 			
-			// Check to see whether the gesture is even long enough to warrent recording...
+			// Check to see whether the gesture is acceptable in the face of up-front analysis from the gesture recognizer...
 			if (GestureRecognizer.isAcceptableGesture(instance)) {
 				
 				// If export to CSV is selected, perform the export
-				if(this.recordingPanel.getCsvExportState()) {
+				if (this.recordingPanel.getCsvExportState()) {
 					this.recordingPanel.exportToCsv(instance);
 				}
 				
@@ -203,59 +172,12 @@ public class MainWindow extends JFrame {
 				this.recordingPanel.setLogString("Unacceptable gesture, please try again!");
 			}
 		}
-		else if (selectedTab == 2 && this.testingPanel.isEngineLoaded()) {
+		else if (selectedTab == TESTING_TAB_IDX && this.testingPanel.isEngineLoaded()) {
 			// If we're on the testing
 			this.testingPanel.testGestureInstance(instance);
 		}
 		
 		this.recordingPanel.setRecordMode(false);
-	}
-	
-	// Triggered from IOServer. Will most Set the coordinates data. If we're in record mode, save that data too.
-	public void hardwareEventListener(GloveEvent gloveEvent) {
-		
-		if (!this.recordingPanel.getRecordMode()) {
-			
-			this.recordingPanel.setRecordMode(true);
-			
-			// If we just started recording, mark the start time. This will be a brand new gesture and file.
-			this.recordingPanel.setNewFile(true); 
-			this.leftGloveData = new ArrayList<GloveData>();
-			this.rightGloveData = new ArrayList<GloveData>();
-			this.timeData = new ArrayList<Double>();
-			this.startTime = System.nanoTime();
-		}
-		else {
-			this.recordingPanel.setNewFile(false);
-		}
-		
-		// Build the gesture coordinates object and final vars to use in the UI thread
-		final double time = getElapsedTime();
-		final GloveData gloveData = buildGloveData(gloveEvent);
-		final String gestureName = this.recordingPanel.getGestureName();
-		
-		switch (gloveEvent.getDevice()) {
-		case LEFT_GLOVE:
-			this.leftGloveData.add(gloveData);
-			break;
-		case RIGHT_GLOVE:
-			this.rightGloveData.add(gloveData);
-			break;
-		default:
-			assert(false);
-			return;
-		}
-		this.timeData.add(time);
-		
-		// Update the UI with the glove data
-		/*
-		this.doUpdateInterface = new Runnable() {       	
-            public void run() {
-            	displayAndLogData(gloveData, gestureName, time);
-            }
-        };
-		SwingUtilities.invokeLater(this.doUpdateInterface);
-		*/
 	}
 	
 	// Call the recorder's display and log method
@@ -307,10 +229,5 @@ public class MainWindow extends JFrame {
 				
 		return panel;
 	}
-	
-	// Gets the time elapsed since recording started in seconds
-	public double getElapsedTime() {
-		double diff = (System.nanoTime() - this.startTime) / (double)(10E9);
-		return diff;
-	}
+
 }

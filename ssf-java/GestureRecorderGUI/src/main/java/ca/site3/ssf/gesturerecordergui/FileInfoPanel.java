@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -88,13 +89,14 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		
 		JLabel dirLabel = new JLabel("Save Directory:");
 		dirLabel.setForeground(Color.black);
-		this.saveDirTextBox = new JTextField(10);
+		this.saveDirTextBox = new JTextField(14);
 		this.saveDirTextBox.setEditable(false);
 		this.dirButton = new JButton("...");
 		this.dirButton.addActionListener(this);
 		
 		formLayoutHelper.addMiddleField(dirLabel, this);
-		JPanel dirPanel = new JPanel(new FlowLayout());
+		JPanel dirPanel = new JPanel();
+		dirPanel.setLayout(new BoxLayout(dirPanel, BoxLayout.X_AXIS));
 		dirPanel.add(this.saveDirTextBox);
 		dirPanel.add(this.dirButton);
 		formLayoutHelper.addLastField(dirPanel, this);
