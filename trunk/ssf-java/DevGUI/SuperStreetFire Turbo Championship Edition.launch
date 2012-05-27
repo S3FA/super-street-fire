@@ -2,7 +2,7 @@
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <stringAttribute key="bad_container_name" value="/DevGUI/ssf.launch"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/DevGUI/src/main/java/ca/site3/ssf/devgui/MainWindow.java"/>
+<listEntry value="/DevGUI/src/main/java/ca/site3/ssf/devgui/DevGUIMainWindow.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
