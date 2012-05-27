@@ -104,6 +104,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		this.durationSlider.setMajorTickSpacing(10);
 		this.durationSlider.setMinorTickSpacing(1);
 		this.durationSlider.setPaintTicks(true);
+		this.durationSlider.setSnapToTicks(true);
 		
 		Hashtable<Integer, JLabel> durationLabelTable = new Hashtable<Integer, JLabel>();
 		for (int i = 10; i <= DURATION_TICK_LENGTH; i += 10) {
@@ -111,6 +112,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		}
 		this.durationSlider.setLabelTable(durationLabelTable);
 		this.durationSlider.setPaintLabels(true);
+		this.durationSlider.setSnapToTicks(true);
 		
 		this.durationSlider.addChangeListener(this);
 		this.durationSlider.setValue(30);
@@ -124,6 +126,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		this.damagePerFlameSlider.setMajorTickSpacing(5);
 		this.damagePerFlameSlider.setMinorTickSpacing(1);
 		this.damagePerFlameSlider.setPaintTicks(true);
+		this.damagePerFlameSlider.setSnapToTicks(true);
 		
 		Hashtable<Integer, JLabel> damageLabelTable = new Hashtable<Integer, JLabel>();
 		damageLabelTable.put(new Integer(1), new JLabel(Integer.toString(1)));
@@ -132,6 +135,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		}
 		this.damagePerFlameSlider.setLabelTable(damageLabelTable);
 		this.damagePerFlameSlider.setPaintLabels(true);
+		this.damagePerFlameSlider.setSnapToTicks(true);
 		
 		this.damagePerFlameSlider.addChangeListener(this);
 		this.damagePerFlameSlider.setValue(5);
@@ -139,12 +143,13 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		formLayoutHelper.addLastField(this.damagePerFlameSlider, controlPanel);
 		
 		// Acceleration controls -----------------------------------------------------
-		final int ACCEL_TICK_LENGTH = 50;
+		final int ACCEL_TICK_LENGTH = 80;
 		JLabel accelLabel = new JLabel("Acceleration (emitter/s^2):");
 		this.accelerationSlider = new JSlider(0, ACCEL_TICK_LENGTH);
 		this.accelerationSlider.setMajorTickSpacing(10);
 		this.accelerationSlider.setMinorTickSpacing(1);
 		this.accelerationSlider.setPaintTicks(true);
+		this.accelerationSlider.setSnapToTicks(true);
 		
 		Hashtable<Integer, JLabel> accelLabelTable = new Hashtable<Integer, JLabel>();
 		for (int i = 0; i <= ACCEL_TICK_LENGTH; i += 10) {
@@ -164,6 +169,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		this.fireWidthSlider.setMajorTickSpacing(1);
 		this.fireWidthSlider.setPaintTicks(true);
 		this.fireWidthSlider.setPaintLabels(true);
+		this.fireWidthSlider.setSnapToTicks(true);
 		this.fireWidthSlider.addChangeListener(this);
 		this.fireWidthSlider.setValue(1);
 		formLayoutHelper.addLabel(fireWidthLabel, controlPanel);
