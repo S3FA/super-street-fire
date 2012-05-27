@@ -1,5 +1,6 @@
 package ca.site3.ssf.gesturerecordergui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -74,11 +75,9 @@ class TrainingPanel extends JPanel implements ActionListener {
 		border.setTitleColor(borderColour);
 		this.setBorder(border);
 		
-        GridBagLayout layout = new GridBagLayout();
-        this.setLayout(layout);
-        
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
 
+		GridBagLayout layout = new GridBagLayout();
 		JPanel wrapperPanel = new JPanel();
 		wrapperPanel.setLayout(layout);
 		
@@ -158,9 +157,15 @@ class TrainingPanel extends JPanel implements ActionListener {
 		engineLoadSavePanel.add(this.clearGestureEngineButton);
 		formLayoutHelper.addLastField(engineLoadSavePanel, wrapperPanel);
 		
-		formLayoutHelper.addLastField(wrapperPanel, this);
-		formLayoutHelper.addLastField(this.trainingFileListPanel, this);
-		formLayoutHelper.addLastField(this.loggingPanel, this);
+
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BorderLayout());
+		centerPanel.add(this.trainingFileListPanel, BorderLayout.NORTH);
+		centerPanel.add(this.loggingPanel, BorderLayout.CENTER);
+		
+		this.setLayout(new BorderLayout());
+		this.add(wrapperPanel, BorderLayout.NORTH);
+		this.add(centerPanel, BorderLayout.CENTER);
 		
 		this.trainFilesButton.setEnabled(false);
 		this.saveGestureEngineButton.setEnabled(false);

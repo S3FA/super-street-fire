@@ -59,7 +59,7 @@ import com.beust.jcommander.JCommander;
  *  
  *  @author Callum
  */
-public class MainWindow extends JFrame implements ActionListener, IDeviceStatusListener {
+public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceStatusListener {
 	
 	private static final long serialVersionUID = 1L;
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -93,7 +93,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
     private Thread gameEventThread;
     
     
-	public MainWindow(IOServer ioserver, CommandLineArgs args) {
+	public DevGUIMainWindow(IOServer ioserver, CommandLineArgs args) {
 		this.args = args;
 		this.ioserver = ioserver;
 		this.gameModel = ioserver.getGameModel();
@@ -188,37 +188,37 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 			public void run() {
 				switch (event.getType()) {
 				case GAME_INFO_REFRESH:
-					MainWindow.this.onGameInfoRefresh((GameInfoRefreshEvent)event);
+					DevGUIMainWindow.this.onGameInfoRefresh((GameInfoRefreshEvent)event);
 					break;
 				case FIRE_EMITTER_CHANGED:
-					MainWindow.this.onFireEmitterChanged((FireEmitterChangedEvent)event);
+					DevGUIMainWindow.this.onFireEmitterChanged((FireEmitterChangedEvent)event);
 					break;
 				case GAME_STATE_CHANGED:
-					MainWindow.this.onGameStateChanged((GameStateChangedEvent)event);
+					DevGUIMainWindow.this.onGameStateChanged((GameStateChangedEvent)event);
 					break;
 				case MATCH_ENDED:
-					MainWindow.this.onMatchEnded((MatchEndedEvent)event);
+					DevGUIMainWindow.this.onMatchEnded((MatchEndedEvent)event);
 					break;
 				case PLAYER_ATTACK_ACTION:
-					MainWindow.this.onPlayerAttackAction((PlayerAttackActionEvent)event);
+					DevGUIMainWindow.this.onPlayerAttackAction((PlayerAttackActionEvent)event);
 					break;
 				case PLAYER_BLOCK_ACTION:
-					MainWindow.this.onPlayerBlockAction((PlayerBlockActionEvent)event);
+					DevGUIMainWindow.this.onPlayerBlockAction((PlayerBlockActionEvent)event);
 					break;
 				case PLAYER_HEALTH_CHANGED:
-					MainWindow.this.onPlayerHealthChanged((PlayerHealthChangedEvent)event);
+					DevGUIMainWindow.this.onPlayerHealthChanged((PlayerHealthChangedEvent)event);
 					break;
 				case RINGMASTER_ACTION:
-					MainWindow.this.onRingmasterAction((RingmasterActionEvent)event);
+					DevGUIMainWindow.this.onRingmasterAction((RingmasterActionEvent)event);
 					break;
 				case ROUND_BEGIN_TIMER_CHANGED:
-					MainWindow.this.onRoundBeginFightTimerChanged((RoundBeginTimerChangedEvent)event);
+					DevGUIMainWindow.this.onRoundBeginFightTimerChanged((RoundBeginTimerChangedEvent)event);
 					break;
 				case ROUND_ENDED:
-					MainWindow.this.onRoundEnded((RoundEndedEvent)event);
+					DevGUIMainWindow.this.onRoundEnded((RoundEndedEvent)event);
 					break;
 				case ROUND_PLAY_TIMER_CHANGED:
-					MainWindow.this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
+					DevGUIMainWindow.this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
 					break;
 				default:
 					assert(false);
@@ -496,7 +496,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception ex) {
-			LoggerFactory.getLogger(MainWindow.class).warn("Couldn't set system look and feel", ex);
+			LoggerFactory.getLogger(DevGUIMainWindow.class).warn("Couldn't set system look and feel", ex);
 		}
 		
 		final IOServer ioserver = new IOServer(args);
@@ -507,7 +507,7 @@ public class MainWindow extends JFrame implements ActionListener, IDeviceStatusL
 		}, "IOServer main thread");
 		serverThread.start();
 		
-		MainWindow window = new MainWindow(ioserver, args);
+		DevGUIMainWindow window = new DevGUIMainWindow(ioserver, args);
 		window.getThisPartyStarted();
 		window.setVisible(true);
 	}

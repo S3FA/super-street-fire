@@ -33,7 +33,7 @@ import ca.site3.ssf.ioserver.PlayerGestureInstance;
  * @author Mike
  *
  */
-public class MainWindow extends JFrame {
+public class GestureRecorderGUIMainWindow extends JFrame {
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	private static final long serialVersionUID = 1L;
@@ -56,7 +56,7 @@ public class MainWindow extends JFrame {
 
 	private JTabbedPane tabbedPane = null;
 	
-	public MainWindow() {
+	public GestureRecorderGUIMainWindow() {
 		super();
 		
 		// Setup the frame's basic characteristics...
@@ -73,7 +73,8 @@ public class MainWindow extends JFrame {
 		
 		// Setup the frame's contents...
 		Container contentPane = this.getContentPane();
-		contentPane.add(this.tabbedPane, BorderLayout.NORTH);
+		contentPane.setLayout(new BorderLayout());
+		contentPane.add(this.tabbedPane, BorderLayout.CENTER);
 		
 		this.pack();
 		this.setLocationRelativeTo(null);
@@ -121,7 +122,7 @@ public class MainWindow extends JFrame {
 
 	// Build the GUI
 	static void createAndShowGUI() {
-		MainWindow mainWindow = new MainWindow();
+		GestureRecorderGUIMainWindow mainWindow = new GestureRecorderGUIMainWindow();
 		mainWindow.setVisible(true);
 	}
 	
@@ -134,7 +135,7 @@ public class MainWindow extends JFrame {
         Runnable doCreateAndShowGUI = new Runnable() {
         	
             public void run() {
-            	MainWindow.createAndShowGUI();
+            	GestureRecorderGUIMainWindow.createAndShowGUI();
             }
         };
         SwingUtilities.invokeLater(doCreateAndShowGUI);
@@ -201,7 +202,7 @@ public class MainWindow extends JFrame {
 		panel.setLayout(new BorderLayout());
 		
 		this.recordingPanel = new RecordingPanel();
-		panel.add(this.recordingPanel, BorderLayout.NORTH);
+		panel.add(this.recordingPanel, BorderLayout.CENTER);
 		
 		return panel;
 	}
@@ -213,7 +214,7 @@ public class MainWindow extends JFrame {
 		panel.setLayout(new BorderLayout());
 		
 		this.trainingPanel = new TrainingPanel();
-		panel.add(this.trainingPanel, BorderLayout.NORTH);
+		panel.add(this.trainingPanel, BorderLayout.CENTER);
 				
 		return panel;
 	}
@@ -225,7 +226,7 @@ public class MainWindow extends JFrame {
 		panel.setLayout(new BorderLayout());
 		
 		this.testingPanel = new TestingPanel();
-		panel.add(this.testingPanel, BorderLayout.NORTH);
+		panel.add(this.testingPanel, BorderLayout.CENTER);
 				
 		return panel;
 	}
