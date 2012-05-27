@@ -10,6 +10,7 @@ import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.Action;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
+import ca.site3.ssf.gamemodel.HeadsetData;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
@@ -168,13 +169,11 @@ public class IOServer {
 			// the game in-general as opposed to when the data is submitted via an Action, where it will only affect that action
 			while (!eventAggregator.getP1HeadsetEventQueue().isEmpty()) {
 				HeadsetEvent p1HeadsetEvent = eventAggregator.getP1HeadsetEventQueue().remove();
-				// TODO: Forward the data to the gamemodel
-				//getGameModel().updatePlayerHeadsetData(1, HeadsetData(p1HeadsetEvent.getAttention(), p1HeadsetEvent.getMeditation())); 
+				getGameModel().updatePlayerHeadsetData(1, new HeadsetData(p1HeadsetEvent.getAttention(), p1HeadsetEvent.getMeditation())); 
 			}
 			while (!eventAggregator.getP2HeadsetEventQueue().isEmpty()) {
 				HeadsetEvent p2HeadsetEvent = eventAggregator.getP2HeadsetEventQueue().remove();
-				// TODO: Forward the data to the gamemodel
-				//getGameModel().updatePlayerHeadsetData(2, HeadsetData(p2HeadsetEvent.getAttention(), p2HeadsetEvent.getMeditation())); 
+				getGameModel().updatePlayerHeadsetData(2, new HeadsetData(p2HeadsetEvent.getAttention(), p2HeadsetEvent.getMeditation())); 
 			}
 			
 			try {
