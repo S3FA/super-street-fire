@@ -1,5 +1,6 @@
 package ca.site3.ssf.gesturerecordergui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -57,11 +58,9 @@ class TestingPanel extends JPanel implements ActionListener {
 		TitledBorder fileBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(borderColour), "Info");
 		border.setTitleColor(borderColour);		
 		
-        GridBagLayout layout = new GridBagLayout();
-        this.setLayout(layout);
-        
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
 
+		GridBagLayout layout = new GridBagLayout();
 		JPanel wrapperPanel = new JPanel();
 		wrapperPanel.setBorder(fileBorder);
 		wrapperPanel.setLayout(layout);
@@ -69,7 +68,7 @@ class TestingPanel extends JPanel implements ActionListener {
 		this.controlPanel = new ControlPanel();
 		this.fileChooser = new JFileChooser();
 		this.fileChooser.setFileFilter(new FileNameExtensionFilter("recognition engine files (*.eng)", "eng"));
-		this.fileName = new JTextField(25);
+		this.fileName = new JTextField(50);
 		this.fileName.setEditable(false);
 		
 		Preferences userPreferences = Preferences.userRoot();
@@ -90,14 +89,17 @@ class TestingPanel extends JPanel implements ActionListener {
 		
 		formLayoutHelper.addLabel(this.fileName, wrapperPanel);
 		formLayoutHelper.addLabel(this.selectFileButton, wrapperPanel);
-		formLayoutHelper.addLastField(new JLabel(""), wrapperPanel);
-		
 		formLayoutHelper.addLabel(this.testButton, wrapperPanel);
 		formLayoutHelper.addLastField(new JLabel(""), wrapperPanel);
 		
-		formLayoutHelper.addLastField(wrapperPanel, this);
-		formLayoutHelper.addLastField(this.controlPanel, this);
-		formLayoutHelper.addLastField(this.loggerPanel, this);
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BorderLayout());
+		centerPanel.add(this.controlPanel, BorderLayout.NORTH);
+		centerPanel.add(this.loggerPanel, BorderLayout.CENTER);
+		
+		this.setLayout(new BorderLayout());
+		this.add(wrapperPanel, BorderLayout.NORTH);
+		this.add(centerPanel, BorderLayout.CENTER);
 		
 		this.isEngineLoaded = false;
 	}

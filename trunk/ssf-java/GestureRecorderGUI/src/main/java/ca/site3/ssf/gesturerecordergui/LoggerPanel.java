@@ -2,6 +2,7 @@ package ca.site3.ssf.gesturerecordergui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,14 +33,19 @@ class LoggerPanel extends JPanel implements ActionListener {
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 
-		this.clearLogButton = new JButton("Clear Log");
+		this.clearLogButton = new JButton("Clear");
 		this.clearLogButton.addActionListener(this);
 		
 		this.log = new TextArea(23, 100);
 		this.log.setEditable(false);
-		this.add(this.log, BorderLayout.NORTH);
-		this.add(this.clearLogButton, BorderLayout.SOUTH);
 		
+		this.setLayout(new BorderLayout());
+		this.add(this.log, BorderLayout.CENTER);
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		buttonPanel.add(this.clearLogButton);
+		this.add(buttonPanel, BorderLayout.EAST);
 	}
 	
 	void setTextAreaSize(int rows, int cols) {

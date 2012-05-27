@@ -35,13 +35,6 @@ class RecordingPanel extends JPanel {
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 
-		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
-		
-		GridBagLayout layout = new GridBagLayout();
-		JPanel stateInfoPanel = new JPanel();
-        stateInfoPanel.setLayout(layout);
-        this.setLayout(layout);
-        
 		this.controlPanel = new ControlPanel();
 		this.loggerPanel = new LoggerPanel("Log");
 		this.loggerPanel.setTextAreaSize(20, 100);
@@ -49,15 +42,21 @@ class RecordingPanel extends JPanel {
 		this.sensorDataPanelLeft = new SensorDataPanel("Left");
 		this.sensorDataPanelRight = new SensorDataPanel("Right");
 		this.fileInfoPanel = new FileInfoPanel();
-		stateInfoPanel.setLayout(new GridLayout(1,2));
 		
-		stateInfoPanel.add(this.sensorDataPanelLeft, BorderLayout.WEST);
-		stateInfoPanel.add(this.sensorDataPanelRight, BorderLayout.EAST);
-		stateInfoPanel.add(this.fileInfoPanel, BorderLayout.SOUTH);
+		JPanel stateInfoPanel = new JPanel();
+		stateInfoPanel.setLayout(new GridLayout(1,3));
+		stateInfoPanel.add(this.sensorDataPanelLeft);
+		stateInfoPanel.add(this.sensorDataPanelRight);
+		stateInfoPanel.add(this.fileInfoPanel);
 		
-		formLayoutHelper.addLastField(stateInfoPanel, this);
-		formLayoutHelper.addLastField(this.controlPanel, this);
-		formLayoutHelper.addLastField(this.loggerPanel, this);
+		JPanel controlAndLoggerPanel = new JPanel();
+		controlAndLoggerPanel.setLayout(new BorderLayout());
+		controlAndLoggerPanel.add(this.controlPanel, BorderLayout.NORTH);
+		controlAndLoggerPanel.add(this.loggerPanel, BorderLayout.CENTER);
+		
+		this.setLayout(new BorderLayout());
+		this.add(stateInfoPanel, BorderLayout.NORTH);
+		this.add(controlAndLoggerPanel, BorderLayout.CENTER);
 		
 		this.isRecordMode = false;
 	}
