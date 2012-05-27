@@ -90,6 +90,11 @@ public class GameModel implements IGameModel {
 		this.currState.togglePause();
 	}
 	
+	public void updatePlayerHeadsetData(int playerNum, HeadsetData data) {
+		// TODO: What do we do with the headset data? ... moves document needs to specify this.
+		//this.currState.updatePlayerHeadsetData(playerNum, data);
+	}
+	
 	public void touchFireEmitter(FireEmitter.Location location, int index,
 								 float intensity, EnumSet<Entity> contributors) {
 		

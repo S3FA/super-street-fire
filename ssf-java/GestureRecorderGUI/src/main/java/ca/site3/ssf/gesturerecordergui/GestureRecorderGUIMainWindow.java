@@ -92,8 +92,6 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 		
 		this.consumerThread = new Thread(new Runnable() {
 			public void run() {
-				
-				
 
 				PlayerGestureInstance currGestureInst = null;
 				
@@ -108,9 +106,11 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 					}
 					catch (InterruptedException e) {
 						log.warn("Gesture queue blocking was interrupted.", e);
+						currGestureInst = null;
 						continue;
 					}
 					
+					assert(currGestureInst != null);
 					exportGatheredData(currGestureInst);
 				}
 			}
