@@ -1,4 +1,10 @@
-package org.Sound;
+package ca.site3.ssf.Sound;
+
+import java.io.File;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelListener;
@@ -12,6 +18,23 @@ public class SoundController implements IGameModelListener
     public static void main( String[] args )
     {
         System.out.println("Created a new instance of SoundController.");
+        new Thread(new Runnable() { // the wrapper thread is unnecessary, unless it blocks on the Clip finishing, see comments
+            public void run() 
+            {
+	              try 
+	              {
+	            	  Clip clip = AudioSystem.getClip();
+	            	  AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File("/src/main/java/org/Sound/Resources/Hadoken.wav"));
+	            	  clip.open(inputStream);
+	            	  clip.start(); 
+	              } 
+	              catch (Exception e) 
+	              {
+	            	  System.err.println(e.getMessage());
+	              }
+            }
+          }).start();
+  
     }
     
     /**
