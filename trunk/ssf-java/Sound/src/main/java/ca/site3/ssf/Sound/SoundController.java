@@ -24,7 +24,7 @@ public class SoundController implements IGameModelListener
 	              try 
 	              {
 	            	  Clip clip = AudioSystem.getClip();
-	            	  AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File("/src/main/java/org/Sound/Resources/Hadoken.wav"));
+	            	  AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File("Resources/Hadoken.wav"));
 	            	  clip.open(inputStream);
 	            	  clip.start(); 
 	              } 
