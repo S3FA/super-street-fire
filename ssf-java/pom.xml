@@ -44,6 +44,7 @@
   	<module>DevGUI</module>
   	<module>GestureRecorderGUI</module>
     <module>SoundProtocol</module>
+    <module>Sound</module>
   </modules>
   <dependencyManagement>
   	<dependencies>
