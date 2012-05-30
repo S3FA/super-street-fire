@@ -1,4 +1,4 @@
-package org.SoundProtocol;
+package org.Sound;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
