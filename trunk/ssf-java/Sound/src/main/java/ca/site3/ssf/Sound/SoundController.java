@@ -1,11 +1,5 @@
 package ca.site3.ssf.Sound;
 
-import java.io.File;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 
@@ -15,28 +9,16 @@ import ca.site3.ssf.gamemodel.IGameModelListener;
  */
 public class SoundController implements IGameModelListener
 {
-    public static void main( String[] args )
-    {
-        System.out.println("Created a new instance of SoundController.");
-        new Thread(new Runnable() { // the wrapper thread is unnecessary, unless it blocks on the Clip finishing, see comments
-            public void run() 
-            {
-	              try 
-	              {
-	            	  Clip clip = AudioSystem.getClip();
-	            	  AudioInputStream inputStream = AudioSystem.getAudioInputStream(new File("Resources/Hadoken.wav"));
-	            	  clip.open(inputStream);
-	            	  clip.start(); 
-	              } 
-	              catch (Exception e) 
-	              {
-	            	  System.err.println(e.getMessage());
-	              }
-            }
-          }).start();
-  
-    }
-    
+	/** Plays audio from given file names. */
+	public static void main( String [] args ) {
+		
+		// Test the playback functionality
+		PlaybackHandler.playAudioFile("Resources/Hadoken.wav");
+
+		// Must exit explicitly since audio creates non-daemon threads.
+		System.exit( 0 );
+	} 
+
     /**
 	 * Called for any event that can be listened for in the gamemodel.
 	 * @param event The object holding the event information.
@@ -69,6 +51,7 @@ public class SoundController implements IGameModelListener
 		}
 	}
 	
+	// Handle different types of sound events
 	private void playGameStateSounds()
 	{
 		
