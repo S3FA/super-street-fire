@@ -15,7 +15,7 @@ public class CommandLineArgs {
 	@Parameter(names = "-chipDamage", description = "Chip damage enabled")
 	public Boolean isChipDamage = true;
 	
-	@Parameter(names = "-chipDamagePercent", description = "Chip damage percentage")
+	@Parameter(names = "-chipDamagePercent", description = "Chip damage percentage (percentage of an attack's damage that transfers to a blocking player)")
 	public Float chipDamagePercentage = 0.1f;
 	
 	@Parameter(names = "-actionGap", description = "Minimum time (in seconds) between player actions")
