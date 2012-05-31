@@ -98,7 +98,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 		formLayoutHelper.addLastField(new JLabel(""), controlPanel);
 		
 		// Duration controls ----------------------------------------------------------
-		final int DURATION_TICK_LENGTH = 80;
+		final int DURATION_TICK_LENGTH = 100;
 		JLabel durationLabel = new JLabel("Duration (s):");
 		this.durationSlider = new JSlider(10, DURATION_TICK_LENGTH);
 		this.durationSlider.setMajorTickSpacing(10);
