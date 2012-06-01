@@ -25,8 +25,15 @@ public enum GestureType {
 	RIGHT_UPPERCUT(4, PlayerActionType.UPPERCUT_ATTACK, 25000, false, true),
 	RIGHT_CHOP(4, PlayerActionType.CHOP_ATTACK, 0, false, true),
 	BLOCK(3, PlayerActionType.BLOCK, 0, true, true),
-	HADOUKEN(3, PlayerActionType.HADOUKEN_ATTACK, 0, true, true),
-	SONIC_BOOM(3, PlayerActionType.SONIC_BOOM_ATTACK, 0, true, true);
+	HADOUKEN(4, PlayerActionType.HADOUKEN_ATTACK, 0, true, true),
+	LEFT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, 0, true, false),
+	RIGHT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, 0, false, true),
+	SONIC_BOOM(4, PlayerActionType.SONIC_BOOM_ATTACK, 0, true, true),
+	DOUBLE_LARIAT(4, PlayerActionType.DOUBLE_LARIAT_ATTACK, 0, true, true),
+	SUMO_HEADBUTT(4, PlayerActionType.SUMO_HEADBUTT_ATTACK, 0, true, true),
+	LEFT_ONE_HUNDRED_HAND_SLAP(4, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, 0, true, false),
+	RIGHT_ONE_HUNDRED_HAND_SLAP(4, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, 0, false, true),
+	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(4, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, 0, true, true);
 	
 	final private PlayerActionType actionFactoryType; // The corresponding gamemodel factory type for when
 													  // it comes time to build the gesture for the gamemodel

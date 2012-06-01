@@ -20,13 +20,17 @@ message Command {
   
   // for EXECUTE_PLAYER_ACTION (PlayerActionType)
   enum PlayerAction {
-    BLOCK             = 0;
-    JAB_ATTACK        = 1;
-    HOOK_ATTACK       = 2;
-    UPPERCUT_ATTACK   = 3;
-    HADOUKEN_ATTACK   = 4;
-    SONIC_BOOM_ATTACK = 5;
-    CHOP_ATTACK       = 6;
+    BLOCK                = 0;
+    JAB_ATTACK           = 1;
+    HOOK_ATTACK          = 2;
+    UPPERCUT_ATTACK      = 3;
+    HADOUKEN_ATTACK      = 4;
+    SONIC_BOOM_ATTACK    = 5;
+    CHOP_ATTACK          = 6;
+    SHORYUKEN_ATTACK     = 7;
+    DOUBLE_LARIAT_ATTACK = 8;
+    SUMO_HEADBUTT_ATTACK = 9;
+    ONE_HUNDRED_HAND_SLAP_ATTACK = 10;
   }
   
   // for EXECUTE_ACTION or TOUCH_EMITTER

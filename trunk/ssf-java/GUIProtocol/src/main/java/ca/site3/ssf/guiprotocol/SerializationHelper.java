@@ -132,6 +132,14 @@ class SerializationHelper {
 			return PlayerAction.CHOP_ATTACK;
 		case SONIC_BOOM_ATTACK:
 			return PlayerAction.SONIC_BOOM_ATTACK;
+		case SHORYUKEN_ATTACK:
+			return PlayerAction.SHORYUKEN_ATTACK;
+		case DOUBLE_LARIAT_ATTACK:
+			return PlayerAction.DOUBLE_LARIAT_ATTACK;
+		case SUMO_HEADBUTT_ATTACK:
+			return PlayerAction.SUMO_HEADBUTT_ATTACK;
+		case ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return PlayerAction.ONE_HUNDRED_HAND_SLAP_ATTACK;
 		default:
 			return null;
 		}
@@ -153,12 +161,18 @@ class SerializationHelper {
 			return PlayerActionType.CHOP_ATTACK;
 		case SONIC_BOOM_ATTACK:
 			return PlayerActionType.SONIC_BOOM_ATTACK;
+		case SHORYUKEN_ATTACK:
+			return PlayerActionType.SHORYUKEN_ATTACK;
+		case DOUBLE_LARIAT_ATTACK:
+			return PlayerActionType.DOUBLE_LARIAT_ATTACK;
+		case SUMO_HEADBUTT_ATTACK:
+			return PlayerActionType.SUMO_HEADBUTT_ATTACK;
+		case ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unknown player action: "+action);
 		}
 	}
-	
-	
 	
 	static Location emitterTypeToGame(FireEmitterType t) {
 		switch (t) {
@@ -418,6 +432,14 @@ class SerializationHelper {
 			return AttackType.RIGHT_CHOP_ATTACK;
 		case SONIC_BOOM:
 			return AttackType.SONIC_BOOM_ATTACK;
+		case SHORYUKEN_ATTACK:
+			return AttackType.SHORYUKEN_ATTACK;
+		case DOUBLE_LARIAT_ATTACK:
+			return AttackType.DOUBLE_LARIAT_ATTACK;
+		case SUMO_HEADBUTT_ATTACK:
+			return AttackType.SUMO_HEADBUTT_ATTACK;
+		case ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
 		}
@@ -447,6 +469,14 @@ class SerializationHelper {
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_CHOP;
 		case SONIC_BOOM_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SONIC_BOOM;
+		case SHORYUKEN_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SHORYUKEN_ATTACK;
+		case DOUBLE_LARIAT_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.DOUBLE_LARIAT_ATTACK;
+		case SUMO_HEADBUTT_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SUMO_HEADBUTT_ATTACK;
+		case ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
 		}
