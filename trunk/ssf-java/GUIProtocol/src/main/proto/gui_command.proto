@@ -26,6 +26,7 @@ message Command {
     UPPERCUT_ATTACK   = 3;
     HADOUKEN_ATTACK   = 4;
     SONIC_BOOM_ATTACK = 5;
+    CHOP_ATTACK       = 6;
   }
   
   // for EXECUTE_ACTION or TOUCH_EMITTER

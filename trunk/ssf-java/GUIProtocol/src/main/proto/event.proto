@@ -61,8 +61,12 @@ message GameEvent {
     RIGHT_HOOK       = 4;
     LEFT_UPPERCUT    = 5;
     RIGHT_UPPERCUT   = 6;
+    
     HADOUKEN         = 7;
     SONIC_BOOM       = 8;
+    
+    LEFT_CHOP        = 10;
+    RIGHT_CHOP       = 11;
   }
   
   enum RoundBeginCountdownTime {
