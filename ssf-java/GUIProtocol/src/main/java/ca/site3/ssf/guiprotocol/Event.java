@@ -20,13 +20,13 @@ public final class Event {
     ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter getEmitter();
     ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitterOrBuilder getEmitterOrBuilder();
     
-    // optional .GameState oldGameState = 3;
+    // optional .guiprotocol.GameState oldGameState = 3;
     boolean hasOldGameState();
-    Common.GameState getOldGameState();
+    ca.site3.ssf.guiprotocol.Common.GameState getOldGameState();
     
-    // optional .GameState newGameState = 4;
+    // optional .guiprotocol.GameState newGameState = 4;
     boolean hasNewGameState();
-    Common.GameState getNewGameState();
+    ca.site3.ssf.guiprotocol.Common.GameState getNewGameState();
     
     // optional .guiprotocol.GameEvent.MatchResult matchResult = 5;
     boolean hasMatchResult();
@@ -68,9 +68,9 @@ public final class Event {
     boolean hasTimeInSecs();
     int getTimeInSecs();
     
-    // optional .GameState gameState = 16;
+    // optional .guiprotocol.GameState gameState = 16;
     boolean hasGameState();
-    Common.GameState getGameState();
+    ca.site3.ssf.guiprotocol.Common.GameState getGameState();
     
     // repeated .guiprotocol.GameEvent.RoundResult roundResults = 17;
     java.util.List<ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult> getRoundResultsList();
@@ -581,6 +581,8 @@ public final class Event {
       RIGHT_UPPERCUT(6, 6),
       HADOUKEN(7, 7),
       SONIC_BOOM(8, 8),
+      LEFT_CHOP(9, 10),
+      RIGHT_CHOP(10, 11),
       ;
       
       public static final int CUSTOM_UNDEFINED_VALUE = 0;
@@ -592,6 +594,8 @@ public final class Event {
       public static final int RIGHT_UPPERCUT_VALUE = 6;
       public static final int HADOUKEN_VALUE = 7;
       public static final int SONIC_BOOM_VALUE = 8;
+      public static final int LEFT_CHOP_VALUE = 10;
+      public static final int RIGHT_CHOP_VALUE = 11;
       
       
       public final int getNumber() { return value; }
@@ -607,6 +611,8 @@ public final class Event {
           case 6: return RIGHT_UPPERCUT;
           case 7: return HADOUKEN;
           case 8: return SONIC_BOOM;
+          case 10: return LEFT_CHOP;
+          case 11: return RIGHT_CHOP;
           default: return null;
         }
       }
@@ -637,7 +643,7 @@ public final class Event {
       }
       
       private static final AttackType[] VALUES = {
-        CUSTOM_UNDEFINED, LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, LEFT_UPPERCUT, RIGHT_UPPERCUT, HADOUKEN, SONIC_BOOM, 
+        CUSTOM_UNDEFINED, LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, LEFT_UPPERCUT, RIGHT_UPPERCUT, HADOUKEN, SONIC_BOOM, LEFT_CHOP, RIGHT_CHOP, 
       };
       
       public static AttackType valueOf(
@@ -1374,23 +1380,23 @@ public final class Event {
       return emitter_;
     }
     
-    // optional .GameState oldGameState = 3;
+    // optional .guiprotocol.GameState oldGameState = 3;
     public static final int OLDGAMESTATE_FIELD_NUMBER = 3;
-    private Common.GameState oldGameState_;
+    private ca.site3.ssf.guiprotocol.Common.GameState oldGameState_;
     public boolean hasOldGameState() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
-    public Common.GameState getOldGameState() {
+    public ca.site3.ssf.guiprotocol.Common.GameState getOldGameState() {
       return oldGameState_;
     }
     
-    // optional .GameState newGameState = 4;
+    // optional .guiprotocol.GameState newGameState = 4;
     public static final int NEWGAMESTATE_FIELD_NUMBER = 4;
-    private Common.GameState newGameState_;
+    private ca.site3.ssf.guiprotocol.Common.GameState newGameState_;
     public boolean hasNewGameState() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
-    public Common.GameState getNewGameState() {
+    public ca.site3.ssf.guiprotocol.Common.GameState getNewGameState() {
       return newGameState_;
     }
     
@@ -1494,13 +1500,13 @@ public final class Event {
       return timeInSecs_;
     }
     
-    // optional .GameState gameState = 16;
+    // optional .guiprotocol.GameState gameState = 16;
     public static final int GAMESTATE_FIELD_NUMBER = 16;
-    private Common.GameState gameState_;
+    private ca.site3.ssf.guiprotocol.Common.GameState gameState_;
     public boolean hasGameState() {
       return ((bitField0_ & 0x00004000) == 0x00004000);
     }
-    public Common.GameState getGameState() {
+    public ca.site3.ssf.guiprotocol.Common.GameState getGameState() {
       return gameState_;
     }
     
@@ -1550,8 +1556,8 @@ public final class Event {
     private void initFields() {
       type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.GAME_INFO_REFRESH;
       emitter_ = ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter.getDefaultInstance();
-      oldGameState_ = Common.GameState.NO_STATE;
-      newGameState_ = Common.GameState.NO_STATE;
+      oldGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
+      newGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
       player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
       attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
@@ -1562,7 +1568,7 @@ public final class Event {
       roundResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RoundResult.ROUND_TIE;
       timedOut_ = false;
       timeInSecs_ = 0;
-      gameState_ = Common.GameState.NO_STATE;
+      gameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       roundResults_ = java.util.Collections.emptyList();
       player1Health_ = 0F;
       player2Health_ = 0F;
@@ -1870,9 +1876,9 @@ public final class Event {
           emitterBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
-        oldGameState_ = Common.GameState.NO_STATE;
+        oldGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         bitField0_ = (bitField0_ & ~0x00000004);
-        newGameState_ = Common.GameState.NO_STATE;
+        newGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         bitField0_ = (bitField0_ & ~0x00000008);
         matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
         bitField0_ = (bitField0_ & ~0x00000010);
@@ -1894,7 +1900,7 @@ public final class Event {
         bitField0_ = (bitField0_ & ~0x00001000);
         timeInSecs_ = 0;
         bitField0_ = (bitField0_ & ~0x00002000);
-        gameState_ = Common.GameState.NO_STATE;
+        gameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         bitField0_ = (bitField0_ & ~0x00004000);
         roundResults_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00008000);
@@ -2166,7 +2172,7 @@ public final class Event {
             }
             case 24: {
               int rawValue = input.readEnum();
-              Common.GameState value = Common.GameState.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Common.GameState value = ca.site3.ssf.guiprotocol.Common.GameState.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
               } else {
@@ -2177,7 +2183,7 @@ public final class Event {
             }
             case 32: {
               int rawValue = input.readEnum();
-              Common.GameState value = Common.GameState.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Common.GameState value = ca.site3.ssf.guiprotocol.Common.GameState.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(4, rawValue);
               } else {
@@ -2268,7 +2274,7 @@ public final class Event {
             }
             case 128: {
               int rawValue = input.readEnum();
-              Common.GameState value = Common.GameState.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Common.GameState value = ca.site3.ssf.guiprotocol.Common.GameState.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(16, rawValue);
               } else {
@@ -2437,15 +2443,15 @@ public final class Event {
         return emitterBuilder_;
       }
       
-      // optional .GameState oldGameState = 3;
-      private Common.GameState oldGameState_ = Common.GameState.NO_STATE;
+      // optional .guiprotocol.GameState oldGameState = 3;
+      private ca.site3.ssf.guiprotocol.Common.GameState oldGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       public boolean hasOldGameState() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-      public Common.GameState getOldGameState() {
+      public ca.site3.ssf.guiprotocol.Common.GameState getOldGameState() {
         return oldGameState_;
       }
-      public Builder setOldGameState(Common.GameState value) {
+      public Builder setOldGameState(ca.site3.ssf.guiprotocol.Common.GameState value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2456,20 +2462,20 @@ public final class Event {
       }
       public Builder clearOldGameState() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        oldGameState_ = Common.GameState.NO_STATE;
+        oldGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         onChanged();
         return this;
       }
       
-      // optional .GameState newGameState = 4;
-      private Common.GameState newGameState_ = Common.GameState.NO_STATE;
+      // optional .guiprotocol.GameState newGameState = 4;
+      private ca.site3.ssf.guiprotocol.Common.GameState newGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       public boolean hasNewGameState() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
-      public Common.GameState getNewGameState() {
+      public ca.site3.ssf.guiprotocol.Common.GameState getNewGameState() {
         return newGameState_;
       }
-      public Builder setNewGameState(Common.GameState value) {
+      public Builder setNewGameState(ca.site3.ssf.guiprotocol.Common.GameState value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2480,7 +2486,7 @@ public final class Event {
       }
       public Builder clearNewGameState() {
         bitField0_ = (bitField0_ & ~0x00000008);
-        newGameState_ = Common.GameState.NO_STATE;
+        newGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         onChanged();
         return this;
       }
@@ -2710,15 +2716,15 @@ public final class Event {
         return this;
       }
       
-      // optional .GameState gameState = 16;
-      private Common.GameState gameState_ = Common.GameState.NO_STATE;
+      // optional .guiprotocol.GameState gameState = 16;
+      private ca.site3.ssf.guiprotocol.Common.GameState gameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       public boolean hasGameState() {
         return ((bitField0_ & 0x00004000) == 0x00004000);
       }
-      public Common.GameState getGameState() {
+      public ca.site3.ssf.guiprotocol.Common.GameState getGameState() {
         return gameState_;
       }
-      public Builder setGameState(Common.GameState value) {
+      public Builder setGameState(ca.site3.ssf.guiprotocol.Common.GameState value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2729,7 +2735,7 @@ public final class Event {
       }
       public Builder clearGameState() {
         bitField0_ = (bitField0_ & ~0x00004000);
-        gameState_ = Common.GameState.NO_STATE;
+        gameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         onChanged();
         return this;
       }
@@ -2879,51 +2885,53 @@ public final class Event {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022\013guiprotocol\032\014common.proto" +
-      "\"\323\r\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
+      "\"\226\016\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
       "ol.GameEvent.EventType\0223\n\007emitter\030\002 \001(\0132" +
-      "\".guiprotocol.GameEvent.FireEmitter\022 \n\014o" +
-      "ldGameState\030\003 \001(\0162\n.GameState\022 \n\014newGame" +
-      "State\030\004 \001(\0162\n.GameState\0227\n\013matchResult\030\005" +
-      " \001(\0162\".guiprotocol.GameEvent.MatchResult" +
-      "\022-\n\006player\030\006 \001(\0162\035.guiprotocol.GameEvent" +
-      ".Player\0225\n\nattackType\030\007 \001(\0162!.guiprotoco" +
-      "l.GameEvent.AttackType\022\021\n\toldHealth\030\t \001(",
-      "\002\022\021\n\tnewHealth\030\n \001(\002\022\023\n\013roundNumber\030\013 \001(" +
-      "\005\022G\n\017roundBeginTimer\030\014 \001(\0162..guiprotocol" +
-      ".GameEvent.RoundBeginCountdownTime\0227\n\013ro" +
-      "undResult\030\r \001(\0162\".guiprotocol.GameEvent." +
-      "RoundResult\022\020\n\010timedOut\030\016 \001(\010\022\022\n\ntimeInS" +
-      "ecs\030\017 \001(\005\022\035\n\tgameState\030\020 \001(\0162\n.GameState" +
-      "\0228\n\014roundResults\030\021 \003(\0162\".guiprotocol.Gam" +
-      "eEvent.RoundResult\022\025\n\rplayer1Health\030\022 \001(" +
-      "\002\022\025\n\rplayer2Health\030\023 \001(\002\022\030\n\020roundInPlayT" +
-      "imer\030\024 \001(\005\032\261\001\n\013FireEmitter\022\024\n\014emitterInd",
-      "ex\030\001 \002(\005\022;\n\013emitterType\030\002 \002(\0162&.guiproto" +
-      "col.GameEvent.FireEmitterType\022\033\n\023intensi" +
-      "tyRingmaster\030\003 \002(\002\022\030\n\020intensityPlayer1\030\004" +
-      " \002(\002\022\030\n\020intensityPlayer2\030\005 \002(\002\"\230\002\n\tEvent" +
-      "Type\022\025\n\021GAME_INFO_REFRESH\020\000\022\030\n\024FIRE_EMIT" +
-      "TER_CHANGED\020\001\022\026\n\022GAME_STATE_CHANGED\020\002\022\031\n" +
-      "\025PLAYER_HEALTH_CHANGED\020\003\022\034\n\030ROUND_PLAY_T" +
-      "IMER_CHANGED\020\004\022\035\n\031ROUND_BEGIN_TIMER_CHAN" +
-      "GED\020\005\022\017\n\013ROUND_ENDED\020\006\022\017\n\013MATCH_ENDED\020\007\022" +
-      "\030\n\024PLAYER_ATTACK_ACTION\020\010\022\027\n\023PLAYER_BLOC",
-      "K_ACTION\020\t\022\025\n\021RINGMASTER_ACTION\020\n\"(\n\006Pla" +
-      "yer\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"L\n\013R" +
-      "oundResult\022\r\n\tROUND_TIE\020\000\022\026\n\022PLAYER_1_RO" +
-      "UND_WIN\020\001\022\026\n\022PLAYER_2_ROUND_WIN\020\002\"=\n\013Mat" +
-      "chResult\022\026\n\022PLAYER_1_MATCH_WIN\020\000\022\026\n\022PLAY" +
-      "ER_2_MATCH_WIN\020\001\"@\n\017FireEmitterType\022\r\n\tL" +
-      "EFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING" +
-      "\020\002\"I\n\020FlameEmitterType\022\020\n\014ATTACK_FLAME\020\000" +
-      "\022\017\n\013BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"\243\001" +
-      "\n\nAttackType\022\024\n\020CUSTOM_UNDEFINED\020\000\022\014\n\010LE",
-      "FT_JAB\020\001\022\r\n\tRIGHT_JAB\020\002\022\r\n\tLEFT_HOOK\020\003\022\016" +
-      "\n\nRIGHT_HOOK\020\004\022\021\n\rLEFT_UPPERCUT\020\005\022\022\n\016RIG" +
-      "HT_UPPERCUT\020\006\022\014\n\010HADOUKEN\020\007\022\016\n\nSONIC_BOO" +
-      "M\020\010\"A\n\027RoundBeginCountdownTime\022\t\n\005THREE\020" +
-      "\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.sit" +
-      "e3.ssf.guiprotocol"
+      "\".guiprotocol.GameEvent.FireEmitter\022,\n\014o" +
+      "ldGameState\030\003 \001(\0162\026.guiprotocol.GameStat" +
+      "e\022,\n\014newGameState\030\004 \001(\0162\026.guiprotocol.Ga" +
+      "meState\0227\n\013matchResult\030\005 \001(\0162\".guiprotoc" +
+      "ol.GameEvent.MatchResult\022-\n\006player\030\006 \001(\016" +
+      "2\035.guiprotocol.GameEvent.Player\0225\n\nattac" +
+      "kType\030\007 \001(\0162!.guiprotocol.GameEvent.Atta",
+      "ckType\022\021\n\toldHealth\030\t \001(\002\022\021\n\tnewHealth\030\n" +
+      " \001(\002\022\023\n\013roundNumber\030\013 \001(\005\022G\n\017roundBeginT" +
+      "imer\030\014 \001(\0162..guiprotocol.GameEvent.Round" +
+      "BeginCountdownTime\0227\n\013roundResult\030\r \001(\0162" +
+      "\".guiprotocol.GameEvent.RoundResult\022\020\n\010t" +
+      "imedOut\030\016 \001(\010\022\022\n\ntimeInSecs\030\017 \001(\005\022)\n\tgam" +
+      "eState\030\020 \001(\0162\026.guiprotocol.GameState\0228\n\014" +
+      "roundResults\030\021 \003(\0162\".guiprotocol.GameEve" +
+      "nt.RoundResult\022\025\n\rplayer1Health\030\022 \001(\002\022\025\n" +
+      "\rplayer2Health\030\023 \001(\002\022\030\n\020roundInPlayTimer",
+      "\030\024 \001(\005\032\261\001\n\013FireEmitter\022\024\n\014emitterIndex\030\001" +
+      " \002(\005\022;\n\013emitterType\030\002 \002(\0162&.guiprotocol." +
+      "GameEvent.FireEmitterType\022\033\n\023intensityRi" +
+      "ngmaster\030\003 \002(\002\022\030\n\020intensityPlayer1\030\004 \002(\002" +
+      "\022\030\n\020intensityPlayer2\030\005 \002(\002\"\230\002\n\tEventType" +
+      "\022\025\n\021GAME_INFO_REFRESH\020\000\022\030\n\024FIRE_EMITTER_" +
+      "CHANGED\020\001\022\026\n\022GAME_STATE_CHANGED\020\002\022\031\n\025PLA" +
+      "YER_HEALTH_CHANGED\020\003\022\034\n\030ROUND_PLAY_TIMER" +
+      "_CHANGED\020\004\022\035\n\031ROUND_BEGIN_TIMER_CHANGED\020" +
+      "\005\022\017\n\013ROUND_ENDED\020\006\022\017\n\013MATCH_ENDED\020\007\022\030\n\024P",
+      "LAYER_ATTACK_ACTION\020\010\022\027\n\023PLAYER_BLOCK_AC" +
+      "TION\020\t\022\025\n\021RINGMASTER_ACTION\020\n\"(\n\006Player\022" +
+      "\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"L\n\013Round" +
+      "Result\022\r\n\tROUND_TIE\020\000\022\026\n\022PLAYER_1_ROUND_" +
+      "WIN\020\001\022\026\n\022PLAYER_2_ROUND_WIN\020\002\"=\n\013MatchRe" +
+      "sult\022\026\n\022PLAYER_1_MATCH_WIN\020\000\022\026\n\022PLAYER_2" +
+      "_MATCH_WIN\020\001\"@\n\017FireEmitterType\022\r\n\tLEFT_" +
+      "RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I" +
+      "\n\020FlameEmitterType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013" +
+      "BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"\302\001\n\nAt",
+      "tackType\022\024\n\020CUSTOM_UNDEFINED\020\000\022\014\n\010LEFT_J" +
+      "AB\020\001\022\r\n\tRIGHT_JAB\020\002\022\r\n\tLEFT_HOOK\020\003\022\016\n\nRI" +
+      "GHT_HOOK\020\004\022\021\n\rLEFT_UPPERCUT\020\005\022\022\n\016RIGHT_U" +
+      "PPERCUT\020\006\022\014\n\010HADOUKEN\020\007\022\016\n\nSONIC_BOOM\020\010\022" +
+      "\r\n\tLEFT_CHOP\020\n\022\016\n\nRIGHT_CHOP\020\013\"A\n\027RoundB" +
+      "eginCountdownTime\022\t\n\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n" +
+      "\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.site3.ssf.guipro" +
+      "tocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2952,7 +2960,7 @@ public final class Event {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          Common.getDescriptor(),
+          ca.site3.ssf.guiprotocol.Common.getDescriptor(),
         }, assigner);
   }
   

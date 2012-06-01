@@ -13,7 +13,7 @@ import ca.site3.ssf.common.MultiLerp;
  */
 final public class ActionFactory {
 	
-	public enum PlayerActionType { BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
+	public enum PlayerActionType { BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
 
 	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
 	final static public float DEFAULT_FULL_OFF_FRACTION = 0.25f;
@@ -62,55 +62,99 @@ final public class ActionFactory {
 				success &= this.addBurstToAction(action, emitterIterRight, 1, 1, 3.0, 0.99, 0.01);
 				break;
 				
-			case JAB_ATTACK:
+			case JAB_ATTACK: {
 				assert(leftHand || rightHand);
-				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_JAB_ATTACK, blockerOrAttacker, attackee, 3.0f);
-					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
-							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
-				}
-				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_JAB_ATTACK, blockerOrAttacker, attackee, 3.0f);
-					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
-							1, 2.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
-				}
-				break;
-			
-			case HOOK_ATTACK:
-				assert(leftHand || rightHand);
-				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
-					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
-							2, 3.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
-				}
-				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, 4.0f);
-					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
-							2, 3.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
-				}
-				break;
-			
-			case UPPERCUT_ATTACK:
-				assert(leftHand || rightHand);
-				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, 5.0f);
-					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
-							2, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
-				}
-				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, 5.0f);
-					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
-							2, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
-				}
-				break;
 				
-			case HADOUKEN_ATTACK:
-				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.HADOUKEN_ATTACK, playerNum, 4.0, 3, 2.0f);
+				final float JAB_TIME_LENGTH_IN_SECS = 4.0f;
+				final float JAB_DAMAGE_PER_FLAME = 5.0f;
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_JAB_ATTACK, blockerOrAttacker, attackee, JAB_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							1, JAB_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_JAB_ATTACK, blockerOrAttacker, attackee, JAB_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							1, JAB_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
 				break;
+			}
+			
+			case HOOK_ATTACK: {
+				assert(leftHand || rightHand);
 				
-			case SONIC_BOOM_ATTACK:
-				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum, 4.0, 3, 2.0f);
+				final float HOOK_TIME_LENGTH_IN_SECS = 4.5f;
+				final float HOOK_DAMAGE_PER_FLAME    = 8.0f;
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, HOOK_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							1, HOOK_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, HOOK_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							1, HOOK_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
 				break;
+			}
+			
+			case UPPERCUT_ATTACK: {
+				assert(leftHand || rightHand);
+				
+				final float UPPERCUT_TIME_LENGTH_IN_SECS = 5.5f;
+				final float UPPERCUT_DAMAGE_PER_FLAME    = 10.0f;
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, UPPERCUT_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							1, UPPERCUT_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, UPPERCUT_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							1, UPPERCUT_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				break;
+			}
+			
+			case CHOP_ATTACK: {
+				assert(leftHand || rightHand);
+				
+				final float CHOP_TIME_LENGTH_IN_SECS = 6.0f;
+				final float CHOP_DAMAGE_PER_FLAME    = 8.75f;
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_CHOP_ATTACK, blockerOrAttacker, attackee, CHOP_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							1, CHOP_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_CHOP_ATTACK, blockerOrAttacker, attackee, CHOP_DAMAGE_PER_FLAME);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							1, CHOP_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				break;
+			}
+			
+			case HADOUKEN_ATTACK: {
+				
+				final float HADOUKEN_TIME_LENGTH_IN_SECS = 4.0f;
+				final float HADOUKEN_DAMAGE_PER_FLAME    = 5.0f;
+				final int HADOUKEN_NUM_FLAMES            = 2;
+				
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.HADOUKEN_ATTACK, playerNum,
+						HADOUKEN_TIME_LENGTH_IN_SECS, HADOUKEN_NUM_FLAMES, HADOUKEN_DAMAGE_PER_FLAME);
+				break;
+			}
+			
+			case SONIC_BOOM_ATTACK: {
+				
+				final float SONIC_BOOM_TIME_LENGTH_IN_SECS = 2.5f;
+				final float SONIC_BOOM_DAMAGE_PER_FLAME    = 5.0f;
+				final int SONIC_BOOM_NUM_FLAMES            = 1;
+				
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum,
+						SONIC_BOOM_TIME_LENGTH_IN_SECS, SONIC_BOOM_NUM_FLAMES, SONIC_BOOM_DAMAGE_PER_FLAME);
+				break;
+			}
 			
 			default:
 				assert(false);

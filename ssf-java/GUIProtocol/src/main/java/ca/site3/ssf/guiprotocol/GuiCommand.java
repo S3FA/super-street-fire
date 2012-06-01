@@ -64,9 +64,9 @@ public final class GuiCommand {
     boolean hasAcceleration();
     double getAcceleration();
     
-    // optional .GameState nextState = 14;
+    // optional .guiprotocol.GameState nextState = 14;
     boolean hasNextState();
-    Common.GameState getNextState();
+    ca.site3.ssf.guiprotocol.Common.GameState getNextState();
   }
   public static final class Command extends
       com.google.protobuf.GeneratedMessage
@@ -188,6 +188,7 @@ public final class GuiCommand {
       UPPERCUT_ATTACK(3, 3),
       HADOUKEN_ATTACK(4, 4),
       SONIC_BOOM_ATTACK(5, 5),
+      CHOP_ATTACK(6, 6),
       ;
       
       public static final int BLOCK_VALUE = 0;
@@ -196,6 +197,7 @@ public final class GuiCommand {
       public static final int UPPERCUT_ATTACK_VALUE = 3;
       public static final int HADOUKEN_ATTACK_VALUE = 4;
       public static final int SONIC_BOOM_ATTACK_VALUE = 5;
+      public static final int CHOP_ATTACK_VALUE = 6;
       
       
       public final int getNumber() { return value; }
@@ -208,6 +210,7 @@ public final class GuiCommand {
           case 3: return UPPERCUT_ATTACK;
           case 4: return HADOUKEN_ATTACK;
           case 5: return SONIC_BOOM_ATTACK;
+          case 6: return CHOP_ATTACK;
           default: return null;
         }
       }
@@ -238,7 +241,7 @@ public final class GuiCommand {
       }
       
       private static final PlayerAction[] VALUES = {
-        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, 
+        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, CHOP_ATTACK, 
       };
       
       public static PlayerAction valueOf(
@@ -539,13 +542,13 @@ public final class GuiCommand {
       return acceleration_;
     }
     
-    // optional .GameState nextState = 14;
+    // optional .guiprotocol.GameState nextState = 14;
     public static final int NEXTSTATE_FIELD_NUMBER = 14;
-    private Common.GameState nextState_;
+    private ca.site3.ssf.guiprotocol.Common.GameState nextState_;
     public boolean hasNextState() {
       return ((bitField0_ & 0x00001000) == 0x00001000);
     }
-    public Common.GameState getNextState() {
+    public ca.site3.ssf.guiprotocol.Common.GameState getNextState() {
       return nextState_;
     }
     
@@ -563,7 +566,7 @@ public final class GuiCommand {
       flameWidth_ = 0;
       durationInSeconds_ = 0D;
       acceleration_ = 0D;
-      nextState_ = Common.GameState.NO_STATE;
+      nextState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -843,7 +846,7 @@ public final class GuiCommand {
         bitField0_ = (bitField0_ & ~0x00000800);
         acceleration_ = 0D;
         bitField0_ = (bitField0_ & ~0x00001000);
-        nextState_ = Common.GameState.NO_STATE;
+        nextState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         bitField0_ = (bitField0_ & ~0x00002000);
         return this;
       }
@@ -1151,7 +1154,7 @@ public final class GuiCommand {
             }
             case 112: {
               int rawValue = input.readEnum();
-              Common.GameState value = Common.GameState.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Common.GameState value = ca.site3.ssf.guiprotocol.Common.GameState.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(14, rawValue);
               } else {
@@ -1481,15 +1484,15 @@ public final class GuiCommand {
         return this;
       }
       
-      // optional .GameState nextState = 14;
-      private Common.GameState nextState_ = Common.GameState.NO_STATE;
+      // optional .guiprotocol.GameState nextState = 14;
+      private ca.site3.ssf.guiprotocol.Common.GameState nextState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       public boolean hasNextState() {
         return ((bitField0_ & 0x00002000) == 0x00002000);
       }
-      public Common.GameState getNextState() {
+      public ca.site3.ssf.guiprotocol.Common.GameState getNextState() {
         return nextState_;
       }
-      public Builder setNextState(Common.GameState value) {
+      public Builder setNextState(ca.site3.ssf.guiprotocol.Common.GameState value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -1500,7 +1503,7 @@ public final class GuiCommand {
       }
       public Builder clearNextState() {
         bitField0_ = (bitField0_ & ~0x00002000);
-        nextState_ = Common.GameState.NO_STATE;
+        nextState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
         onChanged();
         return this;
       }
@@ -1531,7 +1534,7 @@ public final class GuiCommand {
   static {
     java.lang.String[] descriptorData = {
       "\n\021gui_command.proto\022\013guiprotocol\032\014common" +
-      ".proto\"\350\006\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
+      ".proto\"\206\007\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
       "otocol.Command.CommandType\0227\n\014playerActi" +
       "on\030\002 \001(\0162!.guiprotocol.Command.PlayerAct" +
       "ion\022+\n\006player\030\003 \001(\0162\033.guiprotocol.Comman" +
@@ -1542,18 +1545,19 @@ public final class GuiCommand {
       "ties\030\t \003(\0162\033.guiprotocol.Command.Player\022",
       "\023\n\013dmgPerFlame\030\n \001(\002\022\022\n\nflameWidth\030\013 \001(\005" +
       "\022\031\n\021durationInSeconds\030\014 \001(\001\022\024\n\014accelerat" +
-      "ion\030\r \001(\001\022\035\n\tnextState\030\016 \001(\0162\n.GameState" +
-      "\"\245\001\n\013CommandType\022\032\n\026EXECUTE_GENERIC_ACTI" +
-      "ON\020\000\022\031\n\025EXECUTE_PLAYER_ACTION\020\001\022\020\n\014TOGGL" +
-      "E_PAUSE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\nNEXT_STATE\020\004" +
-      "\022\021\n\rTOUCH_EMITTER\020\005\022\033\n\027QUERY_GAME_INFO_R" +
-      "EFRESH\020\006\"{\n\014PlayerAction\022\t\n\005BLOCK\020\000\022\016\n\nJ" +
-      "AB_ATTACK\020\001\022\017\n\013HOOK_ATTACK\020\002\022\023\n\017UPPERCUT" +
-      "_ATTACK\020\003\022\023\n\017HADOUKEN_ATTACK\020\004\022\025\n\021SONIC_",
-      "BOOM_ATTACK\020\005\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022" +
-      "\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLE" +
-      "FT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020" +
-      "\002B\032\n\030ca.site3.ssf.guiprotocol"
+      "ion\030\r \001(\001\022)\n\tnextState\030\016 \001(\0162\026.guiprotoc" +
+      "ol.GameState\"\245\001\n\013CommandType\022\032\n\026EXECUTE_" +
+      "GENERIC_ACTION\020\000\022\031\n\025EXECUTE_PLAYER_ACTIO" +
+      "N\020\001\022\020\n\014TOGGLE_PAUSE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\n" +
+      "NEXT_STATE\020\004\022\021\n\rTOUCH_EMITTER\020\005\022\033\n\027QUERY" +
+      "_GAME_INFO_REFRESH\020\006\"\214\001\n\014PlayerAction\022\t\n" +
+      "\005BLOCK\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013HOOK_ATTACK\020" +
+      "\002\022\023\n\017UPPERCUT_ATTACK\020\003\022\023\n\017HADOUKEN_ATTAC",
+      "K\020\004\022\025\n\021SONIC_BOOM_ATTACK\020\005\022\017\n\013CHOP_ATTAC" +
+      "K\020\006\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n" +
+      "\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022" +
+      "\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030ca.si" +
+      "te3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1574,7 +1578,7 @@ public final class GuiCommand {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          Common.getDescriptor(),
+          ca.site3.ssf.guiprotocol.Common.getDescriptor(),
         }, assigner);
   }
   

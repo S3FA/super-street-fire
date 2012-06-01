@@ -128,6 +128,8 @@ class SerializationHelper {
 			return PlayerAction.JAB_ATTACK;
 		case UPPERCUT_ATTACK:
 			return PlayerAction.UPPERCUT_ATTACK;
+		case CHOP_ATTACK:
+			return PlayerAction.CHOP_ATTACK;
 		case SONIC_BOOM_ATTACK:
 			return PlayerAction.SONIC_BOOM_ATTACK;
 		default:
@@ -147,6 +149,8 @@ class SerializationHelper {
 			return PlayerActionType.JAB_ATTACK;
 		case UPPERCUT_ATTACK:
 			return PlayerActionType.UPPERCUT_ATTACK;
+		case CHOP_ATTACK:
+			return PlayerActionType.CHOP_ATTACK;
 		case SONIC_BOOM_ATTACK:
 			return PlayerActionType.SONIC_BOOM_ATTACK;
 		default:
@@ -402,12 +406,16 @@ class SerializationHelper {
 			return AttackType.LEFT_JAB_ATTACK;
 		case LEFT_UPPERCUT:
 			return AttackType.LEFT_UPPERCUT_ATTACK;
+		case LEFT_CHOP:
+			return AttackType.LEFT_CHOP_ATTACK;
 		case RIGHT_HOOK:
 			return AttackType.RIGHT_HOOK_ATTACK;
 		case RIGHT_JAB:
 			return AttackType.RIGHT_JAB_ATTACK;
 		case RIGHT_UPPERCUT:
 			return AttackType.RIGHT_UPPERCUT_ATTACK;
+		case RIGHT_CHOP:
+			return AttackType.RIGHT_CHOP_ATTACK;
 		case SONIC_BOOM:
 			return AttackType.SONIC_BOOM_ATTACK;
 		default:
@@ -427,12 +435,16 @@ class SerializationHelper {
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
 		case LEFT_UPPERCUT_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_UPPERCUT;
+		case LEFT_CHOP_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_CHOP;
 		case RIGHT_HOOK_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_HOOK;
 		case RIGHT_JAB_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_JAB;
 		case RIGHT_UPPERCUT_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_UPPERCUT;
+		case RIGHT_CHOP_ATTACK:
+			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_CHOP;
 		case SONIC_BOOM_ATTACK:
 			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SONIC_BOOM;
 		default:
