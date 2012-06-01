@@ -189,6 +189,10 @@ public final class GuiCommand {
       HADOUKEN_ATTACK(4, 4),
       SONIC_BOOM_ATTACK(5, 5),
       CHOP_ATTACK(6, 6),
+      SHORYUKEN_ATTACK(7, 7),
+      DOUBLE_LARIAT_ATTACK(8, 8),
+      SUMO_HEADBUTT_ATTACK(9, 9),
+      ONE_HUNDRED_HAND_SLAP_ATTACK(10, 10),
       ;
       
       public static final int BLOCK_VALUE = 0;
@@ -198,6 +202,10 @@ public final class GuiCommand {
       public static final int HADOUKEN_ATTACK_VALUE = 4;
       public static final int SONIC_BOOM_ATTACK_VALUE = 5;
       public static final int CHOP_ATTACK_VALUE = 6;
+      public static final int SHORYUKEN_ATTACK_VALUE = 7;
+      public static final int DOUBLE_LARIAT_ATTACK_VALUE = 8;
+      public static final int SUMO_HEADBUTT_ATTACK_VALUE = 9;
+      public static final int ONE_HUNDRED_HAND_SLAP_ATTACK_VALUE = 10;
       
       
       public final int getNumber() { return value; }
@@ -211,6 +219,10 @@ public final class GuiCommand {
           case 4: return HADOUKEN_ATTACK;
           case 5: return SONIC_BOOM_ATTACK;
           case 6: return CHOP_ATTACK;
+          case 7: return SHORYUKEN_ATTACK;
+          case 8: return DOUBLE_LARIAT_ATTACK;
+          case 9: return SUMO_HEADBUTT_ATTACK;
+          case 10: return ONE_HUNDRED_HAND_SLAP_ATTACK;
           default: return null;
         }
       }
@@ -241,7 +253,7 @@ public final class GuiCommand {
       }
       
       private static final PlayerAction[] VALUES = {
-        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, CHOP_ATTACK, 
+        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, CHOP_ATTACK, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, 
       };
       
       public static PlayerAction valueOf(
@@ -1534,7 +1546,7 @@ public final class GuiCommand {
   static {
     java.lang.String[] descriptorData = {
       "\n\021gui_command.proto\022\013guiprotocol\032\014common" +
-      ".proto\"\206\007\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
+      ".proto\"\362\007\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
       "otocol.Command.CommandType\0227\n\014playerActi" +
       "on\030\002 \001(\0162!.guiprotocol.Command.PlayerAct" +
       "ion\022+\n\006player\030\003 \001(\0162\033.guiprotocol.Comman" +
@@ -1550,14 +1562,17 @@ public final class GuiCommand {
       "GENERIC_ACTION\020\000\022\031\n\025EXECUTE_PLAYER_ACTIO" +
       "N\020\001\022\020\n\014TOGGLE_PAUSE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\n" +
       "NEXT_STATE\020\004\022\021\n\rTOUCH_EMITTER\020\005\022\033\n\027QUERY" +
-      "_GAME_INFO_REFRESH\020\006\"\214\001\n\014PlayerAction\022\t\n" +
+      "_GAME_INFO_REFRESH\020\006\"\370\001\n\014PlayerAction\022\t\n" +
       "\005BLOCK\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013HOOK_ATTACK\020" +
       "\002\022\023\n\017UPPERCUT_ATTACK\020\003\022\023\n\017HADOUKEN_ATTAC",
       "K\020\004\022\025\n\021SONIC_BOOM_ATTACK\020\005\022\017\n\013CHOP_ATTAC" +
-      "K\020\006\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n" +
-      "\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022" +
-      "\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030ca.si" +
-      "te3.ssf.guiprotocol"
+      "K\020\006\022\024\n\020SHORYUKEN_ATTACK\020\007\022\030\n\024DOUBLE_LARI" +
+      "AT_ATTACK\020\010\022\030\n\024SUMO_HEADBUTT_ATTACK\020\t\022 \n" +
+      "\034ONE_HUNDRED_HAND_SLAP_ATTACK\020\n\"(\n\006Playe" +
+      "r\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017Fir" +
+      "eEmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAI" +
+      "L\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030ca.site3.ssf.guip" +
+      "rotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

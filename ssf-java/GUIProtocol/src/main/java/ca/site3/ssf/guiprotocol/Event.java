@@ -579,10 +579,14 @@ public final class Event {
       RIGHT_HOOK(4, 4),
       LEFT_UPPERCUT(5, 5),
       RIGHT_UPPERCUT(6, 6),
-      HADOUKEN(7, 7),
-      SONIC_BOOM(8, 8),
-      LEFT_CHOP(9, 10),
-      RIGHT_CHOP(10, 11),
+      LEFT_CHOP(7, 7),
+      RIGHT_CHOP(8, 8),
+      HADOUKEN(9, 9),
+      SONIC_BOOM(10, 10),
+      SHORYUKEN_ATTACK(11, 11),
+      DOUBLE_LARIAT_ATTACK(12, 12),
+      SUMO_HEADBUTT_ATTACK(13, 13),
+      ONE_HUNDRED_HAND_SLAP_ATTACK(14, 14),
       ;
       
       public static final int CUSTOM_UNDEFINED_VALUE = 0;
@@ -592,10 +596,14 @@ public final class Event {
       public static final int RIGHT_HOOK_VALUE = 4;
       public static final int LEFT_UPPERCUT_VALUE = 5;
       public static final int RIGHT_UPPERCUT_VALUE = 6;
-      public static final int HADOUKEN_VALUE = 7;
-      public static final int SONIC_BOOM_VALUE = 8;
-      public static final int LEFT_CHOP_VALUE = 10;
-      public static final int RIGHT_CHOP_VALUE = 11;
+      public static final int LEFT_CHOP_VALUE = 7;
+      public static final int RIGHT_CHOP_VALUE = 8;
+      public static final int HADOUKEN_VALUE = 9;
+      public static final int SONIC_BOOM_VALUE = 10;
+      public static final int SHORYUKEN_ATTACK_VALUE = 11;
+      public static final int DOUBLE_LARIAT_ATTACK_VALUE = 12;
+      public static final int SUMO_HEADBUTT_ATTACK_VALUE = 13;
+      public static final int ONE_HUNDRED_HAND_SLAP_ATTACK_VALUE = 14;
       
       
       public final int getNumber() { return value; }
@@ -609,10 +617,14 @@ public final class Event {
           case 4: return RIGHT_HOOK;
           case 5: return LEFT_UPPERCUT;
           case 6: return RIGHT_UPPERCUT;
-          case 7: return HADOUKEN;
-          case 8: return SONIC_BOOM;
-          case 10: return LEFT_CHOP;
-          case 11: return RIGHT_CHOP;
+          case 7: return LEFT_CHOP;
+          case 8: return RIGHT_CHOP;
+          case 9: return HADOUKEN;
+          case 10: return SONIC_BOOM;
+          case 11: return SHORYUKEN_ATTACK;
+          case 12: return DOUBLE_LARIAT_ATTACK;
+          case 13: return SUMO_HEADBUTT_ATTACK;
+          case 14: return ONE_HUNDRED_HAND_SLAP_ATTACK;
           default: return null;
         }
       }
@@ -643,7 +655,7 @@ public final class Event {
       }
       
       private static final AttackType[] VALUES = {
-        CUSTOM_UNDEFINED, LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, LEFT_UPPERCUT, RIGHT_UPPERCUT, HADOUKEN, SONIC_BOOM, LEFT_CHOP, RIGHT_CHOP, 
+        CUSTOM_UNDEFINED, LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, LEFT_UPPERCUT, RIGHT_UPPERCUT, LEFT_CHOP, RIGHT_CHOP, HADOUKEN, SONIC_BOOM, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, 
       };
       
       public static AttackType valueOf(
@@ -2885,7 +2897,7 @@ public final class Event {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022\013guiprotocol\032\014common.proto" +
-      "\"\226\016\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
+      "\"\202\017\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
       "ol.GameEvent.EventType\0223\n\007emitter\030\002 \001(\0132" +
       "\".guiprotocol.GameEvent.FireEmitter\022,\n\014o" +
       "ldGameState\030\003 \001(\0162\026.guiprotocol.GameStat" +
@@ -2923,15 +2935,17 @@ public final class Event {
       "_MATCH_WIN\020\001\"@\n\017FireEmitterType\022\r\n\tLEFT_" +
       "RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I" +
       "\n\020FlameEmitterType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013" +
-      "BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"\302\001\n\nAt",
+      "BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"\256\002\n\nAt",
       "tackType\022\024\n\020CUSTOM_UNDEFINED\020\000\022\014\n\010LEFT_J" +
       "AB\020\001\022\r\n\tRIGHT_JAB\020\002\022\r\n\tLEFT_HOOK\020\003\022\016\n\nRI" +
       "GHT_HOOK\020\004\022\021\n\rLEFT_UPPERCUT\020\005\022\022\n\016RIGHT_U" +
-      "PPERCUT\020\006\022\014\n\010HADOUKEN\020\007\022\016\n\nSONIC_BOOM\020\010\022" +
-      "\r\n\tLEFT_CHOP\020\n\022\016\n\nRIGHT_CHOP\020\013\"A\n\027RoundB" +
-      "eginCountdownTime\022\t\n\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n" +
-      "\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.site3.ssf.guipro" +
-      "tocol"
+      "PPERCUT\020\006\022\r\n\tLEFT_CHOP\020\007\022\016\n\nRIGHT_CHOP\020\010" +
+      "\022\014\n\010HADOUKEN\020\t\022\016\n\nSONIC_BOOM\020\n\022\024\n\020SHORYU" +
+      "KEN_ATTACK\020\013\022\030\n\024DOUBLE_LARIAT_ATTACK\020\014\022\030" +
+      "\n\024SUMO_HEADBUTT_ATTACK\020\r\022 \n\034ONE_HUNDRED_" +
+      "HAND_SLAP_ATTACK\020\016\"A\n\027RoundBeginCountdow" +
+      "nTime\022\t\n\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FI" +
+      "GHT\020\003B\032\n\030ca.site3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

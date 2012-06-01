@@ -13,7 +13,11 @@ import ca.site3.ssf.common.MultiLerp;
  */
 final public class ActionFactory {
 	
-	public enum PlayerActionType { BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK };
+	public enum PlayerActionType {
+		BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK,
+		HADOUKEN_ATTACK, SHORYUKEN_ATTACK, SONIC_BOOM_ATTACK, DOUBLE_LARIAT_ATTACK,
+		SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK
+	};
 
 	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
 	final static public float DEFAULT_FULL_OFF_FRACTION = 0.25f;
@@ -103,15 +107,17 @@ final public class ActionFactory {
 				
 				final float UPPERCUT_TIME_LENGTH_IN_SECS = 5.5f;
 				final float UPPERCUT_DAMAGE_PER_FLAME    = 10.0f;
+				final int UPPERCUT_NUM_FLAMES            = 2;
+				
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, UPPERCUT_DAMAGE_PER_FLAME);
 					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
-							1, UPPERCUT_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+							UPPERCUT_NUM_FLAMES, UPPERCUT_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				else {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, UPPERCUT_DAMAGE_PER_FLAME);
 					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
-							1, UPPERCUT_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+							UPPERCUT_NUM_FLAMES, UPPERCUT_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
 				}
 				break;
 			}
@@ -145,6 +151,29 @@ final public class ActionFactory {
 				break;
 			}
 			
+			case SHORYUKEN_ATTACK: {
+				final float SHORYUKEN_TIME_LENGTH_IN_SECS = 3.25f;
+				final float SHORYUKEN_DAMAGE_PER_FLAME    = 9.0f;
+				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 2;
+				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 1;
+				
+				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.SHORYUKEN_ATTACK, blockerOrAttacker, attackee, SHORYUKEN_DAMAGE_PER_FLAME);
+				
+				if (leftHand) {
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							SHORYUKEN_NUM_FLAMES_PUNCH_HAND, SHORYUKEN_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							SHORYUKEN_NUM_FLAMES_OFFHAND, SHORYUKEN_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				else {
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+							SHORYUKEN_NUM_FLAMES_PUNCH_HAND, SHORYUKEN_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+					success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+							SHORYUKEN_NUM_FLAMES_OFFHAND, SHORYUKEN_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+				}
+				break;
+			}
+			
 			case SONIC_BOOM_ATTACK: {
 				
 				final float SONIC_BOOM_TIME_LENGTH_IN_SECS = 2.5f;
@@ -153,6 +182,53 @@ final public class ActionFactory {
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum,
 						SONIC_BOOM_TIME_LENGTH_IN_SECS, SONIC_BOOM_NUM_FLAMES, SONIC_BOOM_DAMAGE_PER_FLAME);
+				break;
+			}
+			
+			case DOUBLE_LARIAT_ATTACK: {
+				final float DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 7.5f;
+				final float DOUBLE_LARIAT_DAMAGE_PER_FLAME    = 8.0f;
+				final int DOUBLE_LARIAT_NUM_FLAMES            = 2;
+				
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.DOUBLE_LARIAT_ATTACK, playerNum,
+						DOUBLE_LARIAT_TIME_LENGTH_IN_SECS, DOUBLE_LARIAT_NUM_FLAMES, DOUBLE_LARIAT_DAMAGE_PER_FLAME);
+				break;
+			}
+			
+			case SUMO_HEADBUTT_ATTACK: {
+				final float SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 5.0f;
+				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME    = 6.0f;
+				final int SUMO_HEADBUTT_NUM_FLAMES            = 2;
+				
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SUMO_HEADBUTT_ATTACK, playerNum,
+						SUMO_HEADBUTT_TIME_LENGTH_IN_SECS, SUMO_HEADBUTT_NUM_FLAMES, SUMO_HEADBUTT_DAMAGE_PER_FLAME);
+				break;
+			}
+			
+			case ONE_HUNDRED_HAND_SLAP_ATTACK: {
+				
+				final float ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 4.33f;
+				final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME    = 5.0f;
+				final int ONE_HUND_HAND_SLAP_NUM_FLAMES            = 3;
+				
+				if (leftHand && rightHand) {
+					action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK, playerNum,
+							ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS, ONE_HUND_HAND_SLAP_NUM_FLAMES, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK,
+							blockerOrAttacker, attackee, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
+					
+					if (leftHand) {
+						success &= this.addConstantVelocityWaveToAction(action, emitterIterLeft, fireEmitterConfig.getNumEmittersPerRail(),
+								ONE_HUND_HAND_SLAP_NUM_FLAMES, ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+					}
+					else {
+						success &= this.addConstantVelocityWaveToAction(action, emitterIterRight, fireEmitterConfig.getNumEmittersPerRail(),
+								ONE_HUND_HAND_SLAP_NUM_FLAMES, ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION);
+					}
+				}
+				
 				break;
 			}
 			

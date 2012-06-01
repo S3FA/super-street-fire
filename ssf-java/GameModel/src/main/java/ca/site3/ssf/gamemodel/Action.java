@@ -6,9 +6,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Stack;
-
 
 import ca.site3.ssf.common.MultiLerp;
 import ca.site3.ssf.gamemodel.FireEmitter.FlameType;
