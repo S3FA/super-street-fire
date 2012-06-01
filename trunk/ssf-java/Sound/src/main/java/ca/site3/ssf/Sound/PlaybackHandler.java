@@ -20,9 +20,9 @@ public class PlaybackHandler {
 	public static void playAudioFile( String fileName ) {
 		File soundFile = new File( fileName );
 		try {
-			// Create a stream from the given file.
-			// Throws IOException or UnsupportedAudioFileException
+			// Create a stream from the given file
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream( soundFile );
+			
 			// AudioSystem.getAudioInputStream( inputStream ); // alternate audio stream from inputstream
 			playAudioStream( audioInputStream );
 		} 
@@ -31,13 +31,16 @@ public class PlaybackHandler {
 			System.out.println( "Problem with file " + fileName + ":" );
 			e.printStackTrace();
 		}
-	} // playAudioFile
+		
+		System.exit( 0 );
+	} 
 	
 	/** Plays audio from the given audio input stream. */
 	private static void playAudioStream( AudioInputStream audioInputStream ) {
 		// Audio format provides information like sample rate, size, channels.
 		AudioFormat audioFormat = audioInputStream.getFormat();
 		System.out.println( "Play input audio format=" + audioFormat );
+		
 		// Open a data line to play our type of sampled audio.
 		// Use SourceDataLine for play and TargetDataLine for record.
 		DataLine.Info info = new DataLine.Info( SourceDataLine.class, audioFormat );
@@ -50,14 +53,17 @@ public class PlaybackHandler {
 		try {
 			// Create a SourceDataLine for play back (throws LineUnavailableException).
 			SourceDataLine dataLine = (SourceDataLine) AudioSystem.getLine( info );
+			
 			// System.out.println( "SourceDataLine class=" + dataLine.getClass() );
 			// The line acquires system resources (throws LineAvailableException).
 			dataLine.open( audioFormat );
+			
 			// Adjust the volume on the output line.
 			if( dataLine.isControlSupported( FloatControl.Type.MASTER_GAIN ) ) {
 				FloatControl volume = (FloatControl) dataLine.getControl( FloatControl.Type.MASTER_GAIN );
 				volume.setValue(6);
 			}
+			
 			// Allows the line to move data in and out to a port.
 			dataLine.start();
 			
@@ -76,17 +82,18 @@ public class PlaybackHandler {
 						// Odd sized sounds throw an exception if we don't write the same amount.
 						int framesWritten = dataLine.write( buffer, 0, bytesRead );
 					}
-				} // while
+				} 
 			} 
 			catch ( IOException e ) {
 				e.printStackTrace();
 			}
 			
 			System.out.println( "Play.playAudioStream draining line." );
+			
 			// Continues data line I/O until its buffer is drained.
 			dataLine.drain();
-			
 			System.out.println( "Play.playAudioStream closing line." );
+			
 			// Closes the data line, freeing any resources such as the audio device.
 			dataLine.close();
 		} 
