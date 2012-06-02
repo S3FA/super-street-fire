@@ -13,6 +13,9 @@ import ca.site3.ssf.gesturerecognizer.GloveData;
 public class PlayerGestureInstance extends GestureInstance {
 
 	private final int playerNum;
+	
+	// TODO: Gestures will need to be associated with headset values - these are the distilled headset values
+	// that occurred over the course of the player carrying out the gesture.
 	//private final double headsetAttention;
 	//private final double headsetMeditation;
 	
