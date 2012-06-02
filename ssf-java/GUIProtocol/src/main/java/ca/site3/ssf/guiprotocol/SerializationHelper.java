@@ -140,6 +140,12 @@ class SerializationHelper {
 			return PlayerAction.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
 			return PlayerAction.ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case PSYCHO_CRUSHER_ATTACK:
+			return PlayerAction.PSYCHO_CRUSHER_ATTACK;
+		case YMCA_ATTACK:
+			return PlayerAction.YMCA_ATTACK;
+		case NYAN_CAT_ATTACK:
+			return PlayerAction.NYAN_CAT_ATTACK;
 		default:
 			return null;
 		}
@@ -169,6 +175,12 @@ class SerializationHelper {
 			return PlayerActionType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
 			return PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case PSYCHO_CRUSHER_ATTACK:
+			return PlayerActionType.PSYCHO_CRUSHER_ATTACK;
+		case YMCA_ATTACK:
+			return PlayerActionType.YMCA_ATTACK;
+		case NYAN_CAT_ATTACK:
+			return PlayerActionType.NYAN_CAT_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unknown player action: "+action);
 		}
@@ -440,43 +452,55 @@ class SerializationHelper {
 			return AttackType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
 			return AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case PSYCHO_CRUSHER_ATTACK:
+			return AttackType.PSYCHO_CRUSHER_ATTACK;
+		case YMCA_ATTACK:
+			return AttackType.YMCA_ATTACK;
+		case NYAN_CAT_ATTACK:
+			return AttackType.NYAN_CAT_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
 		}
 	}
 	
-	static ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType attackTypeToProtobuf(AttackType t) {
+	static GameEvent.AttackType attackTypeToProtobuf(AttackType t) {
 		switch (t) {
 		case CUSTOM_UNDEFINED_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
+			return GameEvent.AttackType.CUSTOM_UNDEFINED;
 		case HADOUKEN_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.HADOUKEN;
+			return GameEvent.AttackType.HADOUKEN;
 		case LEFT_HOOK_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_HOOK;
+			return GameEvent.AttackType.LEFT_HOOK;
 		case LEFT_JAB_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_JAB;
+			return GameEvent.AttackType.LEFT_JAB;
 		case LEFT_UPPERCUT_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_UPPERCUT;
+			return GameEvent.AttackType.LEFT_UPPERCUT;
 		case LEFT_CHOP_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.LEFT_CHOP;
+			return GameEvent.AttackType.LEFT_CHOP;
 		case RIGHT_HOOK_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_HOOK;
+			return GameEvent.AttackType.RIGHT_HOOK;
 		case RIGHT_JAB_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_JAB;
+			return GameEvent.AttackType.RIGHT_JAB;
 		case RIGHT_UPPERCUT_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_UPPERCUT;
+			return GameEvent.AttackType.RIGHT_UPPERCUT;
 		case RIGHT_CHOP_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.RIGHT_CHOP;
+			return GameEvent.AttackType.RIGHT_CHOP;
 		case SONIC_BOOM_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SONIC_BOOM;
+			return GameEvent.AttackType.SONIC_BOOM;
 		case SHORYUKEN_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SHORYUKEN_ATTACK;
+			return GameEvent.AttackType.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.DOUBLE_LARIAT_ATTACK;
+			return GameEvent.AttackType.DOUBLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.SUMO_HEADBUTT_ATTACK;
+			return GameEvent.AttackType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
-			return ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK;
+			return GameEvent.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case PSYCHO_CRUSHER_ATTACK:
+			return GameEvent.AttackType.PSYCHO_CRUSHER_ATTACK;
+		case YMCA_ATTACK:
+			return GameEvent.AttackType.YMCA_ATTACK;
+		case NYAN_CAT_ATTACK:
+			return GameEvent.AttackType.NYAN_CAT_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
 		}

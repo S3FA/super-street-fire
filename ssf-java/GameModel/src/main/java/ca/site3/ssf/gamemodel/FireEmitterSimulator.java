@@ -176,7 +176,7 @@ class FireEmitterSimulator {
 			return;
 		}
 
-		if (this.initialDelayCounterInSecs >= 0.0) {
+		if (this.initialDelayCounterInSecs > 0.0) {
 			this.initialDelayCounterInSecs -= dT;
 			return;
 		}

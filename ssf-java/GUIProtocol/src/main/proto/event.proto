@@ -55,6 +55,8 @@ message GameEvent {
   
   enum AttackType {
     CUSTOM_UNDEFINED = 0;
+    
+    // Basic Attacks
     LEFT_JAB         = 1;
     RIGHT_JAB        = 2; 
     LEFT_HOOK        = 3;
@@ -64,12 +66,19 @@ message GameEvent {
     LEFT_CHOP        = 7;
     RIGHT_CHOP       = 8;
     
-    HADOUKEN             = 9;
-    SONIC_BOOM           = 10;
-    SHORYUKEN_ATTACK     = 11;
-    DOUBLE_LARIAT_ATTACK = 12;
-    SUMO_HEADBUTT_ATTACK = 13;
+    // Special Attacks
+    HADOUKEN                     = 9;
+    SONIC_BOOM                   = 10;
+    SHORYUKEN_ATTACK             = 11;
+    DOUBLE_LARIAT_ATTACK         = 12;
+    SUMO_HEADBUTT_ATTACK         = 13;
     ONE_HUNDRED_HAND_SLAP_ATTACK = 14;
+    PSYCHO_CRUSHER_ATTACK        = 15;
+    
+    // Easter Egg Attacks
+    YMCA_ATTACK     = 16;
+    NYAN_CAT_ATTACK = 17;
+    
   }
   
   enum RoundBeginCountdownTime {

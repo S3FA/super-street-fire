@@ -123,20 +123,21 @@ public abstract class Action {
 	 * - It must start and end with an interpolant value of zero.
 	 * - It must start at a time of zero and have a total time length greater than zero
 	 * - During the interpolation the interpolant value should hit a value of one at least once.
-	 * 
+	 * @param delayInSecs The delay in seconds before the wave starts.
 	 * @return true on success, false on failure.
 	 */
-	boolean addConstantVelocityFireEmitterWave(FireEmitterIterator emitterIter, int travelLength, int width, MultiLerp intensityLerp) {
+	boolean addConstantVelocityFireEmitterWave(FireEmitterIterator emitterIter, int travelLength, int width,
+										       MultiLerp intensityLerp, double delayInSecs) {
 		
 		// Make sure the parameters are at least moderately correct
-		if (intensityLerp == null || emitterIter == null || travelLength <= 0 || width <= 0 || width > travelLength) {
+		if (intensityLerp == null || emitterIter == null || travelLength <= 0 || width <= 0 || width > travelLength || delayInSecs < 0.0) {
 			assert(false);
 			return false;
 		}
 		
 		ArrayList<FireEmitterSimulator> newSimWave = new ArrayList<FireEmitterSimulator>(travelLength);
 		
-		double initialDelayTimeCounter = 0.0;
+		double initialDelayTimeCounter = delayInSecs;
 		
 		// Go through the full wave of simulations required for what has been specified
 		// by the parameters and add a simulator for each emitter in the wave
@@ -161,7 +162,7 @@ public abstract class Action {
 		return true;
 	}
 	
-	boolean addFireEmitterWave(FireEmitterIterator emitterIter, int width, List<MultiLerp> intensityLerps) {
+	boolean addFireEmitterWave(FireEmitterIterator emitterIter, int width, List<MultiLerp> intensityLerps, double delayInSecs) {
 		// Make sure the parameters are at least moderately correct
 		if (emitterIter == null || intensityLerps.isEmpty() || width <= 0 || width > intensityLerps.size()) {
 			assert(false);
@@ -189,7 +190,7 @@ public abstract class Action {
 		}
 		
 		ArrayList<FireEmitterSimulator> newSimWave = new ArrayList<FireEmitterSimulator>(intensityLerps.size());
-		double initialDelayTimeCounter = 0.0;
+		double initialDelayTimeCounter = delayInSecs;
 		int currentEmitterIndex = 0;
 		
 		assert(multiLerpDeques.size() == intensityLerps.size());
