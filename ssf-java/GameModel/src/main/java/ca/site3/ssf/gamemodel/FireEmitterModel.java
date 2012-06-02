@@ -2,6 +2,7 @@ package ca.site3.ssf.gamemodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -195,6 +196,28 @@ class FireEmitterModel {
 			}
 			else {
 				return (this.outerRingEmitters.size() / 2) + 1;
+			}
+		}
+	}
+	
+	int getRandomOneSidedOuterRingEmitterIndex(int playerNum, boolean leftSide) {
+		Random randomNumGen = new Random();
+		int randomHalfNum = 1 + randomNumGen.nextInt(this.outerRingEmitters.size()/2 - 1);
+		
+		if (playerNum == 1) {
+			if (leftSide) {
+				return this.outerRingEmitters.size() - randomHalfNum;
+			}
+			else {
+				return 0 + randomHalfNum;
+			}
+		}
+		else {
+			if (leftSide) {
+				return (this.outerRingEmitters.size() / 2) - randomHalfNum;
+			}
+			else {
+				return ((this.outerRingEmitters.size() / 2) + 1) + randomHalfNum;
 			}
 		}
 	}

@@ -76,9 +76,11 @@ public abstract class Action {
 		}
 	}
 	
-	boolean addFireEmitterBurst(FireEmitterIterator emitterIter, int width, int numBursts, MultiLerp intensityLerp) {
+	boolean addFireEmitterBurst(FireEmitterIterator emitterIter, int width, int numBursts,
+			                    MultiLerp intensityLerp, double delayInSecs) {
+		
 		// Make sure the parameters are at least moderately correct
-		if (intensityLerp == null || emitterIter == null || width <= 0 || numBursts <= 0) {
+		if (intensityLerp == null || emitterIter == null || width <= 0 || numBursts <= 0 || delayInSecs < 0.0) {
 			assert(false);
 			return false;
 		}
@@ -100,7 +102,8 @@ public abstract class Action {
 				intensityLerps.add((MultiLerp) intensityLerp.clone());
 			}
 	
-			newBurstSims.add(new FireEmitterSimulator(this, currEmitter, this.wavesOfOrderedFireSims.size(), i, 0.0, intensityLerps));
+			newBurstSims.add(new FireEmitterSimulator(this, currEmitter,
+					this.wavesOfOrderedFireSims.size(), i, delayInSecs, intensityLerps));
 		}
 
 		// Successfully generated a new wave of fire emitter simulators, add it to this action and exit with success!
