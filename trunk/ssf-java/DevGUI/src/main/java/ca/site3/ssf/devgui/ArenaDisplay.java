@@ -242,10 +242,11 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		// up and around the outer ring to the top-right emitter...
 		g2.setStroke(ArenaDisplay.EMITTER_OUTLINE_STROKE);
 		float currAngle = -HALF_PI + INCREMENT_ANGLE;
+
 		for (int i = 0; i < HALF_NUM_OUTER_RING_EMITTERS; i++) {
 			Point2D.Float outerRingEmitterPos =
 					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
-					CENTER_Y + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);
+					CENTER_Y - OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);
 			
 			Ellipse2D.Float outerRingEmitterShape  = 
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
@@ -262,13 +263,13 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			
 			currAngle += INCREMENT_ANGLE;
 		}
-		
+
 		// Now draw the left-hand side of the outer ring...
 		currAngle = HALF_PI + INCREMENT_ANGLE;
 		for (int i = HALF_NUM_OUTER_RING_EMITTERS; i < this.fireEmitterConfig.getNumOuterRingEmitters(); i++) {
 			Point2D.Float outerRingEmitterPos =
 					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
-					CENTER_Y + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);			
+					CENTER_Y - OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);			
 			
 			Ellipse2D.Float outerRingEmitterShape  =
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);

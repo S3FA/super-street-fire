@@ -3,6 +3,8 @@ package ca.site3.ssf.gamemodel;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
+
 import ca.site3.ssf.common.MultiLerp;
 
 /**
@@ -276,26 +278,54 @@ final public class ActionFactory {
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.PSYCHO_CRUSHER_ATTACK, playerNum,
 						PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS, PSYCHO_CRUSHER_BASE_ACCELERATION,
 						PSYCHO_CRUSHER_NUM_FLAMES, PSYCHO_CRUSHER_DAMAGE_PER_FLAME);
+				
+				// Decoration on the outer ring of flame effects: Two flames starting at the attacking player
+				// and moving to behind the opposing player
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true), true),
+						fireEmitterConfig.getNumOuterRingEmitters()/2, 1, PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, false), false),
+						fireEmitterConfig.getNumOuterRingEmitters()/2, 1, PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				
 				break;
 			}
 			
 			case YMCA_ATTACK: {
 				
-				final double YMCA_BASE_ACCELERATION   = 6.9;
-				final double YMCA_TIME_LENGTH_IN_SECS = 3.0;
+				final double YMCA_BASE_ACCELERATION   = 3.69;
+				final double YMCA_TIME_LENGTH_IN_SECS = 3.5;
 				final float YMCA_DAMAGE_PER_FLAME     = 2.5f;
 				final int YMCA_NUM_FLAMES             = 4;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.YMCA_ATTACK, playerNum,
 						YMCA_TIME_LENGTH_IN_SECS, YMCA_BASE_ACCELERATION, YMCA_NUM_FLAMES, YMCA_DAMAGE_PER_FLAME);
+				
+				// Decoration on the outer ring of flame effects: Two flames starting on either side of the player and each travelling
+				// around the ring completely
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true), true),
+						fireEmitterConfig.getNumOuterRingEmitters(), 1, YMCA_TIME_LENGTH_IN_SECS*1.2,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, false), false),
+						fireEmitterConfig.getNumOuterRingEmitters(), 1, YMCA_TIME_LENGTH_IN_SECS*1.2,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				
 				break;
 			}
 			
 			case NYAN_CAT_ATTACK: {
 				
 				final double NYAN_CAT_BASE_ACCELERATION   = 3.33333333333333333333;
-				final double NYAN_CAT_TIME_LENGTH_IN_SECS = 3.0;
-				final float NYAN_CAT_DAMAGE_PER_FLAME     = 2.22222222222222222222f;
+				final double NYAN_CAT_TIME_LENGTH_IN_SECS = 3.33333333333333333333;
+				final float NYAN_CAT_DAMAGE_PER_FLAME     = 1.11111111111111111111f;
 				final int NYAN_CAT_NUM_FLAMES_PER_WAVE    = 3;
 				final int NYAN_CAT_NUM_WAVES              = 3;
 				
@@ -312,6 +342,15 @@ final public class ActionFactory {
 							NYAN_CAT_NUM_FLAMES_PER_WAVE, NYAN_CAT_TIME_LENGTH_IN_SECS, NYAN_CAT_BASE_ACCELERATION,
 							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currentDelay);
 				}
+				
+				// Decoration on the outer ring of flame effects: A flame starting at the attacking player wraps around
+				// the arena 3 times
+				Random randomValGen = new Random();
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, randomValGen.nextBoolean()), randomValGen.nextBoolean()),
+						fireEmitterConfig.getNumOuterRingEmitters()*NYAN_CAT_NUM_WAVES, 1, NYAN_CAT_TIME_LENGTH_IN_SECS * NYAN_CAT_NUM_WAVES,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				
 				break;
 			}

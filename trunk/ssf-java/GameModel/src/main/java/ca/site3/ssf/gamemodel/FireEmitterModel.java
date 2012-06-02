@@ -173,6 +173,34 @@ class FireEmitterModel {
 	}
 	
 	/**
+	 * Gets the index of the outer ring emitter that's located behind the given player and in a location
+	 * relative to that player as described by 'behindAndToTheLeft'. 
+	 * @param playerNum The player nearest to the emitter.
+	 * @param behindAndToTheLeft The location of the emitter relative to the player (if this is false it is
+	 * assumed to be "behind and to the right" of the player.
+	 * @return The index of the appropriate outer ring emitter.
+	 */
+	int getSemanticOuterRingEmitterIndex(int playerNum, boolean behindAndToTheLeft) {
+		if (playerNum == 1) {
+			if (behindAndToTheLeft) {
+				return this.outerRingEmitters.size();
+			}
+			else {
+				return 0;
+			}
+		}
+		else {
+			if (behindAndToTheLeft) {
+				return this.outerRingEmitters.size() / 2;
+			}
+			else {
+				return (this.outerRingEmitters.size() / 2) + 1;
+			}
+		}
+	}
+	
+	
+	/**
 	 * Resets all of the emitters in the game (both rails and the outer ring). This
 	 * effectively reduces the intensity of every emitter to zero, instantly.
 	 */
