@@ -118,8 +118,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
-		this.setPreferredSize(new Dimension(1200, 750));
-		this.setMinimumSize(new Dimension(1200, 750));
+		this.setPreferredSize(new Dimension(1250, 750));
+		this.setMinimumSize(new Dimension(1250, 750));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		
