@@ -12,11 +12,11 @@ public class MatchEndedSoundPlayer extends SoundPlayerController implements ISou
 		
 		if (event.getMatchResult() == MatchEndedEvent.MatchResult.PLAYER1_VICTORY)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("MatchResult.PlayerOneVictory"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("MatchResult.PlayerOneVictory"), false);
 		}
 		else if (event.getMatchResult() == MatchEndedEvent.MatchResult.PLAYER2_VICTORY)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("MatchResult.PlayerTwoVictory"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("MatchResult.PlayerTwoVictory"), false);
 		}
 	}
 }

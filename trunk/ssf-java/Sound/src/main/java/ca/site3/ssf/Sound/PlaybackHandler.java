@@ -17,14 +17,21 @@ import javax.sound.sampled.SourceDataLine;
  */
 public class PlaybackHandler {
 	// Play back the sound by filename
-	public static void playAudioFile( String fileName ) {
+	public static void playAudioFile( String fileName, boolean isLooping ) {
 		File soundFile = new File( fileName );
-		try {
-			// Create a stream from the given file
-			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream( soundFile );
-			
-			// AudioSystem.getAudioInputStream( inputStream ); // alternate audio stream from inputstream
-			playAudioStream( audioInputStream );
+		
+		try 
+		{
+			// Continue playing the sound as long as we're looping
+			do
+			{
+				// Create a stream from the given file
+				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream( soundFile );
+				
+				// AudioSystem.getAudioInputStream( inputStream ); // alternate audio stream from inputstream
+				playAudioStream( audioInputStream, isLooping );
+			}
+			while (isLooping);
 		} 
 		catch ( Exception e ) 
 		{
@@ -32,11 +39,12 @@ public class PlaybackHandler {
 			e.printStackTrace();
 		}
 		
-		System.exit( 0 );
+		// When the sound finished playing, return to close the thread
+		return;
 	} 
 	
 	/** Plays audio from the given audio input stream. */
-	private static void playAudioStream( AudioInputStream audioInputStream ) {
+	private static void playAudioStream( AudioInputStream audioInputStream, boolean isLooping ) {
 		// Audio format provides information like sample rate, size, channels.
 		AudioFormat audioFormat = audioInputStream.getFormat();
 		System.out.println( "Play input audio format=" + audioFormat );
@@ -72,7 +80,8 @@ public class PlaybackHandler {
 			byte [] buffer = new byte[ bufferSize ];
 			
 			// Move the data until done or there is an error.
-			try {
+			try 
+			{
 				int bytesRead = 0;
 				while ( bytesRead >= 0 ) {
 					bytesRead = audioInputStream.read( buffer, 0, buffer.length );
