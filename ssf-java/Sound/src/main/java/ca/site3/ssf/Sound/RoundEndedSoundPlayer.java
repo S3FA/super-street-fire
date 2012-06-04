@@ -12,15 +12,15 @@ public class RoundEndedSoundPlayer extends SoundPlayerController implements ISou
 		
 		if (event.getRoundResult() == RoundEndedEvent.RoundResult.PLAYER1_VICTORY)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.PlayerOneVictory"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.PlayerOneVictory"), false);
 		}
 		else if (event.getRoundResult() == RoundEndedEvent.RoundResult.PLAYER2_VICTORY)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.PlayerTwoVictory"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.PlayerTwoVictory"), false);
 		}
 		else if (event.getRoundResult() == RoundEndedEvent.RoundResult.TIE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.Tie"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.Tie"), false);
 		}
 	}
 }

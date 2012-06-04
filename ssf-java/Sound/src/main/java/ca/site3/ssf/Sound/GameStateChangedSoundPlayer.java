@@ -13,43 +13,43 @@ public class GameStateChangedSoundPlayer extends SoundPlayerController implement
 		
 		if (event.getNewState() == GameState.GameStateType.IDLE_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.IdleState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.IdleState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.MATCH_ENDED_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.MatchEndedState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.MatchEndedState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.NO_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.NoState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.NoState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.PAUSED_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.PausedState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.PausedState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.RINGMASTER_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RingmasterState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RingmasterState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.ROUND_BEGINNING_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RoundBeginningState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RoundBeginningState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.ROUND_ENDED_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RoundEndedState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RoundEndedState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.ROUND_IN_PLAY_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RoundInPlayState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.RoundInPlayState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.TEST_ROUND_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.TestRoundState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.TestRoundState"), false);
 		}
 		else if (event.getNewState() == GameState.GameStateType.TIE_BREAKER_ROUND_STATE)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.TieBreakerRoundState"));
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("GameStateType.TieBreakerRoundState"), false);
 		}
 	}
 }
