@@ -54,10 +54,7 @@ public class SoundPlayerController implements IGameModelListener
 		if (event.getType() == IGameModelEvent.Type.GAME_STATE_CHANGED)
 		{
 			// Interrupt the existing looping music thread if it exists
-			if (this.loopingSoundThread != null)
-			{
-				this.loopingSoundThread.interrupt();
-			}
+			this.stopLoopingMusic();
 			
 			this.loopingSoundThread = new Thread(new Runnable() {
 				public void run() {
@@ -75,6 +72,7 @@ public class SoundPlayerController implements IGameModelListener
 			Thread soundThread = new Thread(new Runnable() {
 				public void run() {
 					System.out.println("New thread created for a sound effect.");
+					
 					if (event.getType() == IGameModelEvent.Type.PLAYER_ATTACK_ACTION)
 					{
 						PlayerAttackActionSoundPlayer player = new PlayerAttackActionSoundPlayer();
@@ -107,7 +105,16 @@ public class SoundPlayerController implements IGameModelListener
 		}
 	}
 	
-	public void setConfigFile()
+	// Interrupts the currently looping music thread if necessary
+	public void stopLoopingMusic()
+	{
+		if (this.loopingSoundThread != null)
+		{
+			this.loopingSoundThread.interrupt();
+		}
+	}
+	
+	private void setConfigFile()
 	{
 		this.configFile = new Properties();
 		
