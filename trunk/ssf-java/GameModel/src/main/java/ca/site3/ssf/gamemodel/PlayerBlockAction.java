@@ -45,6 +45,11 @@ class PlayerBlockAction extends Action {
 	@Override
 	boolean tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
+		
+		//if (simulator.isFinished()) {
+		//	this.fireEmitterModel.
+		//}
+		
 		return simulator.isFinished();
 	}
 	

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
+import ca.site3.ssf.gesturerecognizer.GestureType;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceDataParser;
@@ -35,6 +36,8 @@ import ca.site3.ssf.ioserver.PlayerGestureInstance;
  */
 public class GestureRecorderGUIMainWindow extends JFrame {
 	
+	private static final String DEFAULT_GLOVE_NETWORK_INTERFACE_IP = "192.168.100.2";
+	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	private static final long serialVersionUID = 1L;
 	
@@ -48,8 +51,9 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 	private BlockingQueue<PlayerGestureInstance> gestureQueue = new LinkedBlockingQueue<PlayerGestureInstance>();
 	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
 	private DeviceStatus deviceStatus = new DeviceStatus();
-	private HeartbeatListener heartbeatListener  = new HeartbeatListener(55555, deviceStatus);
-	private DeviceNetworkListener gloveListener  = new DeviceNetworkListener(new CommandLineArgs().devicePort, new DeviceDataParser(deviceStatus), eventQueue);
+	private HeartbeatListener heartbeatListener  = new HeartbeatListener(DEFAULT_GLOVE_NETWORK_INTERFACE_IP, 55555, deviceStatus);
+	private DeviceNetworkListener gloveListener  = new DeviceNetworkListener(DEFAULT_GLOVE_NETWORK_INTERFACE_IP,
+			new CommandLineArgs().devicePort, new DeviceDataParser(deviceStatus), eventQueue);
 	private GloveEventCoalescer eventAggregator  = null;
 	
 	private Thread consumerThread;
@@ -153,8 +157,23 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 		// selectedTab: 0 is recording, 1 is Training, 2 is Testing
 		if (selectedTab == RECORDING_TAB_IDX) {
 			
+			// Make sure the gesture matches the handedness of the selected gesture...
+			GestureType selectedGesture = this.recordingPanel.getSelectedGesture();
+			
+			
+			if (selectedGesture.getUsesLeftHand() && !recordedGestureInstance.hasLeftGloveData() ||
+				selectedGesture.getUsesRightHand() && !recordedGestureInstance.hasRightGloveData() ||
+				!selectedGesture.getUsesLeftHand() && recordedGestureInstance.hasLeftGloveData() ||
+				!selectedGesture.getUsesRightHand() && recordedGestureInstance.hasRightGloveData()) {
+				
+				this.recordingPanel.setLogString("Unacceptable gesture (glove hand data doesn't correspond to the hand(s) for this gesture), please try again!");
+			}
 			// Check to see whether the gesture is acceptable in the face of up-front analysis from the gesture recognizer...
-			if (GestureRecognizer.isAcceptableGesture(instance)) {
+			else if (!GestureRecognizer.isAcceptableGesture(instance)) {
+				this.recordingPanel.setLogString("Unacceptable gesture, please try again!");
+			}
+			else {
+				// Acceptable gesture...
 				
 				// If export to CSV is selected, perform the export
 				if (this.recordingPanel.getCsvExportState()) {
@@ -169,9 +188,7 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 				// Show all of the recorded data in the GUI Log...
 				this.recordingPanel.setLogString(instance.toDataString());
 			}
-			else {
-				this.recordingPanel.setLogString("Unacceptable gesture, please try again!");
-			}
+
 		}
 		else if (selectedTab == TESTING_TAB_IDX && this.testingPanel.isEngineLoaded()) {
 			// If we're on the testing

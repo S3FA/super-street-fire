@@ -29,7 +29,7 @@ public class TestGloveDataParser {
 			
 			DeviceStatus deviceStatus = new DeviceStatus();
 			deviceStatus.setDeviceInfo(Device.P1_LEFT_GLOVE, localhost, (byte)1, 1);
-			DeviceNetworkListener listener = new DeviceNetworkListener(port, new DeviceDataParser(deviceStatus), q);
+			DeviceNetworkListener listener = new DeviceNetworkListener("192.168.100.2", port, new DeviceDataParser(deviceStatus), q);
 			Thread listenerThread = new Thread(listener, "DeviceNetworkListener Thread");
 			listenerThread.start();
 			

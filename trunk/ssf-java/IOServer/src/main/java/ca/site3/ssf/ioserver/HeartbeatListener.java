@@ -3,8 +3,10 @@ package ca.site3.ssf.ioserver;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,8 @@ public class HeartbeatListener implements Runnable {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private int port;
+	private final String ipAddress;
+	private final int port;
 	private DatagramSocket socket;
 	
 	private volatile boolean shouldListen = true;
@@ -48,17 +51,32 @@ public class HeartbeatListener implements Runnable {
 	
 	
 	
-	public HeartbeatListener(int port, DeviceStatus deviceStatus) {
+	public HeartbeatListener(String ipAddress, int port, DeviceStatus deviceStatus) {
+		this.ipAddress = ipAddress;
 		this.port = port;
 		this.deviceStatus = deviceStatus;
 	}
 	
 	
 	public void run() {
-		
+
+		InetAddress localInterface = null;
 		try {
-			socket = new DatagramSocket(port);
-			log.info("Listening for heartbeats on port {} (UDP)",port);
+			localInterface = InetAddress.getByName(this.ipAddress);
+		} catch (UnknownHostException ex) {
+			log.error("Could not find local network interface for heartbeat listener", ex);
+			
+			try {
+				localInterface = InetAddress.getByName("0.0.0.0");
+			} catch (UnknownHostException e) {
+				log.error("This should never ever happen.", e);
+				return;
+			}
+		}
+
+		try {
+			socket = new DatagramSocket(port, localInterface);
+			log.info("Listening for heartbeats on Network Interface {} (IP) port {} (UDP)", localInterface, port);
 		} catch (SocketException ex) {
 			log.error("Could not start heartbeat listener",ex);
 			return;

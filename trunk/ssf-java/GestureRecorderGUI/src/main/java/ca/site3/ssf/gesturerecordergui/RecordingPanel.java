@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
+import ca.site3.ssf.gesturerecognizer.GestureType;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 
 /**
@@ -59,6 +60,10 @@ class RecordingPanel extends JPanel {
 		this.add(controlAndLoggerPanel, BorderLayout.CENTER);
 		
 		this.isRecordMode = false;
+	}
+	
+	public GestureType getSelectedGesture() {
+		return this.fileInfoPanel.getSelectedGesture();
 	}
 	
 	// Displays the coordinates in the UI and logs anything recorded on screen

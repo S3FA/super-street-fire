@@ -40,7 +40,8 @@ public class CommandLineArgs {
 	@Parameter(names={"-guiPort","-g"}, description="Port to listen on for GUI connections")
 	public Integer guiPort = 31337;
 	
-	
+	@Parameter(names={"-gloveInterfaceIP"}, description="The IP Network Interface of the IOServer for listening to glove data")
+	public String gloveInterfaceIP = "192.168.100.2";
 	
 	
 	@Override

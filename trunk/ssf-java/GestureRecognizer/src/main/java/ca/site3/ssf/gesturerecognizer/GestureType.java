@@ -16,7 +16,10 @@ public enum GestureType {
 	// TODO: Maximum/Full attack fierceness threshold (where anything at or above this counts as the
 	// fastest and strongest possible version of the attack)
 	
-	BLOCK(3, PlayerActionType.BLOCK, 0, true, true),
+	LEFT_BLOCK(3, PlayerActionType.BLOCK, 0, true, false),
+	RIGHT_BLOCK(3, PlayerActionType.BLOCK, 0, false, true),
+	TWO_HANDED_BLOCK(3, PlayerActionType.BLOCK, 0, true, true),
+	
 	LEFT_JAB(4, PlayerActionType.JAB_ATTACK, 9000, true, false),
 	LEFT_HOOK(4, PlayerActionType.HOOK_ATTACK, 16000, true, false),
 	LEFT_UPPERCUT(4, PlayerActionType.UPPERCUT_ATTACK, 25000, true, false),

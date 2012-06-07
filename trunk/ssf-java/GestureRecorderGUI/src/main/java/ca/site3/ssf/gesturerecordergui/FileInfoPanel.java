@@ -26,6 +26,7 @@ import javax.swing.border.TitledBorder;
 
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
+import ca.site3.ssf.gesturerecognizer.GestureType;
 import ca.site3.ssf.gesturerecognizer.GloveData;
 
 /**
@@ -82,7 +83,7 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		formLayoutHelper.addMiddleField(this.exportCsv, this);
 		formLayoutHelper.addLastField(exportToCsvLabel, this);
 		
-		JLabel gestureNameLabel = new JLabel("Gesture Name:");
+		JLabel gestureNameLabel = new JLabel("Gesture:");
 		gestureNameLabel.setForeground(Color.black);
 		formLayoutHelper.addMiddleField(gestureNameLabel, this);
 		formLayoutHelper.addLastField(this.gestureName, this);
@@ -129,6 +130,10 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		if (selectedDir != null) {
 			this.saveDirTextBox.setText(selectedDir.getAbsolutePath());
 		}
+	}
+	
+	public GestureType getSelectedGesture() {
+		return (GestureType)(this.gestureName.getSelectedItem());
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else

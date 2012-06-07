@@ -1,6 +1,7 @@
 package ca.site3.ssf.gesturerecognizer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -39,5 +40,24 @@ public class GestureDataSet {
 		this.instances.add(instance);
 	}
 	
-	
+	public void cleanUpForGestureType(GestureType gestureType) {
+		Iterator<GestureInstance> iter = instances.iterator();
+		while (iter.hasNext()) {
+			GestureInstance currInstance = iter.next();
+			
+			if (currInstance == null) {
+				iter.remove();
+				continue;
+			}
+			
+			if (currInstance.hasLeftGloveData() && !gestureType.getUsesLeftHand() ||
+				currInstance.hasRightGloveData() && !gestureType.getUsesRightHand() ||
+				!currInstance.hasLeftGloveData() && gestureType.getUsesLeftHand() ||
+				!currInstance.hasRightGloveData() && gestureType.getUsesRightHand()) {
+				
+				iter.remove();
+				continue;
+			}
+		}
+	}
 }

@@ -82,7 +82,7 @@ public class IOServer {
 		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
 		
 		
-		heartbeatListener = new HeartbeatListener(args.heartbeatPort, deviceStatus);
+		heartbeatListener = new HeartbeatListener(args.gloveInterfaceIP, args.heartbeatPort, deviceStatus);
 		Thread heartbeatListenerThread = new Thread(heartbeatListener);
 		heartbeatListenerThread.start();
 		
@@ -99,7 +99,7 @@ public class IOServer {
 		Thread eventAggregatorThread = new Thread(eventAggregator, "Event aggregator thread");
 		eventAggregatorThread.start();
 		
-		deviceListener = new DeviceNetworkListener(args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
+		deviceListener = new DeviceNetworkListener(args.gloveInterfaceIP, args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
 		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
 		deviceListenerThread.start();
 		
