@@ -28,7 +28,7 @@ public class TestHeartbeatListener {
 		
 		DeviceStatus deviceStatus = new DeviceStatus();
 		int port = 55555;
-		HeartbeatListener hbl = new HeartbeatListener(port, deviceStatus);
+		HeartbeatListener hbl = new HeartbeatListener("192.168.100.2", port, deviceStatus);
 		
 		Thread listenerThread = new Thread(hbl,"Heartbeat unit test thread");
 		listenerThread.start();

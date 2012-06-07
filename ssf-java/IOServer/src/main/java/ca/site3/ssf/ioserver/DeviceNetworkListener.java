@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
@@ -27,7 +28,8 @@ public class DeviceNetworkListener implements Runnable {
 	
 	private IDeviceDataParser dataParser;
 	
-	private int port;
+	private final String ipAddress;
+	private final int port;
 	private DatagramSocket socket;
 	
 	private Queue<DeviceEvent> eventQueue;
@@ -40,7 +42,8 @@ public class DeviceNetworkListener implements Runnable {
 	 * @param dataParser an object that can translate raw data into higher-level {@link DeviceEvent}s
 	 * @param q queue the {@link DeviceEvent}s will be placed on 
 	 */
-	public DeviceNetworkListener(int port, IDeviceDataParser dataParser, Queue<DeviceEvent> q) {
+	public DeviceNetworkListener(String ipAddress, int port, IDeviceDataParser dataParser, Queue<DeviceEvent> q) {
+		this.ipAddress = ipAddress;
 		this.port = port;
 		this.dataParser = dataParser;
 		this.eventQueue = q;
@@ -49,8 +52,24 @@ public class DeviceNetworkListener implements Runnable {
 	
 	public void run() {
 		stop = false;
+		
+		InetAddress localInterface = null;
 		try {
-			socket = new DatagramSocket(port);
+			localInterface = InetAddress.getByName(this.ipAddress);
+		} catch (UnknownHostException ex) {
+			log.error("Could not find local network interface for device network listener", ex);
+			
+			try {
+				localInterface = InetAddress.getByName("0.0.0.0");
+			} catch (UnknownHostException e) {
+				log.error("This should never ever happen.", e);
+				return;
+			}
+		}
+		
+		try {
+			socket = new DatagramSocket(port, localInterface);
+			log.info("Listening for devices on Network Interface {} (IP) port {} (UDP)", localInterface, port);
 		} catch (SocketException ex) {
 			log.error("Unable to open UDP socket for listening on port "+port, ex);
 			return;

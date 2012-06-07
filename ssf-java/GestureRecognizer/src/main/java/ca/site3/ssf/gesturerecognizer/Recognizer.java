@@ -72,6 +72,8 @@ class Recognizer {
 		assert(dataSet != null);
 		assert(dataSet.getGestureInstanceAt(0).getTrainingDataObservationWidth() == this.gestureType.getNumHands()*3);
 		
+		// Clean up the data set based on the gesture type...
+		dataSet.cleanUpForGestureType(this.gestureType);
 		
 		if (this.recognizer != null) {
 			this.trainMore(dataSet);
