@@ -56,6 +56,14 @@ class RecognizerManager {
 	}
 	
 	/**
+	 * Untrain the given gesture's recognizer to a blank state.
+	 * @param gesture The gesture whose recognizer will be untrained / cleared.
+	 */
+	void untrain(GestureType gesture) {
+		this.recognizerMap.put(gesture, new Recognizer(gesture));
+	}
+	
+	/**
 	 * Tests whether a gesture would even be REMOTELY considered acceptable for testing.
 	 * @param gestureInstance The gesture to test.
 	 * @return true if acceptable, false if not.
@@ -209,11 +217,15 @@ class RecognizerManager {
 			// Begin by reading the number of recognizers to read in from the file...
 
 			char[] charArray = new char[1];
-			int numRecognizers = 0;
+ 			int numRecognizers = 0;
 			String numRecognizersStr = "";
 			
 			reader.read(charArray);
 			while (charArray[0] != '\n') {
+				if (charArray[0] == '\r') {
+					reader.read(charArray);
+					continue;
+				}
 				numRecognizersStr += charArray[0];
 				reader.read(charArray);
 			}
@@ -224,13 +236,11 @@ class RecognizerManager {
 				System.err.println(ex.toString());
 				return false;
 			}
-						
-			for (int i = 0; i < numRecognizers; i++) {
-				
-					Recognizer newRecognizer = new Recognizer();
-					newRecognizer.load(reader);
-					this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
 	
+			for (int i = 0; i < numRecognizers; i++) {
+				Recognizer newRecognizer = new Recognizer();
+				newRecognizer.load(reader);
+				this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
 			}
 		}
 		catch (IOException ex) {

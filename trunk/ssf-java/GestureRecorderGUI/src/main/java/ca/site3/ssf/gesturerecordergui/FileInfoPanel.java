@@ -60,7 +60,7 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		
 		Color borderColour = Color.black;
 		
-		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(borderColour), "File Info");
+		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(borderColour), "Gesture Recording Info");
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 		
@@ -86,11 +86,12 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		JLabel gestureNameLabel = new JLabel("Gesture:");
 		gestureNameLabel.setForeground(Color.black);
 		formLayoutHelper.addMiddleField(gestureNameLabel, this);
-		formLayoutHelper.addLastField(this.gestureName, this);
+		formLayoutHelper.addMiddleField(this.gestureName, this);
+		formLayoutHelper.addLastField(new JLabel(""), this);
 		
 		JLabel dirLabel = new JLabel("Save Directory:");
 		dirLabel.setForeground(Color.black);
-		this.saveDirTextBox = new JTextField(14);
+		this.saveDirTextBox = new JTextField(50);
 		this.saveDirTextBox.setEditable(false);
 		this.dirButton = new JButton("...");
 		this.dirButton.addActionListener(this);

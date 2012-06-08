@@ -56,6 +56,9 @@ public class GestureRecognizer {
 	public boolean trainGesture(GestureType gestureType, GestureDataSet gestureDataSet) {
 		return this.recognizerMgr.train(gestureType, gestureDataSet);
 	}
+	public void untrainAndClearGesture(GestureType gestureType) {
+		this.recognizerMgr.untrain(gestureType);
+	}
 	
 	// GESTURE VALIDITY FUNCTIONALITY ***********************************************************************
 	public static boolean isAcceptableGesture(GestureInstance gestureInstance) {

@@ -204,7 +204,7 @@ class Recognizer {
 				if (reader.read(charArray) == -1) {
 					throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
 				}
-				if (!Character.isSpaceChar(charArray[0]) && charArray[0] != '\n') {
+				if (!Character.isSpaceChar(charArray[0]) && charArray[0] != '\n' && charArray[0] != '\r') {
 					temp += charArray[0];
 				}
 			}

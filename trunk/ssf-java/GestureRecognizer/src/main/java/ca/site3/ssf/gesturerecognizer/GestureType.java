@@ -21,13 +21,13 @@ public enum GestureType {
 	TWO_HANDED_BLOCK(3, PlayerActionType.BLOCK, 0, true, true),
 	
 	LEFT_JAB(4, PlayerActionType.JAB_ATTACK, 9000, true, false),
-	LEFT_HOOK(4, PlayerActionType.HOOK_ATTACK, 16000, true, false),
-	LEFT_UPPERCUT(4, PlayerActionType.UPPERCUT_ATTACK, 25000, true, false),
-	LEFT_CHOP(4, PlayerActionType.CHOP_ATTACK, 0, true, false),
+	LEFT_HOOK(4, PlayerActionType.HOOK_ATTACK, 15000, true, false),
+	LEFT_UPPERCUT(4, PlayerActionType.UPPERCUT_ATTACK, 15000, true, false),
+	LEFT_CHOP(4, PlayerActionType.CHOP_ATTACK, 13000, true, false),
 	RIGHT_JAB(4, PlayerActionType.JAB_ATTACK, 9000, false, true),
 	RIGHT_HOOK(4, PlayerActionType.HOOK_ATTACK, 16000, false, true),
 	RIGHT_UPPERCUT(4, PlayerActionType.UPPERCUT_ATTACK, 25000, false, true),
-	RIGHT_CHOP(4, PlayerActionType.CHOP_ATTACK, 0, false, true),
+	RIGHT_CHOP(4, PlayerActionType.CHOP_ATTACK, 13000, false, true),
 	
 	HADOUKEN(4, PlayerActionType.HADOUKEN_ATTACK, 0, true, true),
 	LEFT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, 0, true, false),
