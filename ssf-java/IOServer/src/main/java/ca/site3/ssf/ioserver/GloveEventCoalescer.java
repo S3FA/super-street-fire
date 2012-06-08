@@ -23,7 +23,7 @@ import ca.site3.ssf.ioserver.GloveEvent.EventType;
  * combining them into {@link GestureInstance}s that are put onto
  * a queue to be consumed by something else.
  * 
- * @author greg
+ * @author greg and Callum
  */
 public class GloveEventCoalescer implements Runnable {
 
@@ -37,6 +37,11 @@ public class GloveEventCoalescer implements Runnable {
 	private BlockingQueue<HeadsetEvent> externalP1HeadsetQueue = new LinkedBlockingQueue<HeadsetEvent>();
 	private BlockingQueue<HeadsetEvent> externalP2HeadsetQueue = new LinkedBlockingQueue<HeadsetEvent>();
 	
+	/**
+	 * The minimum allowed number of elements that it takes to turn a GloveEvent queue
+	 * into a proper gesture.
+	 */
+	private static final int MIN_GLOVE_EVENT_QUEUE_SIZE = 5;
 	/**
 	 * How many {@link GloveEvent}s to cache before aggregating into
 	 * a {@link GestureInstance}.
@@ -150,7 +155,7 @@ public class GloveEventCoalescer implements Runnable {
 					if (eventQueue.size() > GLOVE_DATA_CACHE_SIZE) {
 						log.info("Full GloveEvent queue. Creating GestureInstance.");
 						List<PlayerGestureInstance> gestures = this.aggregateForPlayer(ge.getSource());
-						if (gestures != null) {
+						if (gestures != null && !gestures.isEmpty()) {
 							gestureInstanceQueue.addAll(gestures);
 						}
 					}
@@ -160,13 +165,15 @@ public class GloveEventCoalescer implements Runnable {
 					
 					/*
 					 * This is where decisions get made about what to do after a change in button
-					 * down state.
+					 * down state: If a glove just had its button released then we check the other glove to
+					 * see if it doesn't have a button down. Thus, if both buttons are 'up' then we 
+					 * attempt to create a gesture.
 					 */
 					if (ge.getEventType() == EventType.BUTTON_UP_EVENT && isOtherButtonDown(ge) == false) {
 						// button was released and other glove's button is not down.
 						// create one or more GestureInstances.
 						List<PlayerGestureInstance> gestures = this.aggregateForPlayer(e.getSource());
-						if (gestures != null) {
+						if (gestures != null && !gestures.isEmpty()) {
 							gestureInstanceQueue.addAll(gestures);
 						}
 					}
@@ -225,6 +232,14 @@ public class GloveEventCoalescer implements Runnable {
 			log.warn("Trying to create GestureInstance without any glove data. What nonsense!");
 		}
 		else if (right.isEmpty() == false && left.isEmpty() == true) {
+			if (this.isAlmostEmptyGloveEventQueue(right)) {
+				log.info("Mostly empty right-handed gesture, discarding.");
+				right.clear();
+				return gestures;
+			}
+			
+			log.info("Building right-handed gesture.");
+			
 			// Right-handed gesture
 			timePts = new ArrayList<Double>(right.size());
 			leftGloveData = Collections.emptyList();
@@ -234,9 +249,18 @@ public class GloveEventCoalescer implements Runnable {
 				rightGloveData.add(createGloveData(ge));
 				timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 			}
+			
 			gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
 		}
 		else if (left.isEmpty() == false && right.isEmpty() == true) {
+			if (this.isAlmostEmptyGloveEventQueue(left)) {
+				log.info("Mostly empty left-handed gesture, discarding.");
+				left.clear();
+				return gestures;
+			}
+			
+			log.info("Building left-handed gesture.");
+			
 			// Left-handed gesture
 			timePts = new ArrayList<Double>(left.size());
 			leftGloveData = new ArrayList<GloveData>(left.size());
@@ -246,6 +270,7 @@ public class GloveEventCoalescer implements Runnable {
 				leftGloveData.add(createGloveData(ge));
 				timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 			}
+			
 			gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
 		}
 		else {
@@ -264,28 +289,47 @@ public class GloveEventCoalescer implements Runnable {
 			
 			if (Math.abs(t_left - t_right) > bothButtonsDownThreshold) {
 				
+				log.info("Building two one-handed gestures: button threshold was exceeded.");
+				
 				// If the buttons were not both initially pressed at the same (close enough) time,
 				// split into two single handed gestures
 				
-				timePts = new ArrayList<Double>(left.size());
-				leftGloveData = new ArrayList<GloveData>(left.size());
-				rightGloveData = Collections.emptyList();
-				while ( ! left.isEmpty()) {
-					GloveEvent ge = left.remove();
-					leftGloveData.add(createGloveData(ge));
-					timePts.add((ge.getTimestamp() - startTime) / 1000.0);
+				if (!this.isAlmostEmptyGloveEventQueue(left)) {
+
+					timePts = new ArrayList<Double>(left.size());
+					leftGloveData = new ArrayList<GloveData>(left.size());
+					rightGloveData = Collections.emptyList();
+					while ( ! left.isEmpty()) {
+						GloveEvent ge = left.remove();
+						leftGloveData.add(createGloveData(ge));
+						timePts.add((ge.getTimestamp() - startTime) / 1000.0);
+					}
+					
+					gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
 				}
-				gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+				else {
+					log.info("Mostly empty left-handed gesture, discarding.");
+					left.clear();
+				}
 				
-				timePts = new ArrayList<Double>(right.size());
-				leftGloveData = Collections.emptyList();
-				rightGloveData = new ArrayList<GloveData>(right.size());
-				while ( ! right.isEmpty()) {
-					GloveEvent ge = right.remove();
-					leftGloveData.add(createGloveData(ge));
-					timePts.add((ge.getTimestamp() - startTime) / 1000.0);
+				if (!this.isAlmostEmptyGloveEventQueue(right)) {
+	
+					timePts = new ArrayList<Double>(right.size());
+					leftGloveData = Collections.emptyList();
+					rightGloveData = new ArrayList<GloveData>(right.size());
+					while ( ! right.isEmpty()) {
+						GloveEvent ge = right.remove();
+						rightGloveData.add(createGloveData(ge));
+						timePts.add((ge.getTimestamp() - startTime) / 1000.0);
+					}
+					
+					gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
 				}
-				gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+				else {
+					log.info("Mostly empty right-handed gesture, discarding.");
+					right.clear();
+				}
+				
 			}
 			else {
 				
@@ -303,7 +347,16 @@ public class GloveEventCoalescer implements Runnable {
 				leftGloveData = new ArrayList<GloveData>(mainCache.size());
 				rightGloveData = new ArrayList<GloveData>(mainCache.size());
 				
-				while ( ! mainCache.isEmpty()) {
+				// Do nothing if the main cache is empty
+				if (this.isAlmostEmptyGloveEventQueue(mainCache)) {
+					log.info("Attempted to make a two-handed gesture but there's not enough data available.");
+					otherCache.clear();
+					mainCache.clear();
+					return gestures;
+				}
+				
+				log.info("Building two-handed gesture.");
+				while (!mainCache.isEmpty()) {
 					
 					GloveEvent mainEvent  = mainCache.remove();
 					GloveEvent otherGlove = otherCache.remove();
@@ -321,6 +374,7 @@ public class GloveEventCoalescer implements Runnable {
 				
 				gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
 				otherCache.clear();
+				mainCache.clear();
 			}
 		}
 		
@@ -457,5 +511,16 @@ public class GloveEventCoalescer implements Runnable {
 		}
 		
 		throw new IllegalArgumentException("Non-player GloveEvent passed to isOtherButtonDown");
+	}
+	
+	/**
+	 * Used to determine whether a glove event queue has enough data to satisfy a gesture -
+	 * i.e., did the button just bounce? / is the player just spamming the button? In such cases
+	 * as where the gesture only has a couple of data points we tend to ignore it.
+	 * @param gloveEventQueue The queue to check
+	 * @return true if the queue is almost empty, false otherwise
+	 */
+	private boolean isAlmostEmptyGloveEventQueue(Queue<GloveEvent> gloveEventQueue) {
+		return (gloveEventQueue.size() < MIN_GLOVE_EVENT_QUEUE_SIZE);
 	}
 }

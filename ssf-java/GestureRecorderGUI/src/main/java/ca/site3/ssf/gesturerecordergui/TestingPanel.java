@@ -41,7 +41,6 @@ class TestingPanel extends JPanel implements ActionListener {
 	private JButton testButton;
 	
 	private LoggerPanel loggerPanel;
-	private ControlPanel controlPanel;
 	private GestureRecognizer gestureRecognizer;
 	private boolean isEngineLoaded;
 	private JFileChooser fileChooser;
@@ -65,7 +64,6 @@ class TestingPanel extends JPanel implements ActionListener {
 		wrapperPanel.setBorder(fileBorder);
 		wrapperPanel.setLayout(layout);
 		
-		this.controlPanel = new ControlPanel();
 		this.fileChooser = new JFileChooser();
 		this.fileChooser.setFileFilter(new FileNameExtensionFilter("recognition engine files (*.eng)", "eng"));
 		this.fileName = new JTextField(50);
@@ -92,14 +90,9 @@ class TestingPanel extends JPanel implements ActionListener {
 		formLayoutHelper.addLabel(this.testButton, wrapperPanel);
 		formLayoutHelper.addLastField(new JLabel(""), wrapperPanel);
 		
-		JPanel centerPanel = new JPanel();
-		centerPanel.setLayout(new BorderLayout());
-		centerPanel.add(this.controlPanel, BorderLayout.NORTH);
-		centerPanel.add(this.loggerPanel, BorderLayout.CENTER);
-		
 		this.setLayout(new BorderLayout());
 		this.add(wrapperPanel, BorderLayout.NORTH);
-		this.add(centerPanel, BorderLayout.CENTER);
+		this.add(this.loggerPanel, BorderLayout.CENTER);
 		
 		this.isEngineLoaded = false;
 	}

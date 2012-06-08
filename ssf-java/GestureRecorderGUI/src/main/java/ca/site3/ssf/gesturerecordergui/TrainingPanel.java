@@ -48,6 +48,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 	
 	private JButton selectFileButton;
 	private JButton trainFilesButton;
+	private JButton untrainGestureButton;
 	@SuppressWarnings("rawtypes")
 	private JComboBox gestureType;
 	
@@ -123,6 +124,9 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.trainFilesButton = new JButton("Train!");
 		this.trainFilesButton.addActionListener(this);
 		
+		this.untrainGestureButton = new JButton("Untrain Selected Gesture");
+		this.untrainGestureButton.addActionListener(this);
+		
 		// Allow the user to edit the file list
 		this.trainingFileListPanel = new LoggerPanel("Training Files");
 		this.trainingFileListPanel.setTextAreaSize(15, 100);
@@ -138,6 +142,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		selectGestureControlsPanel.add(this.gestureType);
 		selectGestureControlsPanel.add(this.selectFileButton);
 		selectGestureControlsPanel.add(this.trainFilesButton);
+		selectGestureControlsPanel.add(this.untrainGestureButton);
 		formLayoutHelper.addLastField(selectGestureControlsPanel, wrapperPanel);
 		
 		JLabel gestureEngineLabel = new JLabel("Gesture Recognition Engine: ");
@@ -168,6 +173,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.add(centerPanel, BorderLayout.CENTER);
 		
 		this.trainFilesButton.setEnabled(false);
+		this.untrainGestureButton.setEnabled(false);
 		this.saveGestureEngineButton.setEnabled(false);
 	}
 	
@@ -181,6 +187,13 @@ class TrainingPanel extends JPanel implements ActionListener {
 		else if (e.getSource() == this.trainFilesButton) {
 			this.trainGestureRecognitionEngineFromFileList(this.trainingFileListPanel.getLogText());
 			//this.exportGestureRecognizerEngine(gestureRecognizer);
+		}
+		else if (e.getSource() == this.untrainGestureButton) {
+			this.trainingFileListPanel.clearLog();
+			GestureType gestureToUntrain = (GestureType)this.gestureType.getSelectedItem();
+			this.gestureRecognizer.untrainAndClearGesture(gestureToUntrain);
+			this.loggingPanel.appendLogTextLine("Gesture " + gestureToUntrain.toString() + " is now cleared / untrained.");
+			
 		}
 		else if (e.getSource() == this.loadGestureEngineButton) {
 			this.handleEngineLoadDialog();
@@ -202,6 +215,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 			Preferences userPreferences = Preferences.userRoot();
 			userPreferences.put(SELECTED_GESTURE_TYPE_KEY, String.valueOf(this.gestureType.getSelectedIndex()));
 		}
+
 	}
 	
 	// Displays the file chooser and adds the file to the training list if applicable
@@ -256,6 +270,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 			if (success) {
 				this.loggingPanel.appendLogTextLine("Gesture recognizer engine loaded successfully!");
 				this.saveGestureEngineButton.setEnabled(false);
+				this.untrainGestureButton.setEnabled(true);
 			}
 			else {
 				this.loggingPanel.appendLogTextLine("Failed to load gesture recognizer engine file, bad file format: " + selectedFile.getAbsolutePath());
@@ -350,6 +365,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		if (success) {
 			this.loggingPanel.appendLogTextLine("Training succeeded! (yay!)");
 			this.saveGestureEngineButton.setEnabled(true);
+			this.untrainGestureButton.setEnabled(true);
 		}
 		else {
 			this.loggingPanel.appendLogTextLine("The gesture instances selected cannot be trained!\n");
