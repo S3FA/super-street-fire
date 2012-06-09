@@ -36,7 +36,7 @@ The possible command/value pairs are:
  * {{{'4' [value]}}} - sets flame effect output 4 to {{{[value]}}} %. {{{[value]}}} should be between 0 and 100 inclusive. Other values are ignored. If PWM is not configured for the flame effect, all non-zero values are considered ON.
  * {{{'A' [value]}}} - sets AC output for hot surface igniter to ON if {{{[value]}}} == '1', to OFF if {{{[value]}}} == '0'. Other values are ignored.
  * {{{'E'}}} - emergency stop, turns all flame effect outputs and AC output off.
- * {{{'Q'}}} - query board status.
+ * {{{'?'}}} - query board status.
 
 The broadcast address should be used particularly for the hot surface igniter control and the ESTOP command, but might make for some fun "fire everything" effects.
 
@@ -47,7 +47,7 @@ Flame effect nodes can return their status to the server. This can be used to de
  * The destination node is the server (0).
  * The source node is the node ID.
  * 'S' {{{[armed status]}}} - sends '0' if solenoid power is not present, '1' if present.
- * 'F' {{{[flame status]}}} - sends '0' if no fire is present, '1' if present.
+ * 'F' {{{[flame status]}}} - sends '0' if no fire is present, '1' if present, '?' if unknown.
 
 There will also be other devices on the network:
 
