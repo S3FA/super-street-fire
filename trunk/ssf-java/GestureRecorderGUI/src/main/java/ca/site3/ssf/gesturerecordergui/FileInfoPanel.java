@@ -138,12 +138,16 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 	}
 	
 	// Save the data to a file. Using CSV currently, but if the hardware sends us comma-separated tuples, may need to use pipe-delimiting or something else
-	public void exportToCsv(GestureInstance instance) {
+	public String exportToCsv(GestureInstance instance) {
+		String filename = "";
 		try {	
 			String suffix = "csv";
 			int iteration = getNextFileIteration(suffix);
 			
-	        FileWriter writer = new FileWriter(new File("Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix), !this.isNewFile);
+			filename = "Data/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix;
+			File csvFile = new File(filename);
+			filename = csvFile.toString();
+	        FileWriter writer = new FileWriter(csvFile, !this.isNewFile);
         	
 	        // If we just created the file, 
 	        if (this.isNewFile) {
@@ -204,18 +208,27 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
+			filename = "";
 		}
+		
+		return filename;
 	}
 	
 	// Save the data to a file that can be read by GestureRecognizer's fromDataString() method
-	public void exportToRecognizer(GestureInstance instance) {
+	public String exportToRecognizer(GestureInstance instance) {
+		String filename = "";
 		try {	
 			int iteration = getNextFileIteration(GESTURE_INSTANCE_FILE_EXT);
 	       
 	        // Save the data to a file readable by the GestureRecognizer
-	        FileWriter writer = new FileWriter(new File(this.saveDirTextBox.getText() +
+			
+			filename = this.saveDirTextBox.getText() +
 	        		"/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + 
-	        		"." + GESTURE_INSTANCE_FILE_EXT), false);
+	        		"." + GESTURE_INSTANCE_FILE_EXT;
+			File recognizerFile = new File(filename);
+			filename = recognizerFile.toString();
+			
+	        FileWriter writer = new FileWriter(recognizerFile, false);
 	        writer.write(instance.toDataString());
 	 
 		    writer.flush();
@@ -223,7 +236,9 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		}
 		catch (IOException ex) {
 			ex.printStackTrace();
+			filename = "";
 		}
+		return filename;
 	}
 	
 	// Save a recognizer engine file

@@ -87,9 +87,9 @@ class RecordingPanel extends JPanel {
 		return this.fileInfoPanel.getCsvExportState();
 	}
 	
-	public void exportToCsv(GestureInstance instance)
+	public String exportToCsv(GestureInstance instance)
 	{
-		this.fileInfoPanel.exportToCsv(instance);
+		return this.fileInfoPanel.exportToCsv(instance);
 	}
 	
 	public boolean getRecognizerExportState()
@@ -97,9 +97,9 @@ class RecordingPanel extends JPanel {
 		return this.fileInfoPanel.getRecognizerExportState();
 	}
 	
-	public void exportToRecognizer(GestureInstance instance)
+	public String exportToRecognizer(GestureInstance instance)
 	{
-		this.fileInfoPanel.exportToRecognizer(instance);
+		return this.fileInfoPanel.exportToRecognizer(instance);
 	}
 	
 	public String getGestureName()
