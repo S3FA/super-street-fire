@@ -38,6 +38,8 @@ The possible command/value pairs are:
  * {{{'E'}}} - emergency stop, turns all flame effect outputs and AC output off.
  * {{{'?'}}} - query board status.
 
+Don't repeat the same command twice in a packet.
+
 The broadcast address should be used particularly for the hot surface igniter control and the ESTOP command, but might make for some fun "fire everything" effects.
 
 Flame effect nodes can return their status to the server. This can be used to determine whether the boards are active and working or to get more detailed information. This should not be used with the broadcast address, as all the boards will respond at the same time. These packets take the following format for the payload, using the same framing + length header and checksum trailer:
