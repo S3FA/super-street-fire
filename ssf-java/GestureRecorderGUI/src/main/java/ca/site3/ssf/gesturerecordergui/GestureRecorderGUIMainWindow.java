@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -174,19 +175,28 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 			}
 			else {
 				// Acceptable gesture...
+				List<String> filenames = new ArrayList<String>(2);
 				
 				// If export to CSV is selected, perform the export
 				if (this.recordingPanel.getCsvExportState()) {
-					this.recordingPanel.exportToCsv(instance);
+					String filename = this.recordingPanel.exportToCsv(instance);
+					filenames.add(filename);
 				}
 				
 				// If export to the gesture recognizer is selected, export to the GestureRecognizer
 				if (this.recordingPanel.getRecognizerExportState()) {
-					this.recordingPanel.exportToRecognizer(instance);
+					String filename = this.recordingPanel.exportToRecognizer(instance);
+					filenames.add(filename);
 				}
 				
 				// Show all of the recorded data in the GUI Log...
-				this.recordingPanel.setLogString(instance.toDataString());
+				String logStr = "Gesture exported to file(s):\n";
+				for (String filename : filenames) {
+					logStr += filename + "\n";
+				}
+				logStr += "\n" + instance.toDataString();
+				this.recordingPanel.setLogString(logStr);
+				
 			}
 
 		}
