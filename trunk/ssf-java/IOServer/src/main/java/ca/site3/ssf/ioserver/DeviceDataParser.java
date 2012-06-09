@@ -1,5 +1,6 @@
 package ca.site3.ssf.ioserver;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +26,13 @@ public class DeviceDataParser implements IDeviceDataParser {
 	private DeviceStatus deviceStatus;
 	
 	// gX:69.68,gY:-77.45,gZ:-20.77,aX:-265.64,aY:239.84,aZ:4228.79,RLL:0.69,PCH:-2.46|
-	private Pattern pattern = Pattern.compile("^gX:([^,]+),gY:([^,]+),gZ:([^,]+),aX:([^,]+),aY:([^,]+),aZ:([^,]+),RLL:([^,]+),PCH:([^|]+)\\|$");
+	private final Pattern pattern = Pattern.compile("^gX:([^,]+),gY:([^,]+),gZ:([^,]+),aX:([^,]+),aY:([^,]+),aZ:([^,]+),RLL:([^,]+),PCH:([^|]+)\\|$");
 	
 	public DeviceDataParser(DeviceStatus deviceStatus) {
 		this.deviceStatus = deviceStatus;
 	}
 	
-	public List<DeviceEvent> parseDeviceData(byte[] data, InetAddress srcIP) throws Exception {
+	public List<DeviceEvent> parseDeviceData(byte[] data, int dataLength, InetAddress srcIP) throws Exception {
 		
 		Device d = deviceStatus.getDeviceAtAddress(srcIP);
 		if (d == null) {
@@ -47,12 +48,22 @@ public class DeviceDataParser implements IDeviceDataParser {
 		 *  XXX: currently assuming datagrams break cleanly at | boundaries
 		 *  (though could be multiple lines per datagram)
 		 */
-		String rawString = new String(data).trim();
+		String rawString = "";
+		try {
+			rawString = new String(data, 0, dataLength, "ASCII").trim();
+		}
+		catch (UnsupportedEncodingException e) {
+			log.error("Error while encoding string.", e);
+			return null;
+		}
+		
 		String[] strings = rawString.split("\n");
 		List<DeviceEvent> events = new ArrayList<DeviceEvent>(strings.length);
 		for (String dataStr : strings) {
 			GloveEvent gloveEvent = parseSingleLine(d, dataStr.trim());
-			events.add(gloveEvent);
+			if (gloveEvent != null) {
+				events.add(gloveEvent);
+			}
 		}
 		
 		return events;
@@ -77,7 +88,7 @@ public class DeviceDataParser implements IDeviceDataParser {
 				log.warn("Ignoring data: '{}'",dataStr);
 				return null;
 			}
-			if (dataStr.endsWith("|") == false) {
+			if (dataStr.endsWith("|") == false && dataStr.endsWith("|\r") == false) {
 				log.warn("Looks like an incomplete frame: '{}'", dataStr);
 				return null;
 			}

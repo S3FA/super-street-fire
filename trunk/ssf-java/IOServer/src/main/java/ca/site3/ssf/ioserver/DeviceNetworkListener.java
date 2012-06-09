@@ -1,6 +1,7 @@
 package ca.site3.ssf.ioserver;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -75,13 +76,13 @@ public class DeviceNetworkListener implements Runnable {
 			return;
 		}
 		
-		int bufSize = 1024;
-		byte receivedData[] = new byte[bufSize];
-		DatagramPacket receivedPacket = new DatagramPacket(receivedData, bufSize);
+		final int DATAGRAM_BUFFER_SIZE = 8192;
+		byte receivedData[] = new byte[DATAGRAM_BUFFER_SIZE];
+		DatagramPacket receivedPacket = new DatagramPacket(receivedData, receivedData.length);
 		
 		while ( ! stop ) {
 			// reset buffer size
-			receivedPacket.setLength(bufSize);
+			receivedPacket.setLength(receivedData.length);
 			try {
 				socket.receive(receivedPacket);
 			} catch (SocketTimeoutException ex) {
@@ -92,20 +93,32 @@ public class DeviceNetworkListener implements Runnable {
 			} catch (IOException ex) {
 				log.warn("Exception receiving packet",ex);
 			}
-			
+
 			try {
-				byte[] data = Arrays.copyOfRange(receivedPacket.getData(), receivedPacket.getOffset(), 
-						receivedPacket.getOffset()+receivedPacket.getLength());
 				InetAddress address = receivedPacket.getAddress();
-				List<? extends DeviceEvent> events = dataParser.parseDeviceData(data, address);
-				for (DeviceEvent e : events) {
-					log.debug("Created DeviceEvent: {}", e);
-					if (e != null) {
-						eventQueue.add(e);
+				List<? extends DeviceEvent> events = dataParser.parseDeviceData(receivedPacket.getData(), receivedPacket.getLength(), address);
+				if (events != null) {
+					for (DeviceEvent e : events) {
+						log.debug("Created DeviceEvent: {}", e);
+						if (e != null) {
+							eventQueue.add(e);
+						}
 					}
 				}
+				else {
+					try {
+						log.warn("Could not parse data: " + new String(receivedPacket.getData(), 0, receivedPacket.getLength(), "ASCII").trim());
+					} catch (UnsupportedEncodingException e) {
+						log.error("Error while encoding string.", e);
+					}
+				}
+				
 			} catch (Exception ex) {
-				log.warn("Could not parse packet data", ex);
+				try {
+					log.warn("Could not parse packet data: " + new String(receivedPacket.getData(), 0, receivedPacket.getLength(), "ASCII").trim(), ex);
+				} catch (UnsupportedEncodingException e) {
+					log.error("Error while encoding string.", e);
+				}
 			}
 		}
 		

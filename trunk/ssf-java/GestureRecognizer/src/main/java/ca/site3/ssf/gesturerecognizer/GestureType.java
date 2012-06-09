@@ -16,9 +16,9 @@ public enum GestureType {
 	// TODO: Maximum/Full attack fierceness threshold (where anything at or above this counts as the
 	// fastest and strongest possible version of the attack)
 	
-	LEFT_BLOCK(3, PlayerActionType.BLOCK, 0, true, false),
-	RIGHT_BLOCK(3, PlayerActionType.BLOCK, 0, false, true),
-	TWO_HANDED_BLOCK(3, PlayerActionType.BLOCK, 0, true, true),
+	LEFT_BLOCK(2, PlayerActionType.BLOCK, 0, true, false),
+	RIGHT_BLOCK(2, PlayerActionType.BLOCK, 0, false, true),
+	TWO_HANDED_BLOCK(2, PlayerActionType.BLOCK, 0, true, true),
 	
 	LEFT_JAB(4, PlayerActionType.JAB_ATTACK, 9000, true, false),
 	LEFT_HOOK(4, PlayerActionType.HOOK_ATTACK, 15000, true, false),
@@ -30,8 +30,8 @@ public enum GestureType {
 	RIGHT_CHOP(4, PlayerActionType.CHOP_ATTACK, 13000, false, true),
 	
 	HADOUKEN(4, PlayerActionType.HADOUKEN_ATTACK, 0, true, true),
-	LEFT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, 0, true, false),
-	RIGHT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, 0, false, true),
+	LEFT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, 30000, true, false),
+	RIGHT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, 30000, false, true),
 	SONIC_BOOM(4, PlayerActionType.SONIC_BOOM_ATTACK, 0, true, true),
 	DOUBLE_LARIAT(4, PlayerActionType.DOUBLE_LARIAT_ATTACK, 0, true, true),
 	SUMO_HEADBUTT(4, PlayerActionType.SUMO_HEADBUTT_ATTACK, 0, true, true),

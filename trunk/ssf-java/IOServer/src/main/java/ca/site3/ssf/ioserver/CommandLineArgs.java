@@ -1,5 +1,7 @@
 package ca.site3.ssf.ioserver;
 
+import java.io.File;
+
 import com.beust.jcommander.Parameter;
 
 /**
@@ -43,6 +45,8 @@ public class CommandLineArgs {
 	@Parameter(names={"-gloveInterfaceIP"}, description="The IP Network Interface of the IOServer for listening to glove data")
 	public String gloveInterfaceIP = "192.168.100.2";
 	
+	@Parameter(names={"-gestureEngine", "-ge"}, description="File path to the gesture recognition engine used for recongnizing game gestures")
+	public String gestureEngineFilepath = new File(System.getProperty("user.dir"), "../GestureRecorderGUI/Data/gesture_recognizer_engine.eng").toString();
 	
 	@Override
 	public String toString() {

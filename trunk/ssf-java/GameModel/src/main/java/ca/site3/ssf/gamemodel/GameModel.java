@@ -119,6 +119,9 @@ public class GameModel implements IGameModel {
 	}
 	
 	public void queryGameInfoRefresh() {
+		if (this.currState == null) {
+			return;
+		}
 		
 		int roundInPlayTimer = -1;
 		RoundBeginCountdownType roundBeginCountdown = RoundBeginCountdownType.THREE;

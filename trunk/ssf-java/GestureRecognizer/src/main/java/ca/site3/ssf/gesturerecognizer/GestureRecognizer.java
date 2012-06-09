@@ -35,7 +35,7 @@ import ca.site3.ssf.gamemodel.IGameModel;
 public class GestureRecognizer {
 	
 	public final static double MINIMUM_GESTURE_RECOGNITION_TIME_IN_SECS  = 0.011;
-	public final static double MAXIMUM_GESTURE_RECOGNITION_TIME_IN_SECS  = 2.0;
+	public final static double MAXIMUM_GESTURE_RECOGNITION_TIME_IN_SECS  = 4.0;
 	
 	private RecognizerManager recognizerMgr = null;
 	private Logger logger = null;

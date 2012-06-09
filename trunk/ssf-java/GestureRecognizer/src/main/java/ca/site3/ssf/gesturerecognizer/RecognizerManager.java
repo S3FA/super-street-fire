@@ -25,9 +25,9 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 class RecognizerManager {
 	
 	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD       = 1E-280;
-	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD     = 1E-80;
+	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD     = 1E-85;
 	private final static double EPSILON_BASE_PROBABILITY_THRESHOLD       = 1E-300;
-	private final static double LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD = 1E-40;
+	private final static double LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD = 1E-60;
 	
 	private Logger logger = null;
 	
@@ -93,7 +93,7 @@ class RecognizerManager {
 	GestureType recognize(GestureInstance inst) {
 		// Weed out strange and anomalous data
 		if (!RecognizerManager.isAcceptableGesture(inst)) {
-			this.logger.info("Ignoring gesture - way too short from beginning to end!");
+			this.logger.info("Ignoring gesture - too short from beginning to end!");
 			return null;
 		}
 		

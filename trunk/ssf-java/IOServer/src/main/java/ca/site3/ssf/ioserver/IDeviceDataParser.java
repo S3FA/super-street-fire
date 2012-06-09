@@ -17,5 +17,5 @@ public interface IDeviceDataParser {
 	 * @param src IP address the data came from
 	 * @return a DeviceEvent representing the data from the peripheral
 	 */
-	List<? extends DeviceEvent> parseDeviceData(byte[] data, InetAddress src) throws Exception;
+	List<? extends DeviceEvent> parseDeviceData(byte[] data, int dataLength, InetAddress src) throws Exception;
 }
