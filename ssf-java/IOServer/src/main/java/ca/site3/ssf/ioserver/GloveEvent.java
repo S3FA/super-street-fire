@@ -64,6 +64,10 @@ public final class GloveEvent extends DeviceEvent {
 	
 	@Override
 	public String toString() {
-		return "GloveEvent (" + this.eventType.toString() + ") : gyro: " + Arrays.toString(this.gyro) + " acceleration: " + Arrays.toString(this.acceleration);
+		String gloveEventStr = "GloveEvent (" + this.eventType.toString() + ")";
+		if (this.eventType == EventType.DATA_EVENT) {
+			gloveEventStr += " : gyro: " + Arrays.toString(this.gyro) + " acceleration: " + Arrays.toString(this.acceleration);
+		}
+		return gloveEventStr;
 	}
 }

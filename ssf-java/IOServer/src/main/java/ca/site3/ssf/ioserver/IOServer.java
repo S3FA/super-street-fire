@@ -1,5 +1,7 @@
 package ca.site3.ssf.ioserver;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
@@ -78,14 +80,11 @@ public class IOServer {
 				 "\n~~~~~~~~~~~~~~~~~~~");
 		
 		startTime = System.currentTimeMillis();
-		
 		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
-		
 		
 		heartbeatListener = new HeartbeatListener(args.gloveInterfaceIP, args.heartbeatPort, deviceStatus);
 		Thread heartbeatListenerThread = new Thread(heartbeatListener);
 		heartbeatListenerThread.start();
-		
 		
 		StreetFireServer guiServer = new StreetFireServer(args.guiPort, game.getActionFactory(), commManager.getCommandQueue());
 		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
@@ -93,7 +92,6 @@ public class IOServer {
 		
 		gameEventRouter = new GameEventRouter(guiServer, commManager.getGuiOutQueue());
 		game.addGameModelListener(gameEventRouter);
-		
 
 		eventAggregator = new GloveEventCoalescer(startTime, (2.0 / args.tickFrequency.doubleValue()), commManager.getCommInQueue(), commManager.getGestureQueue());
 		Thread eventAggregatorThread = new Thread(eventAggregator, "Event aggregator thread");
@@ -102,6 +100,17 @@ public class IOServer {
 		deviceListener = new DeviceNetworkListener(args.gloveInterfaceIP, args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
 		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
 		deviceListenerThread.start();
+		
+		// Attempt to setup the gesture recognizer
+		try {
+			boolean success = this.gestureRecognizer.loadRecognizerEngine(new FileReader(args.gestureEngineFilepath));
+			if (!success) {
+				log.warn("Failed to read gesture recognition engine from " + args.gestureEngineFilepath);
+			}
+		}
+		catch (FileNotFoundException e) {
+			log.warn("Could not load file gesture recognition engine from " + args.gestureEngineFilepath, e);
+		}
 		
 		isStopped = false;
 		runLoop();

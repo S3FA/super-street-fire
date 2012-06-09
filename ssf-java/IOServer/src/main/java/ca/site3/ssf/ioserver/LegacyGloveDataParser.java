@@ -25,9 +25,9 @@ public class LegacyGloveDataParser implements IDeviceDataParser {
 	Logger log = LoggerFactory.getLogger(getClass());
 	
 	
-	public List<? extends DeviceEvent> parseDeviceData(byte[] data, InetAddress src) throws Exception {
+	public List<? extends DeviceEvent> parseDeviceData(byte[] data, int dataLength, InetAddress src) throws Exception {
 		
-		String dataStr = new String(data);
+		String dataStr = new String(data, 0, dataLength, "ASCII");
 		log.debug("Parsing data string '{}'",dataStr);
 		if (dataStr.endsWith("|") == false || dataStr.charAt(2) != ':') {
 			log.warn("Discarding what looks like an incomplete message: {}",dataStr);
