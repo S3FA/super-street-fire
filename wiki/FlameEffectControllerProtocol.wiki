@@ -35,12 +35,12 @@ The possible command/value pairs are:
  * {{{'3' [value]}}} - sets flame effect output 3 to {{{[value]}}} %. {{{[value]}}} should be between 0 and 100 inclusive. Other values are ignored. If PWM is not configured for the flame effect, all non-zero values are considered ON.
  * {{{'4' [value]}}} - sets flame effect output 4 to {{{[value]}}} %. {{{[value]}}} should be between 0 and 100 inclusive. Other values are ignored. If PWM is not configured for the flame effect, all non-zero values are considered ON.
  * {{{'A' [value]}}} - sets AC output for hot surface igniter to ON if {{{[value]}}} == '1', to OFF if {{{[value]}}} == '0'. Other values are ignored.
- * 'E' - emergency stop, turns all flame effect outputs and AC output off.
+ * {{{'E'}}} - emergency stop, turns all flame effect outputs and AC output off.
+ * {{{'Q'}}} - query board status.
 
 The broadcast address should be used particularly for the hot surface igniter control and the ESTOP command, but might make for some fun "fire everything" effects.
 
-
-Flame effect nodes can also be configured to return their status periodically to the server. These packets take the following format for the payload, using the same framing + length header and checksum trailer:
+Flame effect nodes can return their status to the server. This can be used to determine whether the boards are active and working or to get more detailed information. This should not be used with the broadcast address, as all the boards will respond at the same time. These packets take the following format for the payload, using the same framing + length header and checksum trailer:
 
 {{{[dest node = 0] [source node] 'S' [armed status] 'F' [flame status]}}}
 
