@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +27,19 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
  */
 class RecognizerManager {
 	
-	private final static double MINIMUM_BASE_PROBABILITY_THRESHOLD       = 1E-280;
-	private final static double MINIMUM_KMEANS_PROBABILITY_THRESHOLD     = 1E-85;
-	private final static double EPSILON_BASE_PROBABILITY_THRESHOLD       = 1E-300;
-	private final static double LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD = 1E-60;
+	private final static double MINIMUM_PROBABILITY_THRESHOLD               = 1E-300;
+	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 1E-55;
+	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E-55;
 	
 	private Logger logger = null;
 	
 	private Map<GestureType, Recognizer> recognizerMap =
 			new HashMap<GestureType, Recognizer>(GestureType.values().length);
+	
+	private Map<GestureGenre, Double> bestProbabilityMap =
+			new Hashtable<GestureGenre, Double>(GestureGenre.values().length);
+	private Map<GestureGenre, GestureType> bestGestureTypeMap =
+			new Hashtable<GestureGenre, GestureType>(GestureGenre.values().length);	
 	
 	RecognizerManager() {
 		this.logger = LoggerFactory.getLogger(this.getClass());
@@ -97,54 +104,137 @@ class RecognizerManager {
 			return null;
 		}
 		
+		// Setup variables for tracking the probabilities of various gestures
 		double currProbability = -1.0;
-		double bestProbability =  0.0;
-		GestureType bestGesture = null;
+		for (GestureGenre genre : GestureGenre.values()) {
+			this.bestProbabilityMap.put(genre, new Double(-1.0));
+		}
 		
+		// Go through each recognizer - only use recognizers that are built for the correct glove data
+		// as is being provided by the gesture instance being recognized. We split the recognition 'bests'
+		// into categories based on the genre of the gesture (i.e., "basic", "special", "easter-egg" gestures)
+		// Later on, we favour basic gestures over special gestures and special gestures over easter-egg gestures.
 		for (Recognizer recognizer : this.recognizerMap.values()) {
-			currProbability = recognizer.probability(inst);
+			GestureType currGestureType = recognizer.getGestureType();
+			
+			// Make sure we only evaluate recognizers for the appropriate hands
+			if (currGestureType.getUsesLeftHand() && !inst.hasLeftGloveData() ||
+				currGestureType.getUsesRightHand() && !inst.hasRightGloveData() ||
+				!currGestureType.getUsesLeftHand() && inst.hasLeftGloveData() ||
+				!currGestureType.getUsesRightHand() && inst.hasRightGloveData()) {
+				continue;
+			}
+			
+			currProbability = Math.max(recognizer.probability(inst), recognizer.kMeansProbability(inst));
+			Double bestProbability = this.bestProbabilityMap.get(currGestureType.getGenre());
+			
 			if (currProbability > bestProbability) {
-				bestProbability = currProbability;
-				bestGesture = recognizer.getGestureType();
+				this.bestProbabilityMap.put(currGestureType.getGenre(), currProbability);
+				this.bestGestureTypeMap.put(currGestureType.getGenre(), currGestureType);
 			}
 		}
 		
-		if (bestProbability < MINIMUM_BASE_PROBABILITY_THRESHOLD) {
+		final double REQUIRED_FIERCENESS = inst.getTotalFierceness();
+		
+		Set<Entry<GestureGenre, Double>> bestProbabilityEntrySet = this.bestProbabilityMap.entrySet();
+		Iterator<Entry<GestureGenre, Double>> probabilityIter = bestProbabilityEntrySet.iterator();
+		
+		while (probabilityIter.hasNext()) {
 			
-			double bestBaseProbability = bestProbability;
+			Entry<GestureGenre, Double> probabilityEntry = probabilityIter.next();
 			
-			for (Recognizer recognizer : this.recognizerMap.values()) {
-				currProbability = recognizer.kMeansProbability(inst);
-				if (currProbability > bestProbability) {
-					bestProbability = currProbability;
-					bestGesture = recognizer.getGestureType();
+			GestureGenre genre = probabilityEntry.getKey();
+			Double probability = probabilityEntry.getValue();
+			
+			assert(genre != null);
+			assert(probability != null);
+			assert(probability >= 0.0);
+		
+			if (probability < MINIMUM_PROBABILITY_THRESHOLD) {
+				this.logger.info("Failed to recognize gesture, did not meet minimum probability threshold of either base or k-means recognitions.");
+				probabilityIter.remove();
+				this.bestGestureTypeMap.remove(genre);
+			}
+			else {
+				GestureType gestureType = this.bestGestureTypeMap.get(genre);
+				// Check the fierceness of the gesture to ensure it's meeting it's minimum threshold...
+				if (gestureType.getMinFierceDiffThreshold() > REQUIRED_FIERCENESS) {
+					this.logger.info("Gesture was recognized, but fireceness was not great enough to execute: " +
+							"Required fierceness: " + gestureType.getMinFierceDiffThreshold() + ", fierceness found: " + REQUIRED_FIERCENESS);
+					
+					probabilityIter.remove();
+					this.bestGestureTypeMap.remove(genre);
+				}	
+			}
+		}
+
+		// The best gesture map will now contain all the best candidates for the given instance, from
+		// each gesture genre. We need to determine what the differences are so that we make a reasonable
+		// choice as to whether we should be using a basic, special or easter-egg type move...
+
+		GestureType bestGesture = null;
+		if (this.bestProbabilityMap.containsKey(GestureGenre.BASIC)) {
+			
+			double basicGestureBestProb = this.bestProbabilityMap.get(GestureGenre.BASIC);
+			
+			if (this.bestProbabilityMap.containsKey(GestureGenre.SPECIAL)) {
+				double specialGestureBestProb = this.bestProbabilityMap.get(GestureGenre.SPECIAL);
+				if (specialGestureBestProb > basicGestureBestProb && 
+					specialGestureBestProb - basicGestureBestProb >= BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD) {
+					
+					if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+						double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
+						
+						if (easterEggGestureBestProb > specialGestureBestProb &&
+							easterEggGestureBestProb - specialGestureBestProb >= SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD) {
+							
+							bestGesture = this.bestGestureTypeMap.get(GestureGenre.EASTER_EGG);
+						}
+						else {
+							bestGesture = this.bestGestureTypeMap.get(GestureGenre.SPECIAL);
+						}
+					}
+					else {
+						bestGesture = this.bestGestureTypeMap.get(GestureGenre.SPECIAL);
+					}
+				}
+				else {
+					bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
 				}
 			}
-			
-			if (bestProbability < MINIMUM_KMEANS_PROBABILITY_THRESHOLD) {
-				this.logger.info("Failed to recognize gesture, did not meet minimum probability threshold of either base or k-means.");
-				return null;
-			}
-			else if (bestBaseProbability < EPSILON_BASE_PROBABILITY_THRESHOLD) {
-				if (bestProbability < LAST_CHANCE_KMEANS_PROBABILITY_THRESHOLD) {
-					this.logger.info("Failed to recognize gesture, did not meet minimum base epsilon probability threshold.");
-					return null;
-				}
+			else {
+				bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
 			}
 			
 		}
-		
-		// Inline: We have a gesture that is a 'best candidate', we still have a bit more checking to
-		// do to see if it is truly worthy of being a proper gesture...
-		double fierceness = inst.getTotalFierceness();
-		if (bestGesture.getMinFierceDiffThreshold() > fierceness) {
-			this.logger.info("Gesture was recognized, but fireceness was not great enough to execute: " +
-					"Required fierceness: " + bestGesture.getMinFierceDiffThreshold() + ", fierceness found: " + fierceness);
+		else if (this.bestProbabilityMap.containsKey(GestureGenre.SPECIAL)) {
+			double specialGestureBestProb = this.bestProbabilityMap.get(GestureGenre.SPECIAL);
+
+			if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+				double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
+				
+				if (easterEggGestureBestProb > specialGestureBestProb &&
+					easterEggGestureBestProb - specialGestureBestProb >= SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD) {
+					
+					bestGesture = this.bestGestureTypeMap.get(GestureGenre.EASTER_EGG);
+				}
+				else {
+					bestGesture = this.bestGestureTypeMap.get(GestureGenre.SPECIAL);
+				}
+			}
+			else {
+				bestGesture = this.bestGestureTypeMap.get(GestureGenre.SPECIAL);
+			}
+			
+		}
+		else if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+			bestGesture = this.bestGestureTypeMap.get(GestureGenre.EASTER_EGG);
+		}
+		else {
 			return null;
 		}
 		
-		this.logger.info("Best found matching gesture: " + bestGesture.toString()); 
-		
+		this.logger.info("Best found matching gesture: " + bestGesture.toString());
 		return bestGesture;
 	}
 	
