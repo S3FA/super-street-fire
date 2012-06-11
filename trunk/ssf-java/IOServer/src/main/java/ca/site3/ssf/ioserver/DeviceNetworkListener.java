@@ -57,12 +57,14 @@ public class DeviceNetworkListener implements Runnable {
 		InetAddress localInterface = null;
 		try {
 			localInterface = InetAddress.getByName(this.ipAddress);
-		} catch (UnknownHostException ex) {
+		}
+		catch (UnknownHostException ex) {
 			log.error("Could not find local network interface for device network listener", ex);
 			
 			try {
 				localInterface = InetAddress.getByName("0.0.0.0");
-			} catch (UnknownHostException e) {
+			}
+			catch (UnknownHostException e) {
 				log.error("This should never ever happen.", e);
 				return;
 			}
@@ -71,7 +73,8 @@ public class DeviceNetworkListener implements Runnable {
 		try {
 			socket = new DatagramSocket(port, localInterface);
 			log.info("Listening for devices on Network Interface {} (IP) port {} (UDP)", localInterface, port);
-		} catch (SocketException ex) {
+		}
+		catch (SocketException ex) {
 			log.error("Unable to open UDP socket for listening on port "+port, ex);
 			return;
 		}
@@ -80,17 +83,20 @@ public class DeviceNetworkListener implements Runnable {
 		byte receivedData[] = new byte[DATAGRAM_BUFFER_SIZE];
 		DatagramPacket receivedPacket = new DatagramPacket(receivedData, receivedData.length);
 		
-		while ( ! stop ) {
+		while (!stop) {
 			// reset buffer size
 			receivedPacket.setLength(receivedData.length);
 			try {
 				socket.receive(receivedPacket);
-			} catch (SocketTimeoutException ex) {
+			}
+			catch (SocketTimeoutException ex) {
 				log.debug("Device listener timed out");
-			} catch (SocketException ex) {
+			}
+			catch (SocketException ex) {
 				log.info("Device listener socket closed",ex);
 				break;
-			} catch (IOException ex) {
+			}
+			catch (IOException ex) {
 				log.warn("Exception receiving packet",ex);
 			}
 
@@ -108,12 +114,14 @@ public class DeviceNetworkListener implements Runnable {
 				else {
 					try {
 						log.warn("Could not parse data: " + new String(receivedPacket.getData(), 0, receivedPacket.getLength(), "ASCII").trim());
-					} catch (UnsupportedEncodingException e) {
+					}
+					catch (UnsupportedEncodingException e) {
 						log.error("Error while encoding string.", e);
 					}
 				}
 				
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				try {
 					log.warn("Could not parse packet data: " + new String(receivedPacket.getData(), 0, receivedPacket.getLength(), "ASCII").trim(), ex);
 				} catch (UnsupportedEncodingException e) {

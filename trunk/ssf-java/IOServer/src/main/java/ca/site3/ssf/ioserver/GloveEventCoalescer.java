@@ -61,7 +61,7 @@ public class GloveEventCoalescer implements Runnable {
 	 * glove forgets to send a Button up event. This value represents the maximum wait time
 	 * between any series of glove events before those events are coalesced.
 	 */
-	private static final long MAX_TIME_TO_WAIT_FOR_BUTTON_UP_EVENT_MS = 750;
+	private static final long MAX_TIME_TO_WAIT_FOR_BUTTON_UP_EVENT_MS = 500;
 	
 	// These queues hold the accumulated data that will make up a distinct gesture once coalesced
 	protected Queue<GloveEvent> p1LeftQueue  = new LinkedList<GloveEvent>();
