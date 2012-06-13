@@ -21,11 +21,14 @@ final public class ActionFactory {
 		
 		// Special moves
 		HADOUKEN_ATTACK, SHORYUKEN_ATTACK, SONIC_BOOM_ATTACK, DOUBLE_LARIAT_ATTACK,
-		SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK,
+		QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK,
+		PSYCHO_CRUSHER_ATTACK,
 		
 		// Easter egg moves
 		YMCA_ATTACK,
-		NYAN_CAT_ATTACK
+		NYAN_CAT_ATTACK,
+		DISCO_STU_ATTACK,
+		ARM_WINDMILL_ATTACK
 	};
 
 	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
@@ -296,6 +299,32 @@ final public class ActionFactory {
 				break;
 			}
 			
+			case QUADRUPLE_LARIAT_ATTACK: {
+				final double QUADRUPLE_LARIAT_BASE_ACCELERATION   = 0.0;
+				final double QUADRUPLE_LARIAT_TIME_LENGTH_IN_SECS = 7.5;
+				final float QUADRUPLE_LARIAT_DAMAGE_PER_FLAME     = 9.0f;
+				final int QUADRUPLE_LARIAT_NUM_FLAMES             = 4;
+				
+				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.QUADRUPLE_LARIAT_ATTACK, playerNum,
+						QUADRUPLE_LARIAT_TIME_LENGTH_IN_SECS, QUADRUPLE_LARIAT_BASE_ACCELERATION,
+						QUADRUPLE_LARIAT_NUM_FLAMES, QUADRUPLE_LARIAT_DAMAGE_PER_FLAME);
+				
+				// Decorate the outer ring with fire effects that move in a twin, staggered spiral around the ring
+				final int NUM_OUTER_RING_CYCLES = 4;
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true), true),
+						NUM_OUTER_RING_CYCLES * fireEmitterConfig.getNumOuterRingEmitters(), 2, QUADRUPLE_LARIAT_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(Player.getOpposingPlayerNum(playerNum), true), true),
+						NUM_OUTER_RING_CYCLES * fireEmitterConfig.getNumOuterRingEmitters(), 2, QUADRUPLE_LARIAT_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				
+				break;
+			}
+			
 			case SUMO_HEADBUTT_ATTACK: {
 				
 				final double SUMO_HEADBUTT_BASE_ACCELERATION   = 0.0;
@@ -475,6 +504,86 @@ final public class ActionFactory {
 								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, randomValGen.nextBoolean()), randomValGen.nextBoolean()),
 						fireEmitterConfig.getNumOuterRingEmitters()*NYAN_CAT_NUM_WAVES, 1, NYAN_CAT_TIME_LENGTH_IN_SECS * NYAN_CAT_NUM_WAVES,
 						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				
+				break;
+			}
+			
+			case DISCO_STU_ATTACK: {
+				
+				final double DISCO_STU_BASE_ACCELERATION   = 1.0;
+				final double DISCO_STU_TIME_LENGTH_IN_SECS = 4.5;
+				final float DISCO_STU_DAMAGE_PER_FLAME     = 3.0f;
+				final int FIRST_RAIL_NUM_FLAMES  = 3;
+				final int SECOND_RAIL_NUM_FLAMES = 2;
+				
+				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.DISCO_STU_ATTACK,
+						blockerOrAttacker, attackee, DISCO_STU_DAMAGE_PER_FLAME);
+				
+				// There is a random chance of which of the rails receives the different number of flames over the other...
+				if (Math.random() >= 0.5) {
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							FIRST_RAIL_NUM_FLAMES, DISCO_STU_TIME_LENGTH_IN_SECS, DISCO_STU_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+					
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							SECOND_RAIL_NUM_FLAMES, DISCO_STU_TIME_LENGTH_IN_SECS, DISCO_STU_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				}
+				else {
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							SECOND_RAIL_NUM_FLAMES, DISCO_STU_TIME_LENGTH_IN_SECS, DISCO_STU_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+					
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							FIRST_RAIL_NUM_FLAMES, DISCO_STU_TIME_LENGTH_IN_SECS, DISCO_STU_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				}
+				
+				// For decoration just add a single wave from the attacker to the attackee on the outer ring
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true), false),
+						fireEmitterConfig.getNumOuterRingEmitters()/2, 1, DISCO_STU_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, false), true),
+						fireEmitterConfig.getNumOuterRingEmitters()/2, 1, DISCO_STU_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				
+				break;
+			}
+			
+			case ARM_WINDMILL_ATTACK: {
+				
+				final double ARM_WINDMILL_BASE_ACCELERATION   = 1.5;
+				final double ARM_WINDMILL_TIME_LENGTH_IN_SECS = 2.5;
+				final float ARM_WINDMILL_DAMAGE_PER_FLAME     = 3.0f;
+				final int ARM_WINDMILL_NUM_FLAMES = 4;
+				
+				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.ARM_WINDMILL_ATTACK,
+						blockerOrAttacker, attackee, ARM_WINDMILL_DAMAGE_PER_FLAME);
+				
+				final int ARM_WINDMILL_DOUBLE_NUM_FLAMES = 2 * ARM_WINDMILL_NUM_FLAMES;
+				
+				for (int i = 0; i < ARM_WINDMILL_DOUBLE_NUM_FLAMES; i++) {
+					double currentDelay = i * (ARM_WINDMILL_TIME_LENGTH_IN_SECS / (double)ARM_WINDMILL_NUM_FLAMES);
+					
+					if (i % 2 == 0) {
+						success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum),
+								fireEmitterConfig.getNumEmittersPerRail(),
+								1, ARM_WINDMILL_TIME_LENGTH_IN_SECS, ARM_WINDMILL_BASE_ACCELERATION,
+								DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currentDelay);
+					}
+					else {
+						success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum),
+								fireEmitterConfig.getNumEmittersPerRail(),
+								1, ARM_WINDMILL_TIME_LENGTH_IN_SECS, ARM_WINDMILL_BASE_ACCELERATION,
+								DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currentDelay);
+					}
+				}
+				
+				// No decoration on outer ring, currently...
 				
 				break;
 			}

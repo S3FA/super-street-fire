@@ -28,8 +28,8 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 class RecognizerManager {
 	
 	private final static double MINIMUM_PROBABILITY_THRESHOLD               = 1E-300;
-	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 1E-55;
-	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E-55;
+	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 1E-25;
+	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E-25;
 	
 	private Logger logger = null;
 	
@@ -180,13 +180,13 @@ class RecognizerManager {
 			if (this.bestProbabilityMap.containsKey(GestureGenre.SPECIAL)) {
 				double specialGestureBestProb = this.bestProbabilityMap.get(GestureGenre.SPECIAL);
 				if (specialGestureBestProb > basicGestureBestProb && 
-					specialGestureBestProb - basicGestureBestProb >= BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD) {
+					specialGestureBestProb - basicGestureBestProb <= BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD) {
 					
 					if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
 						double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
 						
 						if (easterEggGestureBestProb > specialGestureBestProb &&
-							easterEggGestureBestProb - specialGestureBestProb >= SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD) {
+							easterEggGestureBestProb - specialGestureBestProb <= SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD) {
 							
 							bestGesture = this.bestGestureTypeMap.get(GestureGenre.EASTER_EGG);
 						}
@@ -249,7 +249,7 @@ class RecognizerManager {
 		
 		// Weed out strange and anomalous data
 		if (!RecognizerManager.isAcceptableGesture(inst)) {
-			this.logger.info("Ignoring gesture - way too short from beginning to end!");
+			this.logger.info("Ignoring gesture - too short from beginning to end!");
 			for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
 				resultMapping.put(entry.getKey(), new GestureProbabilities(0.0, 0.0));
 			}
@@ -257,6 +257,14 @@ class RecognizerManager {
 		}
 		
 		for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
+			
+			if (entry.getKey().getUsesLeftHand() && !inst.hasLeftGloveData() ||
+				entry.getKey().getUsesRightHand() && !inst.hasRightGloveData() ||
+				!entry.getKey().getUsesLeftHand() && inst.hasLeftGloveData() ||
+				!entry.getKey().getUsesRightHand() && inst.hasRightGloveData()) {
+				
+				continue;
+			}
 			resultMapping.put(entry.getKey(), new GestureProbabilities(entry.getValue().probability(inst), entry.getValue().kMeansProbability(inst)));
 		}
 		

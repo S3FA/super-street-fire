@@ -120,7 +120,9 @@ class RoundInPlayState extends GameState {
 		switch (action.getContributorEntity()) {
 			
 			case PLAYER1_ENTITY:
-				if (this.secsSinceLastP1Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+				if (this.secsSinceLastP1Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
+					action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
+					
 					// Player 1 has already made an action recently, exit without counting the current action
 					return;
 				}
@@ -129,7 +131,9 @@ class RoundInPlayState extends GameState {
 				break;
 				
 			case PLAYER2_ENTITY:
-				if (this.secsSinceLastP2Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+				if (this.secsSinceLastP2Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
+					action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
+					
 					// Player 2 has already made an action recently, exit without counting the current action
 					return;
 				}

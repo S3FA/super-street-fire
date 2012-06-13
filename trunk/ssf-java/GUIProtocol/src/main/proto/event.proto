@@ -71,13 +71,16 @@ message GameEvent {
     SONIC_BOOM                   = 10;
     SHORYUKEN_ATTACK             = 11;
     DOUBLE_LARIAT_ATTACK         = 12;
-    SUMO_HEADBUTT_ATTACK         = 13;
-    ONE_HUNDRED_HAND_SLAP_ATTACK = 14;
-    PSYCHO_CRUSHER_ATTACK        = 15;
+    QUADRUPLE_LARIAT_ATTACK      = 13;
+    SUMO_HEADBUTT_ATTACK         = 14;
+    ONE_HUNDRED_HAND_SLAP_ATTACK = 15;
+    PSYCHO_CRUSHER_ATTACK        = 16;
     
     // Easter Egg Attacks
-    YMCA_ATTACK     = 16;
-    NYAN_CAT_ATTACK = 17;
+    YMCA_ATTACK         = 17;
+    NYAN_CAT_ATTACK     = 18;
+    DISCO_STU_ATTACK    = 19;
+    ARM_WINDMILL_ATTACK = 20;
     
   }
   
