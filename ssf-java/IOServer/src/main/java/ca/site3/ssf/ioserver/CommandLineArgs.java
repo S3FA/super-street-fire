@@ -21,7 +21,7 @@ public class CommandLineArgs {
 	public Float chipDamagePercentage = 0.1f;
 	
 	@Parameter(names = "-actionGap", description = "Minimum time (in seconds) between player actions")
-	public Double minTimeBetweenPlayerActionsInSecs = 0.1;
+	public Double minTimeBetweenPlayerActionsInSecs = 1.0;
 	
 	@Parameter(names="-roundLength", description="Length of rounds (in seconds)")
 	public Integer roundTimeInSecs = 60;

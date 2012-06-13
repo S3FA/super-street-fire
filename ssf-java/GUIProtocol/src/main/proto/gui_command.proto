@@ -33,13 +33,16 @@ message Command {
     SONIC_BOOM_ATTACK            = 6;
     SHORYUKEN_ATTACK             = 7;
     DOUBLE_LARIAT_ATTACK         = 8;
-    SUMO_HEADBUTT_ATTACK         = 9;
-    ONE_HUNDRED_HAND_SLAP_ATTACK = 10;
-    PSYCHO_CRUSHER_ATTACK        = 11;
+    QUADRUPLE_LARIAT_ATTACK      = 9;
+    SUMO_HEADBUTT_ATTACK         = 10;
+    ONE_HUNDRED_HAND_SLAP_ATTACK = 11;
+    PSYCHO_CRUSHER_ATTACK        = 12;
     
     // Easter Egg Actions
-    YMCA_ATTACK     = 12;
-    NYAN_CAT_ATTACK = 13;
+    YMCA_ATTACK         = 13;
+    NYAN_CAT_ATTACK     = 14;
+    DISCO_STU_ATTACK    = 15;
+    ARM_WINDMILL_ATTACK = 16;
   }
   
   // for EXECUTE_ACTION or TOUCH_EMITTER

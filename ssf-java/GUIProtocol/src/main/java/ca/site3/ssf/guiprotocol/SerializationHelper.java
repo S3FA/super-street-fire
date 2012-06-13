@@ -136,6 +136,8 @@ class SerializationHelper {
 			return PlayerAction.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return PlayerAction.DOUBLE_LARIAT_ATTACK;
+		case QUADRUPLE_LARIAT_ATTACK:
+			return PlayerAction.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return PlayerAction.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -146,6 +148,10 @@ class SerializationHelper {
 			return PlayerAction.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return PlayerAction.NYAN_CAT_ATTACK;
+		case DISCO_STU_ATTACK:
+			return PlayerAction.DISCO_STU_ATTACK;
+		case ARM_WINDMILL_ATTACK:
+			return PlayerAction.ARM_WINDMILL_ATTACK;
 		default:
 			return null;
 		}
@@ -171,6 +177,8 @@ class SerializationHelper {
 			return PlayerActionType.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return PlayerActionType.DOUBLE_LARIAT_ATTACK;
+		case QUADRUPLE_LARIAT_ATTACK:
+			return PlayerActionType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return PlayerActionType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -181,6 +189,10 @@ class SerializationHelper {
 			return PlayerActionType.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return PlayerActionType.NYAN_CAT_ATTACK;
+		case DISCO_STU_ATTACK:
+			return PlayerActionType.DISCO_STU_ATTACK;
+		case ARM_WINDMILL_ATTACK:
+			return PlayerActionType.ARM_WINDMILL_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unknown player action: "+action);
 		}
@@ -448,6 +460,8 @@ class SerializationHelper {
 			return AttackType.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return AttackType.DOUBLE_LARIAT_ATTACK;
+		case QUADRUPLE_LARIAT_ATTACK:
+			return AttackType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return AttackType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -458,6 +472,10 @@ class SerializationHelper {
 			return AttackType.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return AttackType.NYAN_CAT_ATTACK;
+		case DISCO_STU_ATTACK:
+			return AttackType.DISCO_STU_ATTACK;
+		case ARM_WINDMILL_ATTACK:
+			return AttackType.ARM_WINDMILL_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
 		}
@@ -491,6 +509,8 @@ class SerializationHelper {
 			return GameEvent.AttackType.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return GameEvent.AttackType.DOUBLE_LARIAT_ATTACK;
+		case QUADRUPLE_LARIAT_ATTACK:
+			return GameEvent.AttackType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return GameEvent.AttackType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -501,6 +521,10 @@ class SerializationHelper {
 			return GameEvent.AttackType.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return GameEvent.AttackType.NYAN_CAT_ATTACK;
+		case DISCO_STU_ATTACK:
+			return GameEvent.AttackType.DISCO_STU_ATTACK;
+		case ARM_WINDMILL_ATTACK:
+			return GameEvent.AttackType.ARM_WINDMILL_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
 		}
