@@ -28,6 +28,16 @@ class FireEmitterIterator {
 		this.iterator = fireEmitterList.listIterator(startIdx);
 		this.reverseDirection = reverseDirection;
 		this.wrapAround = wrapAround;
+		
+		// Need to accomodate the call to previous for a reversed iterator...
+		if (this.reverseDirection) {
+			try {
+				this.iterator.next();
+			}
+			catch (NoSuchElementException ex) {
+				this.iterator = this.fireEmitterList.listIterator(this.fireEmitterList.size());
+			}
+		}
 	}
 	
 	boolean hasNext() {
