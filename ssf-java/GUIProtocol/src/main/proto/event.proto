@@ -81,6 +81,7 @@ message GameEvent {
     NYAN_CAT_ATTACK     = 18;
     DISCO_STU_ATTACK    = 19;
     ARM_WINDMILL_ATTACK = 20;
+    SUCK_IT_ATTACK      = 21;
     
   }
   

@@ -1,5 +1,10 @@
 package ca.site3.ssf.gamemodel;
 
+import java.util.Hashtable;
+import java.util.Map;
+
+import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
+
 /**
  * A class that represents a player of the Super Street Fire game.
  * @author Callum
@@ -29,7 +34,7 @@ class Player {
 		this.gameConfig = gameConfig;
 		assert(this.gameConfig != null);
 		
-		this.reset();
+		this.matchReset();
 		this.isInvincible = false;
 		this.playerNum = playerNum;
 	}
@@ -38,11 +43,11 @@ class Player {
 	 * Reset the player's win/loss record and health. (e.g., do this whenever
 	 * starting an new match).
 	 */
-	void reset() {
+	void matchReset() {
 		this.resetHealth();
 		this.numRoundWins  = 0;
 	}
-	
+
 	/**
 	 * Reset a player's health.
 	 */

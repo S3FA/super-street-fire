@@ -1,7 +1,5 @@
 package ca.site3.ssf.gamemodel;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -13,17 +11,12 @@ import java.util.Iterator;
  * @author Callum
  *
  */
-class TestRoundGameState extends GameState {
-	
-	private Collection<Action> activeActions = new ArrayList<Action>();
-	
-	private double secsSinceLastP1Action = Double.MAX_VALUE;
-	private double secsSinceLastP2Action = Double.MAX_VALUE;
+class TestRoundGameState extends PlayerFightingGameState {
 	
 	private double roundTime = 0.0;
 	
 	public TestRoundGameState(GameModel gameModel) {
-		super(gameModel);
+		super(gameModel, false);
 		
 		// Set both players to be invincible
 		Player p1 = this.gameModel.getPlayer1();
@@ -61,76 +54,8 @@ class TestRoundGameState extends GameState {
 	}
 
 	@Override
-	void killToIdle() {
-		// Turn off invincibility for both players
-		Player p1 = this.gameModel.getPlayer1();
-		Player p2 = this.gameModel.getPlayer2();
-		assert(p1 != null && p2 != null);
-		
-		p1.setInvincible(false);
-		p2.setInvincible(false);
-		
-		// Place the game into the idle state within the next tick
-		this.clearAndResetAllEmitters();
-		this.gameModel.setNextGameState(new IdleGameState(this.gameModel));
-	}
-
-	@Override
-	void initiateNextState(GameState.GameStateType nextState) {
-		// This is ignored - killToIdle in order go get out of this state
-	}
-
-	@Override
-	void executeAction(Action action) {
-		
-		switch (action.getContributorEntity()) {
-		
-		case PLAYER1_ENTITY:
-			if (this.secsSinceLastP1Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
-				action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
-				// Player 1 has already made an action recently, exit without counting the current action
-				return;
-			}
-			
-			this.secsSinceLastP1Action = 0.0;
-			break;
-			
-		case PLAYER2_ENTITY:
-			if (this.secsSinceLastP2Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
-				action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
-				
-				// Player 2 has already made an action recently, exit without counting the current action
-				return;
-			}
-			
-			this.secsSinceLastP2Action = 0.0;
-			break;
-			
-		// We only interpret player actions when the game is in play
-		case RINGMASTER_ENTITY:
-		default:
-			return;
-		}
-	
-		Action.mergeAction(this.activeActions, action);
-	}
-
-	@Override
-	void togglePause() {
-		// Pause the game...
-		this.gameModel.setNextGameState(new PausedGameState(this.gameModel, this));
-	}
-
-	@Override
 	GameStateType getStateType() {
 		return GameState.GameStateType.TEST_ROUND_STATE;
 	}
 
-	/**
-	 * Helper function to clear all active actions in this state and reset all fire emitters.
-	 */
-	private void clearAndResetAllEmitters() {
-		this.activeActions.clear();
-		this.gameModel.getFireEmitterModel().resetAllEmitters();
-	}
 }
