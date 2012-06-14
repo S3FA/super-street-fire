@@ -200,7 +200,7 @@ public final class GuiCommand {
       DISCO_STU_ATTACK(15, 15),
       ARM_WINDMILL_ATTACK(16, 16),
       SUCK_IT_ATTACK(17, 17),
-      FAFANAPOLI_ATTACK(18, 18),
+      VAFANAPOLI_ATTACK(18, 18),
       ;
       
       public static final int BLOCK_VALUE = 0;
@@ -221,7 +221,7 @@ public final class GuiCommand {
       public static final int DISCO_STU_ATTACK_VALUE = 15;
       public static final int ARM_WINDMILL_ATTACK_VALUE = 16;
       public static final int SUCK_IT_ATTACK_VALUE = 17;
-      public static final int FAFANAPOLI_ATTACK_VALUE = 18;
+      public static final int VAFANAPOLI_ATTACK_VALUE = 18;
       
       
       public final int getNumber() { return value; }
@@ -246,7 +246,7 @@ public final class GuiCommand {
           case 15: return DISCO_STU_ATTACK;
           case 16: return ARM_WINDMILL_ATTACK;
           case 17: return SUCK_IT_ATTACK;
-          case 18: return FAFANAPOLI_ATTACK;
+          case 18: return VAFANAPOLI_ATTACK;
           default: return null;
         }
       }
@@ -277,7 +277,7 @@ public final class GuiCommand {
       }
       
       private static final PlayerAction[] VALUES = {
-        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK, YMCA_ATTACK, NYAN_CAT_ATTACK, DISCO_STU_ATTACK, ARM_WINDMILL_ATTACK, SUCK_IT_ATTACK, FAFANAPOLI_ATTACK, 
+        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK, YMCA_ATTACK, NYAN_CAT_ATTACK, DISCO_STU_ATTACK, ARM_WINDMILL_ATTACK, SUCK_IT_ATTACK, VAFANAPOLI_ATTACK, 
       };
       
       public static PlayerAction valueOf(
@@ -1596,7 +1596,7 @@ public final class GuiCommand {
       "D_HAND_SLAP_ATTACK\020\013\022\031\n\025PSYCHO_CRUSHER_A" +
       "TTACK\020\014\022\017\n\013YMCA_ATTACK\020\r\022\023\n\017NYAN_CAT_ATT" +
       "ACK\020\016\022\024\n\020DISCO_STU_ATTACK\020\017\022\027\n\023ARM_WINDM" +
-      "ILL_ATTACK\020\020\022\022\n\016SUCK_IT_ATTACK\020\021\022\025\n\021FAFA" +
+      "ILL_ATTACK\020\020\022\022\n\016SUCK_IT_ATTACK\020\021\022\025\n\021VAFA" +
       "NAPOLI_ATTACK\020\022\"(\n\006Player\022\016\n\nRINGMASTER\020" +
       "\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\t",
       "LEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RIN" +

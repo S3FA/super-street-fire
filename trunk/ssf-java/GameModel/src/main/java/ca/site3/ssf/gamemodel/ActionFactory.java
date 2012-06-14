@@ -31,7 +31,7 @@ final public class ActionFactory {
 		DISCO_STU_ATTACK,
 		ARM_WINDMILL_ATTACK,
 		SUCK_IT_ATTACK,
-		FAFANAPOLI_ATTACK
+		VAFANAPOLI_ATTACK
 	};
 
 	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
@@ -616,7 +616,7 @@ final public class ActionFactory {
 				break;
 			}
 			
-			case FAFANAPOLI_ATTACK: {
+			case VAFANAPOLI_ATTACK: {
 				
 				final double FAFANAPOLI_BASE_ACCELERATION   = 0;
 				final double FAFANAPOLI_TIME_LENGTH_IN_SECS = 4.0;
@@ -625,7 +625,7 @@ final public class ActionFactory {
 				final int FAFANAPOLI_OFF_HAND_NUM_FLAMES    = 1;
 								
 				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_FAFANAPOLI_ATTACK,
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_VAFANAPOLI_ATTACK,
 							blockerOrAttacker, attackee, FAFANAPOLI_DAMAGE_PER_FLAME);
 					
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
@@ -636,7 +636,7 @@ final public class ActionFactory {
 							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_FAFANAPOLI_ATTACK,
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_VAFANAPOLI_ATTACK,
 							blockerOrAttacker, attackee, FAFANAPOLI_DAMAGE_PER_FLAME);
 					
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),

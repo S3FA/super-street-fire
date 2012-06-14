@@ -38,10 +38,9 @@ public class GestureRecognizer {
 	public final static double MAXIMUM_GESTURE_RECOGNITION_TIME_IN_SECS  = 4.0;
 	
 	private RecognizerManager recognizerMgr = null;
-	private Logger logger = null;
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public GestureRecognizer() {
-		this.logger = LoggerFactory.getLogger(this.getClass());
 		this.recognizerMgr = new RecognizerManager();
 	}
 	
@@ -64,7 +63,12 @@ public class GestureRecognizer {
 	public static boolean isAcceptableGesture(GestureInstance gestureInstance) {
 		return RecognizerManager.isAcceptableGesture(gestureInstance);
 	}
-	
+	public static boolean isAcceptableGestureForGivenType(GestureInstance gestureInstance, GestureType expectedType) {
+		if (!RecognizerManager.isAcceptableGesture(gestureInstance)) {
+			return false;
+		}
+		return RecognizerManager.isAcceptableGestureForGivenType(gestureInstance, expectedType);
+	}
 	// GESTURE RECOGNIZER I/O (LOADING/SAVING) FUNCTIONALITY ************************************************
 	
 	/**

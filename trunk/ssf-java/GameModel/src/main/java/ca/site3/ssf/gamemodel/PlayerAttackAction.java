@@ -36,8 +36,8 @@ public class PlayerAttackAction extends Action {
 		DISCO_STU_ATTACK(1),
 		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE),
 		SUCK_IT_ATTACK(1),
-		LEFT_FAFANAPOLI_ATTACK(Integer.MAX_VALUE),
-		RIGHT_FAFANAPOLI_ATTACK(Integer.MAX_VALUE);
+		LEFT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE),
+		RIGHT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE);
 		
 		private final int maxUsesPerRound;
 		
