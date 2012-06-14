@@ -154,6 +154,8 @@ class SerializationHelper {
 			return PlayerAction.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return PlayerAction.SUCK_IT_ATTACK;
+		case FAFANAPOLI_ATTACK:
+			return PlayerAction.FAFANAPOLI_ATTACK;
 		default:
 			return null;
 		}
@@ -197,6 +199,8 @@ class SerializationHelper {
 			return PlayerActionType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return PlayerActionType.SUCK_IT_ATTACK;
+		case FAFANAPOLI_ATTACK:
+			return PlayerActionType.FAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unknown player action: "+action);
 		}
@@ -460,16 +464,22 @@ class SerializationHelper {
 			return AttackType.RIGHT_CHOP_ATTACK;
 		case SONIC_BOOM:
 			return AttackType.SONIC_BOOM_ATTACK;
-		case SHORYUKEN_ATTACK:
-			return AttackType.SHORYUKEN_ATTACK;
+		case LEFT_SHORYUKEN_ATTACK:
+			return AttackType.LEFT_SHORYUKEN_ATTACK;
+		case RIGHT_SHORYUKEN_ATTACK:
+			return AttackType.RIGHT_SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return AttackType.DOUBLE_LARIAT_ATTACK;
 		case QUADRUPLE_LARIAT_ATTACK:
 			return AttackType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return AttackType.SUMO_HEADBUTT_ATTACK;
-		case ONE_HUNDRED_HAND_SLAP_ATTACK:
-			return AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return AttackType.LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return AttackType.RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return AttackType.TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK;
 		case PSYCHO_CRUSHER_ATTACK:
 			return AttackType.PSYCHO_CRUSHER_ATTACK;
 		case YMCA_ATTACK:
@@ -482,6 +492,10 @@ class SerializationHelper {
 			return AttackType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return AttackType.SUCK_IT_ATTACK;
+		case LEFT_FAFANAPOLI_ATTACK:
+			return AttackType.LEFT_FAFANAPOLI_ATTACK;
+		case RIGHT_FAFANAPOLI_ATTACK:
+			return AttackType.RIGHT_FAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
 		}
@@ -511,16 +525,22 @@ class SerializationHelper {
 			return GameEvent.AttackType.RIGHT_CHOP;
 		case SONIC_BOOM_ATTACK:
 			return GameEvent.AttackType.SONIC_BOOM;
-		case SHORYUKEN_ATTACK:
-			return GameEvent.AttackType.SHORYUKEN_ATTACK;
+		case LEFT_SHORYUKEN_ATTACK:
+			return GameEvent.AttackType.LEFT_SHORYUKEN_ATTACK;
+		case RIGHT_SHORYUKEN_ATTACK:
+			return GameEvent.AttackType.RIGHT_SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return GameEvent.AttackType.DOUBLE_LARIAT_ATTACK;
 		case QUADRUPLE_LARIAT_ATTACK:
 			return GameEvent.AttackType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return GameEvent.AttackType.SUMO_HEADBUTT_ATTACK;
-		case ONE_HUNDRED_HAND_SLAP_ATTACK:
-			return GameEvent.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return GameEvent.AttackType.LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return GameEvent.AttackType.RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK;
+		case TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK:
+			return GameEvent.AttackType.TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK;
 		case PSYCHO_CRUSHER_ATTACK:
 			return GameEvent.AttackType.PSYCHO_CRUSHER_ATTACK;
 		case YMCA_ATTACK:
@@ -533,6 +553,10 @@ class SerializationHelper {
 			return GameEvent.AttackType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return GameEvent.AttackType.SUCK_IT_ATTACK;
+		case LEFT_FAFANAPOLI_ATTACK:
+			return GameEvent.AttackType.LEFT_FAFANAPOLI_ATTACK;
+		case RIGHT_FAFANAPOLI_ATTACK:
+			return GameEvent.AttackType.RIGHT_FAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
 		}

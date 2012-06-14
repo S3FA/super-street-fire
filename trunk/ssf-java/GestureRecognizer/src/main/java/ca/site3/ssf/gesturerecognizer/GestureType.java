@@ -47,7 +47,9 @@ public enum GestureType {
 	NYAN_CAT(5, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 0, true, true),
 	DISCO_STU(5, PlayerActionType.DISCO_STU_ATTACK, GestureGenre.EASTER_EGG, 0, true, true),
 	ARM_WINDMILL(5, PlayerActionType.ARM_WINDMILL_ATTACK, GestureGenre.EASTER_EGG, 0, true, true),
-	SUCK_IT(5, PlayerActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 0, true, true);
+	SUCK_IT(5, PlayerActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 0, true, true),
+	LEFT_FAFANAPOLI_ATTACK(5, PlayerActionType.FAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 0, true, false),
+	RIGHT_FAFANAPOLI_ATTACK(5, PlayerActionType.FAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 0, false, true);
 	
 	final private PlayerActionType actionFactoryType; // The corresponding gamemodel factory type for when
 													  // it comes time to build the gesture for the gamemodel

@@ -30,7 +30,8 @@ final public class ActionFactory {
 		NYAN_CAT_ATTACK,
 		DISCO_STU_ATTACK,
 		ARM_WINDMILL_ATTACK,
-		SUCK_IT_ATTACK
+		SUCK_IT_ATTACK,
+		FAFANAPOLI_ATTACK
 	};
 
 	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
@@ -199,9 +200,10 @@ final public class ActionFactory {
 				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 2;
 				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 1;
 				
-				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.SHORYUKEN_ATTACK, blockerOrAttacker, attackee, SHORYUKEN_DAMAGE_PER_FLAME);
-				
+
 				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_SHORYUKEN_ATTACK, blockerOrAttacker, attackee, SHORYUKEN_DAMAGE_PER_FLAME);
+					
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
 							SHORYUKEN_NUM_FLAMES_PUNCH_HAND, SHORYUKEN_TIME_LENGTH_IN_SECS, SHORYUKEN_BASE_ACCELERATION,
 							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
@@ -223,6 +225,8 @@ final public class ActionFactory {
 							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_SHORYUKEN_ATTACK, blockerOrAttacker, attackee, SHORYUKEN_DAMAGE_PER_FLAME);
+					
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
 							SHORYUKEN_NUM_FLAMES_PUNCH_HAND, SHORYUKEN_TIME_LENGTH_IN_SECS, SHORYUKEN_BASE_ACCELERATION,
 							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
@@ -365,7 +369,7 @@ final public class ActionFactory {
 				final int ONE_HANDED_NUM_RANDOM_BURSTS = TWO_HANDED_NUM_RANDOM_BURSTS / 2;
 				
 				if (leftHand && rightHand) {
-					action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK, playerNum,
+					action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK, playerNum,
 							ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS, ONE_HUND_HAND_SLAP_BASE_ACCELERATION,
 							ONE_HUND_HAND_SLAP_NUM_FLAMES, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
 				
@@ -384,11 +388,13 @@ final public class ActionFactory {
 					
 				}
 				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.ONE_HUNDRED_HAND_SLAP_ATTACK,
-							blockerOrAttacker, attackee, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
+
 					
 					double currDelayCount = 0.0;
 					if (leftHand) {
+						action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK,
+								blockerOrAttacker, attackee, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
+						
 						success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
 								ONE_HUND_HAND_SLAP_NUM_FLAMES, ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS, ONE_HUND_HAND_SLAP_BASE_ACCELERATION,
 								DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
@@ -404,6 +410,9 @@ final public class ActionFactory {
 						}
 					}
 					else {
+						action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK,
+								blockerOrAttacker, attackee, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
+						
 						success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
 								ONE_HUND_HAND_SLAP_NUM_FLAMES, ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS, ONE_HUND_HAND_SLAP_BASE_ACCELERATION,
 								DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
@@ -604,6 +613,59 @@ final public class ActionFactory {
 				success = this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(0, true),
 						fireEmitterConfig.getNumOuterRingEmitters(), 1, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 
+				break;
+			}
+			
+			case FAFANAPOLI_ATTACK: {
+				
+				final double FAFANAPOLI_BASE_ACCELERATION   = 0;
+				final double FAFANAPOLI_TIME_LENGTH_IN_SECS = 4.0;
+				final float FAFANAPOLI_DAMAGE_PER_FLAME     = 5.0f;
+				final int FAFANAPOLI_MAIN_HAND_NUM_FLAMES   = 2;
+				final int FAFANAPOLI_OFF_HAND_NUM_FLAMES    = 1;
+								
+				if (leftHand) {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_FAFANAPOLI_ATTACK,
+							blockerOrAttacker, attackee, FAFANAPOLI_DAMAGE_PER_FLAME);
+					
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							FAFANAPOLI_MAIN_HAND_NUM_FLAMES, FAFANAPOLI_TIME_LENGTH_IN_SECS, FAFANAPOLI_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							FAFANAPOLI_OFF_HAND_NUM_FLAMES, FAFANAPOLI_TIME_LENGTH_IN_SECS, FAFANAPOLI_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				}
+				else {
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_FAFANAPOLI_ATTACK,
+							blockerOrAttacker, attackee, FAFANAPOLI_DAMAGE_PER_FLAME);
+					
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							FAFANAPOLI_OFF_HAND_NUM_FLAMES, FAFANAPOLI_TIME_LENGTH_IN_SECS, FAFANAPOLI_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
+							FAFANAPOLI_MAIN_HAND_NUM_FLAMES, FAFANAPOLI_TIME_LENGTH_IN_SECS, FAFANAPOLI_BASE_ACCELERATION,
+							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				}
+				
+				// Decoration involves flames starting midway between both players and then having a flame going towards each player from there
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(4, false),
+						fireEmitterConfig.getNumOuterRingEmitters()/4, 1, FAFANAPOLI_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(3, true),
+						fireEmitterConfig.getNumOuterRingEmitters()/4, 1, FAFANAPOLI_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(12, false),
+						fireEmitterConfig.getNumOuterRingEmitters()/4, 1, FAFANAPOLI_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				success &= this.addConstantVelocityWaveToAction(action,
+						fireEmitterModel.getOuterRingStartEmitterIter(11, true),
+						fireEmitterConfig.getNumOuterRingEmitters()/4, 1, FAFANAPOLI_TIME_LENGTH_IN_SECS,
+						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+				
 				break;
 			}
 			
