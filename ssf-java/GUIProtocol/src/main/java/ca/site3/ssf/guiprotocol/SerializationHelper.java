@@ -154,8 +154,8 @@ class SerializationHelper {
 			return PlayerAction.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return PlayerAction.SUCK_IT_ATTACK;
-		case FAFANAPOLI_ATTACK:
-			return PlayerAction.FAFANAPOLI_ATTACK;
+		case VAFANAPOLI_ATTACK:
+			return PlayerAction.VAFANAPOLI_ATTACK;
 		default:
 			return null;
 		}
@@ -199,8 +199,8 @@ class SerializationHelper {
 			return PlayerActionType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return PlayerActionType.SUCK_IT_ATTACK;
-		case FAFANAPOLI_ATTACK:
-			return PlayerActionType.FAFANAPOLI_ATTACK;
+		case VAFANAPOLI_ATTACK:
+			return PlayerActionType.VAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unknown player action: "+action);
 		}
@@ -492,10 +492,10 @@ class SerializationHelper {
 			return AttackType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return AttackType.SUCK_IT_ATTACK;
-		case LEFT_FAFANAPOLI_ATTACK:
-			return AttackType.LEFT_FAFANAPOLI_ATTACK;
-		case RIGHT_FAFANAPOLI_ATTACK:
-			return AttackType.RIGHT_FAFANAPOLI_ATTACK;
+		case LEFT_VAFANAPOLI_ATTACK:
+			return AttackType.LEFT_VAFANAPOLI_ATTACK;
+		case RIGHT_VAFANAPOLI_ATTACK:
+			return AttackType.RIGHT_VAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
 		}
@@ -553,10 +553,10 @@ class SerializationHelper {
 			return GameEvent.AttackType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return GameEvent.AttackType.SUCK_IT_ATTACK;
-		case LEFT_FAFANAPOLI_ATTACK:
-			return GameEvent.AttackType.LEFT_FAFANAPOLI_ATTACK;
-		case RIGHT_FAFANAPOLI_ATTACK:
-			return GameEvent.AttackType.RIGHT_FAFANAPOLI_ATTACK;
+		case LEFT_VAFANAPOLI_ATTACK:
+			return GameEvent.AttackType.LEFT_VAFANAPOLI_ATTACK;
+		case RIGHT_VAFANAPOLI_ATTACK:
+			return GameEvent.AttackType.RIGHT_VAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
 		}

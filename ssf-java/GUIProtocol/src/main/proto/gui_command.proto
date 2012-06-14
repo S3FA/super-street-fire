@@ -44,7 +44,7 @@ message Command {
     DISCO_STU_ATTACK    = 15;
     ARM_WINDMILL_ATTACK = 16;
     SUCK_IT_ATTACK      = 17;
-    FAFANAPOLI_ATTACK   = 18;
+    VAFANAPOLI_ATTACK   = 18;
   }
   
   // for EXECUTE_ACTION or TOUCH_EMITTER

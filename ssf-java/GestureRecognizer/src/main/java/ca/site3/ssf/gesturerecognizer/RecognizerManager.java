@@ -28,10 +28,11 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 class RecognizerManager {
 	
 	private final static double MINIMUM_PROBABILITY_THRESHOLD               = 1E-300;
-	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 1E-25;
-	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E-25;
+	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 1E-30;
+	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E-30;
+	private final static double BASIC_EASTEREGG_PROB_COMPARISON_THRESHOLD   = 1E-25;
 	
-	private Logger logger = null;
+	private static Logger logger = LoggerFactory.getLogger(RecognizerManager.class);
 	
 	private Map<GestureType, Recognizer> recognizerMap =
 			new HashMap<GestureType, Recognizer>(GestureType.values().length);
@@ -42,8 +43,6 @@ class RecognizerManager {
 			new Hashtable<GestureGenre, GestureType>(GestureGenre.values().length);	
 	
 	RecognizerManager() {
-		this.logger = LoggerFactory.getLogger(this.getClass());
-		
 		// Initialize the map of gesture recognizers
 		for (GestureType gesture : GestureType.values()) {
 			this.recognizerMap.put(gesture, new Recognizer(gesture));
@@ -91,6 +90,36 @@ class RecognizerManager {
 		return true;
 	}
 	
+	static boolean isAcceptableGestureForGivenType(GestureInstance gestureInstance, GestureType expectedType) {
+		
+		// Make sure we only evaluate recognizers for the appropriate hands
+		if (expectedType.getUsesLeftHand() && !gestureInstance.hasLeftGloveData()   ||
+			expectedType.getUsesRightHand() && !gestureInstance.hasRightGloveData() ||
+			!expectedType.getUsesLeftHand() && gestureInstance.hasLeftGloveData()   ||
+			!expectedType.getUsesRightHand() && gestureInstance.hasRightGloveData()) {
+			return false;
+		}
+		
+		// Check the fierceness of the gesture to ensure it's meeting it's minimum threshold...
+		if (gestureInstance.getTotalFierceness() < expectedType.getMinFierceDiffThreshold()) {
+			RecognizerManager.logger.info("Fireceness was not great enough to recognize gesture (" + expectedType.toString() + "): " +
+				"Required fierceness: " + expectedType.getMinFierceDiffThreshold() +
+				", fierceness found: " + gestureInstance.getTotalFierceness());
+			return false;
+		}
+		
+		// Check the number of required data points for the gesture type, if the instance doesn't have enough
+		// data points for the gesture then we don't count it
+		if (gestureInstance.getNumDataPts() < expectedType.getMinNumDataPts()) {
+			RecognizerManager.logger.info("Number of data points was not great enough to recognize gesture (" + expectedType.toString() + "): " +
+					"Required data pts: " + expectedType.getMinNumDataPts() +
+					", data points found: " + gestureInstance.getNumDataPts());
+			return false;
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * Attempts to recongize the given, novel gesture instance among all of the gesture
 	 * recognizers in this manager.
@@ -115,59 +144,29 @@ class RecognizerManager {
 		// into categories based on the genre of the gesture (i.e., "basic", "special", "easter-egg" gestures)
 		// Later on, we favour basic gestures over special gestures and special gestures over easter-egg gestures.
 		for (Recognizer recognizer : this.recognizerMap.values()) {
-			GestureType currGestureType = recognizer.getGestureType();
+			GestureType gestureType = recognizer.getGestureType();
 			
-			// Make sure we only evaluate recognizers for the appropriate hands
-			if (currGestureType.getUsesLeftHand() && !inst.hasLeftGloveData() ||
-				currGestureType.getUsesRightHand() && !inst.hasRightGloveData() ||
-				!currGestureType.getUsesLeftHand() && inst.hasLeftGloveData() ||
-				!currGestureType.getUsesRightHand() && inst.hasRightGloveData()) {
+			// Make sure the instance meets all the criteria for the current recognizable gesture type
+			if (!RecognizerManager.isAcceptableGestureForGivenType(inst, gestureType)) {
 				continue;
 			}
 			
+			// Make sure the probability meets the minimum threshold
 			currProbability = Math.max(recognizer.probability(inst), recognizer.kMeansProbability(inst));
-			Double bestProbability = this.bestProbabilityMap.get(currGestureType.getGenre());
+			if (currProbability < MINIMUM_PROBABILITY_THRESHOLD) {
+				this.logger.info("Failed to recognize gesture (" + gestureType.toString() + 
+						"), did not meet minimum probability threshold of either base or k-means recognitions.");
+				continue;
+			}
 			
+			Double bestProbability = this.bestProbabilityMap.get(gestureType.getGenre());
 			if (currProbability > bestProbability) {
-				this.bestProbabilityMap.put(currGestureType.getGenre(), currProbability);
-				this.bestGestureTypeMap.put(currGestureType.getGenre(), currGestureType);
+				this.bestProbabilityMap.put(gestureType.getGenre(), currProbability);
+				this.bestGestureTypeMap.put(gestureType.getGenre(), gestureType);
 			}
 		}
 		
-		final double REQUIRED_FIERCENESS = inst.getTotalFierceness();
 		
-		Set<Entry<GestureGenre, Double>> bestProbabilityEntrySet = this.bestProbabilityMap.entrySet();
-		Iterator<Entry<GestureGenre, Double>> probabilityIter = bestProbabilityEntrySet.iterator();
-		
-		while (probabilityIter.hasNext()) {
-			
-			Entry<GestureGenre, Double> probabilityEntry = probabilityIter.next();
-			
-			GestureGenre genre = probabilityEntry.getKey();
-			Double probability = probabilityEntry.getValue();
-			
-			assert(genre != null);
-			assert(probability != null);
-			assert(probability >= 0.0);
-		
-			if (probability < MINIMUM_PROBABILITY_THRESHOLD) {
-				this.logger.info("Failed to recognize gesture, did not meet minimum probability threshold of either base or k-means recognitions.");
-				probabilityIter.remove();
-				this.bestGestureTypeMap.remove(genre);
-			}
-			else {
-				GestureType gestureType = this.bestGestureTypeMap.get(genre);
-				// Check the fierceness of the gesture to ensure it's meeting it's minimum threshold...
-				if (gestureType.getMinFierceDiffThreshold() > REQUIRED_FIERCENESS) {
-					this.logger.info("Gesture was recognized, but fireceness was not great enough to execute: " +
-							"Required fierceness: " + gestureType.getMinFierceDiffThreshold() + ", fierceness found: " + REQUIRED_FIERCENESS);
-					
-					probabilityIter.remove();
-					this.bestGestureTypeMap.remove(genre);
-				}	
-			}
-		}
-
 		// The best gesture map will now contain all the best candidates for the given instance, from
 		// each gesture genre. We need to determine what the differences are so that we make a reasonable
 		// choice as to whether we should be using a basic, special or easter-egg type move...
@@ -199,11 +198,39 @@ class RecognizerManager {
 					}
 				}
 				else {
-					bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
+					if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+						double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
+						
+						if (easterEggGestureBestProb > basicGestureBestProb &&
+							easterEggGestureBestProb - basicGestureBestProb <= BASIC_EASTEREGG_PROB_COMPARISON_THRESHOLD) {
+							
+							bestGesture = this.bestGestureTypeMap.get(GestureGenre.EASTER_EGG);
+						}
+						else {
+							bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
+						}
+					}
+					else {
+						bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
+					}
 				}
 			}
 			else {
-				bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
+				if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+					double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
+					
+					if (easterEggGestureBestProb > basicGestureBestProb &&
+						easterEggGestureBestProb - basicGestureBestProb <= BASIC_EASTEREGG_PROB_COMPARISON_THRESHOLD) {
+						
+						bestGesture = this.bestGestureTypeMap.get(GestureGenre.EASTER_EGG);
+					}
+					else {
+						bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
+					}
+				}
+				else {
+					bestGesture = this.bestGestureTypeMap.get(GestureGenre.BASIC);
+				}
 			}
 			
 		}

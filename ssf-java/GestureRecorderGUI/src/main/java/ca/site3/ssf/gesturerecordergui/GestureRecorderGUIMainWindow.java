@@ -161,16 +161,8 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 			// Make sure the gesture matches the handedness of the selected gesture...
 			GestureType selectedGesture = this.recordingPanel.getSelectedGesture();
 			
-			
-			if (selectedGesture.getUsesLeftHand() && !recordedGestureInstance.hasLeftGloveData() ||
-				selectedGesture.getUsesRightHand() && !recordedGestureInstance.hasRightGloveData() ||
-				!selectedGesture.getUsesLeftHand() && recordedGestureInstance.hasLeftGloveData() ||
-				!selectedGesture.getUsesRightHand() && recordedGestureInstance.hasRightGloveData()) {
-				
-				this.recordingPanel.setLogString("Unacceptable gesture (glove hand data doesn't correspond to the hand(s) for this gesture), please try again!");
-			}
 			// Check to see whether the gesture is acceptable in the face of up-front analysis from the gesture recognizer...
-			else if (!GestureRecognizer.isAcceptableGesture(instance)) {
+			if (!GestureRecognizer.isAcceptableGestureForGivenType(instance, selectedGesture)) {
 				this.recordingPanel.setLogString("Unacceptable gesture, please try again!");
 			}
 			else {

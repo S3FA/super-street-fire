@@ -42,15 +42,17 @@ final public class GestureRecognitionResult {
 		
 		ListIterator<Entry<GestureType, Double>> iter = sortedList.listIterator(sortedList.size());
 		
-		result += "Gesture Fierceness: " + this.gestureInstance.getTotalFierceness() + "\n";
-		result += "Gesture Time (s):   " + this.gestureInstance.getMaxTimeDiff() + "\n";
+		result += "Gesture Fierceness:  " + this.gestureInstance.getTotalFierceness() + "\n";
+		result += "Gesture Data Points: " + this.gestureInstance.getNumDataPts() + "\n";
+		result += "Gesture Time (s):    " + this.gestureInstance.getMaxTimeDiff() + "\n";
 		
 		while (iter.hasPrevious()) {
 			Entry<GestureType, Double> entry = iter.previous();
 			GestureProbabilities currProbs = this.resultMapping.get(entry.getKey());
 			result += entry.getKey().toString() + " { " +
 					"Base: " + currProbs.getBaseProbability() + ", KMeans: " + currProbs.getKMeansProbability() +
-					", Required fierceness: " + entry.getKey().getMinFierceDiffThreshold() + " }\n";
+					", Required fierceness: " + entry.getKey().getMinFierceDiffThreshold() +
+					", Required Data Pts: " + entry.getKey().getMinNumDataPts() + " }\n";
 		}
 		
 		return result;
