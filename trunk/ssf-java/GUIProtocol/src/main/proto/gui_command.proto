@@ -43,6 +43,7 @@ message Command {
     NYAN_CAT_ATTACK     = 14;
     DISCO_STU_ATTACK    = 15;
     ARM_WINDMILL_ATTACK = 16;
+    SUCK_IT_ATTACK      = 17;
   }
   
   // for EXECUTE_ACTION or TOUCH_EMITTER

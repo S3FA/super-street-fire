@@ -5,24 +5,44 @@ import java.util.ArrayList;
 public class PlayerAttackAction extends Action {
 	
 	public enum AttackType {
-		CUSTOM_UNDEFINED_ATTACK,
+		CUSTOM_UNDEFINED_ATTACK(Integer.MAX_VALUE),
 		
 		// Basic Attacks
-		LEFT_JAB_ATTACK, RIGHT_JAB_ATTACK, 
-		LEFT_HOOK_ATTACK, RIGHT_HOOK_ATTACK,
-		LEFT_UPPERCUT_ATTACK, RIGHT_UPPERCUT_ATTACK,
-		LEFT_CHOP_ATTACK, RIGHT_CHOP_ATTACK,
+		LEFT_JAB_ATTACK(Integer.MAX_VALUE),
+		RIGHT_JAB_ATTACK(Integer.MAX_VALUE), 
+		LEFT_HOOK_ATTACK(Integer.MAX_VALUE),
+		RIGHT_HOOK_ATTACK(Integer.MAX_VALUE),
+		LEFT_UPPERCUT_ATTACK(Integer.MAX_VALUE),
+		RIGHT_UPPERCUT_ATTACK(Integer.MAX_VALUE),
+		LEFT_CHOP_ATTACK(Integer.MAX_VALUE),
+		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE),
 		
 		// Special Attacks
-		HADOUKEN_ATTACK, SHORYUKEN_ATTACK, SONIC_BOOM_ATTACK,
-		DOUBLE_LARIAT_ATTACK, QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK,
-		ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK,
+		HADOUKEN_ATTACK(Integer.MAX_VALUE),
+		SHORYUKEN_ATTACK(Integer.MAX_VALUE),
+		SONIC_BOOM_ATTACK(Integer.MAX_VALUE),
+		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE),
+		QUADRUPLE_LARIAT_ATTACK(Integer.MAX_VALUE),
+		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE),
+		ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE),
+		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE),
 		
 		// Easter Egg Attacks
-		YMCA_ATTACK,
-		NYAN_CAT_ATTACK,
-		DISCO_STU_ATTACK,
-		ARM_WINDMILL_ATTACK
+		YMCA_ATTACK(1),
+		NYAN_CAT_ATTACK(1),
+		DISCO_STU_ATTACK(1),
+		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE),
+		SUCK_IT_ATTACK(1);
+		
+		private final int maxUsesPerRound;
+		
+		AttackType(int maxUsesPerRound) {
+			this.maxUsesPerRound = maxUsesPerRound;
+		}
+		
+		int getMaxUsesPerRound() {
+			return this.maxUsesPerRound;
+		}
 	};
 
 	final private AttackType type;
@@ -97,6 +117,10 @@ public class PlayerAttackAction extends Action {
 	}
 	Player getAttackee() {
 		return this.attackee;
+	}
+	
+	AttackType getAttackType() {
+		return this.type;
 	}
 	
 	@Override

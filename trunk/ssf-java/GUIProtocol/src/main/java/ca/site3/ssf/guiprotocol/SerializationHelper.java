@@ -152,6 +152,8 @@ class SerializationHelper {
 			return PlayerAction.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return PlayerAction.ARM_WINDMILL_ATTACK;
+		case SUCK_IT_ATTACK:
+			return PlayerAction.SUCK_IT_ATTACK;
 		default:
 			return null;
 		}
@@ -193,6 +195,8 @@ class SerializationHelper {
 			return PlayerActionType.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return PlayerActionType.ARM_WINDMILL_ATTACK;
+		case SUCK_IT_ATTACK:
+			return PlayerActionType.SUCK_IT_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unknown player action: "+action);
 		}
@@ -476,6 +480,8 @@ class SerializationHelper {
 			return AttackType.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return AttackType.ARM_WINDMILL_ATTACK;
+		case SUCK_IT_ATTACK:
+			return AttackType.SUCK_IT_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
 		}
@@ -525,6 +531,8 @@ class SerializationHelper {
 			return GameEvent.AttackType.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return GameEvent.AttackType.ARM_WINDMILL_ATTACK;
+		case SUCK_IT_ATTACK:
+			return GameEvent.AttackType.SUCK_IT_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
 		}

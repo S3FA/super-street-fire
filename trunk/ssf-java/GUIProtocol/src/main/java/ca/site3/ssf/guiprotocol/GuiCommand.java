@@ -199,6 +199,7 @@ public final class GuiCommand {
       NYAN_CAT_ATTACK(14, 14),
       DISCO_STU_ATTACK(15, 15),
       ARM_WINDMILL_ATTACK(16, 16),
+      SUCK_IT_ATTACK(17, 17),
       ;
       
       public static final int BLOCK_VALUE = 0;
@@ -218,6 +219,7 @@ public final class GuiCommand {
       public static final int NYAN_CAT_ATTACK_VALUE = 14;
       public static final int DISCO_STU_ATTACK_VALUE = 15;
       public static final int ARM_WINDMILL_ATTACK_VALUE = 16;
+      public static final int SUCK_IT_ATTACK_VALUE = 17;
       
       
       public final int getNumber() { return value; }
@@ -241,6 +243,7 @@ public final class GuiCommand {
           case 14: return NYAN_CAT_ATTACK;
           case 15: return DISCO_STU_ATTACK;
           case 16: return ARM_WINDMILL_ATTACK;
+          case 17: return SUCK_IT_ATTACK;
           default: return null;
         }
       }
@@ -271,7 +274,7 @@ public final class GuiCommand {
       }
       
       private static final PlayerAction[] VALUES = {
-        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK, YMCA_ATTACK, NYAN_CAT_ATTACK, DISCO_STU_ATTACK, ARM_WINDMILL_ATTACK, 
+        BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK, HADOUKEN_ATTACK, SONIC_BOOM_ATTACK, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK, YMCA_ATTACK, NYAN_CAT_ATTACK, DISCO_STU_ATTACK, ARM_WINDMILL_ATTACK, SUCK_IT_ATTACK, 
       };
       
       public static PlayerAction valueOf(
@@ -1564,7 +1567,7 @@ public final class GuiCommand {
   static {
     java.lang.String[] descriptorData = {
       "\n\021gui_command.proto\022\013guiprotocol\032\014common" +
-      ".proto\"\377\010\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
+      ".proto\"\223\t\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
       "otocol.Command.CommandType\0227\n\014playerActi" +
       "on\030\002 \001(\0162!.guiprotocol.Command.PlayerAct" +
       "ion\022+\n\006player\030\003 \001(\0162\033.guiprotocol.Comman" +
@@ -1580,7 +1583,7 @@ public final class GuiCommand {
       "GENERIC_ACTION\020\000\022\031\n\025EXECUTE_PLAYER_ACTIO" +
       "N\020\001\022\020\n\014TOGGLE_PAUSE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\n" +
       "NEXT_STATE\020\004\022\021\n\rTOUCH_EMITTER\020\005\022\033\n\027QUERY" +
-      "_GAME_INFO_REFRESH\020\006\"\205\003\n\014PlayerAction\022\t\n" +
+      "_GAME_INFO_REFRESH\020\006\"\231\003\n\014PlayerAction\022\t\n" +
       "\005BLOCK\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013HOOK_ATTACK\020" +
       "\002\022\023\n\017UPPERCUT_ATTACK\020\003\022\017\n\013CHOP_ATTACK\020\004\022",
       "\023\n\017HADOUKEN_ATTACK\020\005\022\025\n\021SONIC_BOOM_ATTAC" +
@@ -1590,10 +1593,11 @@ public final class GuiCommand {
       "D_HAND_SLAP_ATTACK\020\013\022\031\n\025PSYCHO_CRUSHER_A" +
       "TTACK\020\014\022\017\n\013YMCA_ATTACK\020\r\022\023\n\017NYAN_CAT_ATT" +
       "ACK\020\016\022\024\n\020DISCO_STU_ATTACK\020\017\022\027\n\023ARM_WINDM" +
-      "ILL_ATTACK\020\020\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006" +
-      "\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLEF" +
-      "T_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002",
-      "B\032\n\030ca.site3.ssf.guiprotocol"
+      "ILL_ATTACK\020\020\022\022\n\016SUCK_IT_ATTACK\020\021\"(\n\006Play" +
+      "er\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017Fi" +
+      "reEmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RA",
+      "IL\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030ca.site3.ssf.gui" +
+      "protocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

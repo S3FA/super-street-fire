@@ -1,7 +1,5 @@
 package ca.site3.ssf.gamemodel;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
@@ -15,27 +13,12 @@ import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
  * @author Callum
  *
  */
-class TieBreakerGameState extends GameState {
+class TieBreakerGameState extends PlayerFightingGameState {
 
-	private Collection<Action> activeActions = new ArrayList<Action>();
-	
-	private double secsSinceLastP1Action = Double.MAX_VALUE;
-	private double secsSinceLastP2Action = Double.MAX_VALUE;
-	
 	private double roundTime = 0.0;
 	
 	public TieBreakerGameState(GameModel gameModel) {
-		super(gameModel);
-		
-		// Clear the complete fire emitter state, just for good measure
-		this.gameModel.getFireEmitterModel().resetAllEmitters();
-		
-		// Make sure both players health is at full
-		Player p1 = this.gameModel.getPlayer1();
-		Player p2 = this.gameModel.getPlayer2();
-		assert(p1 != null && p2 != null);
-		p1.resetHealth();
-		p2.resetHealth();
+		super(gameModel, true);
 		
 		this.gameModel.getActionSignaller().fireOnRoundPlayTimerChanged(0);
 	}
@@ -112,69 +95,10 @@ class TieBreakerGameState extends GameState {
 	}
 
 	@Override
-	void killToIdle() {
-		this.clearAndResetAllEmitters();
-		this.gameModel.setNextGameState(new IdleGameState(this.gameModel));
-	}
-
-	@Override
-	void initiateNextState(GameState.GameStateType nextState) {
-		// The tie breaker must play out before going to the next state
-	}
-
-	@Override
-	void executeAction(Action action) {
-		switch (action.getContributorEntity()) {
-			case PLAYER1_ENTITY:
-				if (this.secsSinceLastP1Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
-					action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
-					
-					// Player 1 has already made an action recently, exit without counting the current action
-					return;
-				}
-				
-				this.secsSinceLastP1Action = 0.0;
-				break;
-				
-			case PLAYER2_ENTITY:
-				if (this.secsSinceLastP2Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
-					action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
-					
-					// Player 2 has already made an action recently, exit without counting the current action
-					return;
-				}
-				
-				this.secsSinceLastP2Action = 0.0;
-				break;
-				
-			// We only interpret player actions when the game is in play
-			case RINGMASTER_ENTITY:
-			default:
-				return;
-		}
-		
-		Action.mergeAction(this.activeActions, action);
-	}
-
-	@Override
-	void togglePause() {
-		this.gameModel.setNextGameState(new PausedGameState(this.gameModel, this));
-	}
-
-	@Override
 	GameStateType getStateType() {
 		return GameState.GameStateType.TIE_BREAKER_ROUND_STATE;
 	}
 
-	/**
-	 * Helper function to clear all active actions in this state and reset all fire emitters.
-	 */
-	private void clearAndResetAllEmitters() {
-		this.activeActions.clear();
-		this.gameModel.getFireEmitterModel().resetAllEmitters();
-	}
-	
-	
 	private void onPlayerVictory(Player victoryPlayer) {
 		assert(victoryPlayer != null);
 		

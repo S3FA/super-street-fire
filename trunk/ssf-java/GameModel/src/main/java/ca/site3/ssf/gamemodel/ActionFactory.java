@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import ca.site3.ssf.common.MultiLerp;
+import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 
 /**
  * Publicly exposed factory class for building the various actions/moves for players and
@@ -28,7 +29,8 @@ final public class ActionFactory {
 		YMCA_ATTACK,
 		NYAN_CAT_ATTACK,
 		DISCO_STU_ATTACK,
-		ARM_WINDMILL_ATTACK
+		ARM_WINDMILL_ATTACK,
+		SUCK_IT_ATTACK
 	};
 
 	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
@@ -585,6 +587,23 @@ final public class ActionFactory {
 				
 				// No decoration on outer ring, currently...
 				
+				break;
+			}
+			
+			case SUCK_IT_ATTACK: {
+				
+				final double SUCK_IT_BASE_ACCELERATION   = 0;
+				final double SUCK_IT_TIME_LENGTH_IN_SECS = 5.0;
+				final float SUCK_IT_DAMAGE_PER_FLAME     = 7.0f;
+				final int SUCK_IT_NUM_FLAMES = 3;
+				
+				action = this.buildPlayerTwoHandedSymetricalAttack(AttackType.SUCK_IT_ATTACK,
+						playerNum, SUCK_IT_TIME_LENGTH_IN_SECS, SUCK_IT_BASE_ACCELERATION, SUCK_IT_NUM_FLAMES, SUCK_IT_DAMAGE_PER_FLAME);
+				
+				// Decoration for the suck it is a massive burst on all emitters for a small amount of time...
+				success = this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(0, true),
+						fireEmitterConfig.getNumOuterRingEmitters(), 1, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+
 				break;
 			}
 			

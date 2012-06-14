@@ -593,6 +593,7 @@ public final class Event {
       NYAN_CAT_ATTACK(18, 18),
       DISCO_STU_ATTACK(19, 19),
       ARM_WINDMILL_ATTACK(20, 20),
+      SUCK_IT_ATTACK(21, 21),
       ;
       
       public static final int CUSTOM_UNDEFINED_VALUE = 0;
@@ -616,6 +617,7 @@ public final class Event {
       public static final int NYAN_CAT_ATTACK_VALUE = 18;
       public static final int DISCO_STU_ATTACK_VALUE = 19;
       public static final int ARM_WINDMILL_ATTACK_VALUE = 20;
+      public static final int SUCK_IT_ATTACK_VALUE = 21;
       
       
       public final int getNumber() { return value; }
@@ -643,6 +645,7 @@ public final class Event {
           case 18: return NYAN_CAT_ATTACK;
           case 19: return DISCO_STU_ATTACK;
           case 20: return ARM_WINDMILL_ATTACK;
+          case 21: return SUCK_IT_ATTACK;
           default: return null;
         }
       }
@@ -673,7 +676,7 @@ public final class Event {
       }
       
       private static final AttackType[] VALUES = {
-        CUSTOM_UNDEFINED, LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, LEFT_UPPERCUT, RIGHT_UPPERCUT, LEFT_CHOP, RIGHT_CHOP, HADOUKEN, SONIC_BOOM, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK, YMCA_ATTACK, NYAN_CAT_ATTACK, DISCO_STU_ATTACK, ARM_WINDMILL_ATTACK, 
+        CUSTOM_UNDEFINED, LEFT_JAB, RIGHT_JAB, LEFT_HOOK, RIGHT_HOOK, LEFT_UPPERCUT, RIGHT_UPPERCUT, LEFT_CHOP, RIGHT_CHOP, HADOUKEN, SONIC_BOOM, SHORYUKEN_ATTACK, DOUBLE_LARIAT_ATTACK, QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK, PSYCHO_CRUSHER_ATTACK, YMCA_ATTACK, NYAN_CAT_ATTACK, DISCO_STU_ATTACK, ARM_WINDMILL_ATTACK, SUCK_IT_ATTACK, 
       };
       
       public static AttackType valueOf(
@@ -2915,7 +2918,7 @@ public final class Event {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022\013guiprotocol\032\014common.proto" +
-      "\"\217\020\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
+      "\"\243\020\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
       "ol.GameEvent.EventType\0223\n\007emitter\030\002 \001(\0132" +
       "\".guiprotocol.GameEvent.FireEmitter\022,\n\014o" +
       "ldGameState\030\003 \001(\0162\026.guiprotocol.GameStat" +
@@ -2953,7 +2956,7 @@ public final class Event {
       "_MATCH_WIN\020\001\"@\n\017FireEmitterType\022\r\n\tLEFT_" +
       "RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I" +
       "\n\020FlameEmitterType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013" +
-      "BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"\273\003\n\nAt",
+      "BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"\317\003\n\nAt",
       "tackType\022\024\n\020CUSTOM_UNDEFINED\020\000\022\014\n\010LEFT_J" +
       "AB\020\001\022\r\n\tRIGHT_JAB\020\002\022\r\n\tLEFT_HOOK\020\003\022\016\n\nRI" +
       "GHT_HOOK\020\004\022\021\n\rLEFT_UPPERCUT\020\005\022\022\n\016RIGHT_U" +
@@ -2964,10 +2967,10 @@ public final class Event {
       "BUTT_ATTACK\020\016\022 \n\034ONE_HUNDRED_HAND_SLAP_A" +
       "TTACK\020\017\022\031\n\025PSYCHO_CRUSHER_ATTACK\020\020\022\017\n\013YM" +
       "CA_ATTACK\020\021\022\023\n\017NYAN_CAT_ATTACK\020\022\022\024\n\020DISC",
-      "O_STU_ATTACK\020\023\022\027\n\023ARM_WINDMILL_ATTACK\020\024\"" +
-      "A\n\027RoundBeginCountdownTime\022\t\n\005THREE\020\000\022\007\n" +
-      "\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.site3.s" +
-      "sf.guiprotocol"
+      "O_STU_ATTACK\020\023\022\027\n\023ARM_WINDMILL_ATTACK\020\024\022" +
+      "\022\n\016SUCK_IT_ATTACK\020\025\"A\n\027RoundBeginCountdo" +
+      "wnTime\022\t\n\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005F" +
+      "IGHT\020\003B\032\n\030ca.site3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

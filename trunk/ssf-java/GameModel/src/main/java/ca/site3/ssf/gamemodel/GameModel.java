@@ -214,8 +214,8 @@ public class GameModel implements IGameModel {
 		Player p1 = this.getPlayer1();
 		Player p2 = this.getPlayer2();
 		
-		p1.reset();
-		p2.reset();
+		p1.matchReset();
+		p2.matchReset();
 		
 		p1.clearHealth();
 		p2.clearHealth();
