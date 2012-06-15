@@ -10,6 +10,7 @@ public class PlayerAttackActionSoundPlayer extends SoundPlayerController impleme
 	public void playSounds(IGameModelEvent gameModelEvent)
 	{
 		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
+		
 		if (event.getAttackType() == PlayerAttackAction.AttackType.CUSTOM_UNDEFINED_ATTACK)
 		{
 			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("AttackType.CustomUndefinedAttack"), false);
@@ -56,7 +57,7 @@ public class PlayerAttackActionSoundPlayer extends SoundPlayerController impleme
 		}
 		else if (event.getAttackType() == PlayerAttackAction.AttackType.HADOUKEN_ATTACK)
 		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("AttackType.HadokenAttack"), false);
+			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("AttackType.HadoukenAttack"), false);
 		}
 		else if (event.getAttackType() == PlayerAttackAction.AttackType.DOUBLE_LARIAT_ATTACK)
 		{

@@ -17,8 +17,8 @@ import javax.sound.sampled.SourceDataLine;
  */
 public class PlaybackHandler {
 	// Play back the sound by filename
-	public static void playAudioFile( String fileName, boolean isLooping ) {
-		File soundFile = new File( fileName );
+	public static void playAudioFile(String fileName, boolean isLooping) {
+		File soundFile = new File(fileName);
 		
 		try 
 		{
@@ -26,10 +26,8 @@ public class PlaybackHandler {
 			do
 			{
 				// Create a stream from the given file
-				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream( soundFile );
-				
-				// AudioSystem.getAudioInputStream( inputStream ); // alternate audio stream from inputstream
-				playAudioStream( audioInputStream, isLooping );
+				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
+				playAudioStream(audioInputStream);
 			}
 			while (isLooping);
 		} 
@@ -44,7 +42,7 @@ public class PlaybackHandler {
 	} 
 	
 	/** Plays audio from the given audio input stream. */
-	private static void playAudioStream( AudioInputStream audioInputStream, boolean isLooping ) {
+	private static void playAudioStream(AudioInputStream audioInputStream) {
 		// Audio format provides information like sample rate, size, channels.
 		AudioFormat audioFormat = audioInputStream.getFormat();
 		System.out.println( "Play input audio format=" + audioFormat );
