@@ -57,46 +57,60 @@ def from_gesture_file_string(fileName, fileStr):
 
 def print_usage_and_exit():
     print "Usage:"
-    print os.path.basename(sys.argv[0]) + " (dir_for_analysis) [num_outliers_to_show]"
+    print os.path.basename(sys.argv[0]) + " (base_dir) (dir_name_for_analysis) [num_outliers_to_show]"
     exit(1) 
 
 
 if __name__ == "__main__":
     
-    if len(sys.argv) < 2 or len(sys.argv) > 3:
+    if len(sys.argv) < 3 or len(sys.argv) > 4:
         print_usage_and_exit()
     
     # Make sure the directory to analyze is valid
-    dirToAnalyze = sys.argv[1]
-    if not os.path.isdir(dirToAnalyze):
-        print "Invalid directory: " + dirToAnalyze
+    dirBasePath      = sys.argv[1]
+    dirNameToAnalyze = sys.argv[2]
+    if not os.path.isdir(dirBasePath):
+        print "Invalid directory: " + dirBasePath
         exit(1)
     
+    # Recursively walk the base directory to find subdirectories with the given dirNameToAnalyze
+    dirsToAnalyze = []
+    for dirpath, dirnames, filenames in os.walk(dirBasePath):
+        for dirname in dirnames:
+            if dirname == dirNameToAnalyze:
+                dirsToAnalyze.append(os.path.join(dirpath, dirname))
+    
     # Get a list of all files in the directory to analyze
-    fileList = os.listdir(dirToAnalyze)
-    #fileList = map((lambda file: os.path.join(dirToAnalyze, file)), fileList)
-     
+    fileList = []
+    for dir in dirsToAnalyze:
+        currFileList = os.listdir(dir)
+        currFileList = map((lambda file: os.path.join(dir, file)), currFileList)
+        fileList.extend(currFileList)
+    
+    print fileList
+    
     # Go through each file and parse it into a GestureFileInfo object, keep a list of these for further summary
     gestureInfoList = []
     for file in fileList:
-        filepath = os.path.join(dirToAnalyze, file)
-        if not os.path.isfile(filepath):
+        
+        if not os.path.isfile(file):
             continue
-        fileHandle = open(filepath, 'r')
+        
+        fileHandle = open(file, 'r')
         fileStr = fileHandle.read()
         fileHandle.close()
+        
         gestureInfo = from_gesture_file_string(file, fileStr)
         if gestureInfo is None:
             print "Warning: Could not parse file " + file
         else:
             gestureInfoList.append(gestureInfo)
             
-    
     # The final analysis involves going through all of the acquired gesture information
     # and finding the outliers
     numOutliersToShow = 5
-    if len(sys.argv) == 3:
-        numOutliersToShow = int(sys.argv[2])
+    if len(sys.argv) == 4:
+        numOutliersToShow = int(sys.argv[3])
     
     sortedDataPts      = sorted(gestureInfoList, key=lambda info: info.num_data_pts)
     sortedAccelMags    = sorted(gestureInfoList, key=lambda info: info.max_accel_mag)
@@ -105,11 +119,11 @@ if __name__ == "__main__":
     numOutliersToShow = min(numOutliersToShow, len(soretedTimeLengths))
     
     # Print the results...
-    FILENAME_LJUST = 40
+    FILENAME_LJUST = 80
     DATA_LJUST = 10
     print ""
     print "========================================================================================"
-    print "Results for gesture files in " + dirToAnalyze
+    print "Results for gesture files found under " + dirBasePath
     print "========================================================================================"
     
     print "Number of data points ------------------------------------------------------------------"
