@@ -98,7 +98,7 @@ if __name__ == "__main__":
         fileStr = fileHandle.read()
         fileHandle.close()
         
-        gestureInfo = from_gesture_file_string(file, fileStr)
+        gestureInfo = from_gesture_file_string(file[len(dirBasePath):], fileStr)
         if gestureInfo is None:
             print "Warning: Could not parse file " + file
         else:
@@ -117,8 +117,11 @@ if __name__ == "__main__":
     numOutliersToShow = min(numOutliersToShow, len(soretedTimeLengths))
     
     # Print the results...
-    FILENAME_LJUST = 80
+    FILENAME_LJUST = 75
     DATA_LJUST = 10
+    SEPARATOR_LINE = ""
+    for i in range(FILENAME_LJUST + DATA_LJUST): SEPARATOR_LINE += "-"
+    SEPARATOR_LINE += "---------------"
     print ""
     print "========================================================================================"
     print "Results for gesture files found under " + dirBasePath
@@ -127,14 +130,15 @@ if __name__ == "__main__":
     print "Number of data points ------------------------------------------------------------------"
     print "HIGHEST:"
     print "Filename".ljust(FILENAME_LJUST) + "Number of data points".ljust(DATA_LJUST)
-    print "--------------------------------------------------------------"
+    print SEPARATOR_LINE
+    
     for i in range(len(sortedDataPts)-1, len(sortedDataPts) - numOutliersToShow - 1, -1):
         print sortedDataPts[i].filename.ljust(FILENAME_LJUST) + str(sortedDataPts[i].num_data_pts).ljust(DATA_LJUST)
     
     print ""
     print "LOWEST:"
     print "Filename".ljust(FILENAME_LJUST) + "Number of data points".ljust(DATA_LJUST)
-    print "--------------------------------------------------------------"
+    print SEPARATOR_LINE
     for i in range(numOutliersToShow):
         print sortedDataPts[i].filename.ljust(FILENAME_LJUST) + str(sortedDataPts[i].num_data_pts).ljust(DATA_LJUST)
     
@@ -142,14 +146,14 @@ if __name__ == "__main__":
     print "Acceleration Magnitude -----------------------------------------------------------------"
     print "HIGHEST:"
     print "Filename".ljust(FILENAME_LJUST) + "Acceleration Magnitude".ljust(DATA_LJUST)
-    print "--------------------------------------------------------------"
+    print SEPARATOR_LINE
     for i in range(len(sortedAccelMags)-1, len(sortedAccelMags) - numOutliersToShow - 1, -1):
         print sortedAccelMags[i].filename.ljust(FILENAME_LJUST) + str(sortedAccelMags[i].max_accel_mag).ljust(DATA_LJUST)
     
     print ""
     print "LOWEST:"
     print "Filename".ljust(FILENAME_LJUST) + "Acceleration Magnitude".ljust(DATA_LJUST)
-    print "--------------------------------------------------------------"
+    print SEPARATOR_LINE
     for i in range(numOutliersToShow):
         print sortedAccelMags[i].filename.ljust(FILENAME_LJUST) + str(sortedAccelMags[i].max_accel_mag).ljust(DATA_LJUST)
         
