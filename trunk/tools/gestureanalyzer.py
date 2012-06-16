@@ -15,8 +15,6 @@ class GestureFileInfo:
         self.time_length   = 0
 
 
-    
-
 '''
 Function for parsing apart a gesture instance file for Super Street Fire.
 Returns: A newly created GestureFileInfo object on success, None on failure.
@@ -26,7 +24,7 @@ def from_gesture_file_string(fileName, fileStr):
     
     # First thing we do is get the total number of data points in the file...
     numDataMatch = re.match(r"^\s*(L|R|LR)\s+(\d+)", fileStr)
-    if len(numDataMatch.groups()) < 2:
+    if numDataMatch is None or len(numDataMatch.groups()) < 2:
         return None
     result.num_data_pts = int(numDataMatch.group(2))
     
@@ -45,8 +43,8 @@ def from_gesture_file_string(fileName, fileStr):
     
     # Get all of the time points in the gesture file
     timePtMatchIter = re.finditer(r"^\s*(-?\d+\.\d+)\s*$", fileStr[idxOfTimePts:], re.MULTILINE)
-    minTimePt = sys.float_info.max
-    maxTimePt = -sys.float_info.max
+    minTimePt = 99999999.999
+    maxTimePt = -999999999.999
     for match in timePtMatchIter:
         # Match 1 will be a time point
         currTimePt = float(match.group(1))
@@ -81,14 +79,17 @@ if __name__ == "__main__":
     # Go through each file and parse it into a GestureFileInfo object, keep a list of these for further summary
     gestureInfoList = []
     for file in fileList:
-        with open(os.path.join(dirToAnalyze, file), 'r') as fileHandle:
-            fileStr = fileHandle.read()
-            
-            gestureInfo = from_gesture_file_string(file, fileStr)
-            if gestureInfo is None:
-                print "Warning: Could not parse file " + file
-            else:
-                gestureInfoList.append(gestureInfo)
+        filepath = os.path.join(dirToAnalyze, file)
+        if not os.path.isfile(filepath):
+            continue
+        fileHandle = open(filepath, 'r')
+        fileStr = fileHandle.read()
+        fileHandle.close()
+        gestureInfo = from_gesture_file_string(file, fileStr)
+        if gestureInfo is None:
+            print "Warning: Could not parse file " + file
+        else:
+            gestureInfoList.append(gestureInfo)
             
     
     # The final analysis involves going through all of the acquired gesture information
@@ -104,50 +105,45 @@ if __name__ == "__main__":
     numOutliersToShow = min(numOutliersToShow, len(soretedTimeLengths))
     
     # Print the results...
+    FILENAME_LJUST = 40
+    DATA_LJUST = 10
     print ""
     print "========================================================================================"
     print "Results for gesture files in " + dirToAnalyze
     print "========================================================================================"
     
-    print ""
     print "Number of data points ------------------------------------------------------------------"
-    print "----------------------------------------------------------------------------------------"
-    print ""
     print "HIGHEST:"
-    print "Filename".ljust(30) + "Number of data points".ljust(10)
-    print "---------------------------------------------------"
+    print "Filename".ljust(FILENAME_LJUST) + "Number of data points".ljust(DATA_LJUST)
+    print "--------------------------------------------------------------"
     for i in range(len(sortedDataPts)-1, len(sortedDataPts) - numOutliersToShow - 1, -1):
-        print sortedDataPts[i].filename.ljust(30) + str(sortedDataPts[i].num_data_pts).ljust(10)
+        print sortedDataPts[i].filename.ljust(FILENAME_LJUST) + str(sortedDataPts[i].num_data_pts).ljust(DATA_LJUST)
     
     print ""
     print "LOWEST:"
-    print "Filename".ljust(30) + "Number of data points".ljust(10)
-    print "---------------------------------------------------"
+    print "Filename".ljust(FILENAME_LJUST) + "Number of data points".ljust(DATA_LJUST)
+    print "--------------------------------------------------------------"
     for i in range(numOutliersToShow):
-        print sortedDataPts[i].filename.ljust(30) + str(sortedDataPts[i].num_data_pts).ljust(10)
+        print sortedDataPts[i].filename.ljust(FILENAME_LJUST) + str(sortedDataPts[i].num_data_pts).ljust(DATA_LJUST)
     
     print ""
     print "Acceleration Magnitude -----------------------------------------------------------------"
-    print "----------------------------------------------------------------------------------------"
-    print ""
     print "HIGHEST:"
-    print "Filename".ljust(30) + "Acceleration Magnitude".ljust(10)
-    print "---------------------------------------------------"
+    print "Filename".ljust(FILENAME_LJUST) + "Acceleration Magnitude".ljust(DATA_LJUST)
+    print "--------------------------------------------------------------"
     for i in range(len(sortedAccelMags)-1, len(sortedAccelMags) - numOutliersToShow - 1, -1):
-        print sortedAccelMags[i].filename.ljust(30) + str(sortedAccelMags[i].max_accel_mag).ljust(10)
+        print sortedAccelMags[i].filename.ljust(FILENAME_LJUST) + str(sortedAccelMags[i].max_accel_mag).ljust(DATA_LJUST)
     
     print ""
     print "LOWEST:"
-    print "Filename".ljust(30) + "Acceleration Magnitude".ljust(10)
-    print "---------------------------------------------------"
+    print "Filename".ljust(FILENAME_LJUST) + "Acceleration Magnitude".ljust(DATA_LJUST)
+    print "--------------------------------------------------------------"
     for i in range(numOutliersToShow):
-        print sortedAccelMags[i].filename.ljust(30) + str(sortedAccelMags[i].max_accel_mag).ljust(10)
+        print sortedAccelMags[i].filename.ljust(FILENAME_LJUST) + str(sortedAccelMags[i].max_accel_mag).ljust(DATA_LJUST)
         
-        
+    '''
     print ""
     print "Time Length ----------------------------------------------------------------------------"
-    print "----------------------------------------------------------------------------------------"
-    print ""
     print "HIGHEST:"
     print "Filename".ljust(30) + "Time Length".ljust(10)
     print "---------------------------------------------------"
@@ -160,7 +156,7 @@ if __name__ == "__main__":
     print "---------------------------------------------------"
     for i in range(numOutliersToShow):
         print soretedTimeLengths[i].filename.ljust(30) + str(soretedTimeLengths[i].time_length).ljust(10)
-    print ""
-        
+    '''
+
     print "========================================================================================"
     
