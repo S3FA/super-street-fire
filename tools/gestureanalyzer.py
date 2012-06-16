@@ -87,8 +87,6 @@ if __name__ == "__main__":
         currFileList = map((lambda file: os.path.join(dir, file)), currFileList)
         fileList.extend(currFileList)
     
-    print fileList
-    
     # Go through each file and parse it into a GestureFileInfo object, keep a list of these for further summary
     gestureInfoList = []
     for file in fileList:
