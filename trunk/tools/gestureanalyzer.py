@@ -45,8 +45,8 @@ def from_gesture_file_string(fileName, fileStr):
     
     # Get all of the time points in the gesture file
     timePtMatchIter = re.finditer(r"^\s*(-?\d+\.\d+)\s*$", fileStr[idxOfTimePts:], re.MULTILINE)
-    minTimePt = 0
-    maxTimePt = 0
+    minTimePt = sys.float_info.max
+    maxTimePt = -sys.float_info.max
     for match in timePtMatchIter:
         # Match 1 will be a time point
         currTimePt = float(match.group(1))
@@ -152,14 +152,14 @@ if __name__ == "__main__":
     print "Filename".ljust(30) + "Time Length".ljust(10)
     print "---------------------------------------------------"
     for i in range(len(soretedTimeLengths)-1, len(soretedTimeLengths) - numOutliersToShow - 1, -1):
-        print soretedTimeLengths[i].filename.ljust(30) + str(soretedTimeLengths[i].max_accel_mag).ljust(10)
+        print soretedTimeLengths[i].filename.ljust(30) + str(soretedTimeLengths[i].time_length).ljust(10)
     
     print ""
     print "LOWEST:"
     print "Filename".ljust(30) + "Time Length".ljust(10)
     print "---------------------------------------------------"
     for i in range(numOutliersToShow):
-        print soretedTimeLengths[i].filename.ljust(30) + str(soretedTimeLengths[i].max_accel_mag).ljust(10)
+        print soretedTimeLengths[i].filename.ljust(30) + str(soretedTimeLengths[i].time_length).ljust(10)
     print ""
         
     print "========================================================================================"
