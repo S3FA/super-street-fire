@@ -42,7 +42,7 @@ public enum GestureType {
 	PSYCHO_CRUSHER(5, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 6500, 35, true, true),
 	
 	YMCA(5, PlayerActionType.YMCA_ATTACK, GestureGenre.EASTER_EGG, 10000, 56, true, true),
-	NYAN_CAT(5, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 6500, 22, true, true),
+	NYAN_CAT(5, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 6500, 30, true, true),
 	DISCO_STU(5, PlayerActionType.DISCO_STU_ATTACK, GestureGenre.EASTER_EGG, 10000, 14, true, true),
 	ARM_WINDMILL(5, PlayerActionType.ARM_WINDMILL_ATTACK, GestureGenre.EASTER_EGG, 18000, 35, true, true),
 	SUCK_IT(5, PlayerActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 7600, 10, true, true),
