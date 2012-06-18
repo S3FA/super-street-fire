@@ -4,6 +4,14 @@ import java.util.Properties;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 
+/**
+ * Super class for all sound players - implements the ISoundPlayer. Classes
+ * that inherit from this are responsible for determining the audio that should play
+ * for particular gamemodel events.
+ * 
+ * @author Callum
+ *
+ */
 abstract class SoundPlayer implements ISoundPlayer {
 
 	protected final String resourcePath;
@@ -16,6 +24,13 @@ abstract class SoundPlayer implements ISoundPlayer {
 		this.configFile   = configFile;
 	}
 	
+	/**
+	 * Factory method for building the appropriate SoundPlayer for the given gameModelEvent.
+	 * @param resourcePath The path to the sound resources.
+	 * @param configFile The configuration/properties file for audio lookup.
+	 * @param gameModelEvent The game model event to base the creation of the sound player off of.
+	 * @return The resulting SoundPlayer, null on error.
+	 */
 	public static SoundPlayer build(String resourcePath, Properties configFile, IGameModelEvent gameModelEvent) {
 		if (resourcePath == null || resourcePath.isEmpty() || configFile == null || gameModelEvent == null) {
 			return null;

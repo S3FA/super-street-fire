@@ -29,5 +29,10 @@
   		<artifactId>IOServer</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>ca.site3.ssf</groupId>
+  		<artifactId>Sound</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>

@@ -38,11 +38,18 @@ class PlaybackHandler implements Runnable {
 	private volatile boolean stop = false;
 	
 	PlaybackHandler(String audioFilepath, int numLoops, float volume) {
+		assert(audioFilepath != null);
+		assert(numLoops == INFINITE_NUM_LOOPS || numLoops > 0);
+		
 		this.audioFilepath = audioFilepath;
 		this.numLoops = numLoops;
 		this.volume = volume;
 	}
 
+	public void stop() {
+		this.stop = true;
+	}
+	
 	public void run() {
 		
 		// Open the audio file from disk (make sure it even exists)
@@ -154,9 +161,13 @@ class PlaybackHandler implements Runnable {
 			
 		}
 		
-		// If this thread has been told to stop then we don't bother draining the data line since
-		// it's a blocking operation and we want to exit immediately
-		if (!this.stop) {
+		if (this.stop) {
+			logger.debug("Prematurely stopping the audio data line.");
+			this.srcDataLine.stop();
+		}
+		else {
+			// If this thread has been told to stop then we don't bother draining the data line since
+			// it's a blocking operation and we want to exit immediately
 			logger.debug("Draining audio source data line.");
 			this.srcDataLine.drain();
 		}
@@ -164,109 +175,5 @@ class PlaybackHandler implements Runnable {
 		logger.debug("Closing audio source data line.");
 		this.srcDataLine.close();
 	} 
-	
-	/**
-	 * Play the given audio file.
-	 * @param fileName Full file path of the audio file.
-	 * @param isLooping Whether or not to loop the audio.
-	 */
-	/*
-	public static void playAudioFile(String fileName, int numLoops) {
-		File soundFile = new File(fileName);
-		
-		try 
-		{
-			// Continue playing the sound as long as we're looping
-			do
-			{
-				// Create a stream from the given file
-				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
-				playAudioStream(audioInputStream);
-			}
-			while (isLooping);
-		} 
-		catch (Exception e) {
-			logger.warn("Problem with file " + fileName + ":", e);
-		}
-		
-		// When the sound finished playing, return to close the thread
-		return;
-	} 
-	*/
-	
-	/**
-	 * Plays audio from the given audio input stream. This is a blocking function that will play
-	 * the complete audio from a given input stream.
-	 * @param audioInputStream The audio input stream to play.
-	 */
-	/*
-	private static void playAudioStream(AudioInputStream audioInputStream) {
-		// Audio format provides information like sample rate, size, channels.
-		AudioFormat audioFormat = audioInputStream.getFormat();
-		logger.debug("Play input audio format=" + audioFormat);
-		
-		// Open a data line to play our type of sampled audio.
-		// Use SourceDataLine for play and TargetDataLine for record.
-		DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-		
-		if (!AudioSystem.isLineSupported(info)) {
-			logger.warn("Play.playAudioStream does not handle this type of audio on this system.");
-			return;
-		}
-				
-		try {
-			// Create a SourceDataLine for play back (throws LineUnavailableException).
-			SourceDataLine dataLine = (SourceDataLine)AudioSystem.getLine(info);
-			
-			// System.out.println( "SourceDataLine class=" + dataLine.getClass() );
-			// The line acquires system resources (throws LineAvailableException).
-			dataLine.open(audioFormat);
-			
-			// Adjust the volume on the output line.
-			if(dataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-				FloatControl volume = (FloatControl)dataLine.getControl(FloatControl.Type.MASTER_GAIN);
-				volume.setValue(6);
-			}
-			
-			// Allows the line to move data in and out to a port.
-			dataLine.start();
-			
-			// Create a buffer for moving data from the audio stream to the line.
-			int bufferSize = (int) audioFormat.getSampleRate() * audioFormat.getFrameSize();
-			byte [] buffer = new byte[ bufferSize ];
-			
-			// Move the data until done or there is an error.
-			try {
-				int bytesRead = 0;
-				while (bytesRead >= 0) {
-					bytesRead = audioInputStream.read(buffer, 0, buffer.length);
-					if (bytesRead >= 0) {
-						// logger.debug("Play.playAudioStream bytes read=" + bytesRead +
-						// ", frame size=" + audioFormat.getFrameSize() + ", frames read=" + bytesRead / audioFormat.getFrameSize());
-						
-						// Odd sized sounds throw an exception if we don't write the same amount.
-						int framesWritten = dataLine.write(buffer, 0, bytesRead);
-					}
-				} 
-			} 
-			catch (IOException e) {
-				logger.warn("Exception while reading/writing audio stream.", e);
-				e.printStackTrace();
-			}
-			
-			logger.debug("Play.playAudioStream draining line.");
-			
-			// Blocking call that continues data line I/O until its buffer is drained
-			dataLine.drain();
-			logger.debug("Play.playAudioStream closing line.");
-			
-			// Closes the data line, freeing any resources such as the audio device.
-			dataLine.close();
-		} 
-		catch (LineUnavailableException e) {
-			logger.warn("Exception while playing audio stream.", e);
-		}
-	}
-	*/
 	
 }
