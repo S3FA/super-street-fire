@@ -1,26 +1,48 @@
 package ca.site3.ssf.Sound;
 
+import java.util.Properties;
+
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 
-public class RoundEndedSoundPlayer extends SoundPlayerController implements ISoundPlayer {
+class RoundEndedSoundPlayer extends SoundPlayer {
+	
+	RoundEndedSoundPlayer(String resourcePath, Properties configFile) {
+		super(resourcePath, configFile);
+	}
 	
 	// Handle the sounds based on round ending
-	public void playSounds(IGameModelEvent gameModelEvent)
-	{
-		RoundEndedEvent event = (RoundEndedEvent)gameModelEvent;
+	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
+		if (gameModelEvent.getType() != IGameModelEvent.Type.ROUND_ENDED) {
+			return;
+		}
 		
-		if (event.getRoundResult() == RoundEndedEvent.RoundResult.PLAYER1_VICTORY)
-		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.PlayerOneVictory"), false);
+		RoundEndedEvent event = (RoundEndedEvent)gameModelEvent;
+		String audioFilepath = "";
+		
+		switch (event.getRoundResult()) {
+		case PLAYER1_VICTORY: {
+			audioFilepath = resourcePath + configFile.getProperty("RoundResult.PlayerOneVictory");
+			break;
 		}
-		else if (event.getRoundResult() == RoundEndedEvent.RoundResult.PLAYER2_VICTORY)
-		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.PlayerTwoVictory"), false);
+		case PLAYER2_VICTORY: {
+			audioFilepath = resourcePath + configFile.getProperty("RoundResult.PlayerTwoVictory");
+			break;
 		}
-		else if (event.getRoundResult() == RoundEndedEvent.RoundResult.TIE)
-		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundResult.Tie"), false);
+		case TIE: {
+			audioFilepath = resourcePath + configFile.getProperty("RoundResult.Tie");
+			break;
 		}
+		
+		default:
+			assert(false);
+			break;
+		}
+		
+		if (audioFilepath.isEmpty()) {
+			return;
+		}
+		
+		new Thread(new PlaybackHandler(audioFilepath, 1, settings.getVolume())).start();
 	}
 }

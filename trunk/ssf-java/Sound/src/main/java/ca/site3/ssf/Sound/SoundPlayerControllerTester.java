@@ -16,17 +16,15 @@ public class SoundPlayerControllerTester {
 		PlayerAttackActionEvent playerAttackActionEvent = new PlayerAttackActionEvent(1, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
 		GameStateChangedEvent gameStateChangedEvent = new GameStateChangedEvent(GameStateType.IDLE_STATE, GameStateType.ROUND_BEGINNING_STATE);
 		
-		soundPlayerController = new SoundPlayerController();
-		soundPlayerController.playEventSounds(playerAttackActionEvent);
-		soundPlayerController.playEventSounds(gameStateChangedEvent);
+		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f));
 		
-		try 
-		{
-			Thread.currentThread().sleep(3000);
-			soundPlayerController.stopLoopingMusic();
+		try {
+			soundPlayerController.onGameModelEvent(playerAttackActionEvent);
+			Thread.sleep(2000);
+			soundPlayerController.onGameModelEvent(gameStateChangedEvent);
+			//soundPlayerController.stopLoopingMusic();
 		} 
-		catch (InterruptedException e) 
-		{
+		catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -1,13 +1,25 @@
 package ca.site3.ssf.Sound;
 
+import java.util.Properties;
+
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 
-public class RingmasterActionSoundPlayer extends SoundPlayerController implements ISoundPlayer {
+class RingmasterActionSoundPlayer extends SoundPlayer {
 	
-	// Handle the sounds based on ringmaster actions
-	public void playSounds(IGameModelEvent gameModelEvent)
-	{
+	RingmasterActionSoundPlayer(String resourcePath, Properties configFile) {
+		super(resourcePath, configFile);
+	}
+	
+	/**
+	 * Handles the sounds based on ringmaster actions.
+	 */
+	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
+		if (gameModelEvent.getType() != IGameModelEvent.Type.RINGMASTER_ACTION) {
+			return;
+		}
+		
 		RingmasterActionEvent event = (RingmasterActionEvent)gameModelEvent;
+		// TODO: Ringmaster action sounds...?
 	}
 }
