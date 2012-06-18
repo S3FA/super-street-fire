@@ -11,7 +11,7 @@ import ca.site3.ssf.gamemodel.IGameModelListener;
 
 /**
  * Listens for game events and plays sound effects and music as appropriate.
- * @author Mike
+ * @author Mike, Callum
  */
 public class SoundPlayerController implements IGameModelListener {
 	
@@ -59,6 +59,8 @@ public class SoundPlayerController implements IGameModelListener {
 		}
 		catch(IOException ex) {
 			logger.warn("Setting config file failed.", ex);
+			this.configFile = null;
+			this.resourcePath = "";
 		}
 	}
 }

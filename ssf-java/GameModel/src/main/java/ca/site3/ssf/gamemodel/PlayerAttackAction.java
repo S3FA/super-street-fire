@@ -40,7 +40,7 @@ public class PlayerAttackAction extends Action {
 		RIGHT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE);
 		
 		private final int maxUsesPerRound;
-		
+
 		AttackType(int maxUsesPerRound) {
 			this.maxUsesPerRound = maxUsesPerRound;
 		}
@@ -48,6 +48,7 @@ public class PlayerAttackAction extends Action {
 		int getMaxUsesPerRound() {
 			return this.maxUsesPerRound;
 		}
+		
 	};
 
 	final private AttackType type;
