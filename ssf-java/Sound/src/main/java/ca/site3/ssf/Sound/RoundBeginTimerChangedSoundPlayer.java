@@ -1,30 +1,53 @@
 package ca.site3.ssf.Sound;
 
+import java.util.Properties;
+
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 
-public class RoundBeginTimerChangedSoundPlayer extends SoundPlayerController implements ISoundPlayer {
+class RoundBeginTimerChangedSoundPlayer extends SoundPlayer {
+	
+	RoundBeginTimerChangedSoundPlayer(String resourcePath, Properties configFile) {
+		super(resourcePath, configFile);
+	}
 	
 	// Handle the sounds based on round begin timer changing
-	public void playSounds(IGameModelEvent gameModelEvent)
-	{
-		RoundBeginTimerChangedEvent event = (RoundBeginTimerChangedEvent)gameModelEvent;
+	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
+		if (gameModelEvent.getType() != IGameModelEvent.Type.ROUND_BEGIN_TIMER_CHANGED) {
+			return;
+		}
 		
-		if (event.getThreeTwoOneFightTime() == RoundBeginTimerChangedEvent.RoundBeginCountdownType.THREE)
-		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundBeginCountdown.Three"), false);
+		RoundBeginTimerChangedEvent event = (RoundBeginTimerChangedEvent)gameModelEvent;
+		String audioFilepath = "";
+		switch (event.getThreeTwoOneFightTime()) {
+		
+		case THREE: {
+			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.Three");
+			break;
 		}
-		else if (event.getThreeTwoOneFightTime() == RoundBeginTimerChangedEvent.RoundBeginCountdownType.TWO)
-		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundBeginCountdown.Two"), false);
+		case TWO: {
+			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.Two");
+			break;
 		}
-		else if (event.getThreeTwoOneFightTime() == RoundBeginTimerChangedEvent.RoundBeginCountdownType.ONE)
-		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundBeginCountdown.One"), false);
+		case ONE: {
+			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.One");
+			break;
 		}
-		else if (event.getThreeTwoOneFightTime() == RoundBeginTimerChangedEvent.RoundBeginCountdownType.FIGHT)
-		{
-			PlaybackHandler.playAudioFile(resourcePath + configFile.getProperty("RoundBeginCountdown.Fight"), false);
+		case FIGHT: {
+			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.Fight");
+			break;
 		}
+		
+		default:
+			assert(false);
+			break;
+			
+		}
+		
+		if (audioFilepath.isEmpty()) {
+			return;
+		}
+		
+		new Thread(new PlaybackHandler(audioFilepath, 1, settings.getVolume())).start();
 	}
 }
