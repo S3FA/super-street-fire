@@ -26,6 +26,8 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.Sound.AudioSettings;
+import ca.site3.ssf.Sound.SoundPlayerController;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
@@ -88,7 +90,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
     
     private CommandLineArgs args       = null;
     private StreetFireGuiClient client = null;
-    
+
     /** thread that monitors the queue for game model events */
     private Thread gameEventThread;
     
@@ -115,6 +117,11 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		} catch (IOException ex) {
 			log.error("DevGUI could not connect to IOServer",ex);
 		}
+		
+		// NOTE: If we setup the sound player to be a direct listener of the game model then the 
+		// the sound player will be touched by the ioserver's thread. This is why we don't keep a
+		// member of it, so that we don't make the mistake of touching it with any of the GUI threads.
+		this.ioserver.getGameModel().addGameModelListener(new SoundPlayerController(new AudioSettings(5.0f)));
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");

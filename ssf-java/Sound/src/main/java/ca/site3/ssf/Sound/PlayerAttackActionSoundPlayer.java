@@ -11,12 +11,16 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
+	public int getNumPlays(IGameModelEvent gameModelEvent) {
+		return 1;
+	}
+	
 	/**
 	 *  Handles the sounds for the various player attacks.
 	 */
-	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
-		if (gameModelEvent.getType() != IGameModelEvent.Type.PLAYER_ATTACK_ACTION) {
-			return;
+	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.PLAYER_ATTACK_ACTION) {
+			return "";
 		}
 		
 		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
@@ -126,10 +130,6 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 			break;
 		}
 		
-		if (audioFilepath.isEmpty()) {
-			return;
-		}
-		
-		new Thread(new PlaybackHandler(audioFilepath, 1, settings.getVolume())).start();
+		return audioFilepath;
 	}
 }

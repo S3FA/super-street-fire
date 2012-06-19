@@ -11,15 +11,21 @@ class RingmasterActionSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
+	public int getNumPlays(IGameModelEvent gameModelEvent) {
+		return 1;
+	}
+	
 	/**
 	 * Handles the sounds based on ringmaster actions.
 	 */
-	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
-		if (gameModelEvent.getType() != IGameModelEvent.Type.RINGMASTER_ACTION) {
-			return;
+	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.RINGMASTER_ACTION) {
+			return "";
 		}
 		
 		RingmasterActionEvent event = (RingmasterActionEvent)gameModelEvent;
 		// TODO: Ringmaster action sounds...?
+		
+		return "";
 	}
 }
