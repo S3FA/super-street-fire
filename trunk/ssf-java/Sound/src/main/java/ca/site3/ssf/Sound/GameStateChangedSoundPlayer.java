@@ -11,12 +11,17 @@ class GameStateChangedSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
+	public int getNumPlays(IGameModelEvent gameModelEvent) {
+		return PlaybackHandler.INFINITE_NUM_LOOPS;
+	}
+	
 	/**
 	 * Handles the sounds based on game state.
 	 */
-	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
-		if (gameModelEvent.getType() != IGameModelEvent.Type.GAME_STATE_CHANGED) {
-			return;
+	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+		
+		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.GAME_STATE_CHANGED) {
+			return "";
 		}
 		
 		GameStateChangedEvent event = (GameStateChangedEvent)gameModelEvent;
@@ -67,11 +72,7 @@ class GameStateChangedSoundPlayer extends SoundPlayer {
 			break;
 		}
 		
-		if (audioFilepath.isEmpty()) {
-			return;
-		}
-		
-		new Thread(new PlaybackHandler(audioFilepath, PlaybackHandler.INFINITE_NUM_LOOPS, settings.getVolume())).start();
+		return audioFilepath;
 	}
 
 }

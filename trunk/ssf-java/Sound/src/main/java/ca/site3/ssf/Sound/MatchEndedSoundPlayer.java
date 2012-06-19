@@ -11,10 +11,18 @@ class MatchEndedSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
+	public int getNumPlays(IGameModelEvent gameModelEvent) {
+		return 1;
+	}
+	
 	/**
 	 * Handles the sounds based on match ending.
 	 */
-	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
+	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+		
+		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.MATCH_ENDED) {
+			return "";
+		}
 		
 		MatchEndedEvent event = (MatchEndedEvent)gameModelEvent;
 		String audioFilepath = "";
@@ -33,10 +41,6 @@ class MatchEndedSoundPlayer extends SoundPlayer {
 			break;
 		}
 		
-		if (audioFilepath.isEmpty()) {
-			return;
-		}
-		
-		new Thread(new PlaybackHandler(audioFilepath, 1, settings.getVolume())).start();
+		return audioFilepath;
 	}
 }

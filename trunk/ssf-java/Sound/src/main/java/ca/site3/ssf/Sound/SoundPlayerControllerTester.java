@@ -10,8 +10,9 @@ public class SoundPlayerControllerTester {
 	static SoundPlayerController soundPlayerController;
 	
 	/** Plays audio from given file names. */
-	// A test class that tests a hadoken attack and a game state changed event which causes a looping track (which is then explicitly stopped)
-	public static void main( String [] args ) {
+	// A test class that tests a hadouken attack and a game state changed event which causes a looping track (which is then explicitly stopped)
+	public static void main(String[] args) {
+		
 		System.out.println("Started the SoundPlayerControllerTester.");
 		PlayerAttackActionEvent playerAttackActionEvent = new PlayerAttackActionEvent(1, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
 		GameStateChangedEvent gameStateChangedEvent = new GameStateChangedEvent(GameStateType.IDLE_STATE, GameStateType.ROUND_BEGINNING_STATE);
@@ -19,10 +20,14 @@ public class SoundPlayerControllerTester {
 		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f));
 		
 		try {
+			
 			soundPlayerController.onGameModelEvent(playerAttackActionEvent);
 			Thread.sleep(2000);
 			soundPlayerController.onGameModelEvent(gameStateChangedEvent);
-			//soundPlayerController.stopLoopingMusic();
+			Thread.sleep(2000);
+			soundPlayerController.stopAllSounds();
+			Thread.sleep(1000);
+
 		} 
 		catch (InterruptedException e) {
 			// TODO Auto-generated catch block

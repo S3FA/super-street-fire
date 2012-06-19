@@ -11,10 +11,14 @@ class RoundBeginTimerChangedSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
+	public int getNumPlays(IGameModelEvent gameModelEvent) {
+		return 1;
+	}
+	
 	// Handle the sounds based on round begin timer changing
-	public void playSounds(AudioSettings settings, IGameModelEvent gameModelEvent) {
-		if (gameModelEvent.getType() != IGameModelEvent.Type.ROUND_BEGIN_TIMER_CHANGED) {
-			return;
+	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.ROUND_BEGIN_TIMER_CHANGED) {
+			return "";
 		}
 		
 		RoundBeginTimerChangedEvent event = (RoundBeginTimerChangedEvent)gameModelEvent;
@@ -41,13 +45,8 @@ class RoundBeginTimerChangedSoundPlayer extends SoundPlayer {
 		default:
 			assert(false);
 			break;
-			
 		}
 		
-		if (audioFilepath.isEmpty()) {
-			return;
-		}
-		
-		new Thread(new PlaybackHandler(audioFilepath, 1, settings.getVolume())).start();
+		return audioFilepath;
 	}
 }

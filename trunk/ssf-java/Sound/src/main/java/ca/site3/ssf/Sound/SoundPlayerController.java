@@ -1,7 +1,13 @@
 package ca.site3.ssf.Sound;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
+
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +29,8 @@ public class SoundPlayerController implements IGameModelListener {
 	private Properties configFile;
 	private AudioSettings settings;
 	
+	private Set<PlaybackHandler> playbackHandlers = new HashSet<PlaybackHandler>(20);
+	
 	public SoundPlayerController(AudioSettings settings) {
 		assert(settings != null);
 		this.settings = settings;
@@ -43,11 +51,24 @@ public class SoundPlayerController implements IGameModelListener {
 		
 		SoundPlayer soundPlayer = SoundPlayer.build(this.resourcePath, this.configFile, gameModelEvent);
 		if (soundPlayer != null) {
+			String resourceFileStr = soundPlayer.getAudioResourcePath(gameModelEvent);
+			int numPlays = soundPlayer.getNumPlays(gameModelEvent);
+			
 			synchronized(this.settings) {
-				soundPlayer.playSounds(this.settings, gameModelEvent);
+				PlaybackHandler handler = new PlaybackHandler(this, resourceFileStr, numPlays, this.settings.getVolume());
+				this.playbackHandlers.add(handler);
+				handler.play();
 			}
 		}
-		
+	}
+	
+	public void stopAllSounds() {
+		Iterator<PlaybackHandler> iter = this.playbackHandlers.iterator();
+		while (iter.hasNext()) {
+			PlaybackHandler handler = iter.next();
+			handler.stop();
+			iter.remove();
+		}
 	}
 	
 	private void setConfigFile(String configPath) {
@@ -63,4 +84,10 @@ public class SoundPlayerController implements IGameModelListener {
 			this.resourcePath = "";
 		}
 	}
+
+	void removePlaybackHandler(PlaybackHandler handler) {
+		assert(handler != null);
+		this.playbackHandlers.remove(handler);
+	}
+
 }

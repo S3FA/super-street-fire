@@ -3,13 +3,14 @@ package ca.site3.ssf.Sound;
 import java.io.File;
 import java.io.IOException;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.Control;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.slf4j.Logger;
@@ -19,41 +20,37 @@ import org.slf4j.LoggerFactory;
  * Plays a .wav file by file name.
  * @author Mike, Callum
  */
-class PlaybackHandler implements Runnable {
+class PlaybackHandler implements LineListener {
 	
 	static final int INFINITE_NUM_LOOPS = 0;
-	
-	private static final long MAX_EXTERNAL_BUFFER_SIZE = 128000;
 	
 	private static Logger logger = LoggerFactory.getLogger(PlaybackHandler.class);
 	
 	private AudioInputStream audioInputStream = null;
-	private SourceDataLine srcDataLine = null;
-	private byte[] externalAudioBuffer = null;
-	
+	private Clip clip = null;
+
+	private final SoundPlayerController controller;
 	private final String audioFilepath;
-	private final int numLoops;
+	private final int numPlays;
 	private final float volume;
-	
-	private volatile boolean stop = false;
-	
-	PlaybackHandler(String audioFilepath, int numLoops, float volume) {
+
+	PlaybackHandler(SoundPlayerController controller, String audioFilepath, int numPlays, float volume) {
+		assert(controller != null);
 		assert(audioFilepath != null);
-		assert(numLoops == INFINITE_NUM_LOOPS || numLoops > 0);
+		assert(numPlays == INFINITE_NUM_LOOPS || numPlays > 0);
 		
+		this.controller = controller;
 		this.audioFilepath = audioFilepath;
-		this.numLoops = numLoops;
+		this.numPlays = numPlays;
 		this.volume = volume;
+		
+		this.init();
 	}
 
-	public void stop() {
-		this.stop = true;
-	}
-	
-	public void run() {
+	private void init() {
 		
 		// Open the audio file from disk (make sure it even exists)
-		File audioFile = new File(audioFilepath);
+		File audioFile = new File(this.audioFilepath);
 		if (!audioFile.canRead()) {
 			logger.warn("Failed to read audio file " + audioFilepath);
 			return;
@@ -75,105 +72,53 @@ class PlaybackHandler implements Runnable {
 			return;
 		}
 		
-		if (this.audioInputStream.markSupported()) {
-			logger.warn("Audio resetting is not supported!");
-		}
-		
-		// Create a source data line for the audio
-		AudioFormat audioFormat = audioInputStream.getFormat();
-		// Open a data line to play our type of sampled audio.
-		// Use SourceDataLine for play and TargetDataLine for record.
-		DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-		if (!AudioSystem.isLineSupported(info)) {
-			logger.warn("Play.playAudioStream does not handle this type of audio on this system.");
-			return;
-		}
-		
 		try {
-			// Create a SourceDataLine for play back (throws LineUnavailableException).
-			this.srcDataLine = (SourceDataLine)AudioSystem.getLine(info);
-			// The line needs to acquire system resources (throws LineAvailableException).
-			this.srcDataLine.open(audioFormat);
-		}
-		catch (LineUnavailableException e) {
-			logger.warn("Exception while attempting to get and open a source data line for audio stream.", e);
+			this.clip = AudioSystem.getClip();
+		} catch (LineUnavailableException e) {
+			logger.warn("Failed to get clip for audio playback.", e);
 			return;
 		}
 		
-		if (this.srcDataLine == null) {
-			logger.warn("Failed to get source data line from the audio system.");
-			return;
-		}
-		
-		// Adjust the volume on the output line.
-		if (this.srcDataLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-			FloatControl volume = (FloatControl)this.srcDataLine.getControl(FloatControl.Type.MASTER_GAIN);
+		// Adjust the volume on the audio clip
+		if (this.clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+			FloatControl volume = (FloatControl)this.clip.getControl(FloatControl.Type.MASTER_GAIN);
 			volume.setValue(Math.min(volume.getMaximum(), Math.max(volume.getMinimum(), this.volume)));
 		}
 		
-		// Get the byte length of the audio stream
-		long tempStreamLengthInBytes = audioInputStream.getFrameLength() * audioFormat.getFrameSize();
-		if (tempStreamLengthInBytes > Integer.MAX_VALUE) {
-			logger.warn("The length of the audio stream input exceeds Integer.MAX_VALUE, cannot properly reset stream!");
+		this.clip.addLineListener(this);
+	}
+	
+	public void play() {
+		try {
+			this.clip.open(this.audioInputStream);
+			if (this.numPlays == INFINITE_NUM_LOOPS) {
+				this.clip.loop(Clip.LOOP_CONTINUOUSLY);
+			}
+			else {
+				this.clip.loop(this.numPlays - 1);
+			}
+			
+		} catch (LineUnavailableException e) {
+			logger.warn("Exception while attempting to get and open a clip for audio stream.", e);
+			return;
+		} catch (IOException e) {
+			logger.warn("Audio input stream read fail.", e);
 			return;
 		}
-		int streamLengthInBytes = (int)tempStreamLengthInBytes;
-		
-		// Setup the external audio buffer (for moving data from the audio input stream through to the source data line)
-		int externalBufferSize = (int)Math.min(MAX_EXTERNAL_BUFFER_SIZE, Math.ceil(audioFormat.getSampleRate() * audioFormat.getFrameSize()));
-		this.externalAudioBuffer = new byte[externalBufferSize];
-		
-		this.srcDataLine.start();
-		
-		int playCount = 0;
-		int bytesRead = 0;
+	}
 
-		while ((playCount < this.numLoops || this.numLoops == INFINITE_NUM_LOOPS) && !this.stop) {
-			
-			this.audioInputStream.mark(streamLengthInBytes);
-			
-			bytesRead = 0;
-			while (bytesRead != -1) {
-				try {
-					bytesRead = this.audioInputStream.read(this.externalAudioBuffer, 0, this.externalAudioBuffer.length);
-				}
-				catch (IOException e) {
-					logger.warn("Audio input stream read fail.", e);
-					this.stop = true;
-					break;
-				}
-				
-				if (bytesRead >= 0) {
-					int	bytesWritten = this.srcDataLine.write(this.externalAudioBuffer, 0, bytesRead);
-				}
-			}
-			
-			if (!this.stop) {
-				playCount++;
-				try {
-					this.audioInputStream.reset();
-				}
-				catch (IOException e) {
-					logger.warn("Failed to reset audio input stream.", e);
-					break;
-				}
-			}
-			
+	public void stop() {
+		if (this.clip != null) {
+			this.clip.stop();
 		}
-		
-		if (this.stop) {
-			logger.debug("Prematurely stopping the audio data line.");
-			this.srcDataLine.stop();
+	}
+	
+	public void update(LineEvent lineEvent) {
+		if (lineEvent.getType() == LineEvent.Type.STOP) {
+			lineEvent.getLine().close();
+			logger.debug("Closing audio source data line.");
+			this.controller.removePlaybackHandler(this);
 		}
-		else {
-			// If this thread has been told to stop then we don't bother draining the data line since
-			// it's a blocking operation and we want to exit immediately
-			logger.debug("Draining audio source data line.");
-			this.srcDataLine.drain();
-		}
-		
-		logger.debug("Closing audio source data line.");
-		this.srcDataLine.close();
 	} 
 	
 }

@@ -9,5 +9,8 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
  *
  */
 interface ISoundPlayer {
-	public void playSounds(AudioSettings settings, IGameModelEvent event);
+	
+	public String getAudioResourcePath(IGameModelEvent gameModelEvent);
+	public int getNumPlays(IGameModelEvent gameModelEvent);
+	
 }
