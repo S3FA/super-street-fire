@@ -133,6 +133,9 @@ class RecognizerManager {
 			return null;
 		}
 		
+		this.bestGestureTypeMap.clear();
+		this.bestProbabilityMap.clear();
+		
 		// Setup variables for tracking the probabilities of various gestures
 		double currProbability = -1.0;
 		for (GestureGenre genre : GestureGenre.values()) {
@@ -172,16 +175,16 @@ class RecognizerManager {
 		// choice as to whether we should be using a basic, special or easter-egg type move...
 
 		GestureType bestGesture = null;
-		if (this.bestProbabilityMap.containsKey(GestureGenre.BASIC)) {
+		if (this.bestGestureTypeMap.containsKey(GestureGenre.BASIC)) {
 			
 			double basicGestureBestProb = this.bestProbabilityMap.get(GestureGenre.BASIC);
 			
-			if (this.bestProbabilityMap.containsKey(GestureGenre.SPECIAL)) {
+			if (this.bestGestureTypeMap.containsKey(GestureGenre.SPECIAL)) {
 				double specialGestureBestProb = this.bestProbabilityMap.get(GestureGenre.SPECIAL);
 				if (specialGestureBestProb > basicGestureBestProb && 
 					specialGestureBestProb - basicGestureBestProb <= BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD) {
 					
-					if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+					if (this.bestGestureTypeMap.containsKey(GestureGenre.EASTER_EGG)) {
 						double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
 						
 						if (easterEggGestureBestProb > specialGestureBestProb &&
@@ -198,7 +201,7 @@ class RecognizerManager {
 					}
 				}
 				else {
-					if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+					if (this.bestGestureTypeMap.containsKey(GestureGenre.EASTER_EGG)) {
 						double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
 						
 						if (easterEggGestureBestProb > basicGestureBestProb &&
@@ -216,7 +219,7 @@ class RecognizerManager {
 				}
 			}
 			else {
-				if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+				if (this.bestGestureTypeMap.containsKey(GestureGenre.EASTER_EGG)) {
 					double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
 					
 					if (easterEggGestureBestProb > basicGestureBestProb &&
@@ -234,10 +237,10 @@ class RecognizerManager {
 			}
 			
 		}
-		else if (this.bestProbabilityMap.containsKey(GestureGenre.SPECIAL)) {
+		else if (this.bestGestureTypeMap.containsKey(GestureGenre.SPECIAL)) {
 			double specialGestureBestProb = this.bestProbabilityMap.get(GestureGenre.SPECIAL);
 
-			if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+			if (this.bestGestureTypeMap.containsKey(GestureGenre.EASTER_EGG)) {
 				double easterEggGestureBestProb = this.bestProbabilityMap.get(GestureGenre.EASTER_EGG);
 				
 				if (easterEggGestureBestProb > specialGestureBestProb &&
@@ -254,10 +257,11 @@ class RecognizerManager {
 			}
 			
 		}
-		else if (this.bestProbabilityMap.containsKey(GestureGenre.EASTER_EGG)) {
+		else if (this.bestGestureTypeMap.containsKey(GestureGenre.EASTER_EGG)) {
 			bestGesture = this.bestGestureTypeMap.get(GestureGenre.EASTER_EGG);
 		}
-		else {
+		
+		if (bestGesture == null) {
 			return null;
 		}
 		
