@@ -29,7 +29,8 @@ public class SoundPlayerController implements IGameModelListener {
 	private Properties configFile;
 	private AudioSettings settings;
 	
-	private Set<PlaybackHandler> playbackHandlers = new HashSet<PlaybackHandler>(20);
+	private Set<PlaybackHandler> fgPlaybackHandlers = new HashSet<PlaybackHandler>(20);
+	private Set<PlaybackHandler> bgPlaybackHandlers = new HashSet<PlaybackHandler>(2);
 	
 	public SoundPlayerController(AudioSettings settings) {
 		assert(settings != null);
@@ -43,6 +44,14 @@ public class SoundPlayerController implements IGameModelListener {
 		}
 	}
 	
+	public AudioSettings getAudioSettings() {
+		AudioSettings result = null;
+		synchronized(this.settings) {
+			result = this.settings;
+		}
+		return result;
+	}
+
     /**
 	 * Called for any event that can be listened for in the gamemodel.
 	 * @param event The object holding the event information.
@@ -51,24 +60,36 @@ public class SoundPlayerController implements IGameModelListener {
 		
 		SoundPlayer soundPlayer = SoundPlayer.build(this.resourcePath, this.configFile, gameModelEvent);
 		if (soundPlayer != null) {
-			String resourceFileStr = soundPlayer.getAudioResourcePath(gameModelEvent);
-			int numPlays = soundPlayer.getNumPlays(gameModelEvent);
-			
-			synchronized(this.settings) {
-				PlaybackHandler handler = new PlaybackHandler(this, resourceFileStr, numPlays, this.settings.getVolume());
-				this.playbackHandlers.add(handler);
-				handler.play();
-			}
+			soundPlayer.execute(this, gameModelEvent);
 		}
 	}
 	
+	public void addAndPlayForegroundHandler(PlaybackHandler handler) {
+		this.fgPlaybackHandlers.add(handler);
+		handler.play();
+	}
+	
+	public void addAndPlayBackgroundHandler(PlaybackHandler handler) {
+		this.bgPlaybackHandlers.add(handler);
+		handler.play();
+	}
+	
 	public void stopAllSounds() {
-		Iterator<PlaybackHandler> iter = this.playbackHandlers.iterator();
+		Iterator<PlaybackHandler> iter = this.fgPlaybackHandlers.iterator();
 		while (iter.hasNext()) {
 			PlaybackHandler handler = iter.next();
 			handler.stop();
 			iter.remove();
 		}
+		assert(this.fgPlaybackHandlers.isEmpty());
+		
+		iter = this.bgPlaybackHandlers.iterator();
+		while (iter.hasNext()) {
+			PlaybackHandler handler = iter.next();
+			handler.stop();
+			iter.remove();
+		}
+		assert(this.bgPlaybackHandlers.isEmpty());
 	}
 	
 	private void setConfigFile(String configPath) {
@@ -78,7 +99,7 @@ public class SoundPlayerController implements IGameModelListener {
 			this.configFile.load(this.getClass().getResourceAsStream(configPath));
 			this.resourcePath = configFile.getProperty("ResourcePath");
 		}
-		catch(IOException ex) {
+		catch (IOException ex) {
 			logger.warn("Setting config file failed.", ex);
 			this.configFile = null;
 			this.resourcePath = "";
@@ -87,7 +108,9 @@ public class SoundPlayerController implements IGameModelListener {
 
 	void removePlaybackHandler(PlaybackHandler handler) {
 		assert(handler != null);
-		this.playbackHandlers.remove(handler);
+		if (!this.fgPlaybackHandlers.remove(handler)) {
+			this.bgPlaybackHandlers.remove(handler);
+		}
 	}
 
 }

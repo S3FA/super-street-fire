@@ -11,8 +11,8 @@ class GameStateChangedSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
-	public int getNumPlays(IGameModelEvent gameModelEvent) {
-		return PlaybackHandler.INFINITE_NUM_LOOPS;
+	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
+		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, PlaybackSettings.INFINITE_NUM_PLAYS);
 	}
 	
 	/**
@@ -75,4 +75,7 @@ class GameStateChangedSoundPlayer extends SoundPlayer {
 		return audioFilepath;
 	}
 
+	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
+		return true;
+	}
 }

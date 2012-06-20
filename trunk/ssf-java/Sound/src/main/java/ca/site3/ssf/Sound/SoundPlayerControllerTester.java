@@ -14,19 +14,22 @@ public class SoundPlayerControllerTester {
 	public static void main(String[] args) {
 		
 		System.out.println("Started the SoundPlayerControllerTester.");
-		PlayerAttackActionEvent playerAttackActionEvent = new PlayerAttackActionEvent(1, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
-		GameStateChangedEvent gameStateChangedEvent = new GameStateChangedEvent(GameStateType.IDLE_STATE, GameStateType.ROUND_BEGINNING_STATE);
+		PlayerAttackActionEvent player1AttackActionEvent = new PlayerAttackActionEvent(1, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
+		PlayerAttackActionEvent player2AttackActionEvent = new PlayerAttackActionEvent(2, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
+		//GameStateChangedEvent gameStateChangedEvent = new GameStateChangedEvent(GameStateType.IDLE_STATE, GameStateType.ROUND_BEGINNING_STATE);
 		
 		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f));
 		
 		try {
 			
-			soundPlayerController.onGameModelEvent(playerAttackActionEvent);
+			soundPlayerController.onGameModelEvent(player1AttackActionEvent);
 			Thread.sleep(2000);
-			soundPlayerController.onGameModelEvent(gameStateChangedEvent);
+			//soundPlayerController.onGameModelEvent(gameStateChangedEvent);
+			//Thread.sleep(2000);
+			soundPlayerController.onGameModelEvent(player2AttackActionEvent);
 			Thread.sleep(2000);
+			
 			soundPlayerController.stopAllSounds();
-			Thread.sleep(1000);
 
 		} 
 		catch (InterruptedException e) {

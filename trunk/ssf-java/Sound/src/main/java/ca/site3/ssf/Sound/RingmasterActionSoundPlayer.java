@@ -11,8 +11,9 @@ class RingmasterActionSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
-	public int getNumPlays(IGameModelEvent gameModelEvent) {
-		return 1;
+	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
+		assert(globalSettings != null);
+		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
 	}
 	
 	/**
@@ -27,5 +28,9 @@ class RingmasterActionSoundPlayer extends SoundPlayer {
 		// TODO: Ringmaster action sounds...?
 		
 		return "";
+	}
+	
+	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
+		return false;
 	}
 }
