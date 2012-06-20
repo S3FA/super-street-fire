@@ -11,8 +11,9 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
-	public int getNumPlays(IGameModelEvent gameModelEvent) {
-		return 1;
+	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
+		assert(globalSettings != null);
+		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
 	}
 	
 	// Handle the sounds based on round ending
@@ -44,5 +45,9 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		}
 		
 		return audioFilepath;
+	}
+	
+	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
+		return false;
 	}
 }

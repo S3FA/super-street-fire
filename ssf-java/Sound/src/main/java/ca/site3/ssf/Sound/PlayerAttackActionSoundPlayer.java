@@ -11,8 +11,13 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		super(resourcePath, configFile);
 	}
 	
-	public int getNumPlays(IGameModelEvent gameModelEvent) {
-		return 1;
+	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
+		assert(globalSettings != null);
+		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.PLAYER_ATTACK_ACTION) {
+			return null;
+		}
+		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
+		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.getPlayerPan(event.getPlayerNum()), 1);
 	}
 	
 	/**
@@ -131,5 +136,9 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		}
 		
 		return audioFilepath;
+	}
+	
+	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
+		return false;
 	}
 }

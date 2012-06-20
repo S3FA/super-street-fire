@@ -70,4 +70,25 @@ abstract class SoundPlayer implements ISoundPlayer {
 		return result;
 	}
 	
+	public void execute(SoundPlayerController controller, IGameModelEvent gameModelEvent) {
+		String resourceFileStr = this.getAudioResourcePath(gameModelEvent);
+
+		PlaybackHandler handler = null;
+		
+		AudioSettings globalSettings  = controller.getAudioSettings();
+		assert(globalSettings != null);
+		PlaybackSettings playbackSettings = this.getPlaybackSettings(globalSettings, gameModelEvent);
+		if (playbackSettings == null) {
+			return;
+		}
+		
+		handler = new PlaybackHandler(controller, resourceFileStr, playbackSettings);
+		
+		if (this.isBackgroundSoundPlayer(gameModelEvent)) {
+			controller.addAndPlayBackgroundHandler(handler);
+		}
+		else {
+			controller.addAndPlayForegroundHandler(handler);
+		}
+	}
 }
