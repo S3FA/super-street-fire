@@ -55,6 +55,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 	private JButton loadGestureEngineButton;
 	private JButton saveGestureEngineButton;
 	private JButton clearGestureEngineButton;
+	private JLabel loadedEngineLabel;
 	
 	private LoggerPanel trainingFileListPanel;
 	private LoggerPanel loggingPanel;
@@ -153,6 +154,8 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.saveGestureEngineButton.addActionListener(this);
 		this.clearGestureEngineButton = new JButton("Clear Engine");
 		this.clearGestureEngineButton.addActionListener(this);
+		this.loadedEngineLabel = new JLabel("");
+		this.loadedEngineLabel.setForeground(Color.black);
 		
 		JPanel engineLoadSavePanel = new JPanel();
 		engineLoadSavePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -162,6 +165,13 @@ class TrainingPanel extends JPanel implements ActionListener {
 		engineLoadSavePanel.add(this.clearGestureEngineButton);
 		formLayoutHelper.addLastField(engineLoadSavePanel, wrapperPanel);
 		
+		JPanel loadedEnginePanel = new JPanel();
+		loadedEnginePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		JLabel loadedEngineTempLbl = new JLabel("Loaded Engine:");
+		loadedEngineTempLbl.setForeground(Color.black);
+		loadedEnginePanel.add(loadedEngineTempLbl);
+		loadedEnginePanel.add(this.loadedEngineLabel);
+		formLayoutHelper.addLastField(loadedEnginePanel, wrapperPanel);
 
 		JPanel centerPanel = new JPanel();
 		centerPanel.setLayout(new BorderLayout());
@@ -271,6 +281,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 				this.loggingPanel.appendLogTextLine("Gesture recognizer engine loaded successfully!");
 				this.saveGestureEngineButton.setEnabled(false);
 				this.untrainGestureButton.setEnabled(true);
+				this.loadedEngineLabel.setText(selectedFile.getAbsolutePath());
 			}
 			else {
 				this.loggingPanel.appendLogTextLine("Failed to load gesture recognizer engine file, bad file format: " + selectedFile.getAbsolutePath());
