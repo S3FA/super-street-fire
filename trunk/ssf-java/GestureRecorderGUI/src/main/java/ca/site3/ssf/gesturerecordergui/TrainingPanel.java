@@ -174,7 +174,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		
 		this.trainFilesButton.setEnabled(false);
 		this.untrainGestureButton.setEnabled(false);
-		this.saveGestureEngineButton.setEnabled(false);
+		this.saveGestureEngineButton.setEnabled(true);
 	}
 	
 	// Handles button events

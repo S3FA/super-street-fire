@@ -16,38 +16,40 @@ public enum GestureType {
 	// TODO: Maximum/Full attack fierceness threshold (where anything at or above this counts as the
 	// fastest and strongest possible version of the attack)
 	
-	LEFT_BLOCK(2, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, false),
-	RIGHT_BLOCK(2, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, false, true),
-	TWO_HANDED_BLOCK(2, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, true),
+	LEFT_BLOCK(3, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, false),
+	RIGHT_BLOCK(3, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, false, true),
+	TWO_HANDED_BLOCK(3, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, true),
 	
-	LEFT_JAB(4, PlayerActionType.JAB_ATTACK, GestureGenre.BASIC, 5600, 8, true, false),
-	LEFT_HOOK(4, PlayerActionType.HOOK_ATTACK, GestureGenre.BASIC, 8000, 10, true, false),
-	LEFT_UPPERCUT(4, PlayerActionType.UPPERCUT_ATTACK, GestureGenre.BASIC, 11000, 10, true, false),
-	LEFT_CHOP(4, PlayerActionType.CHOP_ATTACK, GestureGenre.BASIC, 7000, 10, true, false),
-	RIGHT_JAB(4, PlayerActionType.JAB_ATTACK, GestureGenre.BASIC, 5600, 8, false, true),
-	RIGHT_HOOK(4, PlayerActionType.HOOK_ATTACK, GestureGenre.BASIC, 8000, 10, false, true),
-	RIGHT_UPPERCUT(4, PlayerActionType.UPPERCUT_ATTACK, GestureGenre.BASIC, 11000, 10, false, true),
-	RIGHT_CHOP(4, PlayerActionType.CHOP_ATTACK, GestureGenre.BASIC, 7000, 10, false, true),
+	LEFT_JAB(5, PlayerActionType.JAB_ATTACK, GestureGenre.BASIC, 5600, 8, true, false),
+	LEFT_HOOK(5, PlayerActionType.HOOK_ATTACK, GestureGenre.BASIC, 8000, 10, true, false),
+	LEFT_UPPERCUT(5, PlayerActionType.UPPERCUT_ATTACK, GestureGenre.BASIC, 11000, 10, true, false),
+	LEFT_CHOP(5, PlayerActionType.CHOP_ATTACK, GestureGenre.BASIC, 7000, 10, true, false),
+	RIGHT_JAB(5, PlayerActionType.JAB_ATTACK, GestureGenre.BASIC, 5600, 8, false, true),
+	RIGHT_HOOK(5, PlayerActionType.HOOK_ATTACK, GestureGenre.BASIC, 8000, 10, false, true),
+	RIGHT_UPPERCUT(5, PlayerActionType.UPPERCUT_ATTACK, GestureGenre.BASIC, 11000, 10, false, true),
+	RIGHT_CHOP(5, PlayerActionType.CHOP_ATTACK, GestureGenre.BASIC, 7000, 10, false, true),
 	
-	HADOUKEN(5, PlayerActionType.HADOUKEN_ATTACK, GestureGenre.SPECIAL, 7000, 10, true, true),
-	LEFT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 19000, 21, true, false),
-	RIGHT_SHORYUKEN(4, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 19000, 21, false, true),
-	SONIC_BOOM(5, PlayerActionType.SONIC_BOOM_ATTACK, GestureGenre.SPECIAL, 8000, 15, true, true),
-	DOUBLE_LARIAT(5, PlayerActionType.DOUBLE_LARIAT_ATTACK, GestureGenre.SPECIAL, 6200, 35, true, true),
-	QUADRUPLE_LARIAT(5, PlayerActionType.QUADRUPLE_LARIAT_ATTACK, GestureGenre.SPECIAL, 6200, 55, true, true),
-	SUMO_HEADBUTT(5, PlayerActionType.SUMO_HEADBUTT_ATTACK, GestureGenre.SPECIAL, 7000, 12, true, true),
-	LEFT_ONE_HUNDRED_HAND_SLAP(4, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, false),
-	RIGHT_ONE_HUNDRED_HAND_SLAP(4, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, false, true),
-	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(5, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, true),
-	PSYCHO_CRUSHER(5, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 6500, 35, true, true),
+	HADOUKEN(7, PlayerActionType.HADOUKEN_ATTACK, GestureGenre.SPECIAL, 7000, 10, true, true),
+	LEFT_SHORYUKEN(5, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 19000, 21, true, false),
+	RIGHT_SHORYUKEN(5, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 19000, 21, false, true),
+	SONIC_BOOM(7, PlayerActionType.SONIC_BOOM_ATTACK, GestureGenre.SPECIAL, 8000, 15, true, true),
+	DOUBLE_LARIAT(7, PlayerActionType.DOUBLE_LARIAT_ATTACK, GestureGenre.SPECIAL, 6200, 40, true, true),
+	//This gets confused with the double lariat way too easily
+	//QUADRUPLE_LARIAT(6, PlayerActionType.QUADRUPLE_LARIAT_ATTACK, GestureGenre.SPECIAL, 6200, 73, true, true),
+	SUMO_HEADBUTT(7, PlayerActionType.SUMO_HEADBUTT_ATTACK, GestureGenre.SPECIAL, 7000, 12, true, true),
+	LEFT_ONE_HUNDRED_HAND_SLAP(5, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, false),
+	RIGHT_ONE_HUNDRED_HAND_SLAP(5, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, false, true),
+	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(7, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, true),
+	PSYCHO_CRUSHER(7, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 6500, 35, true, true),
 	
-	YMCA(5, PlayerActionType.YMCA_ATTACK, GestureGenre.EASTER_EGG, 10000, 56, true, true),
-	NYAN_CAT(5, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 6500, 30, true, true),
-	DISCO_STU(5, PlayerActionType.DISCO_STU_ATTACK, GestureGenre.EASTER_EGG, 10000, 14, true, true),
-	ARM_WINDMILL(5, PlayerActionType.ARM_WINDMILL_ATTACK, GestureGenre.EASTER_EGG, 18000, 35, true, true),
-	SUCK_IT(5, PlayerActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 7600, 10, true, true),
-	LEFT_VAFANAPOLI_ATTACK(4, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 3500, 9, true, false),
-	RIGHT_VAFANAPOLI_ATTACK(4, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 3500, 9, false, true);
+	YMCA(7, PlayerActionType.YMCA_ATTACK, GestureGenre.EASTER_EGG, 10000, 56, true, true),
+	NYAN_CAT(7, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 6500, 30, true, true),
+	// Disco Stu interferes with everything... ugh
+	//DISCO_STU(7, PlayerActionType.DISCO_STU_ATTACK, GestureGenre.EASTER_EGG, 10000, 14, true, true),
+	ARM_WINDMILL(7, PlayerActionType.ARM_WINDMILL_ATTACK, GestureGenre.EASTER_EGG, 18000, 35, true, true),
+	SUCK_IT(7, PlayerActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 7600, 10, true, true),
+	LEFT_VAFANAPOLI_ATTACK(5, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5000, 9, true, false),
+	RIGHT_VAFANAPOLI_ATTACK(5, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5000, 9, false, true);
 	
 	final private PlayerActionType actionFactoryType; // The corresponding gamemodel factory type for when
 													  // it comes time to build the gesture for the gamemodel
