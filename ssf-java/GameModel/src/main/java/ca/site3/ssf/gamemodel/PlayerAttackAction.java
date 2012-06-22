@@ -129,6 +129,30 @@ public class PlayerAttackAction extends Action {
 		return this.type;
 	}
 	
+	boolean hasLeftHandedAttack() {
+		for (ArrayList<FireEmitterSimulator> simWave : this.wavesOfOrderedFireSims) {
+			for (FireEmitterSimulator sim : simWave) {
+				ArrayList<FireEmitter> emitters = this.fireEmitterModel.getPlayerLeftEmitters(this.attacker.getPlayerNumber());
+				if (emitters.contains(sim.getEmitter())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	boolean hasRightHandedAttack() {
+		for (ArrayList<FireEmitterSimulator> simWave : this.wavesOfOrderedFireSims) {
+			for (FireEmitterSimulator sim : simWave) {
+				ArrayList<FireEmitter> emitters = this.fireEmitterModel.getPlayerRightEmitters(this.attacker.getPlayerNumber());
+				if (emitters.contains(sim.getEmitter())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	boolean tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
