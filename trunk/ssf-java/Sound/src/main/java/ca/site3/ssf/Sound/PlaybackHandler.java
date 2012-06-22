@@ -56,6 +56,8 @@ class PlaybackHandler implements LineListener {
 		
 		// Create an audio input stream for the file
 		try {
+			/*
+			// This doesn't work properly on a mac...
 			AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(audioFile);
 			AudioFormat format = fileFormat.getFormat();
 			
@@ -63,7 +65,8 @@ class PlaybackHandler implements LineListener {
 			this.audioInputStream = AudioSystem.getAudioInputStream(
 					new AudioFormat(format.getSampleRate(), format.getSampleSizeInBits(), 2, false, format.isBigEndian()),
 					AudioSystem.getAudioInputStream(audioFile));
-			
+			*/
+			this.audioInputStream = AudioSystem.getAudioInputStream(audioFile);
 		} catch (UnsupportedAudioFileException e1) {
 			logger.warn("Failed to get a supported audio input stream.", e1);
 			return;

@@ -55,15 +55,25 @@ public abstract class Action {
 			
 			case ATTACK_FLAME: {
 				// An attack flame will cancel out any blocks being made by the player
-				// making the attack
+				// making the attack on the side(s) of the attack
 				Iterator<Action> iter = activeActions.iterator();
 				while (iter.hasNext()) {
 					Action action = iter.next();
 					if (action.getActionFlameType() == FlameType.BLOCK_FLAME &&
 						action.getContributorEntity() == actionToMerge.getContributorEntity()) {
 						
-						action.kill();
-						iter.remove();
+						if (((PlayerAttackAction)actionToMerge).hasLeftHandedAttack()) {
+							// Remove the left handed part of the block...
+							((PlayerBlockAction)action).removeLeftHandedBlocks();
+						}
+						if (((PlayerAttackAction)actionToMerge).hasRightHandedAttack()) {
+							// Remove the right handed part of the block...
+							((PlayerBlockAction)action).removeRightHandedBlocks();
+						}
+						
+						if (action.isFinished()) {
+							iter.remove();
+						}
 					}
 				}
 				activeActions.add(actionToMerge);

@@ -135,7 +135,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.trainFilesButton = new JButton("Train!");
 		this.trainFilesButton.addActionListener(this);
 		
-		this.untrainGestureButton = new JButton("Untrain Selected Gesture(s)");
+		this.untrainGestureButton = new JButton("Untrain");
 		this.untrainGestureButton.addActionListener(this);
 		
 		// Allow the user to edit the file list

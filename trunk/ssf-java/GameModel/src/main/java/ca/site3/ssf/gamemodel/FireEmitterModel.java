@@ -134,9 +134,30 @@ class FireEmitterModel {
 		return result;
 	}
 	
+	ArrayList<FireEmitter> getPlayerLeftEmitters(int playerNum) {
+		switch (playerNum) {
+		case 1:
+			return this.leftRailEmitters;
+		case 2:
+			return this.rightRailEmitters;
+		default:
+			assert(false);
+			return null;
+		}
+	}
+	ArrayList<FireEmitter> getPlayerRightEmitters(int playerNum) {
+		switch (playerNum) {
+		case 1:
+			return this.rightRailEmitters;
+		case 2:
+			return this.leftRailEmitters;
+		default:
+			assert(false);
+			return null;
+		}
+	}
 	
 	FireEmitterIterator getPlayerLeftHandStartEmitterIter(int playerNum) {
-		assert(playerNum == 1 || playerNum == 2);
 		switch (playerNum) {
 			case 1:
 				return new FireEmitterIterator(this.leftRailEmitters, 0, false, false);
@@ -148,7 +169,6 @@ class FireEmitterModel {
 		}
 	}
 	FireEmitterIterator getPlayerRightHandStartEmitterIter(int playerNum) {
-		assert(playerNum == 1 || playerNum == 2);
 		switch (playerNum) {
 			case 1:
 				return new FireEmitterIterator(this.rightRailEmitters, 0, false, false);

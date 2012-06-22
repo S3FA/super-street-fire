@@ -45,10 +45,20 @@ class FireEmitterSimulator {
 		this.blockAttackCancellationOccurredOnLastLerp = false;
 	}
 	
-	void merge(FireEmitterSimulator simToMerge) {
-		assert(this.waveIndex == simToMerge.waveIndex);
-		assert(this.simulatorIndex == simToMerge.simulatorIndex);
+	FireEmitter getEmitter() {
+		return this.emitter;
+	}
+	
+	boolean merge(FireEmitterSimulator simToMerge) {
+
+		if (this.waveIndex != simToMerge.waveIndex ||
+			this.emitter != simToMerge.emitter ||
+			this.simulatorIndex != simToMerge.simulatorIndex) {
+			return false;
+		}
+		
 		this.intensityLerps.addAll(simToMerge.intensityLerps);
+		return true;
 	}
 	
 	/**
