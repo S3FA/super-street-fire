@@ -31,7 +31,7 @@ class RecognizerManager {
 	
 	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E1;
 	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 1E2;
-	private final static double BASIC_EASTEREGG_PROB_COMPARISON_THRESHOLD   = 1E3;
+	private final static double BASIC_EASTEREGG_PROB_COMPARISON_THRESHOLD   = 1E2;
 	
 	private static Logger logger = LoggerFactory.getLogger(RecognizerManager.class);
 	
