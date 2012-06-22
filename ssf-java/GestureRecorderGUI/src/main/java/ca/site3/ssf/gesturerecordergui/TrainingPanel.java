@@ -63,10 +63,10 @@ class TrainingPanel extends JPanel implements ActionListener {
 	private JButton untrainGestureButton;
 	@SuppressWarnings("rawtypes")
 
-	private DefaultListModel<GestureType> gestureListModel = new DefaultListModel<GestureType>();
-	private DefaultListModel<GestureType> toTrainListModel = new DefaultListModel<GestureType>();
-	private JList<GestureType> gestureList = new JList<GestureType>(gestureListModel);
-	private JList<GestureType> toTrainList = new JList<GestureType>(toTrainListModel);
+	private DefaultListModel gestureListModel = new DefaultListModel();
+	private DefaultListModel toTrainListModel = new DefaultListModel();
+	private JList gestureList = new JList(gestureListModel);
+	private JList toTrainList = new JList(toTrainListModel);
 	private JButton toTrainListButton;
 	private JButton fromTrainListButton;
 	
@@ -135,7 +135,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.trainFilesButton = new JButton("Train!");
 		this.trainFilesButton.addActionListener(this);
 		
-		this.untrainGestureButton = new JButton("Untrain Selected Gesture");
+		this.untrainGestureButton = new JButton("Untrain Selected Gesture(s)");
 		this.untrainGestureButton.addActionListener(this);
 		
 		// Allow the user to edit the file list
@@ -198,20 +198,6 @@ class TrainingPanel extends JPanel implements ActionListener {
 		trainingListsPanel.add(toFromButtonsPanel);
 		trainingListsPanel.add(trainGesturesListPanel);
 		formLayoutHelper.addLastField(trainingListsPanel, wrapperPanel);
-		
-		/*
-		JLabel gestureTypeLabel = new JLabel("Select Gesture: ");
-		gestureTypeLabel.setForeground(Color.black);
-
-		JPanel selectGestureControlsPanel = new JPanel();
-		selectGestureControlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-		selectGestureControlsPanel.add(gestureTypeLabel);
-		selectGestureControlsPanel.add(this.gestureType);
-		selectGestureControlsPanel.add(this.selectFileButton);
-		selectGestureControlsPanel.add(this.trainFilesButton);
-		selectGestureControlsPanel.add(this.untrainGestureButton);
-		formLayoutHelper.addLastField(selectGestureControlsPanel, wrapperPanel);
-		*/
 		
 		searchDirText = new JTextField(50);
 		searchDirText.setText(trainingLoadPath);
@@ -289,7 +275,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 			// Get a list of the gestures that need to be trained...
 			for (int i = 0; i < this.toTrainListModel.size(); i++) {
 				
-				GestureType gesture = this.toTrainListModel.get(i);
+				GestureType gesture = (GestureType)this.toTrainListModel.get(i);
 				assert(gesture != null);
 				List<File> gestureFiles = this.findTrainingFilesInGestureDir(gesture);
 				if (gestureFiles.isEmpty()) {
@@ -305,7 +291,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 
 			for (int i = 0; i < this.toTrainListModel.size(); i++) {
 				
-				GestureType gesture = this.toTrainListModel.get(i);
+				GestureType gesture = (GestureType)this.toTrainListModel.get(i);
 				this.gestureRecognizer.untrainAndClearGesture(gesture);
 				this.loggingPanel.appendLogTextLine("Gesture " + gesture.toString() + " is now cleared / untrained.");
 			}
@@ -327,12 +313,10 @@ class TrainingPanel extends JPanel implements ActionListener {
 			this.gestureRecognizer.clearEngine();
 		}
 		else if (e.getSource() == this.toTrainListButton) {
-			List<GestureType> selectedGestures = this.gestureList.getSelectedValuesList();
-			for (GestureType gesture : selectedGestures) {
+			Object[] selectedGestures = this.gestureList.getSelectedValues();
+			for (Object obj : selectedGestures) {
+				GestureType gesture = (GestureType)obj;
 				gestureListModel.removeElement(gesture);
-			}
-
-			for (GestureType gesture : selectedGestures) {
 				toTrainListModel.addElement(gesture);
 			}
 			
@@ -346,12 +330,10 @@ class TrainingPanel extends JPanel implements ActionListener {
 			}
 		}
 		else if (e.getSource() == this.fromTrainListButton) {
-			List<GestureType> selectedGestures = this.toTrainList.getSelectedValuesList();
-			for (GestureType gesture : selectedGestures) {
+			Object[] selectedGestures = this.toTrainList.getSelectedValues();
+			for (Object obj : selectedGestures) {
+				GestureType gesture = (GestureType)obj;
 				toTrainListModel.removeElement(gesture);
-			}
-			
-			for (GestureType gesture : selectedGestures) {
 				gestureListModel.addElement(gesture);
 			}
 			
@@ -418,13 +400,20 @@ class TrainingPanel extends JPanel implements ActionListener {
             userPreferences.put(TRAINING_LOAD_DIALOG_PATH_KEY, this.searchDirText.getText());
         }
 
-		if (this.selectedBaseGestureDir.canRead()) {
-			this.trainFilesButton.setEnabled(false);
+		if (this.selectedBaseGestureDir.isDirectory()) {
+			if (this.toTrainListModel.isEmpty()) {
+				this.trainFilesButton.setEnabled(false);
+				this.untrainGestureButton.setEnabled(false);
+			}
+			else {
+				this.trainFilesButton.setEnabled(true);
+				this.untrainGestureButton.setEnabled(true);
+			}
 		}
 		else {
-			this.trainFilesButton.setEnabled(true);
+			this.trainFilesButton.setEnabled(false);
+			this.untrainGestureButton.setEnabled(false);
 		}
-		
 	}
 	
 	private void handleEngineLoadDialog() {

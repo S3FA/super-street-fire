@@ -28,9 +28,10 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
 class RecognizerManager {
 	
 	private final static double MINIMUM_PROBABILITY_THRESHOLD               = 1E-300;
+	
+	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E1;
 	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 1E2;
-	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 1E2;
-	private final static double BASIC_EASTEREGG_PROB_COMPARISON_THRESHOLD   = 1E4;
+	private final static double BASIC_EASTEREGG_PROB_COMPARISON_THRESHOLD   = 1E3;
 	
 	private static Logger logger = LoggerFactory.getLogger(RecognizerManager.class);
 	
