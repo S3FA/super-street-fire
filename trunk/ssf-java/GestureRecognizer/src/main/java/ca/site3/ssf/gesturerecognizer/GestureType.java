@@ -19,9 +19,9 @@ public enum GestureType {
 	// TODO: Maximum/Full attack fierceness threshold (where anything at or above this counts as the
 	// fastest and strongest possible version of the attack)
 	
-	LEFT_BLOCK(3, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, false, Arrays.asList("left_blocks")),
-	RIGHT_BLOCK(3, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, false, true, Arrays.asList("right_blocks")),
-	TWO_HANDED_BLOCK(3, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, true, Arrays.asList("two_handed_blocks")),
+	LEFT_BLOCK(5, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, false, Arrays.asList("left_blocks")),
+	RIGHT_BLOCK(5, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, false, true, Arrays.asList("right_blocks")),
+	TWO_HANDED_BLOCK(8, PlayerActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, true, Arrays.asList("two_handed_blocks")),
 	
 	LEFT_JAB(5, PlayerActionType.JAB_ATTACK, GestureGenre.BASIC, 5600, 8, true, false, Arrays.asList("left_jabs")),
 	LEFT_HOOK(5, PlayerActionType.HOOK_ATTACK, GestureGenre.BASIC, 8000, 10, true, false, Arrays.asList("left_hooks")),
@@ -32,27 +32,27 @@ public enum GestureType {
 	RIGHT_UPPERCUT(5, PlayerActionType.UPPERCUT_ATTACK, GestureGenre.BASIC, 11000, 10, false, true, Arrays.asList("right_uppercuts")),
 	RIGHT_CHOP(5, PlayerActionType.CHOP_ATTACK, GestureGenre.BASIC, 7000, 10, false, true, Arrays.asList("right_chops")),
 	
-	HADOUKEN(7, PlayerActionType.HADOUKEN_ATTACK, GestureGenre.SPECIAL, 7000, 10, true, true, Arrays.asList("hadoukens")),
+	HADOUKEN(8, PlayerActionType.HADOUKEN_ATTACK, GestureGenre.SPECIAL, 7000, 10, true, true, Arrays.asList("hadoukens")),
 	LEFT_SHORYUKEN(5, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 19000, 21, true, false, Arrays.asList("left_shoryukens")),
 	RIGHT_SHORYUKEN(5, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 19000, 21, false, true, Arrays.asList("right_shoryukens")),
-	SONIC_BOOM(7, PlayerActionType.SONIC_BOOM_ATTACK, GestureGenre.SPECIAL, 8000, 15, true, true, Arrays.asList("sonic_booms")),
-	DOUBLE_LARIAT(7, PlayerActionType.DOUBLE_LARIAT_ATTACK, GestureGenre.SPECIAL, 6200, 40, true, true, Arrays.asList("double_lariats")),
+	SONIC_BOOM(8, PlayerActionType.SONIC_BOOM_ATTACK, GestureGenre.SPECIAL, 8000, 15, true, true, Arrays.asList("sonic_booms")),
+	DOUBLE_LARIAT(8, PlayerActionType.DOUBLE_LARIAT_ATTACK, GestureGenre.SPECIAL, 6200, 40, true, true, Arrays.asList("double_lariats")),
 	//This gets confused with the double lariat way too easily
 	//QUADRUPLE_LARIAT(6, PlayerActionType.QUADRUPLE_LARIAT_ATTACK, GestureGenre.SPECIAL, 6200, 73, true, true, Arrays.asList("quadruple_lariats")),
-	SUMO_HEADBUTT(7, PlayerActionType.SUMO_HEADBUTT_ATTACK, GestureGenre.SPECIAL, 7000, 12, true, true, Arrays.asList("sumo_headbutts")),
+	SUMO_HEADBUTT(8, PlayerActionType.SUMO_HEADBUTT_ATTACK, GestureGenre.SPECIAL, 7000, 12, true, true, Arrays.asList("sumo_headbutts")),
 	LEFT_ONE_HUNDRED_HAND_SLAP(5, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, false, Arrays.asList("left_100_hand_slaps")),
 	RIGHT_ONE_HUNDRED_HAND_SLAP(5, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, false, true, Arrays.asList("right_100_hand_slaps")),
-	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(7, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, true, Arrays.asList("two_handed_100_hand_slaps")),
-	PSYCHO_CRUSHER(7, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 6500, 35, true, true, Arrays.asList("psycho_crushers")),
+	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(8, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, true, Arrays.asList("two_handed_100_hand_slaps")),
+	PSYCHO_CRUSHER(8, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 8000, 38, true, true, Arrays.asList("psycho_crushers")),
 	
-	YMCA(7, PlayerActionType.YMCA_ATTACK, GestureGenre.EASTER_EGG, 10000, 56, true, true, Arrays.asList("ymcas")),
-	NYAN_CAT(7, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 6500, 30, true, true, Arrays.asList("nyan_cats")),
+	YMCA(8, PlayerActionType.YMCA_ATTACK, GestureGenre.EASTER_EGG, 10000, 56, true, true, Arrays.asList("ymcas")),
+	NYAN_CAT(8, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 6500, 30, true, true, Arrays.asList("nyan_cats")),
 	// Disco Stu interferes with everything... ugh
 	//DISCO_STU(7, PlayerActionType.DISCO_STU_ATTACK, GestureGenre.EASTER_EGG, 10000, 14, true, true, Arrays.asList("disco_stus")),
-	ARM_WINDMILL(7, PlayerActionType.ARM_WINDMILL_ATTACK, GestureGenre.EASTER_EGG, 18000, 35, true, true, Arrays.asList("arm_windmills")),
-	SUCK_IT(7, PlayerActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 7600, 10, true, true, Arrays.asList("suck_its")),
-	LEFT_VAFANAPOLI_ATTACK(5, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5000, 9, true, false, Arrays.asList("left_vafanapoli")),
-	RIGHT_VAFANAPOLI_ATTACK(5, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5000, 9, false, true, Arrays.asList("right_vafanapoli"));
+	ARM_WINDMILL(8, PlayerActionType.ARM_WINDMILL_ATTACK, GestureGenre.EASTER_EGG, 18000, 35, true, true, Arrays.asList("arm_windmills")),
+	SUCK_IT(8, PlayerActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 7600, 10, true, true, Arrays.asList("suck_its")),
+	LEFT_VAFANAPOLI_ATTACK(5, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, true, false, Arrays.asList("left_vafanapoli")),
+	RIGHT_VAFANAPOLI_ATTACK(5, PlayerActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, false, true, Arrays.asList("right_vafanapoli"));
 	
 	final private PlayerActionType actionFactoryType; // The corresponding gamemodel factory type for when
 													  // it comes time to build the gesture for the gamemodel
