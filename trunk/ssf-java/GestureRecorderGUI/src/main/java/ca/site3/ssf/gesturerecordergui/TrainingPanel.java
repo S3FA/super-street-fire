@@ -303,8 +303,9 @@ class TrainingPanel extends JPanel implements ActionListener {
 		}
 		else if (e.getSource() == this.untrainGestureButton) {
 
-			List<GestureType> selectedGestures = this.toTrainList.getSelectedValuesList();
-			for (GestureType gesture : selectedGestures) {
+			for (int i = 0; i < this.toTrainListModel.size(); i++) {
+				
+				GestureType gesture = this.toTrainListModel.get(i);
 				this.gestureRecognizer.untrainAndClearGesture(gesture);
 				this.loggingPanel.appendLogTextLine("Gesture " + gesture.toString() + " is now cleared / untrained.");
 			}
