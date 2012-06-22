@@ -120,6 +120,9 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		}
 		catch (NumberFormatException e) {
 		}
+		catch (IllegalArgumentException e) {
+			this.gestureName.setSelectedIndex(0);
+		}
 		this.gestureName.addActionListener(this);
 		
 		this.dirChooser = new JFileChooser();
