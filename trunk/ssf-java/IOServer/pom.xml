@@ -10,6 +10,8 @@
   <name>I/O Server</name>
   <description>Responsible for sending/receiving information which is relayed from/to the Game Module and where events are further broadcasted via the various protocols/packages used for communicating with remote peripherals and GUIs.</description>
   <dependencies>
+  	
+  	<!-- Logging -->
   	<dependency>
 	  <groupId>org.slf4j</groupId>
 	  <artifactId>slf4j-api</artifactId>
@@ -25,6 +27,15 @@
   		<artifactId>jcommander</artifactId>
   		<version>1.20</version>
   	</dependency>
+  	
+  	<!-- Serial communication -->
+  	<dependency>
+		<groupId>org.rxtx</groupId>
+		<artifactId>rxtx</artifactId>
+		<version>2.1.7</version>
+	</dependency>
+  	
+  	<!-- Other SSF modules -->
   	<dependency>
   		<groupId>ca.site3.ssf</groupId>
   		<artifactId>GameModel</artifactId>

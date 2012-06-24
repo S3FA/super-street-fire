@@ -1,6 +1,7 @@
 package ca.site3.ssf.ioserver;
 
 import java.io.File;
+import java.net.InetAddress;
 
 import com.beust.jcommander.Parameter;
 
@@ -42,11 +43,23 @@ public class CommandLineArgs {
 	@Parameter(names={"-guiPort","-g"}, description="Port to listen on for GUI connections")
 	public Integer guiPort = 31337;
 	
+	@Parameter(names={"-serialDevice","-s"}, description="Serial device used to send data to flamethrowers, timer, etc.")
+	public String serialDevice = System.getProperty("os.name").toLowerCase().contains("win") ? "COM11" : "/dev/tty.xbee";
+
 	@Parameter(names={"-gloveInterfaceIP"}, description="The IP Network Interface of the IOServer for listening to glove data")
 	public String gloveInterfaceIP = "192.168.100.2";
 	
 	@Parameter(names={"-gestureEngine", "-ge"}, description="File path to the gesture recognition engine used for recongnizing game gestures")
 	public String gestureEngineFilepath = new File(System.getProperty("user.dir"), "../GestureRecorderGUI/Data/gesture_recognizer_engine.eng").toString();
+	
+	
+	public CommandLineArgs() {
+		try {
+			gloveInterfaceIP = InetAddress.getLocalHost().toString().substring(InetAddress.getLocalHost().toString().indexOf("/")+1);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} 
+	}
 	
 	@Override
 	public String toString() {
@@ -63,6 +76,8 @@ public class CommandLineArgs {
 		buf.append("\nPeripheral port: "+ devicePort);
 		buf.append("\nHeartbeat port: "+ heartbeatPort);
 		buf.append("\nGUI port: "+ guiPort);
+		buf.append("\nSerial device: "+ serialDevice);
+		buf.append("\nI/O Server IP: "+ gloveInterfaceIP);
 		
 		return buf.toString();
 	}
