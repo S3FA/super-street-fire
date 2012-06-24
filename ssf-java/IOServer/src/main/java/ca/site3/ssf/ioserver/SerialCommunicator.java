@@ -236,10 +236,10 @@ public class SerialCommunicator implements Runnable {
 	 * @param message
 	 */
 	private void enqueueMessage(byte[] message) {
-System.out.println("enqueuing message...");
+//System.out.println("enqueuing message...");
 		if (messageQueue.offer(message) == false) {
 			log.warn("No room on queue for serial message");
 		}
-System.out.println("\t...done");
+//System.out.println("\t...done");
 	}
 }
