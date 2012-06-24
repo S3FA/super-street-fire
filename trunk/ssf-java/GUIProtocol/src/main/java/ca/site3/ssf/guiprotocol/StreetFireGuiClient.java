@@ -36,6 +36,7 @@ import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.EventType;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.Builder;
@@ -76,6 +77,8 @@ public class StreetFireGuiClient {
 	private BlockingQueue<IGameModelEvent> eventQueue = new LinkedBlockingQueue<IGameModelEvent>();
 	/** monitors socket for incoming events from server and places them on eventQueue */
 	private ReceiveThread receiveThread;
+	
+	
 	
 	
 	public StreetFireGuiClient(InetAddress ioserver, int port) {
@@ -211,6 +214,10 @@ public class StreetFireGuiClient {
 	}
 	
 	
+	public void testSystem() throws IOException {
+		Builder b = Command.newBuilder().setType(CommandType.QUERY_SYSTEM_INFO);
+		submitCommand(b.build());
+	}
 	
 	/**
 	 * Sends the given command to the server.
@@ -278,9 +285,13 @@ public class StreetFireGuiClient {
 				try {
 					GameEvent event = GameEvent.parseDelimitedFrom(socket.getInputStream());
 					if (event != null) {
-						IGameModelEvent gameEvent = parseEvent(event);
-						if (gameEvent != null) {
-							eventQueue.add(gameEvent);
+						if (event.getType() == EventType.SYSTEM_INFO_REFRESH) {
+							
+						} else {
+							IGameModelEvent gameEvent = parseEvent(event);
+							if (gameEvent != null) {
+								eventQueue.add(gameEvent);
+							}
 						}
 					}
 				} catch (IOException ex) {

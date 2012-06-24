@@ -13,13 +13,11 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import org.junit.Test;
-
 public class TestSerialStuff {
 
 	SerialPort serialPort;
 	
-	@Test
+//	@Test
 	public void test() {
 		
 		initSerialStuff();
@@ -34,8 +32,11 @@ public class TestSerialStuff {
 		}
 		assertNotNull(ostream);
 		try {
-			ostream.write("Hadouken! Spinning Bird Kick!\n".getBytes());
-			ostream.flush();
+			for (int i=0; i<10000; i++) {
+				ostream.write("Hadouken! Spinning Bird Kick!\n".getBytes());
+				ostream.flush();
+			}
+			
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			fail(ex.getMessage());
@@ -121,5 +122,10 @@ public class TestSerialStuff {
 			
 			serialPort = null;
 		}
+	}
+	
+	public static void main(String[] args) {
+		TestSerialStuff tss = new TestSerialStuff();
+		tss.test();
 	}
 }

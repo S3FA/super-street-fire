@@ -105,6 +105,7 @@ public final class GuiCommand {
       NEXT_STATE(4, 4),
       TOUCH_EMITTER(5, 5),
       QUERY_GAME_INFO_REFRESH(6, 6),
+      QUERY_SYSTEM_INFO(7, 7),
       ;
       
       public static final int EXECUTE_GENERIC_ACTION_VALUE = 0;
@@ -114,6 +115,7 @@ public final class GuiCommand {
       public static final int NEXT_STATE_VALUE = 4;
       public static final int TOUCH_EMITTER_VALUE = 5;
       public static final int QUERY_GAME_INFO_REFRESH_VALUE = 6;
+      public static final int QUERY_SYSTEM_INFO_VALUE = 7;
       
       
       public final int getNumber() { return value; }
@@ -127,6 +129,7 @@ public final class GuiCommand {
           case 4: return NEXT_STATE;
           case 5: return TOUCH_EMITTER;
           case 6: return QUERY_GAME_INFO_REFRESH;
+          case 7: return QUERY_SYSTEM_INFO;
           default: return null;
         }
       }
@@ -157,7 +160,7 @@ public final class GuiCommand {
       }
       
       private static final CommandType[] VALUES = {
-        EXECUTE_GENERIC_ACTION, EXECUTE_PLAYER_ACTION, TOGGLE_PAUSE, KILL_GAME, NEXT_STATE, TOUCH_EMITTER, QUERY_GAME_INFO_REFRESH, 
+        EXECUTE_GENERIC_ACTION, EXECUTE_PLAYER_ACTION, TOGGLE_PAUSE, KILL_GAME, NEXT_STATE, TOUCH_EMITTER, QUERY_GAME_INFO_REFRESH, QUERY_SYSTEM_INFO, 
       };
       
       public static CommandType valueOf(
@@ -1570,7 +1573,7 @@ public final class GuiCommand {
   static {
     java.lang.String[] descriptorData = {
       "\n\021gui_command.proto\022\013guiprotocol\032\014common" +
-      ".proto\"\252\t\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
+      ".proto\"\301\t\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
       "otocol.Command.CommandType\0227\n\014playerActi" +
       "on\030\002 \001(\0162!.guiprotocol.Command.PlayerAct" +
       "ion\022+\n\006player\030\003 \001(\0162\033.guiprotocol.Comman" +
@@ -1582,25 +1585,26 @@ public final class GuiCommand {
       "\023\n\013dmgPerFlame\030\n \001(\002\022\022\n\nflameWidth\030\013 \001(\005" +
       "\022\031\n\021durationInSeconds\030\014 \001(\001\022\024\n\014accelerat" +
       "ion\030\r \001(\001\022)\n\tnextState\030\016 \001(\0162\026.guiprotoc" +
-      "ol.GameState\"\245\001\n\013CommandType\022\032\n\026EXECUTE_" +
+      "ol.GameState\"\274\001\n\013CommandType\022\032\n\026EXECUTE_" +
       "GENERIC_ACTION\020\000\022\031\n\025EXECUTE_PLAYER_ACTIO" +
       "N\020\001\022\020\n\014TOGGLE_PAUSE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\n" +
       "NEXT_STATE\020\004\022\021\n\rTOUCH_EMITTER\020\005\022\033\n\027QUERY" +
-      "_GAME_INFO_REFRESH\020\006\"\260\003\n\014PlayerAction\022\t\n" +
-      "\005BLOCK\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013HOOK_ATTACK\020" +
-      "\002\022\023\n\017UPPERCUT_ATTACK\020\003\022\017\n\013CHOP_ATTACK\020\004\022",
-      "\023\n\017HADOUKEN_ATTACK\020\005\022\025\n\021SONIC_BOOM_ATTAC" +
-      "K\020\006\022\024\n\020SHORYUKEN_ATTACK\020\007\022\030\n\024DOUBLE_LARI" +
-      "AT_ATTACK\020\010\022\033\n\027QUADRUPLE_LARIAT_ATTACK\020\t" +
-      "\022\030\n\024SUMO_HEADBUTT_ATTACK\020\n\022 \n\034ONE_HUNDRE" +
-      "D_HAND_SLAP_ATTACK\020\013\022\031\n\025PSYCHO_CRUSHER_A" +
-      "TTACK\020\014\022\017\n\013YMCA_ATTACK\020\r\022\023\n\017NYAN_CAT_ATT" +
-      "ACK\020\016\022\024\n\020DISCO_STU_ATTACK\020\017\022\027\n\023ARM_WINDM" +
-      "ILL_ATTACK\020\020\022\022\n\016SUCK_IT_ATTACK\020\021\022\025\n\021VAFA" +
-      "NAPOLI_ATTACK\020\022\"(\n\006Player\022\016\n\nRINGMASTER\020" +
-      "\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"@\n\017FireEmitterType\022\r\n\t",
-      "LEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RIN" +
-      "G\020\002B\032\n\030ca.site3.ssf.guiprotocol"
+      "_GAME_INFO_REFRESH\020\006\022\025\n\021QUERY_SYSTEM_INF" +
+      "O\020\007\"\260\003\n\014PlayerAction\022\t\n\005BLOCK\020\000\022\016\n\nJAB_A" +
+      "TTACK\020\001\022\017\n\013HOOK_ATTACK\020\002\022\023\n\017UPPERCUT_ATT",
+      "ACK\020\003\022\017\n\013CHOP_ATTACK\020\004\022\023\n\017HADOUKEN_ATTAC" +
+      "K\020\005\022\025\n\021SONIC_BOOM_ATTACK\020\006\022\024\n\020SHORYUKEN_" +
+      "ATTACK\020\007\022\030\n\024DOUBLE_LARIAT_ATTACK\020\010\022\033\n\027QU" +
+      "ADRUPLE_LARIAT_ATTACK\020\t\022\030\n\024SUMO_HEADBUTT" +
+      "_ATTACK\020\n\022 \n\034ONE_HUNDRED_HAND_SLAP_ATTAC" +
+      "K\020\013\022\031\n\025PSYCHO_CRUSHER_ATTACK\020\014\022\017\n\013YMCA_A" +
+      "TTACK\020\r\022\023\n\017NYAN_CAT_ATTACK\020\016\022\024\n\020DISCO_ST" +
+      "U_ATTACK\020\017\022\027\n\023ARM_WINDMILL_ATTACK\020\020\022\022\n\016S" +
+      "UCK_IT_ATTACK\020\021\022\025\n\021VAFANAPOLI_ATTACK\020\022\"(" +
+      "\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002",
+      "\"@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRI" +
+      "GHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030ca.site3.s" +
+      "sf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

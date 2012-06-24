@@ -37,6 +37,7 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JButton nextStateButton1 = null;
 	private JButton nextStateButton2 = null;
 	private JButton pauseButton      = null;
+	private JButton testButton      = null;
 	
 	private JButton executeP1ActionButton 			= null;
 	private JButton executeP2ActionButton 			= null;
@@ -83,6 +84,10 @@ class ControlPanel extends JPanel implements ActionListener {
 		this.pauseButton.addActionListener(this);
 		generalButtonPanel.add(this.pauseButton);
 		
+		this.testButton = new JButton("Test System");
+		this.testButton.addActionListener(this);
+		generalButtonPanel.add(this.testButton);
+		
 		this.add(generalButtonPanel);
 		
 		String[] playerActionStrs = new String[GestureType.values().length];
@@ -127,6 +132,8 @@ class ControlPanel extends JPanel implements ActionListener {
 			}
 			else if (event.getSource() == this.executeP2ActionButton) {
 				this.executePlayerAction(2);
+			} else if (event.getSource() == this.testButton) {
+				client.testSystem();
 			}
 		} catch (IOException ex) {
 			log.warn("Exception communicating with IOServer",ex);
