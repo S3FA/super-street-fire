@@ -26,15 +26,20 @@ public class SerialCommunicator implements Runnable {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private BufferedOutputStream serialOutStream;
-	private BufferedInputStream serialInStream;
+	private BufferedOutputStream out;
+	private BufferedInputStream in;
+	
+//	private OutputStream out;
+//	private InputStream in;
 	
 	private BlockingQueue<byte[]> messageQueue = new LinkedBlockingQueue<byte[]>();
 	
 	
 	public SerialCommunicator(InputStream serialIn, OutputStream serialOut) {
-		this.serialInStream = new BufferedInputStream(serialIn);
-		this.serialOutStream = new BufferedOutputStream(serialOut);
+		this.in = new BufferedInputStream(serialIn);
+		this.out = new BufferedOutputStream(serialOut);
+//		this.in = serialIn;
+//		this.out = serialOut;
 	}
 	
 		
@@ -42,12 +47,10 @@ public class SerialCommunicator implements Runnable {
 	public void run() {
 		while (true) {
 			try {
-//System.out.println("take...");
 				byte[] message = messageQueue.take();
-//System.out.println("...took");
-				serialOutStream.write(message);
-				serialOutStream.flush();
-//System.out.println("wrote and flushed: "+message);
+				this.out.write(message);
+				//this.out.flush();
+				log.debug("wrote message: {}",bytesToHex(message));
 			} catch (IOException ex) {
 				log.error("Error writing to serial device",ex);
 			} catch (InterruptedException ex) {
@@ -57,6 +60,18 @@ public class SerialCommunicator implements Runnable {
 	}
 
 	
+	public static String bytesToHex(byte[] bytes) {
+	    final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	    char[] hexChars = new char[bytes.length * 2];
+	    int v;
+	    for ( int j = 0; j < bytes.length; j++ ) {
+	        v = bytes[j] & 0xFF;
+	        hexChars[j * 2] = hexArray[v >>> 4];
+	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+	    }
+	    return new String(hexChars);
+	}
+	
 
 	/**
 	 * Send messages to the serial port to trigger the flame effect.
@@ -65,10 +80,10 @@ public class SerialCommunicator implements Runnable {
 	 * Each flame effect has 5 outputs: '1','2','3','4' for effect outputs (values from 0-100)
 	 * 									'A' for AC output of hot surface igniter (values 0 or 1)
 	 * 
-	 * These outputs are controlled by sending commands. One command per output means that we
-	 * need to send 4 commands per event to ensure each effect output is in the correct state.
+	 * These outputs are controlled by sending one command per output (multiple commands
+	 * can be in a message payload).
 	 * 
-	 * We get one of these events for each emitter every tick, even if there's no actual change.
+	 * Note: we get one of these events for each emitter every tick, even if there's no actual change.
 	 * 
 	 * 
 	 * @param event
@@ -120,19 +135,22 @@ public class SerialCommunicator implements Runnable {
 			values[0] = values[1] = values[2] = values[3] = 0;
 		}
 		
-		byte destNode = getHardwareIdFromEvent(event);
+		byte[] payload = new byte[9]; // 1 byte for dest node + 4*2 bytes command/values 
+		payload[0] = getHardwareIdFromEvent(event);
 		
 		for (int effectOutputIndex=0; effectOutputIndex < 4; effectOutputIndex++) {
-			byte[] payload = new byte[] { destNode, commands[effectOutputIndex], values[effectOutputIndex] };
-			byte checksum = getChecksum(payload);
-			byte[] message = new byte[] {	
-					(byte)0xAA, (byte)0xAA,	// framing bytes
-					(byte)3,				// payload length: dest node + command + value
-					payload[0],payload[1],payload[2],
-					checksum
-			};
-			enqueueMessage(message);
+			payload[effectOutputIndex*2 + 1] = commands[effectOutputIndex];
+			payload[effectOutputIndex*2 + 2] = values[effectOutputIndex];
 		}
+
+		byte[] message = new byte[payload.length + 3];
+		message[0] = message[1] = (byte) 0xAA; // framing bytes
+		message[2] = 9; // payload length
+		for (int i=0; i < payload.length; i++) {
+			message[i+3] = payload[i];
+		}
+		message[11] = getChecksum(payload);
+		enqueueMessage(message);
 	}
 	
 	
@@ -236,10 +254,8 @@ public class SerialCommunicator implements Runnable {
 	 * @param message
 	 */
 	private void enqueueMessage(byte[] message) {
-//System.out.println("enqueuing message...");
 		if (messageQueue.offer(message) == false) {
 			log.warn("No room on queue for serial message");
 		}
-//System.out.println("\t...done");
 	}
 }

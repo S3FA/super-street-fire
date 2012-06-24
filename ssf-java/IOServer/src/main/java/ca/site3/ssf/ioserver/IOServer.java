@@ -246,6 +246,15 @@ public class IOServer {
 	
 	public void stop() {
 		isStopped = true;
+		
+		/*
+		 *  give main thread time to clean up (this typically gets called on
+		 *  the AWT thread when the dev gui window is closing, which also
+		 *  triggers the application to exit). 
+		 */
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException ex) { ex.printStackTrace(); }
 	}
 	
 	
@@ -326,7 +335,6 @@ public class IOServer {
 			return;
 		}
 		
-		
 		// 57600 8N1 for now.. may need to expose these in command line args
 		int baudRate = 57600;
 		int databits = SerialPort.DATABITS_8;
@@ -335,7 +343,7 @@ public class IOServer {
 		
 		try {
 			serialPort.setSerialPortParams(baudRate, databits, stopbits, parity);
-			// serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+			serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
 		} catch (UnsupportedCommOperationException ex) {
 			log.error("Could not configure serial port", ex);
 		}
@@ -343,7 +351,10 @@ public class IOServer {
 	
 	private void closeSerialDevice() {
 		if (serialPort != null) {
+			log.info("Closing serial port");
 			try {
+				serialPort.getOutputStream().write("buh-bye\n".getBytes());
+				serialPort.getOutputStream().flush();
 				serialPort.getInputStream().close();
 				serialPort.getOutputStream().close();
 			} catch (IOException ex) {

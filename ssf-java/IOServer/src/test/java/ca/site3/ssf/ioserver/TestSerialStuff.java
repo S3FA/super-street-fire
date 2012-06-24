@@ -22,8 +22,6 @@ public class TestSerialStuff {
 	@Test
 	public void test() {
 		
-		if (Integer.toString(42).equals("42")) return;
-		
 		initSerialStuff();
 		
 		assertNotNull(serialPort);
@@ -41,9 +39,9 @@ public class TestSerialStuff {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			fail(ex.getMessage());
+		} finally {		
+			closeSerialStuff();
 		}
-		
-		closeSerialStuff();
 	}
 
 	
