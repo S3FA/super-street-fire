@@ -1,48 +1,50 @@
 package ca.site3.ssf.Sound;
 
-import java.util.Properties;
-
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
 
 class MatchEndedSoundPlayer extends SoundPlayer {
 	
-	MatchEndedSoundPlayer(String resourcePath, Properties configFile) {
-		super(resourcePath, configFile);
-	}
-	
-	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
-		assert(globalSettings != null);
-		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
-	}
-	
-	/**
-	 * Handles the sounds based on match ending.
-	 */
-	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+	private PlaybackHandler p1VictoryPlayback;
+	private PlaybackHandler p2VictoryPlayback;
 		
+	MatchEndedSoundPlayer(SoundPlayerController controller) {
+		super(controller);
+		
+		String tempPath = "";
+		AudioSettings globalSettings = controller.getAudioSettings();
+		
+		tempPath = controller.getResourcePath() +
+				controller.getConfigProperties().getProperty("MatchResult.PlayerOneVictory");
+		this.p1VictoryPlayback = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		
+		tempPath = controller.getResourcePath() +
+				controller.getConfigProperties().getProperty("MatchResult.PlayerTwoVictory");
+		this.p2VictoryPlayback = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+	}
+	
+	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent) {
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.MATCH_ENDED) {
-			return "";
+			return null;
 		}
 		
 		MatchEndedEvent event = (MatchEndedEvent)gameModelEvent;
-		String audioFilepath = "";
 		
 		switch (event.getMatchResult()) {
 		case PLAYER1_VICTORY: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("MatchResult.PlayerOneVictory");
-			break;
+			return this.p1VictoryPlayback;
 		}
 		case PLAYER2_VICTORY: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("MatchResult.PlayerTwoVictory");
-			break;
+			return this.p2VictoryPlayback;
 		}
 		default:
 			assert(false);
 			break;
 		}
 		
-		return audioFilepath;
+		return null;
 	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {

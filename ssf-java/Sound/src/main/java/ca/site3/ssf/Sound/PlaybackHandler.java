@@ -128,6 +128,10 @@ class PlaybackHandler implements LineListener {
 		this.updateSettings();
 	}
 	
+	void setGlobalAudioSettings(AudioSettings globalSettings) {
+		this.settings.setVolume(globalSettings.getVolume());
+	}
+	
 	private void updateSettings() {
 		if (this.clip == null) {
 			return;

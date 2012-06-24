@@ -124,7 +124,9 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		// NOTE: If we setup the sound player to be a direct listener of the game model then the 
 		// the sound player will be touched by the ioserver's thread. This is why we don't keep a
 		// member of it, so that we don't make the mistake of touching it with any of the GUI threads.
-		this.ioserver.getGameModel().addGameModelListener(new SoundPlayerController(new AudioSettings(5.0f)));
+		SoundPlayerController soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f));
+		new Thread(soundPlayerController).start();
+		this.ioserver.getGameModel().addGameModelListener(soundPlayerController);
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI)");
@@ -157,7 +159,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.setupCustomActionFrame();
 		
 		// Setup the frame's contents...
-		this.arenaDisplay = new ArenaDisplay(gameModel.getConfiguration().getNumRoundsPerMatch(), new FireEmitterConfig(true, 16, 8), client);
+		this.arenaDisplay = new ArenaDisplay(gameModel.getConfiguration().getNumRoundsPerMatch(),
+				new FireEmitterConfig(true, 16, 8), client);
 		Container contentPane = this.getContentPane();
 		contentPane.add(this.arenaDisplay, BorderLayout.CENTER);
 		

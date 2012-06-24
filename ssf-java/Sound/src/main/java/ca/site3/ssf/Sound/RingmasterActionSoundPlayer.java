@@ -7,8 +7,8 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 
 class RingmasterActionSoundPlayer extends SoundPlayer {
 	
-	RingmasterActionSoundPlayer(String resourcePath, Properties configFile) {
-		super(resourcePath, configFile);
+	RingmasterActionSoundPlayer(SoundPlayerController controller) {
+		super(controller);
 	}
 	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
@@ -19,15 +19,15 @@ class RingmasterActionSoundPlayer extends SoundPlayer {
 	/**
 	 * Handles the sounds based on ringmaster actions.
 	 */
-	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent) {
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.RINGMASTER_ACTION) {
-			return "";
+			return null;
 		}
 		
-		RingmasterActionEvent event = (RingmasterActionEvent)gameModelEvent;
+		//RingmasterActionEvent event = (RingmasterActionEvent)gameModelEvent;
 		// TODO: Ringmaster action sounds...?
 		
-		return "";
+		return null;
 	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
