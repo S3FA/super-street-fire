@@ -3,6 +3,7 @@ package ca.site3.ssf.Sound;
 import java.util.Properties;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 
 /**
  * Super class for all sound players - implements the ISoundPlayer. Classes
@@ -14,14 +15,11 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
  */
 abstract class SoundPlayer implements ISoundPlayer {
 
-	protected final String resourcePath;
-	protected final Properties configFile;
+	protected SoundPlayerController controller;
 	
-	protected SoundPlayer(String resourcePath, Properties configFile) {
-		assert(resourcePath != null);
-		assert(configFile != null);
-		this.resourcePath = resourcePath;
-		this.configFile   = configFile;
+	protected SoundPlayer(SoundPlayerController controller) {
+		assert(controller != null);
+		this.controller = controller;
 	}
 	
 	/**
@@ -31,8 +29,8 @@ abstract class SoundPlayer implements ISoundPlayer {
 	 * @param gameModelEvent The game model event to base the creation of the sound player off of.
 	 * @return The resulting SoundPlayer, null on error.
 	 */
-	public static SoundPlayer build(String resourcePath, Properties configFile, IGameModelEvent gameModelEvent) {
-		if (resourcePath == null || resourcePath.isEmpty() || configFile == null || gameModelEvent == null) {
+	public static SoundPlayer build(SoundPlayerController controller, IGameModelEvent gameModelEvent) {
+		if (controller == null || gameModelEvent == null) {
 			return null;
 		}
 		
@@ -40,27 +38,27 @@ abstract class SoundPlayer implements ISoundPlayer {
 		switch (gameModelEvent.getType()) {
 		
 		case GAME_STATE_CHANGED: {
-			result = new GameStateChangedSoundPlayer(resourcePath, configFile);
+			result = new GameStateChangedSoundPlayer(controller);
 			break;
 		}
 		case PLAYER_ATTACK_ACTION: {
-			result = new PlayerAttackActionSoundPlayer(resourcePath, configFile);
+			result = new PlayerAttackActionSoundPlayer(controller);
 			break;
 		}
 		case ROUND_ENDED: {
-			result = new RoundEndedSoundPlayer(resourcePath, configFile);
+			result = new RoundEndedSoundPlayer(controller);
 			break;
 		}
 		case MATCH_ENDED: {
-			result = new MatchEndedSoundPlayer(resourcePath, configFile);
+			result = new MatchEndedSoundPlayer(controller);
 			break;
 		}
 		case RINGMASTER_ACTION: {
-			result = new RingmasterActionSoundPlayer(resourcePath, configFile);
+			result = new RingmasterActionSoundPlayer(controller);
 			break;
 		}
 		case ROUND_BEGIN_TIMER_CHANGED: {
-			result = new RoundBeginTimerChangedSoundPlayer(resourcePath, configFile);
+			result = new RoundBeginTimerChangedSoundPlayer(controller);
 			break;
 		}
 		default:
@@ -70,20 +68,22 @@ abstract class SoundPlayer implements ISoundPlayer {
 		return result;
 	}
 	
-	public void execute(SoundPlayerController controller, IGameModelEvent gameModelEvent) {
-		String resourceFileStr = this.getAudioResourcePath(gameModelEvent);
-
-		PlaybackHandler handler = null;
-		
-		AudioSettings globalSettings  = controller.getAudioSettings();
+	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
 		assert(globalSettings != null);
-		PlaybackSettings playbackSettings = this.getPlaybackSettings(globalSettings, gameModelEvent);
-		if (playbackSettings == null) {
+		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
+	}
+	
+	public void execute(IGameModelEvent gameModelEvent) {
+		
+		PlaybackHandler handler = this.getAudioPlaybackHandler(gameModelEvent);
+		if (handler == null) {
 			return;
 		}
 		
-		handler = new PlaybackHandler(controller, resourceFileStr, playbackSettings);
-		
+		AudioSettings globalSettings  = controller.getAudioSettings();
+		assert(globalSettings != null);
+		handler.setSettings(this.getPlaybackSettings(globalSettings, gameModelEvent));
+
 		if (this.isBackgroundSoundPlayer(gameModelEvent)) {
 			controller.addAndPlayBackgroundHandler(handler);
 		}

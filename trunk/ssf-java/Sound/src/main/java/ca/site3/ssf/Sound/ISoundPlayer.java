@@ -9,11 +9,10 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
  *
  */
 interface ISoundPlayer {
-	
-	public String getAudioResourcePath(IGameModelEvent gameModelEvent);
-	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent);
+
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent);
+	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent);
 	
-	public void execute(SoundPlayerController controller, IGameModelEvent gameModelEvent);
+	public void execute(IGameModelEvent gameModelEvent);
 	
 }

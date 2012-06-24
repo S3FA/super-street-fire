@@ -7,8 +7,29 @@ import ca.site3.ssf.gamemodel.RoundEndedEvent;
 
 class RoundEndedSoundPlayer extends SoundPlayer {
 	
-	RoundEndedSoundPlayer(String resourcePath, Properties configFile) {
-		super(resourcePath, configFile);
+	private PlaybackHandler p1VictoryAudioHandler;
+	private PlaybackHandler p2VictoryAudioHandler;
+	private PlaybackHandler tieAudioHandler;
+	
+	RoundEndedSoundPlayer(SoundPlayerController controller) {
+		super(controller);
+		
+		Properties configProperties = controller.getConfigProperties();
+		String resourcePath = controller.getResourcePath();
+		AudioSettings globalSettings = controller.getAudioSettings();
+		
+		String tempPath = "";
+		tempPath = resourcePath + configProperties.getProperty("RoundResult.PlayerOneVictory");
+		this.p1VictoryAudioHandler = new PlaybackHandler(controller, tempPath,
+			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		
+		tempPath = resourcePath + configProperties.getProperty("RoundResult.PlayerTwoVictory");
+		this.p2VictoryAudioHandler = new PlaybackHandler(controller, tempPath,
+			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		
+		tempPath = resourcePath + configProperties.getProperty("RoundResult.Tie");
+		this.tieAudioHandler = new PlaybackHandler(controller, tempPath,
+			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 	}
 	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
@@ -17,34 +38,26 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 	}
 	
 	// Handle the sounds based on round ending
-	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent) {
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.ROUND_ENDED) {
-			return "";
+			return null;
 		}
 		
 		RoundEndedEvent event = (RoundEndedEvent)gameModelEvent;
-		String audioFilepath = "";
-		
 		switch (event.getRoundResult()) {
-		case PLAYER1_VICTORY: {
-			audioFilepath = resourcePath + configFile.getProperty("RoundResult.PlayerOneVictory");
-			break;
-		}
-		case PLAYER2_VICTORY: {
-			audioFilepath = resourcePath + configFile.getProperty("RoundResult.PlayerTwoVictory");
-			break;
-		}
-		case TIE: {
-			audioFilepath = resourcePath + configFile.getProperty("RoundResult.Tie");
-			break;
-		}
+		case PLAYER1_VICTORY:
+			return this.p1VictoryAudioHandler;
+		case PLAYER2_VICTORY:
+			return this.p2VictoryAudioHandler;
+		case TIE:
+			return this.tieAudioHandler;
 		
 		default:
 			assert(false);
 			break;
 		}
 		
-		return audioFilepath;
+		return null;
 	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {

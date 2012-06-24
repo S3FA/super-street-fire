@@ -1,6 +1,6 @@
 package ca.site3.ssf.Sound;
 
-final class PlaybackSettings {
+class PlaybackSettings {
 
 	static final int INFINITE_NUM_PLAYS = 0;
 	
@@ -8,14 +8,18 @@ final class PlaybackSettings {
 	static final float PLAYER_1_PAN = -1.0f;
 	static final float PLAYER_2_PAN = 1.0f;
 	
-	private final float volume;
-	private final float pan;
-	private final int numPlays;
+	private float volume;
+	private float pan;
+	private int numPlays;
 	
 	PlaybackSettings(float vol, float pan, int numPlays) {
 		this.volume = vol;
 		this.pan    = pan;
 		this.numPlays = numPlays;
+	}
+	
+	void setVolume(float vol) {
+		this.volume = vol;
 	}
 	
 	float getVolume() {

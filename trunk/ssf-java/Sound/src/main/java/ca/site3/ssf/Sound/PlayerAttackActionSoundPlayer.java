@@ -1,14 +1,140 @@
 package ca.site3.ssf.Sound;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 
 class PlayerAttackActionSoundPlayer extends SoundPlayer {
 	
-	PlayerAttackActionSoundPlayer(String resourcePath, Properties configFile) {
-		super(resourcePath, configFile);
+	private Map<AttackType, PlaybackHandler> attackAudioMap =
+			new HashMap<AttackType, PlaybackHandler>(AttackType.values().length);
+	
+	PlayerAttackActionSoundPlayer(SoundPlayerController controller) {
+		super(controller);
+		
+		Properties configProperties = controller.getConfigProperties();
+		String resourcePath = controller.getResourcePath();
+		AudioSettings globalSettings = controller.getAudioSettings();
+		
+		String tempPath = "";
+		tempPath = resourcePath + configProperties.getProperty("AttackType.CustomUndefinedAttack");
+		attackAudioMap.put(AttackType.CUSTOM_UNDEFINED_ATTACK, new PlaybackHandler(controller, tempPath,
+			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+
+		tempPath = resourcePath + configProperties.getProperty("AttackType.LeftHookAttack");
+		attackAudioMap.put(AttackType.LEFT_HOOK_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.LeftJabAttack");
+		attackAudioMap.put(AttackType.LEFT_JAB_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.LeftUppercutAttack");
+		attackAudioMap.put(AttackType.LEFT_UPPERCUT_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.LeftChopAttack");
+		attackAudioMap.put(AttackType.LEFT_CHOP_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.RightHookAttack");
+		attackAudioMap.put(AttackType.RIGHT_HOOK_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.RightJabAttack");
+		attackAudioMap.put(AttackType.RIGHT_JAB_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.RightUppercutAttack");
+		attackAudioMap.put(AttackType.RIGHT_UPPERCUT_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.RightChopAttack");
+		attackAudioMap.put(AttackType.RIGHT_CHOP_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.SonicBoomAttack");
+		attackAudioMap.put(AttackType.SONIC_BOOM_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.ShoryukenAttack");
+		PlaybackHandler shoryukenPlayback = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		attackAudioMap.put(AttackType.LEFT_SHORYUKEN_ATTACK, shoryukenPlayback);
+		attackAudioMap.put(AttackType.RIGHT_SHORYUKEN_ATTACK, shoryukenPlayback);
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.HadoukenAttack");
+		attackAudioMap.put(AttackType.HADOUKEN_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.DoubleLariatAttack");
+		attackAudioMap.put(AttackType.DOUBLE_LARIAT_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.QuadrupleLariatAttack");
+		attackAudioMap.put(AttackType.QUADRUPLE_LARIAT_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.SumoHeadbuttAttack");
+		attackAudioMap.put(AttackType.SUMO_HEADBUTT_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.TwoHandedOneHundredHandSlapAttack");
+		attackAudioMap.put(AttackType.TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.OneHandedOneHundredHandSlapAttack");
+		PlaybackHandler oneHandedOneHundredHandSlap = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		attackAudioMap.put(AttackType.LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK, oneHandedOneHundredHandSlap);
+		attackAudioMap.put(AttackType.RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK, oneHandedOneHundredHandSlap);
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.PsychoCrusherAttack");
+		attackAudioMap.put(AttackType.PSYCHO_CRUSHER_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.YmcaAttack");
+		attackAudioMap.put(AttackType.YMCA_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.NyanCatAttack");
+		attackAudioMap.put(AttackType.NYAN_CAT_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.ArmWindmillAttack");
+		attackAudioMap.put(AttackType.ARM_WINDMILL_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.DiscoStuAttack");
+		attackAudioMap.put(AttackType.DISCO_STU_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.SuckItAttack");
+		attackAudioMap.put(AttackType.SUCK_IT_ATTACK, new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		
+		tempPath = resourcePath + configProperties.getProperty("AttackType.VafanapoliAttack");
+		PlaybackHandler vafanapoliHandler = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		attackAudioMap.put(AttackType.LEFT_VAFANAPOLI_ATTACK, vafanapoliHandler);
+		attackAudioMap.put(AttackType.RIGHT_VAFANAPOLI_ATTACK, vafanapoliHandler);
+	}
+	
+	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent) {
+		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.PLAYER_ATTACK_ACTION) {
+			return null;
+		}
+		
+		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
+		return this.attackAudioMap.get(event.getAttackType());
+	}
+	
+	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
+		return false;
 	}
 	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
@@ -18,127 +144,5 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		}
 		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
 		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.getPlayerPan(event.getPlayerNum()), 1);
-	}
-	
-	/**
-	 *  Handles the sounds for the various player attacks.
-	 */
-	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
-		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.PLAYER_ATTACK_ACTION) {
-			return "";
-		}
-		
-		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
-		String audioFilepath = "";
-		
-		switch (event.getAttackType()) {
-		
-		case CUSTOM_UNDEFINED_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.CustomUndefinedAttack");
-			break;
-		}
-		case LEFT_HOOK_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.LeftHookAttack");
-			break;
-		}
-		case LEFT_JAB_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.LeftJabAttack");
-			break;
-		}
-		case LEFT_UPPERCUT_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.LeftUppercutAttack");
-			break;
-		}
-		case LEFT_CHOP_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.LeftChopAttack");
-			break;
-		}
-		case RIGHT_HOOK_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.RightHookAttack");
-			break;
-		}
-		case RIGHT_JAB_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.RightJabAttack");
-			break;
-		}
-		case RIGHT_UPPERCUT_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.RightUppercutAttack");
-			break;
-		}
-		case RIGHT_CHOP_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.RightChopAttack");
-			break;
-		}
-		case SONIC_BOOM_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.SonicBoomAttack");
-			break;
-		}
-		case LEFT_SHORYUKEN_ATTACK:
-		case RIGHT_SHORYUKEN_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.ShoryukenAttack");
-			break;
-		}
-		case HADOUKEN_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.HadoukenAttack");
-			break;
-		}
-		case DOUBLE_LARIAT_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.DoubleLariatAttack");
-			break;
-		}
-		case QUADRUPLE_LARIAT_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.QuadrupleLariatAttack");
-			break;
-		}
-		case SUMO_HEADBUTT_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.SumoHeadbuttAttack");
-			break;
-		}
-		case LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK:
-		case RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK:
-		case TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.OneHundredHandSlapAttack");
-			break;
-		}
-		case PSYCHO_CRUSHER_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.PsychoCrusherAttack");
-			break;
-		}
-		case YMCA_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.YmcaAttack");
-			break;
-		}
-		case NYAN_CAT_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.NyanCatAttack");
-			break;
-		}
-		case ARM_WINDMILL_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.ArmWindmillAttack");
-			break;
-		}
-		case DISCO_STU_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.DiscoStuAttack");
-			break;
-		}
-		case SUCK_IT_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.SuckItAttack");
-			break;
-		}
-		case LEFT_VAFANAPOLI_ATTACK:
-		case RIGHT_VAFANAPOLI_ATTACK: {
-			audioFilepath = this.resourcePath + this.configFile.getProperty("AttackType.VafanapoliAttack");
-			break;
-		}
-		
-		default:
-			assert(false);
-			break;
-		}
-		
-		return audioFilepath;
-	}
-	
-	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
-		return false;
 	}
 }

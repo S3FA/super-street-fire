@@ -7,48 +7,60 @@ import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 
 class RoundBeginTimerChangedSoundPlayer extends SoundPlayer {
 	
-	RoundBeginTimerChangedSoundPlayer(String resourcePath, Properties configFile) {
-		super(resourcePath, configFile);
-	}
+	private PlaybackHandler threeAudioHandler;
+	private PlaybackHandler twoAudioHandler; 
+	private PlaybackHandler oneAudioHandler;
+	private PlaybackHandler fightAudioHandler;
 	
-	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
-		assert(globalSettings != null);
-		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
+	RoundBeginTimerChangedSoundPlayer(SoundPlayerController controller) {
+		super(controller);
+		
+		Properties configProperties = controller.getConfigProperties();
+		String resourcePath = controller.getResourcePath();
+		AudioSettings globalSettings = controller.getAudioSettings();
+		
+		String tempPath = "";
+		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Three");
+		this.threeAudioHandler = new PlaybackHandler(controller, tempPath,
+			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		
+		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Two");
+		this.twoAudioHandler = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		
+		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.One");
+		this.oneAudioHandler = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		
+		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Fight");
+		this.fightAudioHandler = new PlaybackHandler(controller, tempPath,
+				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 	}
 	
 	// Handle the sounds based on round begin timer changing
-	public String getAudioResourcePath(IGameModelEvent gameModelEvent) {
+	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent) {
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.ROUND_BEGIN_TIMER_CHANGED) {
-			return "";
+			return null;
 		}
 		
 		RoundBeginTimerChangedEvent event = (RoundBeginTimerChangedEvent)gameModelEvent;
-		String audioFilepath = "";
 		switch (event.getThreeTwoOneFightTime()) {
 		
-		case THREE: {
-			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.Three");
-			break;
-		}
-		case TWO: {
-			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.Two");
-			break;
-		}
-		case ONE: {
-			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.One");
-			break;
-		}
-		case FIGHT: {
-			audioFilepath = resourcePath + configFile.getProperty("RoundBeginCountdown.Fight");
-			break;
-		}
+		case THREE:
+			return this.threeAudioHandler;
+		case TWO: 
+			return this.twoAudioHandler;
+		case ONE:
+			return this.oneAudioHandler;
+		case FIGHT: 
+			return this.fightAudioHandler;
 		
 		default:
 			assert(false);
 			break;
 		}
 		
-		return audioFilepath;
+		return null;
 	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
