@@ -163,6 +163,11 @@ public class StreetFireServer implements Runnable {
 		}
 	}
 	
+	/**
+	 * Places the game model event in a queue to be sent to the GUI via
+	 * the Server thread.
+	 * @param e
+	 */
 	public void notifyGUI(IGameModelEvent e) {
 		eventQueue.offer(eventToProtobuf(e));
 	}

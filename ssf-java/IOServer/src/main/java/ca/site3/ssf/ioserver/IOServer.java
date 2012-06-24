@@ -1,7 +1,16 @@
 package ca.site3.ssf.ioserver;
 
+import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.SerialPort;
+import gnu.io.UnsupportedCommOperationException;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 
@@ -40,6 +49,8 @@ public class IOServer {
 	
 	private IGameModelListener gameEventRouter;
 	
+	/** Comm port for sending commands to flamethrowers, timer, etc. Null until {@link #initSerialDevice()} is called.  */
+	private SerialPort serialPort;
 	
 	/** Time the event loop started (millis since epoch) */
 	private long startTime;
@@ -83,23 +94,49 @@ public class IOServer {
 		frameLengthInMillis = (int)Math.round(1000.0 / args.tickFrequency);
 		
 		heartbeatListener = new HeartbeatListener(args.gloveInterfaceIP, args.heartbeatPort, deviceStatus);
-		Thread heartbeatListenerThread = new Thread(heartbeatListener);
+		Thread heartbeatListenerThread = new Thread(heartbeatListener, "Glove heartbeat listener thread");
 		heartbeatListenerThread.start();
 		
 		StreetFireServer guiServer = new StreetFireServer(args.guiPort, game.getActionFactory(), commManager.getCommandQueue());
 		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
 		guiServerThread.start();
 		
-		gameEventRouter = new GameEventRouter(guiServer, commManager.getGuiOutQueue());
+		
+		initSerialDevice();
+		
+		InputStream serialIn = null;
+		OutputStream serialOut = null;
+		if (serialPort != null) {
+			try {
+				serialIn = serialPort.getInputStream();
+				serialOut = serialPort.getOutputStream();
+			} catch (IOException ex) {
+				log.error("Exception accessing serial stream",ex);
+			}
+		}
+		if (serialOut == null) {
+			serialOut = new OutputStream() { public @Override void write(int b) throws IOException { } }; // /dev/null
+		}
+		if (serialIn == null) {
+			serialIn = new InputStream() { public @Override int read() throws IOException { return 0; } }; // /dev/null
+		}
+		
+		SerialCommunicator serialComm = new SerialCommunicator(serialIn, serialOut);
+		Thread serialCommThread = new Thread(serialComm, "Serial communications thread");
+		serialCommThread.start();
+		
+		gameEventRouter = new GameEventRouter(guiServer, serialComm);
 		game.addGameModelListener(gameEventRouter);
-
+		
 		eventAggregator = new GloveEventCoalescer(startTime, 0.5, commManager.getCommInQueue(), commManager.getGestureQueue());
+
 		Thread eventAggregatorThread = new Thread(eventAggregator, "Event aggregator thread");
 		eventAggregatorThread.start();
 		
 		deviceListener = new DeviceNetworkListener(args.gloveInterfaceIP, args.devicePort, new DeviceDataParser(deviceStatus), commManager.getCommInQueue());
 		Thread deviceListenerThread = new Thread(deviceListener, "DeviceListener Thread");
 		deviceListenerThread.start();
+		
 		
 		// Attempt to setup the gesture recognizer
 		try {
@@ -115,6 +152,9 @@ public class IOServer {
 		isStopped = false;
 		runLoop();
 		log.info("I/O server terminating");
+		
+		closeSerialDevice();
+		
 		deviceListener.stop();
 		
 	}
@@ -241,6 +281,77 @@ public class IOServer {
 				root.setLevel(Level.ERROR); break;
 			default:
 				root.setLevel(Level.INFO);
+		}
+	}
+	
+	
+	/**
+	 * Initialize the serial comm port.
+	 */
+	private void initSerialDevice() {
+		
+		CommPortIdentifier commPortId = null;
+		try {
+			commPortId = CommPortIdentifier.getPortIdentifier(args.serialDevice);
+		} catch (NoSuchPortException ex) {
+			CommPortIdentifier.addPortName(args.serialDevice, CommPortIdentifier.PORT_SERIAL, null);
+			try {
+				commPortId = CommPortIdentifier.getPortIdentifier(args.serialDevice);
+			} catch (NoSuchPortException ex2) {
+				log.error("Could not open or add serial port '"+ args.serialDevice+"'",ex2);
+			}
+		} catch (UnsatisfiedLinkError ex) {
+			log.error("Could not load rxtx serial comm native library.\n" + 
+						"If you're on a Mac, copy IOServer/src/main/resources/librxtxSerial.jnilib to ~/Library/Java/Extensions/\n" +
+						"Otherwise take a look here: http://rxtx.qbang.org/wiki/index.php/Main_Page");
+		}
+		
+		if (commPortId == null) {
+			log.error("Could not get serial port ID for device '"+args.serialDevice+"'. No fire :-(");
+			return;
+		}
+		
+		try {
+			serialPort = (SerialPort) commPortId.open("StreetFire IOServer", 5000);
+			serialPort.getInputStream();
+			serialPort.getOutputStream();
+		} catch (PortInUseException ex) {
+			log.error("Serial port in use! This might be solved by 'sudo mkdir /var/lock; sudo chmod 777 /var/lock' on a Mac",ex);
+			return;
+		} catch (Exception ex) {
+			log.error("Exception opening serial port",ex);
+			if (serialPort != null) {
+				serialPort.close();
+			}
+			return;
+		}
+		
+		
+		// 57600 8N1 for now.. may need to expose these in command line args
+		int baudRate = 57600;
+		int databits = SerialPort.DATABITS_8;
+		int stopbits = SerialPort.STOPBITS_1;
+		int parity = SerialPort.PARITY_NONE;
+		
+		try {
+			serialPort.setSerialPortParams(baudRate, databits, stopbits, parity);
+			// serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
+		} catch (UnsupportedCommOperationException ex) {
+			log.error("Could not configure serial port", ex);
+		}
+	}
+	
+	private void closeSerialDevice() {
+		if (serialPort != null) {
+			try {
+				serialPort.getInputStream().close();
+				serialPort.getOutputStream().close();
+			} catch (IOException ex) {
+				log.warn("Error trying to close serial port stream",ex);
+			}
+			serialPort.close();
+			
+			serialPort = null;
 		}
 	}
 }

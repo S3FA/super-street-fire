@@ -7,6 +7,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -31,6 +33,7 @@ import ca.site3.ssf.Sound.SoundPlayerController;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
+import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
@@ -43,7 +46,6 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
-import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceConstants.Device;
@@ -171,6 +173,12 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 
 		this.pack();
 		this.setLocationRelativeTo(null);
+		
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				DevGUIMainWindow.this.ioserver.stop();
+			}
+		});
 		
 		gameEventThread = new Thread("DevGUI game event listener thread") {
 			public @Override void run() {
