@@ -16,7 +16,8 @@ public interface IGameModelEvent {
 		MATCH_ENDED,
 		PLAYER_ATTACK_ACTION,
 		PLAYER_BLOCK_ACTION,
-		RINGMASTER_ACTION
+		RINGMASTER_ACTION,
+		SYSTEM_INFO_REFRESH // this doens't strictly belong here
 	};
 		
 	public Type getType();

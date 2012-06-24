@@ -37,6 +37,8 @@ import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent.OutputDeviceStatus;
 import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 
 class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener {
@@ -62,6 +64,13 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	final static Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
 	final static Color RINGMASTER_COLOUR = Color.orange;
 	
+	// Colours used to indicate status of emitters
+	final static Color DEVICE_UNKNOWN_STATUS_COLOUR = Color.BLACK;
+	final static Color DEVICE_RESPONDING_COLOUR = Color.GREEN;
+	final static Color DEVICE_ARMED_COLOUR = Color.MAGENTA;
+	final static Color DEVICE_FLAME_COLOUR = Color.ORANGE;
+	final static Color DEVICE_NOT_RESPONDING_COLOUR = Color.RED;
+	
 	final private FireEmitterConfig fireEmitterConfig;
 	
 	private Image ssfImage;
@@ -76,6 +85,9 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	private RoundResult[] roundResults = null;
 	
 	private StreetFireGuiClient client = null;
+	
+	private SystemInfoRefreshEvent latestSystemStatus = null;
+	
 	
 	public ArenaDisplay(int roundsPerMatch, FireEmitterConfig fireEmitterConfig,
 						StreetFireGuiClient client) {
@@ -132,6 +144,10 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	public void setInfoText(String text) {
 		this.infoText = text;
 		this.repaint();
+	}
+	
+	public void setSystemStatus(SystemInfoRefreshEvent statusEvent) {
+		this.latestSystemStatus = statusEvent;
 	}
 	
 	public void setLeftRailEmitter(int index, EmitterData data) {
@@ -215,10 +231,13 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			
 			String leftEmitterPercentStr = "" + (int)(this.leftRailEmitterData[i].maxIntensity * 100) + "%";
 			String rightEmitterPercentStr = "" + (int)(this.rightRailEmitterData[i].maxIntensity * 100) + "%";
+			g2.setPaint(getStatusColorForEmitter(Location.LEFT_RAIL, i));
 			g2.drawString(leftEmitterPercentStr, leftRailEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(leftEmitterPercentStr),
 					leftRailEmitterPos.y + EMITTER_RADIUS);
+			g2.setPaint(getStatusColorForEmitter(Location.RIGHT_RAIL, i));
 			g2.drawString(rightEmitterPercentStr, rightRailEmitterPos.x + EMITTER_DIAMETER + 2, rightRailEmitterPos.y + EMITTER_RADIUS);
 			
+			g2.setPaint(Color.black);
 			currPosition -= (EMITTER_DIAMETER + DISTANCE_BETWEEN_RAIL_EMITTERS);
 		}
 		
@@ -477,4 +496,26 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		}
 	}
 
+	
+	private Color getStatusColorForEmitter(Location location, int index) {
+		if (latestSystemStatus == null) {
+			return DEVICE_UNKNOWN_STATUS_COLOUR;
+		}
+		try {
+			OutputDeviceStatus status = latestSystemStatus.getDeviceStatus(location, index);
+			if (status.isFlame) {
+				return DEVICE_FLAME_COLOUR;
+			} else if (status.isArmed) {
+				return DEVICE_ARMED_COLOUR;
+			} else if (status.isResponding) {
+				return DEVICE_RESPONDING_COLOUR;
+			} else {
+				return DEVICE_NOT_RESPONDING_COLOUR;
+			}
+		} catch (IllegalArgumentException ex) {
+			log.error("Invalid location / index",ex);
+			return DEVICE_UNKNOWN_STATUS_COLOUR;
+		}
+		
+	}
 }

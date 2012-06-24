@@ -48,6 +48,7 @@ import ca.site3.ssf.guiprotocol.Event.GameEvent.EventType;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command;
+import ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType;
 
 /**
  * Accepts connections from a {@link StreetFireGuiClient} and handles
@@ -310,6 +311,9 @@ public class StreetFireServer implements Runnable {
 			while ( shouldListen ) {
 				try {
 					Command cmd = Command.parseDelimitedFrom(socket.getInputStream());
+					if (cmd.getType() == CommandType.QUERY_SYSTEM_INFO) {
+						
+					}
 					if (cmd != null) {
 						AbstractGameModelCommand gameCmd = parseCommand(cmd); 
 						if (gameCmd != null) {

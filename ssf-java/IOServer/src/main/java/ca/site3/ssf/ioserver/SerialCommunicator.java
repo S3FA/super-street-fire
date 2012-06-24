@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent.OutputDeviceStatus;
 
 /**
  * Contains logic for converting game event data to the format expected by the
@@ -25,6 +26,8 @@ import ca.site3.ssf.gamemodel.IGameModel.Entity;
 public class SerialCommunicator implements Runnable {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	private OutputDeviceStatus[] systemStatus = null;
 	
 	private BufferedOutputStream out;
 	private BufferedInputStream in;
@@ -48,9 +51,14 @@ public class SerialCommunicator implements Runnable {
 		while (true) {
 			try {
 				byte[] message = messageQueue.take();
-				this.out.write(message);
-				//this.out.flush();
-				log.debug("wrote message: {}",bytesToHex(message));
+				if (message.length == 1 && message[0] == 63) {
+					// signal to query system status ('?' == ascii 63)
+					doSystemQuery();
+				} else {
+					this.out.write(message);
+					this.out.flush();
+log.debug("wrote message: {}", bytesToHexString(message));
+				}
 			} catch (IOException ex) {
 				log.error("Error writing to serial device",ex);
 			} catch (InterruptedException ex) {
@@ -60,8 +68,8 @@ public class SerialCommunicator implements Runnable {
 	}
 
 	
-	public static String bytesToHex(byte[] bytes) {
-	    final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	private String bytesToHexString(byte[] bytes) {
 	    char[] hexChars = new char[bytes.length * 2];
 	    int v;
 	    for ( int j = 0; j < bytes.length; j++ ) {
@@ -152,6 +160,54 @@ public class SerialCommunicator implements Runnable {
 		message[11] = getChecksum(payload);
 		enqueueMessage(message);
 	}
+	
+	
+	/**
+	 * Sends out a query command to the devices one at a time.
+	 * Note! this will hold up the serial comm thread so it should not be
+	 * done while a game is actually going on.
+	 */
+	void querySystemStatus() {
+		enqueueMessage( "?".getBytes() ); // sentinel value to trigger system query
+	}
+	
+	
+	
+	/**
+	 * Queries each emitter sequentially for its status.
+	 * Note that this method gets called on the comm thread, so it
+	 * directly reads/writes the serial streams.
+	 */
+	private void doSystemQuery() {
+		
+		systemStatus = new OutputDeviceStatus[32]; // indexes are off-by-one compared to device IDs
+		
+		// sent out to each emitter in turn
+		byte[] messageTemplate = new byte[] { 
+			(byte) 0xAA, (byte) 0xAA, // framing bytes
+			(byte) 2, // payload length (node ID and command)
+			0, // destination node to be replaced within the loop
+			(byte)63, // '?' command in ASCII
+			0 // checksum to be replaced within the loop
+		};
+		
+		byte[] buffer = new byte[6]; // used to read in responses
+		int len = -1;
+		
+		for (int i=1; i<=32; i++) {
+			messageTemplate[3] = (byte)i;
+			messageTemplate[5] = (byte) ~(i + 63);
+			try {
+				this.out.write(messageTemplate);
+				this.out.flush();
+			} catch (IOException ex) {
+				log.error("Error reading or writing status query for node", ex);
+				systemStatus[i-1] = new OutputDeviceStatus(false, false, false);
+			}
+		}
+	}
+	
+	
 	
 	
 	/**

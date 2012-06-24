@@ -46,6 +46,7 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
 import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceConstants.Device;
@@ -235,12 +236,18 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 				case ROUND_PLAY_TIMER_CHANGED:
 					DevGUIMainWindow.this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
 					break;
+				case SYSTEM_INFO_REFRESH:
+					DevGUIMainWindow.this.onSystemInfoRefresh((SystemInfoRefreshEvent)event);
 				default:
 					assert(false);
 					break;
 				}				
 			}
 		});
+	}
+	
+	private void onSystemInfoRefresh(SystemInfoRefreshEvent event) {
+		this.arenaDisplay.setSystemStatus(event);
 	}
 	
 	private void onGameInfoRefresh(GameInfoRefreshEvent event) {
