@@ -155,14 +155,13 @@ class RecognizerManager {
 		for (Recognizer recognizer : this.recognizerMap.values()) {
 			GestureType gestureType = recognizer.getGestureType();
 			
-			// Make sure the instance meets all the criteria for the current recognizable gesture type
+			// Make sure the instance has the correct handedness for the current gesture type
 			if (!RecognizerManager.isAcceptableHandednessForGivenType(inst, gestureType)) {
 				continue;
 			}
 			
-			// Make sure the probability meets the minimum threshold
+			// Find the highest probability gestures for each 'genre' of gesture...
 			currProbability = recognizer.lnProbability(inst);
-
 			Double bestProbability = bestProbabilityMap.get(gestureType.getGenre());
 			if (currProbability > bestProbability) {
 				bestProbabilityMap.put(gestureType.getGenre(), currProbability);
@@ -172,14 +171,11 @@ class RecognizerManager {
 
 		}
 		
-		// If we failed to find a gesture with a good probability then we try using the k-means
-		// method to find an appropriate gesture...
 		GestureType bestGesture = null;
 
 		// The best gesture map will now contain all the best candidates for the given instance, from
 		// each gesture genre. We need to determine what the differences are so that we make a reasonable
 		// choice as to whether we should be using a basic, special or easter-egg type move...
-
 		if (bestGestureTypeMap.containsKey(GestureGenre.BASIC)) {
 			
 			double basicGestureBestProb = bestProbabilityMap.get(GestureGenre.BASIC);
@@ -270,7 +266,9 @@ class RecognizerManager {
 			return null;
 		}
 		
-		// Final tests: make sure the best gesture's probability exceeds its lowest minimum probability
+		// Final filtering...
+		
+		// Make sure the best gesture's probability exceeds its lowest minimum probability
 		double bestProb = bestProbabilityMap.get(bestGesture.getGenre());
 		double lowestAcceptableProb = lowestAcceptableProbMap.get(bestGesture.getGenre());
 		if (bestProb < lowestAcceptableProb) {
@@ -278,7 +276,7 @@ class RecognizerManager {
 			return null;
 		}
 		
-		// Make sure the gesture is actually acceptible given other criteria (e.g., min fireceness etc.)
+		// Make sure the gesture is actually acceptable given other criteria (e.g., min fireceness etc.)
 		if (!RecognizerManager.isAcceptableGestureForGivenType(inst, bestGesture)) {
 			logger.info("Gesture was not recognized because it did not meet its acceptable criteria.");
 			return null;
