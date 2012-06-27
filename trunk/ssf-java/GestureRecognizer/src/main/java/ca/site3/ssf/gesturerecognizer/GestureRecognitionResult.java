@@ -35,7 +35,7 @@ final public class GestureRecognitionResult {
 		
 		Map<GestureType, Double> probabilitiesMap = new HashMap<GestureType, Double>(this.resultMapping.size());
 		for (Entry<GestureType, GestureProbabilities> entry : this.resultMapping.entrySet()) {
-			probabilitiesMap.put(entry.getKey(), Math.max(entry.getValue().getBaseProbability(), entry.getValue().getKMeansProbability()));
+			probabilitiesMap.put(entry.getKey(), entry.getValue().getLnProbability());
 		}
 		
 		List<Entry<GestureType, Double>> sortedList = MapUtil.sortMapToList(probabilitiesMap);
@@ -50,7 +50,8 @@ final public class GestureRecognitionResult {
 			Entry<GestureType, Double> entry = iter.previous();
 			GestureProbabilities currProbs = this.resultMapping.get(entry.getKey());
 			result += entry.getKey().toString() + " { " +
-					"Base: " + currProbs.getBaseProbability() + ", KMeans: " + currProbs.getKMeansProbability() +
+					"Ln Probability: " + currProbs.getLnProbability() +
+					", Required Ln Probability: " + currProbs.getMinLnProbability() +
 					", Required fierceness: " + entry.getKey().getMinFierceDiffThreshold() +
 					", Required Data Pts: " + entry.getKey().getMinNumDataPts() + " }\n";
 		}
