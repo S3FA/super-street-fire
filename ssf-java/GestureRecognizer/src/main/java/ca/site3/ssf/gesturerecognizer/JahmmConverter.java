@@ -88,7 +88,7 @@ public class JahmmConverter {
 		try {
 			Hmm<ObservationVector> kMeansHmm = kMeansLearner.iterate();
 			BaumWelchScaledLearner bwl = new BaumWelchScaledLearner();
-			bwl.setNbIterations(10);
+			bwl.setNbIterations(15);
 			return bwl.learn(kMeansHmm, sequences);
 		}
 		catch (IllegalArgumentException e) {
@@ -107,7 +107,7 @@ public class JahmmConverter {
 		List<List<ObservationVector>> sequences = JahmmConverter.gestureDataSetToObservationSequences(dataSet);
 		try {
 			BaumWelchScaledLearner bwl = new BaumWelchScaledLearner();
-			bwl.setNbIterations(10);
+			bwl.setNbIterations(15);
 			return bwl.learn(hmm, sequences);
 		}
 		catch (IllegalArgumentException e) {

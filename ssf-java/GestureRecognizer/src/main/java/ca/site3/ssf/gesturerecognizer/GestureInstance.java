@@ -25,7 +25,8 @@ import org.apache.commons.math.geometry.Vector3D;
  *
  */
 public class GestureInstance {
-
+	static final public int NUM_COORDS_PER_GLOVE = 3;
+	
 	static final private String LEFT_GLOVE_DATA_STR  = "LEFT_GLOVE_DATA";
 	static final private String RIGHT_GLOVE_DATA_STR = "RIGHT_GLOVE_DATA";
 	static final private String TIME_PTS_DATA_STR    = "TIME_PTS";
@@ -229,9 +230,10 @@ public class GestureInstance {
 		
 		if (this.hasLeftGloveData()) {
 			if (this.hasRightGloveData()) {
-				double[][] result = new double[this.getNumDataPts()][6];
+				double[][] result = new double[this.getNumDataPts()][2*NUM_COORDS_PER_GLOVE];
 				
-				// Two handed gesture, each tuple is size 6 (for two glove's worth of accelerometer data)
+				// Two handed gesture, each tuple is size 2*NUM_COORDS_PER_GLOVE
+				// (for two glove's worth of accelerometer data)
 				for (int i = 0; i < this.getNumDataPts(); i++) {
 					
 					// Right now we only consider accelerometer data...
@@ -249,12 +251,24 @@ public class GestureInstance {
 					result[i][3] = rightGloveAccelData.getX();
 					result[i][4] = rightGloveAccelData.getY();
 					result[i][5] = rightGloveAccelData.getZ();
+					/*
+					Vector3D leftGloveGyroData  = leftGloveData.getGyroData();
+					Vector3D rightGloveGyroData = rightGloveData.getGyroData();
+					assert(leftGloveGyroData != null && rightGloveGyroData != null);
+					
+					result[i][6] = leftGloveGyroData.getX();
+					result[i][7] = leftGloveGyroData.getY();
+					result[i][8] = leftGloveGyroData.getZ();
+					result[i][9] = rightGloveGyroData.getX();
+					result[i][10] = rightGloveGyroData.getY();
+					result[i][11] = rightGloveGyroData.getZ();
+					*/
 				}
 				return result;
 			}
 			else {
 				// Left handed gesture, each tuple is size 3 (for one glove's worth of accelerometer data)
-				double[][] result = new double[this.getNumDataPts()][3];
+				double[][] result = new double[this.getNumDataPts()][NUM_COORDS_PER_GLOVE];
 				
 				// Two handed gesture, each tuple is size 6 (for two glove's worth of accelerometer data)
 				for (int i = 0; i < this.getNumDataPts(); i++) {
@@ -269,13 +283,21 @@ public class GestureInstance {
 					result[i][0] = leftGloveAccelData.getX();
 					result[i][1] = leftGloveAccelData.getY();
 					result[i][2] = leftGloveAccelData.getZ();
+					/*
+					Vector3D leftGloveGyroData  = leftGloveData.getGyroData();
+					assert(leftGloveGyroData != null);
+					
+					result[i][3] = leftGloveGyroData.getX();
+					result[i][4] = leftGloveGyroData.getY();
+					result[i][5] = leftGloveGyroData.getZ();
+					*/
 				}
 				return result;
 			}
 		}
 		else {
 			// Right handed gesture, each tuple is size 3 (for one glove's worth of accelerometer data)
-			double[][] result = new double[this.getNumDataPts()][3];
+			double[][] result = new double[this.getNumDataPts()][NUM_COORDS_PER_GLOVE];
 			
 			// Two handed gesture, each tuple is size 6 (for two glove's worth of accelerometer data)
 			for (int i = 0; i < this.getNumDataPts(); i++) {
@@ -290,6 +312,15 @@ public class GestureInstance {
 				result[i][0] = rightGloveAccelData.getX();
 				result[i][1] = rightGloveAccelData.getY();
 				result[i][2] = rightGloveAccelData.getZ();
+				
+				/*
+				Vector3D rightGloveGyroData = rightGloveData.getGyroData();
+				assert(rightGloveGyroData != null);
+				
+				result[i][3] = rightGloveGyroData.getX();
+				result[i][4] = rightGloveGyroData.getY();
+				result[i][5] = rightGloveGyroData.getZ();
+				*/
 			}
 			return result;
 		}

@@ -36,6 +36,9 @@ class Recognizer {
 	private GestureType gestureType;
 	private Hmm<ObservationVector> recognizer;
 	
+	private double lowestLnProbability  = -Double.MAX_VALUE;
+	private double highestLnProbability = -Double.MAX_VALUE;
+	
 	/**
 	 * Default constructor for Recognizer. Creates an invalid Recognizer.
 	 * This should only be used right before reading in a recognizer.
@@ -57,6 +60,10 @@ class Recognizer {
 	
 	GestureType getGestureType() {
 		return this.gestureType;
+	}
+	
+	double getLowestAcceptableLnProbability() {
+		return (this.lowestLnProbability + this.highestLnProbability) / 2.0;
 	}
 	
 	/**
@@ -97,9 +104,23 @@ class Recognizer {
 			}
 		}
 		
+		// Output the probabilities based on all the training data and also acquire the
+		// lowest probability of all training data
 		logger.debug("Probabilities of data set in recognizer: ");
+		this.lowestLnProbability  = Double.MAX_VALUE;
+		this.highestLnProbability = -Double.MAX_VALUE;
 		for (int i = 0; i < dataSet.getNumGestureInstances(); i++) {
-			logger.debug("Index " + i + ": "+ this.probability(dataSet.getGestureInstanceAt(i)));
+			
+			double lnProb = this.lnProbability(dataSet.getGestureInstanceAt(i));
+			if (lnProb < this.lowestLnProbability) {
+				this.lowestLnProbability = lnProb;
+			}
+			if (lnProb > this.highestLnProbability) {
+				this.highestLnProbability = lnProb;
+			}
+			
+			logger.debug("Index " + i + ": (Base Probability: "+ this.probability(dataSet.getGestureInstanceAt(i)) +
+					", ln Probability: " + lnProb);
 		}
 		
 		return true;
@@ -122,37 +143,6 @@ class Recognizer {
 		return false;
 	}
 	
-	/**
-	 * Gets a probability [0,1] of the given gesture instance being the same type of gesture
-	 * as the one recognized by this.
-	 * @param inst The gesture instance to test against.
-	 * @return The [0,1] probability of the gesture being the same as the one recognized by this.
-	 */
-	double kMeansProbability(GestureInstance inst) {
-		assert(inst != null);
-		
-		if (this.failsBasicTestBeforeProbabilityCheck(inst)) {
-			return 0.0;
-		}
-
-		int observationVecSize = this.gestureType.getNumHands()*3;
-		List<ObservationVector> sequence = JahmmConverter.gestureInstanceToObservationSequence(inst);
-		KMeansCalculator<ObservationVector> kMeansCalc = new KMeansCalculator<ObservationVector>(this.gestureType.getNumHmmNodes(), sequence);
-		List<ObservationVector> centroidSequence = new ArrayList<ObservationVector>(kMeansCalc.nbClusters());
-		
-		for (int i = 0; i < kMeansCalc.nbClusters(); i++) {
-			Collection<ObservationVector> cluster = kMeansCalc.cluster(i);
-			
-			ObservationVector avg = new ObservationVector(observationVecSize);
-			for (ObservationVector v : cluster) {
-				avg = avg.plus(v);
-			}
-			avg = avg.times(1.0 / (double)cluster.size());
-			centroidSequence.add(avg);
-		}
-		return this.recognizer.probability(centroidSequence, this.recognizer.mostLikelyStateSequence(centroidSequence));
-	}
-	
 	double probability(GestureInstance inst) {
 		assert(inst != null);
 		
@@ -162,6 +152,17 @@ class Recognizer {
 
 		List<ObservationVector> sequence = JahmmConverter.gestureInstanceToObservationSequence(inst);
 		return this.recognizer.probability(sequence, this.recognizer.mostLikelyStateSequence(sequence));
+	}
+	
+	double lnProbability(GestureInstance inst) {
+		assert(inst != null);
+		
+		if (this.failsBasicTestBeforeProbabilityCheck(inst)) {
+			return 0.0;
+		}
+
+		List<ObservationVector> sequence = JahmmConverter.gestureInstanceToObservationSequence(inst);
+		return this.recognizer.lnProbability(sequence);
 	}
 	
 	/**
@@ -175,11 +176,11 @@ class Recognizer {
 		writer.write(this.gestureType.name());
 		
 		if (this.recognizer != null) {
-			writer.write(" 1\n");
+			writer.write(" " + this.lowestLnProbability + " " + this.highestLnProbability + " 1 \n");
 			HmmWriter.write(writer, new OpdfMultiGaussianWriter(), this.recognizer);
 		}
 		else {
-			writer.write(" 0\n");
+			writer.write(" " + this.lowestLnProbability + " " + this.highestLnProbability + " 0 \n");
 		}
 	}
 	
@@ -214,6 +215,46 @@ class Recognizer {
 		
 		// Skip the space character
 		reader.skip(1);
+		
+		// Read the lowest ln probability for this recognizer
+		temp = "";
+		for(;;) {
+			if (reader.read(charArray) == -1) {
+				throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
+			}
+			if (Character.isSpaceChar(charArray[0])) {
+				break;
+			}
+			
+			temp += charArray[0];
+		}
+		
+		try {
+			this.lowestLnProbability = Double.parseDouble(temp);
+		}
+		catch (NumberFormatException e) {
+			throw new FileFormatException("Failed to parse highest probability in recognizer.");
+		}
+		// Read the highest ln probability for this recognizer
+		temp = "";
+		for(;;) {
+			if (reader.read(charArray) == -1) {
+				throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
+			}
+			if (Character.isSpaceChar(charArray[0])) {
+				break;
+			}
+			
+			temp += charArray[0];
+		}
+		
+		try {
+			this.highestLnProbability = Double.parseDouble(temp);
+		}
+		catch (NumberFormatException e) {
+			throw new FileFormatException("Failed to parse highest probability in recognizer.");
+		}
+		
 		// Read whether or not there is a HMM for this recognizer in the file
 		if (reader.read(charArray)== -1) {
 			throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
