@@ -43,7 +43,7 @@ public enum GestureType {
 	LEFT_ONE_HUNDRED_HAND_SLAP(7, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, false, Arrays.asList("left_100_hand_slaps")),
 	RIGHT_ONE_HUNDRED_HAND_SLAP(7, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, false, true, Arrays.asList("right_100_hand_slaps")),
 	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(9, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, true, Arrays.asList("two_handed_100_hand_slaps")),
-	PSYCHO_CRUSHER(9, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 8000, 38, true, true, Arrays.asList("psycho_crushers")),
+	PSYCHO_CRUSHER(9, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 7400, 38, true, true, Arrays.asList("psycho_crushers")),
 	
 	YMCA(9, PlayerActionType.YMCA_ATTACK, GestureGenre.EASTER_EGG, 10000, 56, true, true, Arrays.asList("ymcas")),
 	NYAN_CAT(9, PlayerActionType.NYAN_CAT_ATTACK, GestureGenre.EASTER_EGG, 6500, 30, true, true, Arrays.asList("nyan_cats")),
