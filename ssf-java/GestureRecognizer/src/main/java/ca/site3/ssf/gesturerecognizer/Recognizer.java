@@ -3,18 +3,12 @@ package ca.site3.ssf.gesturerecognizer;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import be.ac.ulg.montefiore.run.jahmm.CentroidObservationVector;
-import be.ac.ulg.montefiore.run.jahmm.ForwardBackwardCalculator;
-import be.ac.ulg.montefiore.run.jahmm.ForwardBackwardScaledCalculator;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
-import be.ac.ulg.montefiore.run.jahmm.KMeansCalculator;
 import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
 import be.ac.ulg.montefiore.run.jahmm.OpdfMultiGaussian;
 import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
@@ -63,7 +57,7 @@ class Recognizer {
 	}
 	
 	double getLowestAcceptableLnProbability() {
-		return (this.lowestLnProbability + this.highestLnProbability) / 2.0;
+		return 3.0 * (this.lowestLnProbability + this.highestLnProbability) / 4.0;
 	}
 	
 	/**
