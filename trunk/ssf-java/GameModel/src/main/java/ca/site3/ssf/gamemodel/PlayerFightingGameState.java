@@ -7,6 +7,7 @@ import java.util.Map;
 
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 
+
 abstract class PlayerFightingGameState extends GameState {
 
 	protected Collection<Action> activeActions = new ArrayList<Action>();

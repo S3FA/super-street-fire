@@ -127,7 +127,6 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		}
 	}
 
-	@Override
 	public void run() {
 		while (!this.stop) {
 			IGameModelEvent gameModelEvent;
