@@ -330,7 +330,7 @@ public class GloveEventCoalescer implements Runnable {
 	}
 	
 	private void aggregateAndAdd(Entity player) {
-		List<PlayerGestureInstance> gestures = this.aggregateForPlayer(Entity.PLAYER1_ENTITY);
+		List<PlayerGestureInstance> gestures = this.aggregateForPlayer(player);
 		if (gestures != null && !gestures.isEmpty()) {
 			gestureInstanceQueue.addAll(gestures);
 		}

@@ -48,7 +48,7 @@ public class LegacyGloveDataParser implements IDeviceDataParser {
 			for (int sensorIdx=0; sensorIdx<3; sensorIdx++) {
 				String[] components = sensors[sensorIdx].split(",");
 				if (components.length != 3) {
-					log.warn("Could not split sensor {} into 3 components",sensorIdx);
+					log.warn("Could not split sensor {} into 3 components", sensorIdx);
 					return null;
 				}
 				for (int i=0; i<3; i++) {

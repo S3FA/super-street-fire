@@ -105,7 +105,7 @@ public class DeviceNetworkListener implements Runnable {
 				List<? extends DeviceEvent> events = dataParser.parseDeviceData(receivedPacket.getData(), receivedPacket.getLength(), address);
 				if (events != null) {
 					for (DeviceEvent e : events) {
-						log.debug("Created DeviceEvent: {}", e);
+						log.debug("Created DeviceEvent: {}", e.toString());
 						if (e != null) {
 							eventQueue.add(e);
 						}
