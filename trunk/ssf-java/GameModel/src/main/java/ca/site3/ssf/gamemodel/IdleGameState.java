@@ -10,7 +10,7 @@ package ca.site3.ssf.gamemodel;
  */
 class IdleGameState extends GameState {
 
-	final static private double TIME_BETWEEN_RESETS = 0.1;
+	final static private double TIME_BETWEEN_RESETS = 1.0;
 	private double timeSinceLastReset;
 	private boolean firstTick = true;
 	
