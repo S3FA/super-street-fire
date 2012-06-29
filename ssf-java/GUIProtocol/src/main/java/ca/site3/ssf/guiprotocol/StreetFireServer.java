@@ -119,7 +119,7 @@ public class StreetFireServer implements Runnable {
 				// A connection has been accepted, build a handler for the new connection and start it up
 				GuiHandler handler = new GuiHandler(s);
 				activeHandlers.add(handler);
-				Thread t = new Thread(handler, "GuiHandler - "+handler.hashCode());
+				Thread t = new Thread(handler, "GuiHandler - " + handler.hashCode());
 				t.start();
 				
 			} catch (SocketTimeoutException ex) {
@@ -157,6 +157,7 @@ public class StreetFireServer implements Runnable {
 						catch (IOException ex) {
 							log.error("Exception sending GameEvent to GUI client", ex);
 						}
+
 					}
 				} catch (InterruptedException ex) {
 					log.warn("Interrupted waiting for an event", ex);
@@ -321,9 +322,16 @@ public class StreetFireServer implements Runnable {
 							commandQueue.add(gameCmd);
 						}
 					}
-				} catch (IOException ex) {
-					log.warn("IOException listening on GUI input stream", ex);
-				} catch (Exception ex) {
+				}
+				catch (SocketException ex) {
+					log.warn("SocketException, closing connection with GUI", ex);
+					shouldListen = false;
+					break;
+				}
+				catch (IOException ex) {
+					log.warn("IOException listening on GUI input stream", ex);	
+				} 
+				catch (Exception ex) {
 					log.error("Exception listening on GUI input stream", ex);
 				}
 			}
@@ -332,13 +340,12 @@ public class StreetFireServer implements Runnable {
 				try {
 					socket.close();
 				} catch (IOException ex) {
-					log.warn("Exception closing GuiHandler socket",ex);
+					log.warn("Exception closing GuiHandler socket", ex);
 				}
 			}
 			
 			activeHandlers.remove(this);
 		}
-		
 		
 		public void stop() {
 			this.shouldListen = false;
