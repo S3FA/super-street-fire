@@ -153,12 +153,13 @@ public class StreetFireServer implements Runnable {
 					for (GuiHandler guiHandler : activeHandlers) {
 						try {
 							guiHandler.sendGameEvent(event);
-						} catch (IOException ex) {
-							log.error("Exception sending GameEvent {} to GUI client", ex);
+						}
+						catch (IOException ex) {
+							log.error("Exception sending GameEvent to GUI client", ex);
 						}
 					}
 				} catch (InterruptedException ex) {
-					log.warn("Interrupted waiting for an event",ex);
+					log.warn("Interrupted waiting for an event", ex);
 				}
 			}
 		}
@@ -321,9 +322,9 @@ public class StreetFireServer implements Runnable {
 						}
 					}
 				} catch (IOException ex) {
-					log.warn("IOException listening on GUI input stream",ex);
+					log.warn("IOException listening on GUI input stream", ex);
 				} catch (Exception ex) {
-					log.error("Exception listening on GUI input stream",ex);
+					log.error("Exception listening on GUI input stream", ex);
 				}
 			}
 			
