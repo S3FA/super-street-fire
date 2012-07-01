@@ -32,7 +32,6 @@ public enum GestureType {
 	RIGHT_UPPERCUT(RecognizerManager.NUM_ONE_HANDED_NODES, PlayerActionType.UPPERCUT_ATTACK, GestureGenre.BASIC, 11000, 10, false, true, Arrays.asList("right_uppercuts")),
 	RIGHT_CHOP(RecognizerManager.NUM_ONE_HANDED_NODES, PlayerActionType.CHOP_ATTACK, GestureGenre.BASIC, 8800, 10, false, true, Arrays.asList("right_chops")),
 
-
 	HADOUKEN(RecognizerManager.NUM_TWO_HANDED_NODES, PlayerActionType.HADOUKEN_ATTACK, GestureGenre.SPECIAL, 7000, 10, true, true, Arrays.asList("hadoukens")),
 	LEFT_SHORYUKEN(RecognizerManager.NUM_ONE_HANDED_NODES, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 20000, 21, true, false, Arrays.asList("left_shoryukens")),
 	RIGHT_SHORYUKEN(RecognizerManager.NUM_ONE_HANDED_NODES, PlayerActionType.SHORYUKEN_ATTACK, GestureGenre.SPECIAL, 20000, 21, false, true, Arrays.asList("right_shoryukens")),
@@ -43,7 +42,7 @@ public enum GestureType {
 	SUMO_HEADBUTT(RecognizerManager.NUM_TWO_HANDED_NODES, PlayerActionType.SUMO_HEADBUTT_ATTACK, GestureGenre.SPECIAL, 7500, 13, true, true, Arrays.asList("sumo_headbutts")),
 	LEFT_ONE_HUNDRED_HAND_SLAP(RecognizerManager.NUM_ONE_HANDED_NODES, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, false, Arrays.asList("left_100_hand_slaps")),
 	RIGHT_ONE_HUNDRED_HAND_SLAP(RecognizerManager.NUM_ONE_HANDED_NODES, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, false, true, Arrays.asList("right_100_hand_slaps")),
-	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(RecognizerManager.NUM_TWO_HANDED_NODES, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 16000, 38, true, true, Arrays.asList("two_handed_100_hand_slaps")),
+	TWO_HANDED_ONE_HUNDRED_HAND_SLAP(RecognizerManager.NUM_TWO_HANDED_NODES, PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK, GestureGenre.SPECIAL, 17000, 38, true, true, Arrays.asList("two_handed_100_hand_slaps")),
 	PSYCHO_CRUSHER(RecognizerManager.NUM_TWO_HANDED_NODES, PlayerActionType.PSYCHO_CRUSHER_ATTACK, GestureGenre.SPECIAL, 7400, 38, true, true, Arrays.asList("psycho_crushers")),
 
 	YMCA(RecognizerManager.NUM_TWO_HANDED_NODES, PlayerActionType.YMCA_ATTACK, GestureGenre.EASTER_EGG, 10000, 56, true, true, Arrays.asList("ymcas")),
