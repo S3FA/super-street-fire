@@ -219,10 +219,10 @@ class FireEmitterModel {
 		}
 		else {
 			if (behindAndToTheLeft) {
-				return this.outerRingEmitters.size() / 2;
+				return this.outerRingEmitters.size() / 2 - 1;
 			}
 			else {
-				return (this.outerRingEmitters.size() / 2) + 1;
+				return (this.outerRingEmitters.size() / 2);
 			}
 		}
 	}

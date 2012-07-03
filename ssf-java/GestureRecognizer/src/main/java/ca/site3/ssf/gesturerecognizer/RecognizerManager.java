@@ -156,7 +156,7 @@ class RecognizerManager {
 		for (Recognizer recognizer : this.recognizerMap.values()) {
 			GestureType gestureType = recognizer.getGestureType();
 			
-			if (isRingmasterGesture && !gestureType.getIsRingmasterGesture()) {
+			if (isRingmasterGesture != gestureType.getIsRingmasterGesture()) {
 				continue;
 			}
 			
