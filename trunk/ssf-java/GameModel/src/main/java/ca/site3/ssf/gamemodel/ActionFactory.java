@@ -62,8 +62,8 @@ final public class ActionFactory {
 		
 	};
 
-	final static public float DEFAULT_FULL_ON_FRACTION  = 0.80f;
-	final static public float DEFAULT_FULL_OFF_FRACTION = 0.10f;
+	final static public float DEFAULT_FULL_ON_FRACTION  = 0.70f;
+	final static public float DEFAULT_FULL_OFF_FRACTION = 0.20f;
 	
 	final private GameModel gameModel;
 	
