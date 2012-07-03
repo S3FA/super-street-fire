@@ -20,6 +20,7 @@ message GameEvent {
     PLAYER_ATTACK_ACTION      = 8;
     PLAYER_BLOCK_ACTION       = 9;
     RINGMASTER_ACTION         = 10;
+    SYSTEM_INFO_REFRESH       = 11;
   }
   
   // for PlayerEvents, FireEmitterChanged etc.
@@ -90,6 +91,18 @@ message GameEvent {
     
   }
   
+  enum RingmasterActionType {
+      LEFT_HALF_RING_ACTION  = 0;
+      RIGHT_HALF_RING_ACTION = 1;
+      LEFT_JAB_ACTION        = 2;
+      RIGHT_JAB_ACTION       = 3;
+      ERUPTION_ACTION        = 4;
+      LEFT_CIRCLE_ACTION     = 5;
+      RIGHT_CIRCLE_ACTION    = 6;
+      HADOUKEN_ACTION        = 7;
+      DRUM_ACTION            = 8;
+  }
+  
   enum RoundBeginCountdownTime {
     THREE = 0;
     TWO   = 1;
@@ -132,10 +145,7 @@ message GameEvent {
   // PlayerHealthChange
   optional float oldHealth = 9;
   optional float newHealth = 10;
-  
-  // RingmasterActionEvent
-  // -- nothing to do here
-  
+    
   // RoundBeginTimerChangeEvent
   optional int32 roundNumber = 11;
   optional RoundBeginCountdownTime roundBeginTimer = 12;
@@ -156,5 +166,8 @@ message GameEvent {
   optional float player2Health       = 19;
   optional int32 roundInPlayTimer    = 20;
   // NOTE: The GameInfoRefreshEvent also makes use of timedOut, roundBeginTimer, matchResult
+  
+  // RingmasterActionEvent
+  optional RingmasterActionType ringmasterActionType = 21;
   
 }

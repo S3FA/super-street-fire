@@ -2,10 +2,26 @@ package ca.site3.ssf.gamemodel;
 
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 
-class RingmasterAction extends Action {
+public class RingmasterAction extends Action {
 	
-	public RingmasterAction(FireEmitterModel fireEmitterModel) {
+	public enum ActionType {
+		RINGMASTER_LEFT_HALF_RING_ACTION,
+		RINGMASTER_RIGHT_HALF_RING_ACTION,
+		RINGMASTER_LEFT_JAB_ACTION,
+		RINGMASTER_RIGHT_JAB_ACTION,
+		RINGMASTER_ERUPTION_ACTION,
+		RINGMASTER_LEFT_CIRCLE_ACTION,
+		RINGMASTER_RIGHT_CIRCLE_ACTION,
+		RINGMASTER_HADOUKEN_ACTION,
+		RINGMASTER_DRUM_ACTION
+	}
+	
+	final private ActionType type;
+	
+	RingmasterAction(FireEmitterModel fireEmitterModel, RingmasterAction.ActionType type) {
 		super(fireEmitterModel);
+		this.type = type;
+		assert(type != null);
 	}
 	
 	@Override
@@ -24,7 +40,7 @@ class RingmasterAction extends Action {
 		// Raise an event for the action...
 		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
 		assert(actionSignaller != null);
-		actionSignaller.fireOnRingmasterAction();
+		actionSignaller.fireOnRingmasterAction(this.type);
 	}
 
 	@Override

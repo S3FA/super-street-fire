@@ -105,13 +105,13 @@ public class GestureRecognizer {
 	 * @return The winning gesture that would be executed in-game, null if no gesture was suitable.
 	 */
 	public GestureType recognizerPlayerGestureAsGameWould(GestureInstance gestureInstance) {
-		return this.recognizerMgr.recognize(gestureInstance);
+		return this.recognizerMgr.recognize(gestureInstance, false);
 	}
 	
 	/**
 	 * Use the gesture recognizer to recognize a given gesture instance executed by the given player.
 	 * This function will both recognize the gesture and, if the gesture is identified, it will build
-	 * the approriate Action for the gamemodel to consume.
+	 * the appropriate Action for the gamemodel to consume.
 	 * @param actionFactory The game model's action factory, used to construct the gesture action if one is identified.
 	 * @param playerNum The player who is executing the gesture.
 	 * @param gestureInstance The gesture instance data to recognize.
@@ -145,7 +145,7 @@ public class GestureRecognizer {
 		assert(gestureInstance != null);
 
 		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
-		GestureRecognitionResult result = this.recognizerMgr.recognizeWithFullResult(gestureInstance);
+		GestureRecognitionResult result = this.recognizerMgr.recognizeWithFullResult(gestureInstance, false);
 		return result;
 	}
 	

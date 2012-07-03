@@ -183,18 +183,38 @@ public class StreetFireGuiClient {
 	 * @throws IOException
 	 */
 	public void executePlayerAction(int playerNum, 
-									ActionFactory.PlayerActionType playerActionType, 
+									ActionFactory.ActionType playerActionType, 
 									boolean usesLeftHand,
 									boolean usesRightHand) throws IOException {
 		
+		if (!playerActionType.getIsPlayerAction()) {
+			assert(false);
+			return;
+		}
+		
 		Builder b = Command.newBuilder().setType(CommandType.EXECUTE_PLAYER_ACTION)
 					.setPlayer(SerializationHelper.playerFromNum(playerNum))
-					.setPlayerAction(SerializationHelper.actionToProtobuf(playerActionType))
+					.setPlayerAction(SerializationHelper.playerActionToProtobuf(playerActionType))
 					.setLeftHand(usesLeftHand)
 					.setRightHand(usesRightHand);
 		submitCommand(b.build());
 	}
 	
+	
+	public void executeRingmasterAction(ActionFactory.ActionType ringmasterActionType,
+										boolean usesLeftHand, boolean usesRightHand) throws IOException {
+		
+		if (ringmasterActionType.getIsPlayerAction()) {
+			assert(false);
+			return;
+		}
+		
+		Builder b = Command.newBuilder().setType(CommandType.EXECUTE_RINGMASTER_ACTION)
+				.setRingmasterAction(SerializationHelper.ringmasterActionToProtobuf(ringmasterActionType))
+				.setLeftHand(usesLeftHand)
+				.setRightHand(usesRightHand);
+		submitCommand(b.build());
+	}
 	
 	/**
 	 * @see TouchFireEmitterCommand
@@ -285,13 +305,9 @@ public class StreetFireGuiClient {
 				try {
 					GameEvent event = GameEvent.parseDelimitedFrom(socket.getInputStream());
 					if (event != null) {
-						if (event.getType() == EventType.SYSTEM_INFO_REFRESH) {
-							
-						} else {
-							IGameModelEvent gameEvent = parseEvent(event);
-							if (gameEvent != null) {
-								eventQueue.add(gameEvent);
-							}
+						IGameModelEvent gameEvent = parseEvent(event);
+						if (gameEvent != null) {
+							eventQueue.add(gameEvent);
 						}
 					}
 				} catch (IOException ex) {
@@ -315,6 +331,10 @@ public class StreetFireGuiClient {
 				e.getPlayer1Health(), e.getPlayer2Health(),
 				SerializationHelper.protobufToRoundBeginCountdownTimer(e.getRoundBeginTimer()),
 				e.getRoundInPlayTimer(), e.getTimedOut());
+		
+		case SYSTEM_INFO_REFRESH:
+			// TODO
+			return null;
 			
 		case FIRE_EMITTER_CHANGED:
 			return new FireEmitterChangedEvent(createFireEmitter(e));
@@ -339,7 +359,7 @@ public class StreetFireGuiClient {
 					e.getOldHealth(), e.getNewHealth());
 			
 		case RINGMASTER_ACTION:
-			return new RingmasterActionEvent();
+			return new RingmasterActionEvent(SerializationHelper.protobufToRingmasterAction(e.getRingmasterActionType()));
 			
 		case ROUND_BEGIN_TIMER_CHANGED:
 			return new RoundBeginTimerChangedEvent(SerializationHelper.protobufToRoundBeginCountdownTimer(e.getRoundBeginTimer()), e.getRoundNumber());

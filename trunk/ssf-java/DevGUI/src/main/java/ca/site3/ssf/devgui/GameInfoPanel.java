@@ -118,6 +118,10 @@ class GameInfoPanel extends JPanel {
 	PlayerInfoPanel getPlayer2Panel() {
 		return this.player2Panel;
 	}
+	RingmasterInfoPanel getRingmasterPanel() {
+		return this.ringmasterPanel;
+	}
+	
 	PlayerInfoPanel getPlayerPanel(int playerNum) {
 		if (playerNum == 1) {
 			return this.getPlayer1Panel();
@@ -126,5 +130,4 @@ class GameInfoPanel extends JPanel {
 			return this.getPlayer2Panel();
 		}
 	}
-	
 }

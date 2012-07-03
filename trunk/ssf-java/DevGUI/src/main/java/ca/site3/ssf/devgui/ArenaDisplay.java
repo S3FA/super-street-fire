@@ -54,10 +54,11 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	final static private BasicStroke PODIUM_OUTLINE_STROKE  = new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	final static private BasicStroke ROUND_OUTLINE_STROKE   = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 	
-	final static private Font INTENSITY_FONT = new Font("SansSerif", Font.PLAIN, 12);
-	final static private Font PLAYER_FONT    = new Font("SansSerif", Font.BOLD, 16);
-	final static private Font COUNTDOWN_FONT = new Font("SansSerif", Font.ITALIC, 20);
-	final static private Font ROUND_FONT     = new Font("SansSerif", Font.BOLD, 24);
+	final static private Font INTENSITY_FONT  = new Font("SansSerif", Font.PLAIN, 12);
+	final static private Font PLAYER_FONT     = new Font("SansSerif", Font.BOLD, 16);
+	final static private Font RINGMASTER_FONT = new Font("SansSerif", Font.BOLD, 12);
+	final static private Font COUNTDOWN_FONT  = new Font("SansSerif", Font.ITALIC, 20);
+	final static private Font ROUND_FONT      = new Font("SansSerif", Font.BOLD, 24);
 	
 	// Colours used when drawing the fire emitters whose flame belongs to a particular entity in the game...
 	final static Color PLAYER_1_COLOUR   = new Color(1.0f, 0.0f, 0.0f);
@@ -172,8 +173,9 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 		
-		final FontMetrics INTENSITY_FONT_METRICS = g2.getFontMetrics(INTENSITY_FONT);
-		final FontMetrics PLAYER_FONT_METRICS    = g2.getFontMetrics(PLAYER_FONT);
+		final FontMetrics INTENSITY_FONT_METRICS  = g2.getFontMetrics(INTENSITY_FONT);
+		final FontMetrics PLAYER_FONT_METRICS     = g2.getFontMetrics(PLAYER_FONT);
+		final FontMetrics RINGMASTER_FONT_METRICS = g2.getFontMetrics(RINGMASTER_FONT);
 		
 		Dimension size = this.getSize();
 		
@@ -314,6 +316,9 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final float PLAYER_LEFT_X  = CENTER_X - PODIUM_WIDTH / 2.0f;
 		final float PLAYER_1_TOP_Y = RAIL_BOTTOM_Y;
 		final float PLAYER_2_TOP_Y = RAIL_TOP_Y - PODIUM_WIDTH;
+		final float RINGMASTER_PODIUM_WIDTH = PODIUM_WIDTH/1.5f;
+		final float RINGMASTER_LEFT_X = CENTER_X - WIDTH_BETWEEN_RAILS - RINGMASTER_PODIUM_WIDTH;
+		final float RINGMASTER_TOP_Y  = CENTER_Y - (PODIUM_WIDTH/2.0f);
 		
 		RoundRectangle2D.Float player1PodiumShape = new RoundRectangle2D.Float(PLAYER_LEFT_X, PLAYER_1_TOP_Y, PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
 		g2.setStroke(ArenaDisplay.PODIUM_OUTLINE_STROKE);
@@ -329,11 +334,22 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		g2.setPaint(Color.black);
 		g2.draw(player2PodiumShape);
 		
+		RoundRectangle2D.Float ringmasterPodiumShape = new RoundRectangle2D.Float(RINGMASTER_LEFT_X, RINGMASTER_TOP_Y, RINGMASTER_PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
+		g2.setStroke(ArenaDisplay.PODIUM_OUTLINE_STROKE);
+		g2.setPaint(ArenaDisplay.RINGMASTER_COLOUR);
+		g2.fill(ringmasterPodiumShape);
+		g2.setPaint(Color.black);
+		g2.draw(ringmasterPodiumShape);
+		
 		String player1Str = "Player 1";
 		String player2Str = "Player 2";
+		String ringmasterStr = "MG";
 		g2.setFont(PLAYER_FONT);
 		g2.drawString(player1Str, player1PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player1Str)) / 2.0f, player1PodiumShape.y + HALF_PODIUM_WIDTH);
 		g2.drawString(player2Str, player2PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player2Str)) / 2.0f, player2PodiumShape.y + HALF_PODIUM_WIDTH);
+		g2.setFont(RINGMASTER_FONT);
+		g2.drawString(ringmasterStr, ringmasterPodiumShape.x + (RINGMASTER_PODIUM_WIDTH - RINGMASTER_FONT_METRICS.stringWidth(ringmasterStr)) / 2.0f,
+				ringmasterPodiumShape.y + PODIUM_WIDTH/2.0f);
 		
 		// Draw the countdown text...
 		FontMetrics COUNTDOWN_FONT_METRICS = g2.getFontMetrics(ArenaDisplay.COUNTDOWN_FONT);
