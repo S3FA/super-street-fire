@@ -3,7 +3,7 @@ package ca.site3.ssf.gamemodel;
 import java.util.Hashtable;
 import java.util.Map;
 
-import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
+import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 
 /**
  * A class that represents a player of the Super Street Fire game.

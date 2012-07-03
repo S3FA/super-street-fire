@@ -12,7 +12,7 @@ class RingmasterInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JLabel timeOfLastAction;
+	private JLabel lastAction;
 	
 	RingmasterInfoPanel() {
 		super();
@@ -26,17 +26,18 @@ class RingmasterInfoPanel extends JPanel {
 
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
 		
-		this.timeOfLastAction = new JLabel("N/A");
-		this.timeOfLastAction.setForeground(Color.black);		
+		this.lastAction = new JLabel("N/A");
+		this.lastAction.setForeground(Color.black);
 		
-		JLabel timeLabel = new JLabel("Time of Last Action:");
-		timeLabel.setForeground(Color.black);
-		formLayoutHelper.addLabel(timeLabel, this);
-		formLayoutHelper.addLastField(this.timeOfLastAction, this);
+		JLabel lastActionLabel = new JLabel("Last Action:");
+		lastActionLabel.setForeground(Color.black);
+		formLayoutHelper.addLabel(lastActionLabel, this);
+		formLayoutHelper.addLastField(this.lastAction, this);
+
 	}
 	
-	void setLastAction(double clockTime) {
-		this.timeOfLastAction.setText("T-" + clockTime);
+	void setLastAction(ca.site3.ssf.gamemodel.RingmasterAction.ActionType actionType, double clockTime) {
+		this.lastAction.setText(actionType.toString());
 	}
 	
 }

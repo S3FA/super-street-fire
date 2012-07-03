@@ -89,10 +89,9 @@ public final class Event {
     boolean hasRoundInPlayTimer();
     int getRoundInPlayTimer();
     
-    // repeated int32 deviceIndexOn = 21;
-    java.util.List<java.lang.Integer> getDeviceIndexOnList();
-    int getDeviceIndexOnCount();
-    int getDeviceIndexOn(int index);
+    // optional .guiprotocol.GameEvent.RingmasterActionType ringmasterActionType = 21;
+    boolean hasRingmasterActionType();
+    ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType getRingmasterActionType();
   }
   public static final class GameEvent extends
       com.google.protobuf.GeneratedMessage
@@ -722,6 +721,96 @@ public final class Event {
       // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.AttackType)
     }
     
+    public enum RingmasterActionType
+        implements com.google.protobuf.ProtocolMessageEnum {
+      LEFT_HALF_RING_ACTION(0, 0),
+      RIGHT_HALF_RING_ACTION(1, 1),
+      LEFT_JAB_ACTION(2, 2),
+      RIGHT_JAB_ACTION(3, 3),
+      ERUPTION_ACTION(4, 4),
+      LEFT_CIRCLE_ACTION(5, 5),
+      RIGHT_CIRCLE_ACTION(6, 6),
+      HADOUKEN_ACTION(7, 7),
+      DRUM_ACTION(8, 8),
+      ;
+      
+      public static final int LEFT_HALF_RING_ACTION_VALUE = 0;
+      public static final int RIGHT_HALF_RING_ACTION_VALUE = 1;
+      public static final int LEFT_JAB_ACTION_VALUE = 2;
+      public static final int RIGHT_JAB_ACTION_VALUE = 3;
+      public static final int ERUPTION_ACTION_VALUE = 4;
+      public static final int LEFT_CIRCLE_ACTION_VALUE = 5;
+      public static final int RIGHT_CIRCLE_ACTION_VALUE = 6;
+      public static final int HADOUKEN_ACTION_VALUE = 7;
+      public static final int DRUM_ACTION_VALUE = 8;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static RingmasterActionType valueOf(int value) {
+        switch (value) {
+          case 0: return LEFT_HALF_RING_ACTION;
+          case 1: return RIGHT_HALF_RING_ACTION;
+          case 2: return LEFT_JAB_ACTION;
+          case 3: return RIGHT_JAB_ACTION;
+          case 4: return ERUPTION_ACTION;
+          case 5: return LEFT_CIRCLE_ACTION;
+          case 6: return RIGHT_CIRCLE_ACTION;
+          case 7: return HADOUKEN_ACTION;
+          case 8: return DRUM_ACTION;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<RingmasterActionType>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<RingmasterActionType>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<RingmasterActionType>() {
+              public RingmasterActionType findValueByNumber(int number) {
+                return RingmasterActionType.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(7);
+      }
+      
+      private static final RingmasterActionType[] VALUES = {
+        LEFT_HALF_RING_ACTION, RIGHT_HALF_RING_ACTION, LEFT_JAB_ACTION, RIGHT_JAB_ACTION, ERUPTION_ACTION, LEFT_CIRCLE_ACTION, RIGHT_CIRCLE_ACTION, HADOUKEN_ACTION, DRUM_ACTION, 
+      };
+      
+      public static RingmasterActionType valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private RingmasterActionType(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.RingmasterActionType)
+    }
+    
     public enum RoundBeginCountdownTime
         implements com.google.protobuf.ProtocolMessageEnum {
       THREE(0, 0),
@@ -770,7 +859,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(7);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(8);
       }
       
       private static final RoundBeginCountdownTime[] VALUES = {
@@ -1609,18 +1698,14 @@ public final class Event {
       return roundInPlayTimer_;
     }
     
-    // repeated int32 deviceIndexOn = 21;
-    public static final int DEVICEINDEXON_FIELD_NUMBER = 21;
-    private java.util.List<java.lang.Integer> deviceIndexOn_;
-    public java.util.List<java.lang.Integer>
-        getDeviceIndexOnList() {
-      return deviceIndexOn_;
+    // optional .guiprotocol.GameEvent.RingmasterActionType ringmasterActionType = 21;
+    public static final int RINGMASTERACTIONTYPE_FIELD_NUMBER = 21;
+    private ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType ringmasterActionType_;
+    public boolean hasRingmasterActionType() {
+      return ((bitField0_ & 0x00040000) == 0x00040000);
     }
-    public int getDeviceIndexOnCount() {
-      return deviceIndexOn_.size();
-    }
-    public int getDeviceIndexOn(int index) {
-      return deviceIndexOn_.get(index);
+    public ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType getRingmasterActionType() {
+      return ringmasterActionType_;
     }
     
     private void initFields() {
@@ -1643,7 +1728,7 @@ public final class Event {
       player1Health_ = 0F;
       player2Health_ = 0F;
       roundInPlayTimer_ = 0;
-      deviceIndexOn_ = java.util.Collections.emptyList();;
+      ringmasterActionType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType.LEFT_HALF_RING_ACTION;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1724,8 +1809,8 @@ public final class Event {
       if (((bitField0_ & 0x00020000) == 0x00020000)) {
         output.writeInt32(20, roundInPlayTimer_);
       }
-      for (int i = 0; i < deviceIndexOn_.size(); i++) {
-        output.writeInt32(21, deviceIndexOn_.get(i));
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        output.writeEnum(21, ringmasterActionType_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -1817,14 +1902,9 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(20, roundInPlayTimer_);
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < deviceIndexOn_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeInt32SizeNoTag(deviceIndexOn_.get(i));
-        }
-        size += dataSize;
-        size += 2 * getDeviceIndexOnList().size();
+      if (((bitField0_ & 0x00040000) == 0x00040000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(21, ringmasterActionType_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1993,7 +2073,7 @@ public final class Event {
         bitField0_ = (bitField0_ & ~0x00020000);
         roundInPlayTimer_ = 0;
         bitField0_ = (bitField0_ & ~0x00040000);
-        deviceIndexOn_ = java.util.Collections.emptyList();;
+        ringmasterActionType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType.LEFT_HALF_RING_ACTION;
         bitField0_ = (bitField0_ & ~0x00080000);
         return this;
       }
@@ -2114,11 +2194,10 @@ public final class Event {
           to_bitField0_ |= 0x00020000;
         }
         result.roundInPlayTimer_ = roundInPlayTimer_;
-        if (((bitField0_ & 0x00080000) == 0x00080000)) {
-          deviceIndexOn_ = java.util.Collections.unmodifiableList(deviceIndexOn_);
-          bitField0_ = (bitField0_ & ~0x00080000);
+        if (((from_bitField0_ & 0x00080000) == 0x00080000)) {
+          to_bitField0_ |= 0x00040000;
         }
-        result.deviceIndexOn_ = deviceIndexOn_;
+        result.ringmasterActionType_ = ringmasterActionType_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2199,15 +2278,8 @@ public final class Event {
         if (other.hasRoundInPlayTimer()) {
           setRoundInPlayTimer(other.getRoundInPlayTimer());
         }
-        if (!other.deviceIndexOn_.isEmpty()) {
-          if (deviceIndexOn_.isEmpty()) {
-            deviceIndexOn_ = other.deviceIndexOn_;
-            bitField0_ = (bitField0_ & ~0x00080000);
-          } else {
-            ensureDeviceIndexOnIsMutable();
-            deviceIndexOn_.addAll(other.deviceIndexOn_);
-          }
-          onChanged();
+        if (other.hasRingmasterActionType()) {
+          setRingmasterActionType(other.getRingmasterActionType());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2424,17 +2496,14 @@ public final class Event {
               break;
             }
             case 168: {
-              ensureDeviceIndexOnIsMutable();
-              deviceIndexOn_.add(input.readInt32());
-              break;
-            }
-            case 170: {
-              int length = input.readRawVarint32();
-              int limit = input.pushLimit(length);
-              while (input.getBytesUntilLimit() > 0) {
-                addDeviceIndexOn(input.readInt32());
+              int rawValue = input.readEnum();
+              ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType value = ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(21, rawValue);
+              } else {
+                bitField0_ |= 0x00080000;
+                ringmasterActionType_ = value;
               }
-              input.popLimit(limit);
               break;
             }
           }
@@ -2968,47 +3037,26 @@ public final class Event {
         return this;
       }
       
-      // repeated int32 deviceIndexOn = 21;
-      private java.util.List<java.lang.Integer> deviceIndexOn_ = java.util.Collections.emptyList();;
-      private void ensureDeviceIndexOnIsMutable() {
-        if (!((bitField0_ & 0x00080000) == 0x00080000)) {
-          deviceIndexOn_ = new java.util.ArrayList<java.lang.Integer>(deviceIndexOn_);
-          bitField0_ |= 0x00080000;
-         }
+      // optional .guiprotocol.GameEvent.RingmasterActionType ringmasterActionType = 21;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType ringmasterActionType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType.LEFT_HALF_RING_ACTION;
+      public boolean hasRingmasterActionType() {
+        return ((bitField0_ & 0x00080000) == 0x00080000);
       }
-      public java.util.List<java.lang.Integer>
-          getDeviceIndexOnList() {
-        return java.util.Collections.unmodifiableList(deviceIndexOn_);
+      public ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType getRingmasterActionType() {
+        return ringmasterActionType_;
       }
-      public int getDeviceIndexOnCount() {
-        return deviceIndexOn_.size();
-      }
-      public int getDeviceIndexOn(int index) {
-        return deviceIndexOn_.get(index);
-      }
-      public Builder setDeviceIndexOn(
-          int index, int value) {
-        ensureDeviceIndexOnIsMutable();
-        deviceIndexOn_.set(index, value);
+      public Builder setRingmasterActionType(ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00080000;
+        ringmasterActionType_ = value;
         onChanged();
         return this;
       }
-      public Builder addDeviceIndexOn(int value) {
-        ensureDeviceIndexOnIsMutable();
-        deviceIndexOn_.add(value);
-        onChanged();
-        return this;
-      }
-      public Builder addAllDeviceIndexOn(
-          java.lang.Iterable<? extends java.lang.Integer> values) {
-        ensureDeviceIndexOnIsMutable();
-        super.addAll(values, deviceIndexOn_);
-        onChanged();
-        return this;
-      }
-      public Builder clearDeviceIndexOn() {
-        deviceIndexOn_ = java.util.Collections.emptyList();;
+      public Builder clearRingmasterActionType() {
         bitField0_ = (bitField0_ & ~0x00080000);
+        ringmasterActionType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType.LEFT_HALF_RING_ACTION;
         onChanged();
         return this;
       }
@@ -3044,7 +3092,7 @@ public final class Event {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022\013guiprotocol\032\014common.proto" +
-      "\"\207\022\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
+      "\"\242\024\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
       "ol.GameEvent.EventType\0223\n\007emitter\030\002 \001(\0132" +
       "\".guiprotocol.GameEvent.FireEmitter\022,\n\014o" +
       "ldGameState\030\003 \001(\0162\026.guiprotocol.GameStat" +
@@ -3063,46 +3111,53 @@ public final class Event {
       "roundResults\030\021 \003(\0162\".guiprotocol.GameEve" +
       "nt.RoundResult\022\025\n\rplayer1Health\030\022 \001(\002\022\025\n" +
       "\rplayer2Health\030\023 \001(\002\022\030\n\020roundInPlayTimer",
-      "\030\024 \001(\005\022\025\n\rdeviceIndexOn\030\025 \003(\005\032\261\001\n\013FireEm" +
-      "itter\022\024\n\014emitterIndex\030\001 \002(\005\022;\n\013emitterTy" +
-      "pe\030\002 \002(\0162&.guiprotocol.GameEvent.FireEmi" +
-      "tterType\022\033\n\023intensityRingmaster\030\003 \002(\002\022\030\n" +
-      "\020intensityPlayer1\030\004 \002(\002\022\030\n\020intensityPlay" +
-      "er2\030\005 \002(\002\"\261\002\n\tEventType\022\025\n\021GAME_INFO_REF" +
-      "RESH\020\000\022\030\n\024FIRE_EMITTER_CHANGED\020\001\022\026\n\022GAME" +
-      "_STATE_CHANGED\020\002\022\031\n\025PLAYER_HEALTH_CHANGE" +
-      "D\020\003\022\034\n\030ROUND_PLAY_TIMER_CHANGED\020\004\022\035\n\031ROU" +
-      "ND_BEGIN_TIMER_CHANGED\020\005\022\017\n\013ROUND_ENDED\020",
-      "\006\022\017\n\013MATCH_ENDED\020\007\022\030\n\024PLAYER_ATTACK_ACTI" +
-      "ON\020\010\022\027\n\023PLAYER_BLOCK_ACTION\020\t\022\025\n\021RINGMAS" +
-      "TER_ACTION\020\n\022\027\n\023SYSTEM_INFO_REFRESH\020\013\"(\n" +
-      "\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"" +
-      "L\n\013RoundResult\022\r\n\tROUND_TIE\020\000\022\026\n\022PLAYER_" +
-      "1_ROUND_WIN\020\001\022\026\n\022PLAYER_2_ROUND_WIN\020\002\"=\n" +
-      "\013MatchResult\022\026\n\022PLAYER_1_MATCH_WIN\020\000\022\026\n\022" +
-      "PLAYER_2_MATCH_WIN\020\001\"@\n\017FireEmitterType\022" +
-      "\r\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_" +
-      "RING\020\002\"I\n\020FlameEmitterType\022\020\n\014ATTACK_FLA",
-      "ME\020\000\022\017\n\013BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020" +
-      "\002\"\203\005\n\nAttackType\022\024\n\020CUSTOM_UNDEFINED\020\000\022\014" +
-      "\n\010LEFT_JAB\020\001\022\r\n\tRIGHT_JAB\020\002\022\r\n\tLEFT_HOOK" +
-      "\020\003\022\016\n\nRIGHT_HOOK\020\004\022\021\n\rLEFT_UPPERCUT\020\005\022\022\n" +
-      "\016RIGHT_UPPERCUT\020\006\022\r\n\tLEFT_CHOP\020\007\022\016\n\nRIGH" +
-      "T_CHOP\020\010\022\014\n\010HADOUKEN\020\t\022\016\n\nSONIC_BOOM\020\n\022\031" +
-      "\n\025LEFT_SHORYUKEN_ATTACK\020\013\022\032\n\026RIGHT_SHORY" +
-      "UKEN_ATTACK\020\014\022\030\n\024DOUBLE_LARIAT_ATTACK\020\r\022" +
-      "\033\n\027QUADRUPLE_LARIAT_ATTACK\020\016\022\030\n\024SUMO_HEA" +
-      "DBUTT_ATTACK\020\017\022%\n!LEFT_ONE_HUNDRED_HAND_",
-      "SLAP_ATTACK\020\020\022&\n\"RIGHT_ONE_HUNDRED_HAND_" +
-      "SLAP_ATTACK\020\021\022+\n\'TWO_HANDED_ONE_HUNDRED_" +
-      "HAND_SLAP_ATTACK\020\022\022\031\n\025PSYCHO_CRUSHER_ATT" +
-      "ACK\020\023\022\017\n\013YMCA_ATTACK\020\024\022\023\n\017NYAN_CAT_ATTAC" +
-      "K\020\025\022\024\n\020DISCO_STU_ATTACK\020\026\022\027\n\023ARM_WINDMIL" +
-      "L_ATTACK\020\027\022\022\n\016SUCK_IT_ATTACK\020\030\022\032\n\026LEFT_V" +
-      "AFANAPOLI_ATTACK\020\031\022\033\n\027RIGHT_VAFANAPOLI_A" +
-      "TTACK\020\032\"A\n\027RoundBeginCountdownTime\022\t\n\005TH" +
-      "REE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca" +
-      ".site3.ssf.guiprotocol"
+      "\030\024 \001(\005\022I\n\024ringmasterActionType\030\025 \001(\0162+.g" +
+      "uiprotocol.GameEvent.RingmasterActionTyp" +
+      "e\032\261\001\n\013FireEmitter\022\024\n\014emitterIndex\030\001 \002(\005\022" +
+      ";\n\013emitterType\030\002 \002(\0162&.guiprotocol.GameE" +
+      "vent.FireEmitterType\022\033\n\023intensityRingmas" +
+      "ter\030\003 \002(\002\022\030\n\020intensityPlayer1\030\004 \002(\002\022\030\n\020i" +
+      "ntensityPlayer2\030\005 \002(\002\"\261\002\n\tEventType\022\025\n\021G" +
+      "AME_INFO_REFRESH\020\000\022\030\n\024FIRE_EMITTER_CHANG" +
+      "ED\020\001\022\026\n\022GAME_STATE_CHANGED\020\002\022\031\n\025PLAYER_H" +
+      "EALTH_CHANGED\020\003\022\034\n\030ROUND_PLAY_TIMER_CHAN",
+      "GED\020\004\022\035\n\031ROUND_BEGIN_TIMER_CHANGED\020\005\022\017\n\013" +
+      "ROUND_ENDED\020\006\022\017\n\013MATCH_ENDED\020\007\022\030\n\024PLAYER" +
+      "_ATTACK_ACTION\020\010\022\027\n\023PLAYER_BLOCK_ACTION\020" +
+      "\t\022\025\n\021RINGMASTER_ACTION\020\n\022\027\n\023SYSTEM_INFO_" +
+      "REFRESH\020\013\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P" +
+      "1\020\001\022\006\n\002P2\020\002\"L\n\013RoundResult\022\r\n\tROUND_TIE\020" +
+      "\000\022\026\n\022PLAYER_1_ROUND_WIN\020\001\022\026\n\022PLAYER_2_RO" +
+      "UND_WIN\020\002\"=\n\013MatchResult\022\026\n\022PLAYER_1_MAT" +
+      "CH_WIN\020\000\022\026\n\022PLAYER_2_MATCH_WIN\020\001\"@\n\017Fire" +
+      "EmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL",
+      "\020\001\022\016\n\nOUTER_RING\020\002\"I\n\020FlameEmitterType\022\020" +
+      "\n\014ATTACK_FLAME\020\000\022\017\n\013BLOCK_FLAME\020\001\022\022\n\016NON" +
+      "_GAME_FLAME\020\002\"\203\005\n\nAttackType\022\024\n\020CUSTOM_U" +
+      "NDEFINED\020\000\022\014\n\010LEFT_JAB\020\001\022\r\n\tRIGHT_JAB\020\002\022" +
+      "\r\n\tLEFT_HOOK\020\003\022\016\n\nRIGHT_HOOK\020\004\022\021\n\rLEFT_U" +
+      "PPERCUT\020\005\022\022\n\016RIGHT_UPPERCUT\020\006\022\r\n\tLEFT_CH" +
+      "OP\020\007\022\016\n\nRIGHT_CHOP\020\010\022\014\n\010HADOUKEN\020\t\022\016\n\nSO" +
+      "NIC_BOOM\020\n\022\031\n\025LEFT_SHORYUKEN_ATTACK\020\013\022\032\n" +
+      "\026RIGHT_SHORYUKEN_ATTACK\020\014\022\030\n\024DOUBLE_LARI" +
+      "AT_ATTACK\020\r\022\033\n\027QUADRUPLE_LARIAT_ATTACK\020\016",
+      "\022\030\n\024SUMO_HEADBUTT_ATTACK\020\017\022%\n!LEFT_ONE_H" +
+      "UNDRED_HAND_SLAP_ATTACK\020\020\022&\n\"RIGHT_ONE_H" +
+      "UNDRED_HAND_SLAP_ATTACK\020\021\022+\n\'TWO_HANDED_" +
+      "ONE_HUNDRED_HAND_SLAP_ATTACK\020\022\022\031\n\025PSYCHO" +
+      "_CRUSHER_ATTACK\020\023\022\017\n\013YMCA_ATTACK\020\024\022\023\n\017NY" +
+      "AN_CAT_ATTACK\020\025\022\024\n\020DISCO_STU_ATTACK\020\026\022\027\n" +
+      "\023ARM_WINDMILL_ATTACK\020\027\022\022\n\016SUCK_IT_ATTACK" +
+      "\020\030\022\032\n\026LEFT_VAFANAPOLI_ATTACK\020\031\022\033\n\027RIGHT_" +
+      "VAFANAPOLI_ATTACK\020\032\"\344\001\n\024RingmasterAction" +
+      "Type\022\031\n\025LEFT_HALF_RING_ACTION\020\000\022\032\n\026RIGHT",
+      "_HALF_RING_ACTION\020\001\022\023\n\017LEFT_JAB_ACTION\020\002" +
+      "\022\024\n\020RIGHT_JAB_ACTION\020\003\022\023\n\017ERUPTION_ACTIO" +
+      "N\020\004\022\026\n\022LEFT_CIRCLE_ACTION\020\005\022\027\n\023RIGHT_CIR" +
+      "CLE_ACTION\020\006\022\023\n\017HADOUKEN_ACTION\020\007\022\017\n\013DRU" +
+      "M_ACTION\020\010\"A\n\027RoundBeginCountdownTime\022\t\n" +
+      "\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n" +
+      "\030ca.site3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3114,7 +3169,7 @@ public final class Event {
           internal_static_guiprotocol_GameEvent_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guiprotocol_GameEvent_descriptor,
-              new java.lang.String[] { "Type", "Emitter", "OldGameState", "NewGameState", "MatchResult", "Player", "AttackType", "OldHealth", "NewHealth", "RoundNumber", "RoundBeginTimer", "RoundResult", "TimedOut", "TimeInSecs", "GameState", "RoundResults", "Player1Health", "Player2Health", "RoundInPlayTimer", "DeviceIndexOn", },
+              new java.lang.String[] { "Type", "Emitter", "OldGameState", "NewGameState", "MatchResult", "Player", "AttackType", "OldHealth", "NewHealth", "RoundNumber", "RoundBeginTimer", "RoundResult", "TimedOut", "TimeInSecs", "GameState", "RoundResults", "Player1Health", "Player2Health", "RoundInPlayTimer", "RingmasterActionType", },
               ca.site3.ssf.guiprotocol.Event.GameEvent.class,
               ca.site3.ssf.guiprotocol.Event.GameEvent.Builder.class);
           internal_static_guiprotocol_GameEvent_FireEmitter_descriptor =

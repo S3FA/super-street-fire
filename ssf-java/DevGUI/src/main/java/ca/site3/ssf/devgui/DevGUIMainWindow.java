@@ -373,7 +373,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	}
 
 	private void onRingmasterAction(RingmasterActionEvent event) {
-		// TODO Auto-generated method stub
+		RingmasterInfoPanel ringmasterPanel = this.infoPanel.getRingmasterPanel();
+		ringmasterPanel.setLastAction(event.getActionType(), this.infoPanel.getRoundTime());
 	}
 
 	private void onFireEmitterChanged(FireEmitterChangedEvent event) {

@@ -20,9 +20,10 @@ import org.slf4j.LoggerFactory;
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.Action;
 import ca.site3.ssf.gamemodel.ActionFactory;
-import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
+import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 import ca.site3.ssf.gamemodel.ExecuteGenericActionCommand;
 import ca.site3.ssf.gamemodel.ExecutePlayerActionCommand;
+import ca.site3.ssf.gamemodel.ExecuteRingmasterActionCommand;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
@@ -38,6 +39,7 @@ import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.QueryGameInfoRefreshCommand;
+import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
@@ -248,7 +250,9 @@ public class StreetFireServer implements Runnable {
 		}
 		
 		case RINGMASTER_ACTION: {
+			RingmasterActionEvent e = (RingmasterActionEvent)evt;
 			b.setType(EventType.RINGMASTER_ACTION);
+			b.setRingmasterActionType(SerializationHelper.ringmasterActionTypeToProtobuf(e.getActionType()));
 			break;
 		}
 		
@@ -366,6 +370,8 @@ public class StreetFireServer implements Runnable {
 				return createGenericActionCommand(cmd);
 			case EXECUTE_PLAYER_ACTION:
 				return createPlayerActionCommand(cmd);
+			case EXECUTE_RINGMASTER_ACTION:
+				return createRingmasterActionCommand(cmd);
 			case KILL_GAME:
 				return createKillCommand(cmd);
 			case NEXT_STATE:
@@ -398,10 +404,14 @@ public class StreetFireServer implements Runnable {
 		
 		private ExecutePlayerActionCommand createPlayerActionCommand(Command cmd) {
 			int playerNum = SerializationHelper.playerToNum(cmd.getPlayer());
-			PlayerActionType type = SerializationHelper.actionToGame(cmd.getPlayerAction());
+			ActionType type = SerializationHelper.playerActionToGame(cmd.getPlayerAction());
 			return new ExecutePlayerActionCommand(playerNum, type, cmd.getLeftHand(), cmd.getRightHand());
 		}
 		
+		private ExecuteRingmasterActionCommand createRingmasterActionCommand(Command cmd) {
+			ActionType type = SerializationHelper.ringmasterActionToGame(cmd.getRingmasterAction());
+			return new ExecuteRingmasterActionCommand(type, cmd.getLeftHand(), cmd.getRightHand());
+		}
 		
 		private InitiateNextStateCommand createNextStateCommand(Command cmd) {
 			return new InitiateNextStateCommand(SerializationHelper.protobufToGameState(cmd.getNextState()));

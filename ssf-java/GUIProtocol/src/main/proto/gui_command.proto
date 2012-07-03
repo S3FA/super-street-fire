@@ -9,16 +9,18 @@ message Command {
   
   // corresponds to AbstractGameModelCommand classes
   enum CommandType {
-    EXECUTE_GENERIC_ACTION = 0; // 
-    EXECUTE_PLAYER_ACTION = 1;
-    TOGGLE_PAUSE = 2;
-    KILL_GAME = 3; // no args
-    NEXT_STATE = 4; // no args
-    TOUCH_EMITTER = 5; // FireEmitterType, emitterIndex, intensity, emitterEntities
-    QUERY_GAME_INFO_REFRESH = 6;
+    EXECUTE_GENERIC_ACTION    = 0;  // player, leftHand, rightHand, dmgPerFlame, flameWidth, durationInSeconds, acceleration
+    EXECUTE_PLAYER_ACTION     = 1;  // playerAction, player, leftHand, rightHand
+    TOGGLE_PAUSE              = 2;  // no args
+    KILL_GAME                 = 3;  // no args
+    NEXT_STATE                = 4;  // no args
+    TOUCH_EMITTER             = 5;  // FireEmitterType, emitterIndex, intensity, emitterEntities
+    QUERY_GAME_INFO_REFRESH   = 6;  // no args
+    EXECUTE_RINGMASTER_ACTION = 7;  // ringmasterAction, leftHand, rightHand
+    QUERY_SYSTEM_INFO         = 8;  // no args
   }  
   
-  // for EXECUTE_PLAYER_ACTION (PlayerActionType)
+  // For EXECUTE_PLAYER_ACTION (PlayerActionType)
   enum PlayerAction {
     
     // Basic Actions
@@ -47,14 +49,24 @@ message Command {
     VAFANAPOLI_ATTACK   = 18;
   }
   
-  // for EXECUTE_ACTION or TOUCH_EMITTER
+  // For EXECUTE_RINGMASTER_ACTION
+  enum RingmasterAction {
+    HALF_RING_ACTION = 0;
+    JAB_ACTION       = 1;
+    ERUPTION_ACTION  = 2;
+    CIRCLE_ACTION    = 3;
+    HADOUKEN_ACTION  = 4;
+    DRUM_ACTION      = 5;
+  }
+  
+  // For EXECUTE_ACTION or TOUCH_EMITTER
   enum Player {
     RINGMASTER = 0;
     P1 = 1;
     P2 = 2;
   }
   
-  // for TOUCH_EMITTER
+  // For TOUCH_EMITTER
   enum FireEmitterType {
     LEFT_RAIL = 0;
     RIGHT_RAIL = 1;
@@ -67,6 +79,8 @@ message Command {
   // EXECUTE_PLAYER_ACTION
   optional PlayerAction playerAction = 2;
   optional Player player = 3;
+  
+  // EXECUTE_PLAYER_ACTION and EXECUTE_RINGMASTER_ACTION
   optional bool leftHand = 4;
   optional bool rightHand = 5;
   
@@ -87,4 +101,6 @@ message Command {
   // NEXT_STATE
   optional GameState nextState = 14;
   
+  // EXECUTE_RINGMASTER_ACTION
+  optional RingmasterAction ringmasterAction = 15;
 }

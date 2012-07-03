@@ -16,26 +16,54 @@ import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
  */
 final public class ActionFactory {
 	
-	public enum PlayerActionType {
+	public enum ActionType {
 		// Basic moves
-		BLOCK, JAB_ATTACK, HOOK_ATTACK, UPPERCUT_ATTACK, CHOP_ATTACK,
+		BLOCK(true),
+		JAB_ATTACK(true),
+		HOOK_ATTACK(true),
+		UPPERCUT_ATTACK(true),
+		CHOP_ATTACK(true),
 		
 		// Special moves
-		HADOUKEN_ATTACK, SHORYUKEN_ATTACK, SONIC_BOOM_ATTACK, DOUBLE_LARIAT_ATTACK,
-		QUADRUPLE_LARIAT_ATTACK, SUMO_HEADBUTT_ATTACK, ONE_HUNDRED_HAND_SLAP_ATTACK,
-		PSYCHO_CRUSHER_ATTACK,
+		HADOUKEN_ATTACK(true),
+		SHORYUKEN_ATTACK(true),
+		SONIC_BOOM_ATTACK(true),
+		DOUBLE_LARIAT_ATTACK(true),
+		QUADRUPLE_LARIAT_ATTACK(true),
+		SUMO_HEADBUTT_ATTACK(true),
+		ONE_HUNDRED_HAND_SLAP_ATTACK(true),
+		PSYCHO_CRUSHER_ATTACK(true),
 		
 		// Easter egg moves
-		YMCA_ATTACK,
-		NYAN_CAT_ATTACK,
-		DISCO_STU_ATTACK,
-		ARM_WINDMILL_ATTACK,
-		SUCK_IT_ATTACK,
-		VAFANAPOLI_ATTACK
+		YMCA_ATTACK(true),
+		NYAN_CAT_ATTACK(true),
+		DISCO_STU_ATTACK(true),
+		ARM_WINDMILL_ATTACK(true),
+		SUCK_IT_ATTACK(true),
+		VAFANAPOLI_ATTACK(true),
+		
+		// Ringmaster moves
+		RINGMASTER_HALF_RING_ACTION(false),
+		RINGMASTER_JAB_ACTION(false),
+		RINGMASTER_ERUPTION_ACTION(false),
+		RINGMASTER_CIRCLE_ACTION(false),
+		RINGMASTER_HADOUKEN_ACTION(false),
+		RINGMASTER_DRUM_ACTION(false);
+		
+		final private boolean isPlayerAction;
+		
+		ActionType(boolean isPlayerAction) {
+			this.isPlayerAction = isPlayerAction;
+		}
+		
+		public boolean getIsPlayerAction() {
+			return this.isPlayerAction;
+		}
+		
 	};
 
-	final static public float DEFAULT_FULL_ON_FRACTION  = 0.45f;
-	final static public float DEFAULT_FULL_OFF_FRACTION = 0.25f;
+	final static public float DEFAULT_FULL_ON_FRACTION  = 0.80f;
+	final static public float DEFAULT_FULL_OFF_FRACTION = 0.10f;
 	
 	final private GameModel gameModel;
 	
@@ -52,7 +80,7 @@ final public class ActionFactory {
 	 * @param rightHand Whether the player's right hand is being used in the action.
 	 * @return The resulting action, null on failure.
 	 */
-	final public Action buildPlayerAction(int playerNum, PlayerActionType playerActionType,
+	final public Action buildPlayerAction(int playerNum, ActionType playerActionType,
 			                              boolean leftHand, boolean rightHand) {
 		
 		// Player number should be valid
@@ -670,7 +698,6 @@ final public class ActionFactory {
 			}
 			
 			default:
-				assert(false);
 				return null;
 		}
 		
@@ -681,9 +708,188 @@ final public class ActionFactory {
 		return action;
 	}
 	
-	// TODO
-	//final public Action buildRingmasterAction(double totalDurationInSecs, int width, int startEmitterIdx) {
-	//}
+	/**
+	 * Builds a ringmaster action type as specified by the given enumeration.
+	 * @param ringmasterActionType The type of ringmaster action.
+	 * @param leftHand Whether the ringmaster's left hand is being used in the action.
+	 * @param rightHand Whether the ringmaster's right hand is being used in the action.
+	 * @return The resulting action, null on failure.
+	 */
+	final public Action buildRingmasterAction(ActionType ringmasterActionType,
+											  boolean leftHand, boolean rightHand) {
+		
+		boolean success = true;
+		
+		FireEmitterModel fireEmitterModel   = this.gameModel.getFireEmitterModel();
+		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
+		
+		Action action = null;
+		
+		switch (ringmasterActionType) {
+		
+		case RINGMASTER_HALF_RING_ACTION: {
+			final double HALF_RING_DURATION_IN_SECS = 2.5;
+			final int HALF_RING_NUM_FLAME_BURSTS = 1;
+			
+			FireEmitterIterator fireEmitterIter = null;
+			
+			if (leftHand) {
+				action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_LEFT_HALF_RING_ACTION);
+				fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER, true);
+			}
+			else {
+				action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_RIGHT_HALF_RING_ACTION);
+				fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_12OCLOCK_OUTER_RING_RIGHT_EMITTER, true);
+			}
+			
+			assert(fireEmitterIter != null);
+			success = this.addBurstToAction(action, fireEmitterIter, fireEmitterConfig.getNumOuterRingEmitters()/2, HALF_RING_NUM_FLAME_BURSTS,
+					HALF_RING_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			break;
+		}
+		
+		case RINGMASTER_JAB_ACTION: {
+			final double JAB_DURATION_IN_SECS = 2.0;
+			final int JAB_FLAME_WIDTH = 2;
+			
+			FireEmitterIterator fireEmitterIter = null;
+			
+			if (leftHand) {
+				action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_LEFT_JAB_ACTION);
+				fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER, true);
+			}
+			else {
+				action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_RIGHT_JAB_ACTION);
+				fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_RIGHT_EMITTER, false);
+			}
+			
+			assert(fireEmitterIter != null);
+			success = this.addConstantVelocityWaveToAction(action, fireEmitterIter, fireEmitterConfig.getNumOuterRingEmitters()/2,
+					JAB_FLAME_WIDTH, JAB_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			break;
+		}
+
+		case RINGMASTER_ERUPTION_ACTION: {
+			final double ERUPTION_DURATION_IN_SECS = 2.0;
+			final int ERUPTION_NUM_BURSTS = 1;
+			
+			success = true;
+			action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_ERUPTION_ACTION);
+			
+			// Full outer ring sustained burst
+			success &= this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(0, true), fireEmitterConfig.getNumOuterRingEmitters(),
+					ERUPTION_NUM_BURSTS, ERUPTION_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			// Full right rail sustained burst
+			success &= this.addBurstToAction(action, fireEmitterModel.getRightRailStartEmitterIter(0), fireEmitterConfig.getNumEmittersPerRail(),
+					ERUPTION_NUM_BURSTS, ERUPTION_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			// Full left rail sustained burst
+			success &= this.addBurstToAction(action, fireEmitterModel.getLeftRailStartEmitterIter(0), fireEmitterConfig.getNumEmittersPerRail(),
+					ERUPTION_NUM_BURSTS, ERUPTION_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			
+			break;
+		}
+		
+		case RINGMASTER_CIRCLE_ACTION: {
+			final double CIRCLE_DURATION_IN_SECS = 3.0;
+			final int CIRCLE_WAVE_WIDTH = 2;
+			
+			FireEmitterIterator fireEmitterIter1 = null;
+			FireEmitterIterator fireEmitterIter2 = null;
+			if (leftHand) {
+				action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_LEFT_CIRCLE_ACTION);
+				fireEmitterIter1 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_3OCLOCK_OUTER_RING_CLOSE_EMITTER, true);
+				fireEmitterIter2 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_9OCLOCK_OUTER_RING_FAR_EMITTER, true);
+			}
+			else {
+				action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_RIGHT_CIRCLE_ACTION);
+				fireEmitterIter1 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_3OCLOCK_OUTER_RING_FAR_EMITTER, false);
+				fireEmitterIter2 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_9OCLOCK_OUTER_RING_CLOSE_EMITTER, false);
+			}
+			assert(fireEmitterIter1 != null);
+			assert(fireEmitterIter2 != null);
+			
+			success = true;
+			
+			success &= this.addConstantVelocityWaveToAction(action, fireEmitterIter1, fireEmitterConfig.getNumOuterRingEmitters(), CIRCLE_WAVE_WIDTH,
+					CIRCLE_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			success &= this.addConstantVelocityWaveToAction(action, fireEmitterIter2, fireEmitterConfig.getNumOuterRingEmitters(), CIRCLE_WAVE_WIDTH,
+					CIRCLE_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			
+			break;
+		}
+
+		case RINGMASTER_HADOUKEN_ACTION: {
+			final double HADOUKEN_DURATION_IN_SECS = 2.5;
+			final int HADOUKEN_FLAME_WIDTH = 3;
+					
+			FireEmitterIterator fireEmitterIter1 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER, true);
+			FireEmitterIterator fireEmitterIter2 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_RIGHT_EMITTER, false);
+
+			success = true;
+			action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_HADOUKEN_ACTION);
+			
+			success &= this.addConstantVelocityWaveToAction(action, fireEmitterIter1, fireEmitterConfig.getNumOuterRingEmitters()/2,
+					HADOUKEN_FLAME_WIDTH, HADOUKEN_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			success &= this.addConstantVelocityWaveToAction(action, fireEmitterIter2, fireEmitterConfig.getNumOuterRingEmitters()/2,
+					HADOUKEN_FLAME_WIDTH, HADOUKEN_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+			
+			break;
+		}
+		
+		case RINGMASTER_DRUM_ACTION: {
+			
+			final double DRUM_DURATION_IN_SECS = 5.0;
+			final int NUM_RANDOM_BURSTS = 20;
+			final double BURST_DURATION_IN_SECS = 0.75;
+			final double BURST_DIV_SECS = (DRUM_DURATION_IN_SECS / (double)NUM_RANDOM_BURSTS);
+			
+			// Decoration in the outer ring of fire emitters is random bursts all over the ring
+			double currDelayCount = 0.0;
+			Random randomNumGen = new Random();
+			
+			success = true;
+			action = new RingmasterAction(fireEmitterModel, RingmasterAction.ActionType.RINGMASTER_DRUM_ACTION);
+			
+			for (int i = 0; i < NUM_RANDOM_BURSTS; i++) {
+				
+				if (randomNumGen.nextBoolean()) {
+					// Outer ring random effect...
+					success &= this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(
+							Math.abs(randomNumGen.nextInt()) % fireEmitterConfig.getNumOuterRingEmitters(), true),
+							1, 1, BURST_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currDelayCount);
+				}
+				else {
+					if (randomNumGen.nextBoolean()) {
+						// Left rail random effect...
+						success &= this.addBurstToAction(action, fireEmitterModel.getLeftRailStartEmitterIter(
+								Math.abs(randomNumGen.nextInt()) % fireEmitterConfig.getNumEmittersPerRail()),
+								1, 1, BURST_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currDelayCount);
+					}
+					else {
+						// Right rail random effect...
+						success &= this.addBurstToAction(action, fireEmitterModel.getRightRailStartEmitterIter(
+								Math.abs(randomNumGen.nextInt()) % fireEmitterConfig.getNumEmittersPerRail()),
+								1, 1, BURST_DURATION_IN_SECS, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currDelayCount);
+					}
+				}
+				
+				currDelayCount += BURST_DIV_SECS;
+			}
+			
+			break;
+		}
+			
+		default:
+			return null;
+		}
+		
+		if (!success) {
+			return null;
+		}
+		
+		return action;
+	}
+
 	
 	final public Action buildCustomPlayerAttackAction(int playerNum, int flameWidth, float dmgPerFlame, double acceleration,
 											          boolean leftHand, boolean rightHand, double durationInSecs,

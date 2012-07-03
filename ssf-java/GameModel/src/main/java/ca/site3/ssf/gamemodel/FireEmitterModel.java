@@ -9,6 +9,16 @@ import org.slf4j.LoggerFactory;
 
 class FireEmitterModel {
 	
+	final static int RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER   = 11;
+	final static int RINGMASTER_6OCLOCK_OUTER_RING_RIGHT_EMITTER  = 12;
+	final static int RINGMASTER_12OCLOCK_OUTER_RING_LEFT_EMITTER  = 4;
+	final static int RINGMASTER_12OCLOCK_OUTER_RING_RIGHT_EMITTER = 3;
+	final static int RINGMASTER_3OCLOCK_OUTER_RING_CLOSE_EMITTER  = 15;
+	final static int RINGMASTER_3OCLOCK_OUTER_RING_FAR_EMITTER    = 0;
+	final static int RINGMASTER_9OCLOCK_OUTER_RING_CLOSE_EMITTER  = 8;
+	final static int RINGMASTER_9OCLOCK_OUTER_RING_FAR_EMITTER    = 7;
+	
+	
 	final private FireEmitterConfig config;
 	
 	private GameModelActionSignaller actionSignaller = null;
@@ -179,10 +189,7 @@ class FireEmitterModel {
 				return null;
 		}
 	}
-	FireEmitterIterator getRingmasterStartEmitterIter(int startEmitterIdx, boolean clockwise) {
-		return this.getOuterRingStartEmitterIter(startEmitterIdx, clockwise);
-	}
-	
+
 	FireEmitterIterator getOuterRingStartEmitterIter(int startEmitterIdx, boolean clockwise) {
 		return new FireEmitterIterator(this.outerRingEmitters, startEmitterIdx, clockwise, true);
 	}

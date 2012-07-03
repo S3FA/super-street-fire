@@ -5,8 +5,9 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
-import ca.site3.ssf.gamemodel.ActionFactory.PlayerActionType;
+import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
+import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
@@ -17,9 +18,11 @@ import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction;
+import ca.site3.ssf.guiprotocol.GuiCommand.Command.RingmasterAction;
 
 /**
  * Utility methods for converting between enums etc. in the
@@ -116,7 +119,7 @@ class SerializationHelper {
 	
 	
 	
-	static PlayerAction actionToProtobuf(PlayerActionType type) {
+	static PlayerAction playerActionToProtobuf(ActionType type) {
 		switch (type) {
 		case BLOCK:
 			return PlayerAction.BLOCK;
@@ -161,48 +164,87 @@ class SerializationHelper {
 		}
 	}
 	
-	static PlayerActionType actionToGame(PlayerAction action) {
+	static RingmasterAction ringmasterActionToProtobuf(ActionType action) {
+		switch (action) {
+		case RINGMASTER_CIRCLE_ACTION:
+			return RingmasterAction.CIRCLE_ACTION;
+		case RINGMASTER_DRUM_ACTION:
+			return RingmasterAction.DRUM_ACTION;
+		case RINGMASTER_ERUPTION_ACTION:
+			return RingmasterAction.ERUPTION_ACTION;
+		case RINGMASTER_HADOUKEN_ACTION:
+			return RingmasterAction.HADOUKEN_ACTION;
+		case RINGMASTER_HALF_RING_ACTION:
+			return RingmasterAction.HALF_RING_ACTION;
+		case RINGMASTER_JAB_ACTION:
+			return RingmasterAction.JAB_ACTION;
+		default:
+			return null;
+		}
+	}
+	
+	static ActionType playerActionToGame(PlayerAction action) {
 		switch (action) {
 		case BLOCK:
-			return PlayerActionType.BLOCK;
+			return ActionType.BLOCK;
 		case HADOUKEN_ATTACK:
-			return PlayerActionType.HADOUKEN_ATTACK;
+			return ActionType.HADOUKEN_ATTACK;
 		case HOOK_ATTACK:
-			return PlayerActionType.HOOK_ATTACK;
+			return ActionType.HOOK_ATTACK;
 		case JAB_ATTACK:
-			return PlayerActionType.JAB_ATTACK;
+			return ActionType.JAB_ATTACK;
 		case UPPERCUT_ATTACK:
-			return PlayerActionType.UPPERCUT_ATTACK;
+			return ActionType.UPPERCUT_ATTACK;
 		case CHOP_ATTACK:
-			return PlayerActionType.CHOP_ATTACK;
+			return ActionType.CHOP_ATTACK;
 		case SONIC_BOOM_ATTACK:
-			return PlayerActionType.SONIC_BOOM_ATTACK;
+			return ActionType.SONIC_BOOM_ATTACK;
 		case SHORYUKEN_ATTACK:
-			return PlayerActionType.SHORYUKEN_ATTACK;
+			return ActionType.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
-			return PlayerActionType.DOUBLE_LARIAT_ATTACK;
+			return ActionType.DOUBLE_LARIAT_ATTACK;
 		case QUADRUPLE_LARIAT_ATTACK:
-			return PlayerActionType.QUADRUPLE_LARIAT_ATTACK;
+			return ActionType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
-			return PlayerActionType.SUMO_HEADBUTT_ATTACK;
+			return ActionType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
-			return PlayerActionType.ONE_HUNDRED_HAND_SLAP_ATTACK;
+			return ActionType.ONE_HUNDRED_HAND_SLAP_ATTACK;
 		case PSYCHO_CRUSHER_ATTACK:
-			return PlayerActionType.PSYCHO_CRUSHER_ATTACK;
+			return ActionType.PSYCHO_CRUSHER_ATTACK;
 		case YMCA_ATTACK:
-			return PlayerActionType.YMCA_ATTACK;
+			return ActionType.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
-			return PlayerActionType.NYAN_CAT_ATTACK;
+			return ActionType.NYAN_CAT_ATTACK;
 		case DISCO_STU_ATTACK:
-			return PlayerActionType.DISCO_STU_ATTACK;
+			return ActionType.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
-			return PlayerActionType.ARM_WINDMILL_ATTACK;
+			return ActionType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
-			return PlayerActionType.SUCK_IT_ATTACK;
+			return ActionType.SUCK_IT_ATTACK;
 		case VAFANAPOLI_ATTACK:
-			return PlayerActionType.VAFANAPOLI_ATTACK;
+			return ActionType.VAFANAPOLI_ATTACK;
 		default:
-			throw new IllegalArgumentException("Unknown player action: "+action);
+			throw new IllegalArgumentException("Unknown player action: " + action);
+		}
+	}
+	
+	static ActionType ringmasterActionToGame(RingmasterAction action) {
+		
+		switch (action) {
+		case CIRCLE_ACTION:
+			return ActionType.RINGMASTER_CIRCLE_ACTION;
+		case DRUM_ACTION:
+			return ActionType.RINGMASTER_DRUM_ACTION;
+		case ERUPTION_ACTION:
+			return ActionType.RINGMASTER_ERUPTION_ACTION;
+		case HADOUKEN_ACTION:
+			return ActionType.RINGMASTER_HADOUKEN_ACTION;
+		case HALF_RING_ACTION:
+			return ActionType.RINGMASTER_HALF_RING_ACTION;
+		case JAB_ACTION:
+			return ActionType.RINGMASTER_JAB_ACTION;
+		default:
+			throw new IllegalArgumentException("Unknown ringmaster action: " + action);
 		}
 	}
 	
@@ -558,7 +600,57 @@ class SerializationHelper {
 		case RIGHT_VAFANAPOLI_ATTACK:
 			return GameEvent.AttackType.RIGHT_VAFANAPOLI_ATTACK;
 		default:
-			throw new IllegalArgumentException("Unrecognized AttackType: "+t);
+			throw new IllegalArgumentException("Unrecognized AttackType: " + t);
+		}
+	}
+	
+	static ca.site3.ssf.gamemodel.RingmasterAction.ActionType protobufToRingmasterAction(RingmasterActionType action) {
+		switch (action) {
+		case LEFT_CIRCLE_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_LEFT_CIRCLE_ACTION;
+		case RIGHT_CIRCLE_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_RIGHT_CIRCLE_ACTION;
+		case DRUM_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_DRUM_ACTION;
+		case ERUPTION_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_ERUPTION_ACTION;
+		case HADOUKEN_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_HADOUKEN_ACTION;
+		case LEFT_HALF_RING_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_LEFT_HALF_RING_ACTION;
+		case RIGHT_HALF_RING_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_RIGHT_HALF_RING_ACTION;
+		case LEFT_JAB_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_LEFT_JAB_ACTION;
+		case RIGHT_JAB_ACTION:
+			return ca.site3.ssf.gamemodel.RingmasterAction.ActionType.RINGMASTER_RIGHT_JAB_ACTION;
+		default:
+			throw new IllegalArgumentException("Unrecognized RingmasterActionType: " + action);
+		}
+	}
+	
+	static RingmasterActionType ringmasterActionTypeToProtobuf(ca.site3.ssf.gamemodel.RingmasterAction.ActionType action) {
+		switch (action) {
+		case RINGMASTER_DRUM_ACTION:
+			return RingmasterActionType.DRUM_ACTION;
+		case RINGMASTER_ERUPTION_ACTION:
+			return RingmasterActionType.ERUPTION_ACTION;
+		case RINGMASTER_HADOUKEN_ACTION:
+			return RingmasterActionType.HADOUKEN_ACTION;
+		case RINGMASTER_LEFT_CIRCLE_ACTION:
+			return RingmasterActionType.LEFT_CIRCLE_ACTION;
+		case RINGMASTER_LEFT_HALF_RING_ACTION:
+			return RingmasterActionType.LEFT_HALF_RING_ACTION;
+		case RINGMASTER_LEFT_JAB_ACTION:
+			return RingmasterActionType.LEFT_JAB_ACTION;
+		case RINGMASTER_RIGHT_CIRCLE_ACTION:
+			return RingmasterActionType.RIGHT_CIRCLE_ACTION;
+		case RINGMASTER_RIGHT_HALF_RING_ACTION:
+			return RingmasterActionType.RIGHT_HALF_RING_ACTION;
+		case RINGMASTER_RIGHT_JAB_ACTION:
+			return RingmasterActionType.RIGHT_JAB_ACTION;
+		default:
+			throw new IllegalArgumentException("Unrecognized RingmasterAction.ActionType: " + action);
 		}
 	}
 	

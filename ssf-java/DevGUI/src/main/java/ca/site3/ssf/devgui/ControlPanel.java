@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,19 +38,20 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JButton nextStateButton1 = null;
 	private JButton nextStateButton2 = null;
 	private JButton pauseButton      = null;
-	private JButton testButton      = null;
+	private JButton testButton       = null;
 	
 	private JButton executeP1ActionButton 			= null;
 	private JButton executeP2ActionButton 			= null;
-	//private JButton executeRingmasterActionButton	= null;
+	private JButton executeRingmasterActionButton	= null;
 	
+	@SuppressWarnings("rawtypes")
 	private JComboBox playerActionComboBox     = null;
-	//private JComboBox ringmasterActionComboBox = null;
+	@SuppressWarnings("rawtypes")
+	private JComboBox ringmasterActionComboBox = null;
 	
 	List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
 	
-	
-
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	ControlPanel(ActionFactory actionFactory, StreetFireGuiClient client) {
 		super();
 		
@@ -61,7 +63,7 @@ class ControlPanel extends JPanel implements ActionListener {
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 		
-		this.setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+		this.setLayout(new FlowLayout());
 		
 		JPanel generalButtonPanel = new JPanel();
 		generalButtonPanel.setLayout(new FlowLayout());
@@ -90,25 +92,42 @@ class ControlPanel extends JPanel implements ActionListener {
 		
 		this.add(generalButtonPanel);
 		
-		String[] playerActionStrs = new String[GestureType.values().length];
-		int count = 0;
+		Collection<String> playerActionStrs = new ArrayList<String>(GestureType.values().length);
+		Collection<String> ringmasterActionStrs = new ArrayList<String>(GestureType.values().length);
+
 		for (GestureType gestureType : GestureType.values()) {
-			playerActionStrs[count++] = gestureType.toString();
+			if (gestureType.getIsRingmasterGesture()) {
+				ringmasterActionStrs.add(gestureType.toString());
+			}
+			else {
+				playerActionStrs.add(gestureType.toString());
+			}
 		}
 		
-		this.playerActionComboBox  = new JComboBox(playerActionStrs);
+		this.playerActionComboBox  = new JComboBox(playerActionStrs.toArray());
+		this.ringmasterActionComboBox = new JComboBox(ringmasterActionStrs.toArray());
 		this.executeP1ActionButton = new JButton("Execute for Player 1");
 		this.executeP1ActionButton.addActionListener(this);
 		this.executeP2ActionButton = new JButton("Execute for Player 2");
 		this.executeP2ActionButton.addActionListener(this);
+		this.executeRingmasterActionButton = new JButton("Execute for Ringmaster");
+		this.executeRingmasterActionButton.addActionListener(this);
 		
-		JPanel playerActionPanel = new JPanel();
-		playerActionPanel.setLayout(new FlowLayout());
-		playerActionPanel.add(this.playerActionComboBox);
-		playerActionPanel.add(this.executeP1ActionButton);
-		playerActionPanel.add(this.executeP2ActionButton);
+		this.playerActionComboBox.setVisible(false);
+		this.ringmasterActionComboBox.setVisible(false);
+		this.executeP1ActionButton.setVisible(false);
+		this.executeP2ActionButton.setVisible(false);
+		this.executeRingmasterActionButton.setVisible(false);
 		
-		this.add(playerActionPanel);
+		JPanel actionPanel = new JPanel();
+		actionPanel.setLayout(new FlowLayout());
+		actionPanel.add(this.playerActionComboBox);
+		actionPanel.add(this.executeP1ActionButton);
+		actionPanel.add(this.executeP2ActionButton);
+		actionPanel.add(this.ringmasterActionComboBox);
+		actionPanel.add(this.executeRingmasterActionButton);
+		
+		this.add(actionPanel);
 	}
 
 	public void actionPerformed(ActionEvent event) {
@@ -132,7 +151,11 @@ class ControlPanel extends JPanel implements ActionListener {
 			}
 			else if (event.getSource() == this.executeP2ActionButton) {
 				this.executePlayerAction(2);
-			} else if (event.getSource() == this.testButton) {
+			}
+			else if (event.getSource() == this.executeRingmasterActionButton) {
+				this.executeRingmasterAction();
+			}
+			else if (event.getSource() == this.testButton) {
 				client.testSystem();
 			}
 		} catch (IOException ex) {
@@ -167,13 +190,15 @@ class ControlPanel extends JPanel implements ActionListener {
 			Collections.copy(this.nextStates, nextGoToStates);
 			
 			switch (nextGoToStates.get(0)) {
+			
 				case RINGMASTER_STATE:
-					this.nextStateButton1.setText("Enter Ringmaster State");	
+					this.nextStateButton1.setText("Enter Ringmaster State");
 					break;
+					
 				case ROUND_BEGINNING_STATE:
 					this.nextStateButton1.setText("Begin Round");
 					break;
-					
+				
 				default:
 					assert(false);
 					return;
@@ -204,36 +229,57 @@ class ControlPanel extends JPanel implements ActionListener {
 		}
 		
 		switch (stateType) {
+		
 			case ROUND_IN_PLAY_STATE:
 			case TIE_BREAKER_ROUND_STATE:
 			case TEST_ROUND_STATE:
-				this.setEnablePlayerActionControls(true);
+				this.setEnableActionControls(true, false);
 				break;
+				
+			case RINGMASTER_STATE:
+				this.setEnableActionControls(false, true);
+				break;
+				
 			default:
-				this.setEnablePlayerActionControls(false);
+				this.setEnableActionControls(false, false);
 				break;
 		}
-		
 	}
-	
 
 	private void executePlayerAction(int playerNum) {
 		try {
 			GestureType gesture = GestureType.valueOf(GestureType.class,
 				this.playerActionComboBox.getSelectedItem().toString());
 			client.executePlayerAction(playerNum, gesture.getActionFactoryType(), gesture.getUsesLeftHand(), gesture.getUsesRightHand());
-		} catch (IllegalArgumentException ex) {
+		}
+		catch (IllegalArgumentException ex) {
 			assert(false);
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			log.warn("Could not execute player action",ex);
 		}
 	}
 	
+	private void executeRingmasterAction() {
+		try {
+			GestureType gesture = GestureType.valueOf(GestureType.class,
+				this.ringmasterActionComboBox.getSelectedItem().toString());
+			client.executeRingmasterAction(gesture.getActionFactoryType(), gesture.getUsesLeftHand(), gesture.getUsesRightHand());
+		}
+		catch (IllegalArgumentException ex) {
+			assert(false);
+		}
+		catch (IOException ex) {
+			log.warn("Could not execute player action",ex);
+		}
+	}
 	
-	private void setEnablePlayerActionControls(boolean enabled) {
-		this.playerActionComboBox.setEnabled(enabled);
-		this.executeP1ActionButton.setEnabled(enabled);
-		this.executeP2ActionButton.setEnabled(enabled);
+	private void setEnableActionControls(boolean enabledPlayerControls, boolean enabledRingmasterControls) {
+		this.playerActionComboBox.setVisible(enabledPlayerControls);
+		this.executeP1ActionButton.setVisible(enabledPlayerControls);
+		this.executeP2ActionButton.setVisible(enabledPlayerControls);
+		this.ringmasterActionComboBox.setVisible(enabledRingmasterControls);
+		this.executeRingmasterActionButton.setVisible(enabledRingmasterControls);
 	}
 	
 }

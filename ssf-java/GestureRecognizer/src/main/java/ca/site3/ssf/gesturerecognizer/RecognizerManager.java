@@ -123,12 +123,13 @@ class RecognizerManager {
 	}
 	
 	/**
-	 * Attempts to recongize the given, novel gesture instance among all of the gesture
+	 * Attempts to recognize the given, novel gesture instance among all of the gesture
 	 * recognizers in this manager.
 	 * @param inst The novel gesture instance to identify/recognize.
+	 * @param isRingmasterGesture Whether the provided gesture instance is supposed to be a ringmaster gesture or not.
 	 * @return The gesture type that was recognized, null on no recognized gesture.
 	 */
-	GestureType recognize(GestureInstance inst) {
+	GestureType recognize(GestureInstance inst, boolean isRingmasterGesture) {
 		// Weed out strange and anomalous data
 		if (!RecognizerManager.isAcceptableGesture(inst)) {
 			logger.info("Ignoring gesture - too short from beginning to end!");
@@ -154,6 +155,10 @@ class RecognizerManager {
 		// Later on, we favour basic gestures over special gestures and special gestures over easter-egg gestures.
 		for (Recognizer recognizer : this.recognizerMap.values()) {
 			GestureType gestureType = recognizer.getGestureType();
+			
+			if (isRingmasterGesture && !gestureType.getIsRingmasterGesture()) {
+				continue;
+			}
 			
 			// Make sure the instance has the correct handedness for the current gesture type
 			if (!RecognizerManager.isAcceptableHandednessForGivenType(inst, gestureType)) {
@@ -290,9 +295,10 @@ class RecognizerManager {
 	 * Performs gesture recognition on the given gesture instance for all gestures and
 	 * places the full result into the returned data.
 	 * @param inst The gesture instance to identify/recognize.
+	 * @param isRingmasterGesture Whether the provided gesture instance is supposed to be a ringmaster gesture or not.
 	 * @return The full result of the recognition procedure, with data for all gestures.
 	 */
-	GestureRecognitionResult recognizeWithFullResult(GestureInstance inst) {
+	GestureRecognitionResult recognizeWithFullResult(GestureInstance inst, boolean isRingmasterGesture) {
 		Map<GestureType, GestureProbabilities> resultMapping = new HashMap<GestureType, GestureProbabilities>();
 		
 		// Weed out strange and anomalous data
@@ -306,6 +312,10 @@ class RecognizerManager {
 		
 		for (Entry<GestureType, Recognizer> entry : this.recognizerMap.entrySet()) {
 			
+			if (entry.getKey().getIsRingmasterGesture() != isRingmasterGesture) {
+				continue;
+			}
+			
 			if (entry.getKey().getUsesLeftHand() && !inst.hasLeftGloveData() ||
 				entry.getKey().getUsesRightHand() && !inst.hasRightGloveData() ||
 				!entry.getKey().getUsesLeftHand() && inst.hasLeftGloveData() ||
@@ -313,6 +323,7 @@ class RecognizerManager {
 				
 				continue;
 			}
+			
 			resultMapping.put(entry.getKey(), new GestureProbabilities(entry.getValue().getLowestAcceptableLnProbability(),
 					entry.getValue().probability(inst), entry.getValue().lnProbability(inst)));
 		}
