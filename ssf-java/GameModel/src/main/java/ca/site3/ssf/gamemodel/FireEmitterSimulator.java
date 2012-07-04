@@ -204,6 +204,7 @@ class FireEmitterSimulator {
 	 */
 	private void updateLerp() {
 		if (this.isFinished()) {
+			this.emitter.setIntensity(this.action, 0.0f);
 			return;
 		}
 		

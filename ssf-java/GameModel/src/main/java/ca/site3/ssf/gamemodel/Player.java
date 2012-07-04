@@ -19,7 +19,8 @@ class Player {
 	private float health;
 	private int numRoundWins;
 	private boolean isInvincible;
-	private float lastDmgAmount;   // The amount of damage that this player suffered last
+	private boolean hasInfiniteMoves; // Whether or not the player has the ability to do any type of move as much as they want
+	private float lastDmgAmount;          // The amount of damage that this player suffered last
 	
 	private GameConfig gameConfig = null;
 	private GameModelActionSignaller actionSignaller = null;
@@ -36,6 +37,7 @@ class Player {
 		
 		this.matchReset();
 		this.isInvincible = false;
+		this.hasInfiniteMoves = false;
 		this.playerNum = playerNum;
 	}
 	
@@ -46,8 +48,16 @@ class Player {
 	void matchReset() {
 		this.resetHealth();
 		this.numRoundWins  = 0;
+		this.hasInfiniteMoves = false;
 	}
 
+	void setHasInfiniteMoves(boolean activated) {
+		this.hasInfiniteMoves = activated;
+	}
+	boolean getHasInfiniteMoves() {
+		return this.hasInfiniteMoves;
+	}
+	
 	/**
 	 * Reset a player's health.
 	 */

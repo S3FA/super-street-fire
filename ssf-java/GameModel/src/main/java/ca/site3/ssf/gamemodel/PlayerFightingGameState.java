@@ -68,7 +68,7 @@ abstract class PlayerFightingGameState extends GameState {
 		
 		switch (action.getContributorEntity()) {
 		
-		case PLAYER1_ENTITY:
+		case PLAYER1_ENTITY: {
 			if (this.secsSinceLastP1Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
 				action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
 				
@@ -76,7 +76,8 @@ abstract class PlayerFightingGameState extends GameState {
 				return;
 			}
 			
-			if (applyActionLimits) {
+			Player p1 = this.gameModel.getPlayer1();
+			if (applyActionLimits && !p1.getHasInfiniteMoves()) {
 				if (action.getActionFlameType() == FireEmitter.FlameType.ATTACK_FLAME) {
 					AttackType atkType = ((PlayerAttackAction)action).getAttackType();
 					
@@ -94,8 +95,9 @@ abstract class PlayerFightingGameState extends GameState {
 			
 			this.secsSinceLastP1Action = 0.0;
 			break;
+		}
 			
-		case PLAYER2_ENTITY:
+		case PLAYER2_ENTITY: {
 			if (this.secsSinceLastP2Action < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
 				action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
 				
@@ -103,7 +105,8 @@ abstract class PlayerFightingGameState extends GameState {
 				return;
 			}
 			
-			if (applyActionLimits) {
+			Player p2 = this.gameModel.getPlayer2();
+			if (applyActionLimits && !p2.getHasInfiniteMoves()) {
 				if (action.getActionFlameType() == FireEmitter.FlameType.ATTACK_FLAME) {
 					AttackType atkType = ((PlayerAttackAction)action).getAttackType();
 					
@@ -121,12 +124,12 @@ abstract class PlayerFightingGameState extends GameState {
 			
 			this.secsSinceLastP2Action = 0.0;
 			break;
+		}
 			
 		// We only interpret player actions when the game is in play
 		case RINGMASTER_ENTITY:
 		default:
 			return;
-		
 		}
 		
 		Action.mergeAction(this.activeActions, action);
