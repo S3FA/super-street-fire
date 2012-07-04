@@ -278,6 +278,7 @@ public abstract class Action {
 				FireEmitterSimulator currSimulator = simIter.next();
 				if (this.tickSimulator(dT, currSimulator)) {
 					simIter.remove();
+					currSimulator.kill(); // Just to make sure it's officially and definitely dead
 				}
 			}
 			
@@ -287,13 +288,6 @@ public abstract class Action {
 			
 		}
 		
-		/*
-		for (ArrayList<FireEmitterSimulator> simulatorWave : this.wavesOfOrderedFireSims) {
-			for (FireEmitterSimulator simulator : simulatorWave) {
-				this.tickSimulator(dT, simulator);
-			}
-		}
-		*/
 	}
 	
 	abstract boolean tickSimulator(double dT, FireEmitterSimulator simulator);

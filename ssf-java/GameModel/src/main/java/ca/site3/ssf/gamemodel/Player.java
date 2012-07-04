@@ -1,10 +1,5 @@
 package ca.site3.ssf.gamemodel;
 
-import java.util.Hashtable;
-import java.util.Map;
-
-import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
-
 /**
  * A class that represents a player of the Super Street Fire game.
  * @author Callum
@@ -18,9 +13,9 @@ class Player {
 	private int playerNum;
 	private float health;
 	private int numRoundWins;
-	private boolean isInvincible;
+	private boolean isInvincible;     // Whether 'god-mode'/invincibility is enabled or not
 	private boolean hasInfiniteMoves; // Whether or not the player has the ability to do any type of move as much as they want
-	private float lastDmgAmount;          // The amount of damage that this player suffered last
+	private float lastDmgAmount;      // The amount of damage that this player suffered last
 	
 	private GameConfig gameConfig = null;
 	private GameModelActionSignaller actionSignaller = null;
@@ -48,7 +43,6 @@ class Player {
 	void matchReset() {
 		this.resetHealth();
 		this.numRoundWins  = 0;
-		this.hasInfiniteMoves = false;
 	}
 
 	void setHasInfiniteMoves(boolean activated) {
