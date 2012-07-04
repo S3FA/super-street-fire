@@ -167,7 +167,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		JPanel infoAndControlPanel = new JPanel();
 		infoAndControlPanel.setLayout(new BorderLayout());
 		
-		this.infoPanel = new GameInfoPanel();
+		this.infoPanel = new GameInfoPanel(client);
 		infoAndControlPanel.add(this.infoPanel, BorderLayout.NORTH);
 		
 		this.controlPanel = new ControlPanel(gameModel.getActionFactory(), client);
@@ -303,6 +303,12 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	
 	private void onGameStateChanged(GameStateChangedEvent event) {
 		this.infoPanel.setPreviousGameState(event.getOldState());
+		
+		if (event.getOldState() == GameState.GameStateType.TEST_ROUND_STATE) {
+			this.infoPanel.getPlayer1Panel().setUnlimitedMovesCheckBoxEnabled(true);
+			this.infoPanel.getPlayer2Panel().setUnlimitedMovesCheckBoxEnabled(true);
+		}
+		
 		this.performOnCurrStateChanges(event.getNewState());
 	}
 	
@@ -434,6 +440,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	private void onTestRound() {
 		this.arenaDisplay.clearRoundResults();
 		this.arenaDisplay.setInfoText("Test Round");
+		this.infoPanel.getPlayer1Panel().setUnlimitedMovesCheckBoxEnabled(false);
+		this.infoPanel.getPlayer2Panel().setUnlimitedMovesCheckBoxEnabled(false);
 	}
 	
 	@Override

@@ -18,6 +18,7 @@ message Command {
     QUERY_GAME_INFO_REFRESH   = 6;  // no args
     EXECUTE_RINGMASTER_ACTION = 7;  // ringmasterAction, leftHand, rightHand
     QUERY_SYSTEM_INFO         = 8;  // no args
+    UPDATE_PLAYER_STATUS      = 9;  // player, godModeOn, unlimitedMovesOn
   }  
   
   // For EXECUTE_PLAYER_ACTION (PlayerActionType)
@@ -103,4 +104,7 @@ message Command {
   
   // EXECUTE_RINGMASTER_ACTION
   optional RingmasterAction ringmasterAction = 15;
+  
+  // UPDATE_PLAYER_STATUS
+  optional bool unlimitedMovesOn = 16;
 }

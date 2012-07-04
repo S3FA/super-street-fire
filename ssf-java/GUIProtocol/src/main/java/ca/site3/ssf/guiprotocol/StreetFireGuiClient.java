@@ -216,6 +216,13 @@ public class StreetFireGuiClient {
 		submitCommand(b.build());
 	}
 	
+	public void updatePlayerStatus(int playerNum, boolean unlimitedMovesOn) throws IOException {
+		Builder b = Command.newBuilder().setType(CommandType.UPDATE_PLAYER_STATUS)
+				.setPlayer(SerializationHelper.playerFromNum(playerNum))
+				.setUnlimitedMovesOn(unlimitedMovesOn);
+		submitCommand(b.build());
+	}
+	
 	/**
 	 * @see TouchFireEmitterCommand
 	 * @throws IOException
@@ -329,6 +336,7 @@ public class StreetFireGuiClient {
 				SerializationHelper.protobufToRoundResults(e.getRoundResultsList()),
 				SerializationHelper.protobufToMatchResult(e.getMatchResult()),
 				e.getPlayer1Health(), e.getPlayer2Health(),
+				e.getPlayer1UnlimitedMovesOn(), e.getPlayer2UnlimitedMovesOn(),
 				SerializationHelper.protobufToRoundBeginCountdownTimer(e.getRoundBeginTimer()),
 				e.getRoundInPlayTimer(), e.getTimedOut());
 		

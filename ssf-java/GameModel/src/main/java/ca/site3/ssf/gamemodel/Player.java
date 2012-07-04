@@ -51,7 +51,7 @@ class Player {
 	boolean getHasInfiniteMoves() {
 		return this.hasInfiniteMoves;
 	}
-	
+
 	/**
 	 * Reset a player's health.
 	 */
@@ -108,7 +108,9 @@ class Player {
 	void setInvincible(boolean invincibilityOn) {
 		this.isInvincible = invincibilityOn;
 	}
-	
+	boolean getIsInvincible() {
+		return this.isInvincible;
+	}
 	/**
 	 * Query whether this player is knocked-out.
 	 * @return true if KOed, false if not.
