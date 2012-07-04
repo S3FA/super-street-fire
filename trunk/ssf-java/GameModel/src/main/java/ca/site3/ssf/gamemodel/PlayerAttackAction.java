@@ -5,49 +5,55 @@ import java.util.ArrayList;
 public class PlayerAttackAction extends Action {
 	
 	public enum AttackType {
-		CUSTOM_UNDEFINED_ATTACK(Integer.MAX_VALUE),
+		CUSTOM_UNDEFINED_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
 		
 		// Basic Attacks
-		LEFT_JAB_ATTACK(Integer.MAX_VALUE),
-		RIGHT_JAB_ATTACK(Integer.MAX_VALUE), 
-		LEFT_HOOK_ATTACK(Integer.MAX_VALUE),
-		RIGHT_HOOK_ATTACK(Integer.MAX_VALUE),
-		LEFT_UPPERCUT_ATTACK(Integer.MAX_VALUE),
-		RIGHT_UPPERCUT_ATTACK(Integer.MAX_VALUE),
-		LEFT_CHOP_ATTACK(Integer.MAX_VALUE),
-		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE),
+		LEFT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		RIGHT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE), 
+		LEFT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		RIGHT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		LEFT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		RIGHT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		LEFT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
 		
 		// Special Attacks
-		HADOUKEN_ATTACK(Integer.MAX_VALUE),
-		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE),
-		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE),
-		SONIC_BOOM_ATTACK(Integer.MAX_VALUE),
-		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE),
-		QUADRUPLE_LARIAT_ATTACK(Integer.MAX_VALUE),
-		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE),
-		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE),
-		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE),
-		TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE),
-		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE),
+		HADOUKEN_ATTACK(Integer.MAX_VALUE, 3),
+		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3),
+		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3),
+		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 5),
+		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 2),
+		QUADRUPLE_LARIAT_ATTACK(Integer.MAX_VALUE, 1),
+		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 3),
+		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 3),
+		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 3),
+		TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1),
+		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE, 1),
 		
 		// Easter Egg Attacks
-		YMCA_ATTACK(1),
-		NYAN_CAT_ATTACK(1),
-		DISCO_STU_ATTACK(1),
-		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE),
-		SUCK_IT_ATTACK(1),
-		LEFT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE),
-		RIGHT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE);
+		YMCA_ATTACK(1, 1),
+		NYAN_CAT_ATTACK(1, 1),
+		DISCO_STU_ATTACK(1, 1),
+		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1),
+		SUCK_IT_ATTACK(1, 1),
+		LEFT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1),
+		RIGHT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1);
 		
-		private final int maxUsesPerRound;
-		//private final boolean isOneAtATimeLimitedAttackType;
+		private final int maxUsesPerRound;         // Maximum of this attack type that are allowed per-round
+		private final int numAllowedActiveAtATime; // Maximum of this attack type that are allowed to be active at any given time in a round
 
-		AttackType(int maxUsesPerRound) {
+		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime) {
+			assert(maxUsesPerRound >= 0);
+			assert(numAllowedActiveAtATime >= 0);
 			this.maxUsesPerRound = maxUsesPerRound;
+			this.numAllowedActiveAtATime = numAllowedActiveAtATime;
 		}
 		
 		int getMaxUsesPerRound() {
 			return this.maxUsesPerRound;
+		}
+		int getNumAllowedActiveAtATime() {
+			return this.numAllowedActiveAtATime;
 		}
 		
 	};

@@ -67,6 +67,7 @@ class RoundInPlayState extends PlayerFightingGameState {
 			Action currAction = iter.next();
 			if (currAction.isFinished()) {
 				iter.remove();
+				this.removeAction(currAction);
 				continue;
 			}
 			currAction.tick(dT);
