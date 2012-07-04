@@ -53,6 +53,10 @@ public class GameModel implements IGameModel {
 		this.nextState = new IdleGameState(this);
 	}
 	
+	GameState getCurrentState() {
+		return this.currState;
+	}
+	
 	// Begin IGameModel Interface function implementations *******************************************
 	
 	public void tick(double dT) {
@@ -151,6 +155,7 @@ public class GameModel implements IGameModel {
 		GameInfoRefreshEvent event = new GameInfoRefreshEvent(
 				this.currState.getStateType(), this.roundResults, matchResult, 
 				this.player1.getHealth(), this.player2.getHealth(),
+				this.player1.getHasInfiniteMoves(), this.player2.getHasInfiniteMoves(),
 				roundBeginCountdown, roundInPlayTimer, roundTimedOut);
 		this.actionSignaller.fireOnQueryGameInfoRefresh(event);
 		

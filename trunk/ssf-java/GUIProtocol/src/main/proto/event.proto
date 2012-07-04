@@ -165,9 +165,13 @@ message GameEvent {
   optional float player1Health       = 18;
   optional float player2Health       = 19;
   optional int32 roundInPlayTimer    = 20;
+  
+  optional bool player1UnlimitedMovesOn = 22;
+  optional bool player2UnlimitedMovesOn = 23;
+  
   // NOTE: The GameInfoRefreshEvent also makes use of timedOut, roundBeginTimer, matchResult
   
   // RingmasterActionEvent
-  optional RingmasterActionType ringmasterActionType = 21;
+  optional RingmasterActionType ringmasterActionType = 24;
   
 }

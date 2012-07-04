@@ -38,6 +38,7 @@ import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.PlayerStatusUpdateCommand;
 import ca.site3.ssf.gamemodel.QueryGameInfoRefreshCommand;
 import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
@@ -317,13 +318,19 @@ public class StreetFireServer implements Runnable {
 			while ( shouldListen ) {
 				try {
 					Command cmd = Command.parseDelimitedFrom(socket.getInputStream());
-					if (cmd.getType() == CommandType.QUERY_SYSTEM_INFO) {
-						
-					}
+
 					if (cmd != null) {
-						AbstractGameModelCommand gameCmd = parseCommand(cmd); 
-						if (gameCmd != null) {
-							commandQueue.add(gameCmd);
+						if (cmd.getType() == CommandType.QUERY_SYSTEM_INFO) {
+							// The query system info command is special - we need to poll the wifire boards for
+							// their information and then eventually return the info back to the clients...
+							
+						}
+						else {
+						
+							AbstractGameModelCommand gameCmd = parseCommand(cmd); 
+							if (gameCmd != null) {
+								commandQueue.add(gameCmd);
+							}
 						}
 					}
 				}
@@ -382,6 +389,8 @@ public class StreetFireServer implements Runnable {
 				return createFireEmitterCommand(cmd);
 			case QUERY_GAME_INFO_REFRESH:
 				return createQueryGameInfoRefreshCommand(cmd);
+			case UPDATE_PLAYER_STATUS:
+				return createPlayerStatusUpdateCommand(cmd);
 			default:
 				log.warn("Unhandled command type: "+cmd.getType());
 				return null;
@@ -436,6 +445,11 @@ public class StreetFireServer implements Runnable {
 		
 		private QueryGameInfoRefreshCommand createQueryGameInfoRefreshCommand(Command cmd) {
 			return new QueryGameInfoRefreshCommand();
+		}
+
+		private PlayerStatusUpdateCommand createPlayerStatusUpdateCommand(Command cmd) {
+			int playerNum = SerializationHelper.playerToNum(cmd.getPlayer());
+			return new PlayerStatusUpdateCommand(playerNum, cmd.getUnlimitedMovesOn());
 		}
 		
 		private void sendGameEvent(GameEvent event) throws IOException {

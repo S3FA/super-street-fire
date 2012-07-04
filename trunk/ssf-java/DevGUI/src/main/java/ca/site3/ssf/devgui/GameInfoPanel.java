@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import ca.site3.ssf.gamemodel.GameState;
+import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 
 class GameInfoPanel extends JPanel {
 
@@ -26,7 +27,7 @@ class GameInfoPanel extends JPanel {
 	private PlayerInfoPanel player2Panel;
 	private RingmasterInfoPanel ringmasterPanel;
 	
-	GameInfoPanel() {
+	GameInfoPanel(StreetFireGuiClient client) {
 		super();
 		
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Game Information");
@@ -68,8 +69,8 @@ class GameInfoPanel extends JPanel {
 		
 		// ********************************************************************
 		
-		this.player1Panel = new PlayerInfoPanel(1);
-		this.player2Panel = new PlayerInfoPanel(2);
+		this.player1Panel = new PlayerInfoPanel(client, 1);
+		this.player2Panel = new PlayerInfoPanel(client, 2);
 		this.ringmasterPanel = new RingmasterInfoPanel();
 
 		this.setLayout(new GridLayout(0,4));

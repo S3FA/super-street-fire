@@ -2,25 +2,44 @@ package ca.site3.ssf.devgui;
 
 import java.awt.Color;
 import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
-import ca.site3.ssf.gamemodel.PlayerAttackAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-class PlayerInfoPanel extends JPanel {
+import ca.site3.ssf.gamemodel.PlayerAttackAction;
+import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
+
+class PlayerInfoPanel extends JPanel implements ItemListener {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private int playerNum;
 	
 	private JProgressBar lifeBar;
 	private JLabel lastAction;
 	private JLabel timeOfLastAction;
 	
-	PlayerInfoPanel(int playerNum) {
+	private JCheckBox unlimitedMovesCheckBox;
+	
+	private StreetFireGuiClient client = null;
+	
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	PlayerInfoPanel(StreetFireGuiClient client, int playerNum) {
 		super();
+		
+		assert(client != null);
+		this.client = client;
 		
 		Color borderColour = null;
 		if (playerNum == 1) {
@@ -30,6 +49,7 @@ class PlayerInfoPanel extends JPanel {
 			borderColour = ArenaDisplay.PLAYER_2_COLOUR;
 		}
 		
+		this.playerNum = playerNum;
 		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(borderColour), "Player " + playerNum);
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
@@ -66,12 +86,22 @@ class PlayerInfoPanel extends JPanel {
 		formLayoutHelper.addLabel(timeLabel, this);
 		formLayoutHelper.addLastField(this.timeOfLastAction, this);
 		
+		this.unlimitedMovesCheckBox = new JCheckBox("Unlimited Moves");
+		this.unlimitedMovesCheckBox.addItemListener(this);
+		this.unlimitedMovesCheckBox.setVisible(true);
+		this.unlimitedMovesCheckBox.setEnabled(true);
+		this.unlimitedMovesCheckBox.setSelected(false);
+		//JLabel unlimitedMovesLabel = new JLabel("Unlimited Moves:");
+		//unlimitedMovesLabel.setForeground(Color.black);
+		//formLayoutHelper.addLabel(unlimitedMovesLabel, this);
+		formLayoutHelper.addLastField(this.unlimitedMovesCheckBox, this);
+		
 	}
 	
 	void setLife(float lifePercent) {
 		ProgressBarColourLerp.setPercentageAndRedToGreenColour(this.lifeBar, lifePercent);
 	}
-	
+
 	void setLastActionAsAttack(PlayerAttackAction.AttackType actionType, double clockTime) {
 		
 		if (actionType == null) {
@@ -86,5 +116,22 @@ class PlayerInfoPanel extends JPanel {
 	void setLastActionAsBlock(double clockTime) {
 		this.lastAction.setText("BLOCK");
 		this.timeOfLastAction.setText("" + clockTime);
+	}
+
+	void setUnlimitedMovesCheckBoxEnabled(boolean enabled) {
+		this.unlimitedMovesCheckBox.setVisible(enabled);
+		this.unlimitedMovesCheckBox.setEnabled(enabled);
+	}
+	
+	@Override
+	public void itemStateChanged(ItemEvent event) {
+		if (event.getSource() == this.unlimitedMovesCheckBox) {
+			try {
+				this.client.updatePlayerStatus(this.playerNum, event.getStateChange() == ItemEvent.SELECTED);
+			}
+			catch (IOException e) {
+				log.warn("Failed to update unlimited move attribute of player status.", e);
+			}
+		}
 	}	
 }
