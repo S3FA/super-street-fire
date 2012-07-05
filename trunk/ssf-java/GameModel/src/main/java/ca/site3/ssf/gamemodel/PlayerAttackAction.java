@@ -18,35 +18,50 @@ public class PlayerAttackAction extends Action {
 		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
 		
 		// Special Attacks
-		HADOUKEN_ATTACK(Integer.MAX_VALUE, 3),
-		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3),
-		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3),
-		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 5),
-		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 2),
-		QUADRUPLE_LARIAT_ATTACK(Integer.MAX_VALUE, 1),
-		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 3),
-		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 3),
-		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 3),
-		TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1),
-		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE, 1),
+		HADOUKEN_ATTACK(Integer.MAX_VALUE, 2, 2),
+		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3, 3),
+		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3, 3),
+		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 5, 5),
+		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 2, 2),
+		QUADRUPLE_LARIAT_ATTACK(Integer.MAX_VALUE, 1, 1),
+		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 2, 2),
+		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
+		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
+		TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
+		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE, 1, 1),
 		
 		// Easter Egg Attacks
-		YMCA_ATTACK(1, 1),
-		NYAN_CAT_ATTACK(1, 1),
+		YMCA_ATTACK(1, 1, 1),
+		NYAN_CAT_ATTACK(1, 1, 1),
 		DISCO_STU_ATTACK(1, 1),
-		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1),
-		SUCK_IT_ATTACK(1, 1),
-		LEFT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1),
-		RIGHT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1);
+		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1, 1),
+		SUCK_IT_ATTACK(1, 1, 1),
+		LEFT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1, 1),
+		RIGHT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1, 1);
 		
 		private final int maxUsesPerRound;         // Maximum of this attack type that are allowed per-round
 		private final int numAllowedActiveAtATime; // Maximum of this attack type that are allowed to be active at any given time in a round
-
-		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime) {
+		
+		private final boolean isActivationGroupLimited;  // Whether this attack type is limited by the global number of active group attacks for a given player
+		private final int numActivationsInGroupAtATime;  // If this attack type is activation group limited, then this is the limit
+		
+		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime, int numActivationsInGroupAtATime) {
+			
 			assert(maxUsesPerRound >= 0);
 			assert(numAllowedActiveAtATime >= 0);
 			this.maxUsesPerRound = maxUsesPerRound;
 			this.numAllowedActiveAtATime = numAllowedActiveAtATime;
+			this.isActivationGroupLimited = true;
+			this.numActivationsInGroupAtATime = numActivationsInGroupAtATime;
+		} 
+		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime) {
+			
+			assert(maxUsesPerRound >= 0);
+			assert(numAllowedActiveAtATime >= 0);
+			this.maxUsesPerRound = maxUsesPerRound;
+			this.numAllowedActiveAtATime = numAllowedActiveAtATime;
+			this.isActivationGroupLimited = false;
+			this.numActivationsInGroupAtATime = Integer.MAX_VALUE;
 		}
 		
 		int getMaxUsesPerRound() {
@@ -55,7 +70,12 @@ public class PlayerAttackAction extends Action {
 		int getNumAllowedActiveAtATime() {
 			return this.numAllowedActiveAtATime;
 		}
-		
+		boolean getIsActivationGroupLimited() {
+			return this.isActivationGroupLimited;
+		}
+		int getNumActivationsInGroupAtATime() {
+			return this.numActivationsInGroupAtATime;
+		}
 	};
 
 	final private AttackType type;

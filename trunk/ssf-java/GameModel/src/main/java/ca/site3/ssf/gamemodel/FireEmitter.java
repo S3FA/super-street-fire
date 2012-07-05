@@ -59,6 +59,15 @@ public class FireEmitter {
 		return contributorSet;
 	}
 	
+	EnumSet<FireEmitter.FlameType> getContributingEntityFlameTypes(GameModel.Entity entity) {
+		FireEmitterContributor fireEmitterContrib = this.contributors.get(entity);
+		if (fireEmitterContrib == null) {
+			return EnumSet.noneOf(FireEmitter.FlameType.class);
+		}
+		
+		return fireEmitterContrib.getFlameTypes();
+	}
+	
 	/**
 	 * Get the index of this emitter within its location (e.g., if its on the right rail, how
 	 * far along the rail is it?).
