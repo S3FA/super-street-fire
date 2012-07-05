@@ -181,19 +181,43 @@ abstract class PlayerFightingGameState extends GameState {
 	private boolean checkPlayerAction(Action action, Player player, double secsSinceLastAction, Map<AttackType, Integer> attacksExecuted,
 		                              Map<AttackType, Integer> attacksCurrentlyActive, int numGroupLimitedActiveAttacks) {
 		
+		// If the action is an attack and the player hasn't waited for their attack cooldown time then we
+		// just ignore the action - we never ignore blocks though, blocks ALWAYS work
 		if (secsSinceLastAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
 			action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
 				
 			// Player has already made an action recently, exit without counting the current action
 			return false;
 		}
+		
+		if (action.getActionFlameType() == FireEmitter.FlameType.ATTACK_FLAME) {
+			PlayerAttackAction attackAction = ((PlayerAttackAction)action);
+			AttackType attackType = attackAction.getAttackType();
+		
+			// If there is already an attack present on the first relevant fire emitter(s) for the player
+			// then don't allow it
+			int playerNum = player.getPlayerNumber();
+			FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
+			assert(fireEmitterModel != null);
 			
-		if (this.applyActionLimits) {
-			
-			if (action.getActionFlameType() == FireEmitter.FlameType.ATTACK_FLAME) {
-				PlayerAttackAction attackAction = ((PlayerAttackAction)action);
-				AttackType attackType = attackAction.getAttackType();
+			if (attackAction.hasLeftHandedAttack()) {
+				FireEmitter firstLeftEmitter  = fireEmitterModel.getPlayerLeftEmitters(playerNum).get(0);
 				
+				if (firstLeftEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
+					return false;
+				}
+			}
+			
+			if (attackAction.hasRightHandedAttack()) {
+				FireEmitter firstRightEmitter = fireEmitterModel.getPlayerRightEmitters(playerNum).get(0);
+				
+				if (firstRightEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
+					return false;
+				}
+			}
+			
+			if (this.applyActionLimits) {
+			
 				// Determine whether the attack can even be executed based on how many of the same type are
 				// already currently active - if there are already too many of the same attack active then we do not allow it
 				int numAttacksCurrentlyActive = attacksCurrentlyActive.get(attackType);
@@ -210,29 +234,6 @@ abstract class PlayerFightingGameState extends GameState {
 					}
 				}
 				
-				// If there is already an attack present on the first relevant fire emitter(s) for the player
-				// then don't allow it
-
-				int playerNum = player.getPlayerNumber();
-				FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
-				assert(fireEmitterModel != null);
-				
-				if (attackAction.hasLeftHandedAttack()) {
-					FireEmitter firstLeftEmitter  = fireEmitterModel.getPlayerLeftEmitters(playerNum).get(0);
-					
-					if (firstLeftEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
-						return false;
-					}
-				}
-				
-				if (attackAction.hasRightHandedAttack()) {
-					FireEmitter firstRightEmitter = fireEmitterModel.getPlayerRightEmitters(playerNum).get(0);
-					
-					if (firstRightEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
-						return false;
-					}
-				}
-
 				// Determine whether the attack is group limited, if it is check to see the number of group limited attacks
 				// that are currently active, if the number exceeds or is equal to the limit number then we do not allow it
 				if (attackType.getIsActivationGroupLimited()) {
@@ -248,13 +249,11 @@ abstract class PlayerFightingGameState extends GameState {
 					}
 				}
 				
-
 				attacksExecuted.put(attackType, numAttacks + 1);
 				attacksCurrentlyActive.put(attackType, numAttacksCurrentlyActive + 1);
 			}
 		}
 	
-		
 		return true;
 	}
 }
