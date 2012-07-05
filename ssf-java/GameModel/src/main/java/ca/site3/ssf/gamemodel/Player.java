@@ -31,6 +31,7 @@ class Player {
 		assert(this.gameConfig != null);
 		
 		this.matchReset();
+		this.resetHealth();
 		this.isInvincible = false;
 		this.hasInfiniteMoves = false;
 		this.playerNum = playerNum;
@@ -41,7 +42,6 @@ class Player {
 	 * starting an new match).
 	 */
 	void matchReset() {
-		this.resetHealth();
 		this.numRoundWins  = 0;
 	}
 

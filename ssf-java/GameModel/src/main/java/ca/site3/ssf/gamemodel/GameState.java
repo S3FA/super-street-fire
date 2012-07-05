@@ -23,9 +23,9 @@ public abstract class GameState {
 		ROUND_ENDED_STATE      ("Round Ended",               true,  true,  null),
 		TIE_BREAKER_ROUND_STATE("Tie Breaker Round In-Play", true,  true,  null),
 		TEST_ROUND_STATE       ("Test Round",                true,  true,  null),
-		MATCH_ENDED_STATE      ("Match Ended",               true,  true,  null),
 		PAUSED_STATE           ("Paused",                    true,  true,  null),
 		RINGMASTER_STATE       ("Ringmaster Control",        true,  true,  Arrays.asList(ROUND_BEGINNING_STATE)),
+		MATCH_ENDED_STATE      ("Match Ended",               true,  true,  Arrays.asList(RINGMASTER_STATE)),
 		IDLE_STATE             ("Idle",                      false, false, Arrays.asList(RINGMASTER_STATE, TEST_ROUND_STATE));
 		
 		final private String name;

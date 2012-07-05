@@ -15,6 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import org.slf4j.Logger;
@@ -59,15 +60,12 @@ class ControlPanel extends JPanel implements ActionListener {
 		this.client = client;
 		assert(this.actionFactory != null && this.client != null);
 		
-		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Controls");
-		border.setTitleColor(Color.black);
-		this.setBorder(border);
-		
+		this.setBorder(new EmptyBorder(0, 0, 0, 0));
 		this.setLayout(new FlowLayout());
 		
 		JPanel generalButtonPanel = new JPanel();
+		generalButtonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 		generalButtonPanel.setLayout(new FlowLayout());
-		
 		
 		this.nextStateButton1 = new JButton("Next State");
 		this.nextStateButton1.addActionListener(this);

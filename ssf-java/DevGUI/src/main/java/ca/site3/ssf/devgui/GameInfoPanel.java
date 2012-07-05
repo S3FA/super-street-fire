@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import ca.site3.ssf.gamemodel.GameState;
@@ -30,19 +31,20 @@ class GameInfoPanel extends JPanel {
 	GameInfoPanel(StreetFireGuiClient client) {
 		super();
 		
-		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Game Information");
-		border.setTitleColor(Color.black);
-		this.setBorder(border);
-		
+		this.setBorder(new EmptyBorder(0, 0, 0, 0));
 		
 		// GAME STATE INFO PANEL *********************************************
 		JPanel stateInfoPanel = new JPanel();
+		
+		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black), "Game State Info");
+		border.setTitleColor(Color.black);
+		stateInfoPanel.setBorder(border);
 		
         GridBagLayout layout = new GridBagLayout();
         stateInfoPanel.setLayout(layout);
 
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();		
-		
+
 		JLabel prevStateLabel = new JLabel("Previous State:");
 		prevStateLabel.setForeground(Color.black);
 		formLayoutHelper.addLabel(prevStateLabel, stateInfoPanel);
