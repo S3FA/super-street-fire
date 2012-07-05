@@ -13,8 +13,10 @@ abstract class PlayerFightingGameState extends GameState {
 
 	protected Collection<Action> activeActions = new ArrayList<Action>();
 	
-	protected double secsSinceLastP1Action = Double.MAX_VALUE;
-	protected double secsSinceLastP2Action = Double.MAX_VALUE;
+	protected double secsSinceLastP1LeftAction  = Double.MAX_VALUE;
+	protected double secsSinceLastP1RightAction = Double.MAX_VALUE;
+	protected double secsSinceLastP2LeftAction  = Double.MAX_VALUE;
+	protected double secsSinceLastP2RightAction = Double.MAX_VALUE;
 	
 	// Keep track of the number of attacks executed of each type, for each player, in this fighting state
 	protected Map<AttackType, Integer> p1AttacksExecuted = new Hashtable<AttackType, Integer>(AttackType.values().length);
@@ -126,23 +128,23 @@ abstract class PlayerFightingGameState extends GameState {
 		
 		case PLAYER1_ENTITY: {
 			if (!this.checkPlayerAction(action, this.gameModel.getPlayer1(),
-				this.secsSinceLastP1Action, this.p1AttacksExecuted, this.p1AttackTypesCurrentlyActive,
+				this.secsSinceLastP1LeftAction, this.secsSinceLastP1RightAction,
+				this.p1AttacksExecuted, this.p1AttackTypesCurrentlyActive,
 				this.numP1GroupLimitedActiveAttacks)) {
 				return;
 			}
 
-			this.secsSinceLastP1Action = 0.0;
 			break;
 		}
 			
 		case PLAYER2_ENTITY: {
 			if (!this.checkPlayerAction(action, this.gameModel.getPlayer2(),
-				this.secsSinceLastP2Action, this.p2AttacksExecuted, this.p2AttackTypesCurrentlyActive,
+				this.secsSinceLastP2LeftAction, this.secsSinceLastP2RightAction, 
+				this.p2AttacksExecuted, this.p2AttackTypesCurrentlyActive,
 				this.numP2GroupLimitedActiveAttacks)) {
 				return;
 			}
-			
-			this.secsSinceLastP2Action = 0.0;
+
 			break;
 		}
 			
@@ -172,35 +174,52 @@ abstract class PlayerFightingGameState extends GameState {
 	 * Private helper method for limiting player actions and determining whether an action will actually become active or not.
 	 * @param action The action to check.
 	 * @param player The player executing the action.
-	 * @param secsSinceLastAction The time since the last action for the given player.
+	 * @param secsSinceLastLeftAction The time since the last left-handed action for the given player.
+	 * @param secsSinceLastRightAction The time since the last right-handed action for the given player.
 	 * @param attacksExecuted The number of attacks of each type currently being executed for the given player.
 	 * @param attacksCurrentlyActive The number of attacks of each type that are currently active for the given player.
 	 * @param numGroupLimitedActiveAttacks The number of attacks that are currently active which are 'group limited'.
 	 * @return false if the action doesn't pass the check, true if it does.
 	 */
-	private boolean checkPlayerAction(Action action, Player player, double secsSinceLastAction, Map<AttackType, Integer> attacksExecuted,
-		                              Map<AttackType, Integer> attacksCurrentlyActive, int numGroupLimitedActiveAttacks) {
+	private boolean checkPlayerAction(Action action, Player player, double secsSinceLastLeftAction, double secsSinceLastRightAction,
+									  Map<AttackType, Integer> attacksExecuted, Map<AttackType, Integer> attacksCurrentlyActive,
+									  int numGroupLimitedActiveAttacks) {
 		
-		// If the action is an attack and the player hasn't waited for their attack cooldown time then we
-		// just ignore the action - we never ignore blocks though, blocks ALWAYS work
-		if (secsSinceLastAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
-			action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
-				
-			// Player has already made an action recently, exit without counting the current action
-			return false;
+
+		// We never ignore/filter blocks, blocks should ALWAYS work, immediately!
+		if (action.getActionFlameType() == FireEmitter.FlameType.BLOCK_FLAME) {
+			return true;
 		}
 		
 		if (action.getActionFlameType() == FireEmitter.FlameType.ATTACK_FLAME) {
+			
 			PlayerAttackAction attackAction = ((PlayerAttackAction)action);
 			AttackType attackType = attackAction.getAttackType();
-		
-			// If there is already an attack present on the first relevant fire emitter(s) for the player
-			// then don't allow it
+			
+
 			int playerNum = player.getPlayerNumber();
 			FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 			assert(fireEmitterModel != null);
 			
-			if (attackAction.hasLeftHandedAttack()) {
+			boolean isLeftHandedAttack  = attackAction.hasLeftHandedAttack();
+			boolean isRightHandedAttack = attackAction.hasRightHandedAttack();
+			
+			// If there is already an attack present on the first relevant fire emitter(s) for the player
+			// then don't allow it, also check to see whether the timer between attacks allows the player to make another attack for
+			// its handedness as well...
+
+			if (isLeftHandedAttack) {
+				if (playerNum == 1) {
+					if (this.secsSinceLastP1LeftAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+						return false;
+					}
+				}
+				else {
+					if (this.secsSinceLastP2LeftAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+						return false;
+					}
+				}
+				
 				FireEmitter firstLeftEmitter  = fireEmitterModel.getPlayerLeftEmitters(playerNum).get(0);
 				
 				if (firstLeftEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
@@ -208,7 +227,18 @@ abstract class PlayerFightingGameState extends GameState {
 				}
 			}
 			
-			if (attackAction.hasRightHandedAttack()) {
+			if (isRightHandedAttack) {
+				if (playerNum == 1) {
+					if (this.secsSinceLastP1RightAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+						return false;
+					}
+				}
+				else {
+					if (this.secsSinceLastP2RightAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+						return false;
+					}
+				}
+				
 				FireEmitter firstRightEmitter = fireEmitterModel.getPlayerRightEmitters(playerNum).get(0);
 				
 				if (firstRightEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
@@ -216,18 +246,20 @@ abstract class PlayerFightingGameState extends GameState {
 				}
 			}
 			
+			int numAttacks = attacksExecuted.get(attackType);
+			int numAttacksCurrentlyActive = attacksCurrentlyActive.get(attackType);
+			
 			if (this.applyActionLimits) {
 			
 				// Determine whether the attack can even be executed based on how many of the same type are
 				// already currently active - if there are already too many of the same attack active then we do not allow it
-				int numAttacksCurrentlyActive = attacksCurrentlyActive.get(attackType);
 				if (numAttacksCurrentlyActive >= attackType.getNumAllowedActiveAtATime()) {
 					return false;
 				}
 				
 				// If the player is not allowed to have unlimited attacks and if the attack is not allowed to have
 				// more than x use(s) per round then we do not allow it
-				int numAttacks = attacksExecuted.get(attackType);
+				
 				if (!player.getHasInfiniteMoves()) {
 					if (attackType.getMaxUsesPerRound() <= numAttacks) {
 						return false;
@@ -248,10 +280,29 @@ abstract class PlayerFightingGameState extends GameState {
 						this.numP2GroupLimitedActiveAttacks++;
 					}
 				}
-				
-				attacksExecuted.put(attackType, numAttacks + 1);
-				attacksCurrentlyActive.put(attackType, numAttacksCurrentlyActive + 1);
 			}
+			
+			// Reset the time on each of the player's handed attacks since we're about to let this attack go through
+			if (playerNum == 1) {
+				if (isLeftHandedAttack) {
+					this.secsSinceLastP1LeftAction = 0.0;
+				}
+				if (isRightHandedAttack) {
+					this.secsSinceLastP1RightAction = 0.0;
+				}
+			}
+			else {
+				if (isLeftHandedAttack) {
+					this.secsSinceLastP2LeftAction = 0.0;
+				}
+				if (isRightHandedAttack) {
+					this.secsSinceLastP2RightAction = 0.0;
+				}
+			}
+			
+			// Update the attacks that are active and that have been executed to include the current attack action
+			attacksExecuted.put(attackType, numAttacks + 1);
+			attacksCurrentlyActive.put(attackType, numAttacksCurrentlyActive + 1);
 		}
 	
 		return true;

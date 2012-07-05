@@ -47,8 +47,10 @@ class TestRoundGameState extends PlayerFightingGameState {
 		this.gameModel.getFireEmitterModel().fireAllEmitterChangedEvent();
 		
 		// Update time since last attack counters
-		this.secsSinceLastP1Action += dT;
-		this.secsSinceLastP2Action += dT;
+		this.secsSinceLastP1LeftAction  += dT;
+		this.secsSinceLastP1RightAction += dT;
+		this.secsSinceLastP2LeftAction  += dT;
+		this.secsSinceLastP2RightAction += dT;
 		
 		this.roundTime += dT;
 		this.gameModel.getActionSignaller().fireOnRoundPlayTimerChanged((int)Math.ceil(this.roundTime));
