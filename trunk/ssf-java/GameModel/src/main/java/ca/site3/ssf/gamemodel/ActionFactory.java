@@ -931,7 +931,7 @@ final public class ActionFactory {
 	 * @return The resulting action, null on failure.
 	 */
 	final Action buildCrowdPleaserBurstAction(GameModel.Entity colourEntity, FireEmitter.Location location,
-								              double totalDurationInSecs, int numBursts) {
+								              double totalDurationInSecs, int numBursts, double delayInSecs) {
 		
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
@@ -958,7 +958,7 @@ final public class ActionFactory {
 		}
 
 		Action action = new CrowdPleaserAction(fireEmitterModel, colourEntity);
-		this.addBurstToAction(action, emitterIter, numEmitters, numBursts, totalDurationInSecs, 0.8f, 0.05f, 0.0);
+		this.addBurstToAction(action, emitterIter, numEmitters, numBursts, totalDurationInSecs, 0.8f, 0.05f, delayInSecs);
 		return action;
 	}
 
@@ -1413,7 +1413,7 @@ final public class ActionFactory {
 			System.out.println();
 		}
 		*/
-		Action rightRailBurst = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 1.0, 1);
+		Action rightRailBurst = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 1.0, 1, 0.0);
 		assert(rightRailBurst != null);
 		while (!rightRailBurst.isFinished()) {
 			rightRailBurst.tick(0.01666);

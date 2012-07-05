@@ -45,36 +45,36 @@ class RoundEndedGameState extends GameState {
 		
 		// Action for the various of fire emitter areas in the game arena...
 		tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.RINGMASTER_ENTITY,
-				FireEmitter.Location.OUTER_RING, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 1);
+				FireEmitter.Location.OUTER_RING, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 1, 0.0);
 		assert(tempAction != null);
 		this.roundEndActions.add(tempAction);
 		
 		if (roundVictor != null) {
 			tempAction  = actionFactory.buildCrowdPleaserBurstAction(roundVictor.getEntity(),
-					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3);
+					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 			tempAction = actionFactory.buildCrowdPleaserBurstAction(roundVictor.getEntity(),
-					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3);
+					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 		}
 		else {
 			tempAction  = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY,
-					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3);
+					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 			tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY,
-					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3);
+					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 			
 			tempAction  = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER2_ENTITY,
-					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3);
+					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 			tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER2_ENTITY,
-					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3);
+					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 		}

@@ -22,7 +22,7 @@ class IdleGameState extends GameState {
 		super(gameModel);
 		
 		// Make sure the game is completely reset
-		this.gameModel.resetGame();
+		this.gameModel.resetGame(true);
 		this.timeSinceLastReset = 0.0;
 	}
 	
@@ -31,7 +31,7 @@ class IdleGameState extends GameState {
 		
 		// Make sure the game is reset when this state is initially ticked
 		if (this.firstTick) {
-			this.gameModel.resetGame();
+			this.gameModel.resetGame(true);
 			this.firstTick = false;
 		}
 		

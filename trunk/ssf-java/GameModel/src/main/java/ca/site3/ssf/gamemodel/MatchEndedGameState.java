@@ -36,15 +36,15 @@ class MatchEndedGameState extends GameState {
 		
 		Action tempAction = null;
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 4.0, 1);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.OUTER_RING, 4.0, 1, 0.0);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 4.0, 4);
+		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 4.0, 4, 0.0);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 4.0, 4);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 4.0, 4, 0.0);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
@@ -64,10 +64,6 @@ class MatchEndedGameState extends GameState {
 		
 		// Once all the flashy actions are done we move on to the next state...
 		if (this.matchEndActions.isEmpty()) {
-			
-			// Reset the game entirely, the match is now over
-			this.gameModel.resetGame();
-			this.gameModel.setNextGameState(new RingmasterGameState(this.gameModel));
 			return;
 		}
 		
@@ -93,8 +89,14 @@ class MatchEndedGameState extends GameState {
 
 	@Override
 	void initiateNextState(GameState.GameStateType nextState) {
-		// Does nothing, have to wait for the match over state to finish on its own
-		// in order to move to the next state.
+		// We make sure that all match end actions have finished first (the player deserves their victory fire!)
+		if (!this.matchEndActions.isEmpty()) {
+			return;
+		}
+		
+		// Reset the game (the ringmaster wants to exit this state and go back to showing off)
+		this.gameModel.resetGame(false);
+		this.gameModel.setNextGameState(new RingmasterGameState(this.gameModel));
 	}
 
 	@Override

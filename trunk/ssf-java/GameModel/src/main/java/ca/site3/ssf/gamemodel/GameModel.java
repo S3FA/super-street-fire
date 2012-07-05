@@ -211,7 +211,7 @@ public class GameModel implements IGameModel {
 	/**
 	 * Completely resets the game data and turns all emitters off.
 	 */
-	void resetGame() {
+	void resetGame(boolean clearPlayerHealth) {
 		// Make sure the game is completely reset:
 		// - All emitters must be turned off
 		// - All players must have full health restored and all record of wins/losses wiped
@@ -222,8 +222,10 @@ public class GameModel implements IGameModel {
 		p1.matchReset();
 		p2.matchReset();
 		
-		p1.clearHealth();
-		p2.clearHealth();
+		if (clearPlayerHealth) {
+			p1.clearHealth();
+			p2.clearHealth();
+		}
 		
 		assert(this.roundResults.size() <= this.getConfig().getMaxNumRoundsPerMatch());
 		this.roundResults.clear();
