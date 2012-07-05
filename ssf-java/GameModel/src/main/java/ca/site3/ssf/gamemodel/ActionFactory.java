@@ -114,7 +114,7 @@ final public class ActionFactory {
 			case JAB_ATTACK: {
 				assert(leftHand || rightHand);
 				
-				final double JAB_BASE_ACCELERATION   = 0.5;
+				final double JAB_BASE_ACCELERATION   = 0.0;
 				final double JAB_TIME_LENGTH_IN_SECS = 4.0;
 				final float JAB_DAMAGE_PER_FLAME     = 5.0f;
 				final int JAB_NUM_FLAMES             = 1;
@@ -132,44 +132,25 @@ final public class ActionFactory {
 				break;
 			}
 			
-			case HOOK_ATTACK: {
-				assert(leftHand || rightHand);
-				
-				final double HOOK_BASE_ACCELERATION   = 0.0;
-				final double HOOK_TIME_LENGTH_IN_SECS = 4.5;
-				final float HOOK_DAMAGE_PER_FLAME     = 8.0f;
-				final int HOOK_NUM_FLAMES             = 1;
-				
-				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, HOOK_DAMAGE_PER_FLAME);
-					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
-							HOOK_NUM_FLAMES, HOOK_TIME_LENGTH_IN_SECS, HOOK_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
-				}
-				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, HOOK_DAMAGE_PER_FLAME);
-					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
-							HOOK_NUM_FLAMES, HOOK_TIME_LENGTH_IN_SECS, HOOK_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
-				}
-				break;
-			}
-			
+			// Both hook and uppercut get mistaken A LOT in the gesture recognition, so I've made both attacks do the same thing :P
+			case HOOK_ATTACK:
 			case UPPERCUT_ATTACK: {
 				assert(leftHand || rightHand);
 				
-				final double UPPERCUT_BASE_ACCELERATION   = 0.0;
-				final double UPPERCUT_TIME_LENGTH_IN_SECS = 5.5;
-				final float UPPERCUT_DAMAGE_PER_FLAME    = 10.0f;
-				final int UPPERCUT_NUM_FLAMES            = 2;
+				final double BASE_ACCELERATION   = 0.25;
+				final double TIME_LENGTH_IN_SECS = 5.0;
+				final float DAMAGE_PER_FLAME     = 7.0f;
+				final int NUM_FLAMES             = 1;
 				
 				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, UPPERCUT_DAMAGE_PER_FLAME);
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, DAMAGE_PER_FLAME);
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
-							UPPERCUT_NUM_FLAMES, UPPERCUT_TIME_LENGTH_IN_SECS, UPPERCUT_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+							NUM_FLAMES, TIME_LENGTH_IN_SECS, BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_UPPERCUT_ATTACK, blockerOrAttacker, attackee, UPPERCUT_DAMAGE_PER_FLAME);
+					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, DAMAGE_PER_FLAME);
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
-							UPPERCUT_NUM_FLAMES, UPPERCUT_TIME_LENGTH_IN_SECS, UPPERCUT_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+							NUM_FLAMES, TIME_LENGTH_IN_SECS, BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				break;
 			}
@@ -177,20 +158,20 @@ final public class ActionFactory {
 			case CHOP_ATTACK: {
 				assert(leftHand || rightHand);
 				
-				final double CHOP_BASE_ACCELERATION   = 0.0;
-				final double CHOP_TIME_LENGTH_IN_SECS = 6.0;
-				final float CHOP_DAMAGE_PER_FLAME    = 8.75f;
-				final int CHOP_NUM_FLAMES            = 1;
+				final double CHOP_BASE_ACCELERATION   = 0.25;
+				final double CHOP_TIME_LENGTH_IN_SECS = 4.25;
+				final float CHOP_DAMAGE_PER_FLAME     = 6.0f;
+				final int CHOP_NUM_FLAMES             = 1;
 				
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_CHOP_ATTACK, blockerOrAttacker, attackee, CHOP_DAMAGE_PER_FLAME);
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
-							1, CHOP_TIME_LENGTH_IN_SECS, CHOP_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+							CHOP_NUM_FLAMES, CHOP_TIME_LENGTH_IN_SECS, CHOP_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				else {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_CHOP_ATTACK, blockerOrAttacker, attackee, CHOP_DAMAGE_PER_FLAME);
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
-							1, CHOP_TIME_LENGTH_IN_SECS, CHOP_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+							CHOP_NUM_FLAMES, CHOP_TIME_LENGTH_IN_SECS, CHOP_BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				break;
 			}
@@ -224,9 +205,9 @@ final public class ActionFactory {
 				
 				final double SHORYUKEN_BASE_ACCELERATION   = 0.0;
 				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 3.25;
-				final float SHORYUKEN_DAMAGE_PER_FLAME    = 9.0f;
-				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 2;
-				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 1;
+				final float SHORYUKEN_DAMAGE_PER_FLAME    = 7.0f;
+				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 3;
+				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 2;
 				
 
 				if (leftHand) {

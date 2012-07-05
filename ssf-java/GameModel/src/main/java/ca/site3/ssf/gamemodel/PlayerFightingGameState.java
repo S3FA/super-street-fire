@@ -24,6 +24,10 @@ abstract class PlayerFightingGameState extends GameState {
 	protected Map<AttackType, Integer> p1AttackTypesCurrentlyActive = new Hashtable<AttackType, Integer>(AttackType.values().length);
 	protected Map<AttackType, Integer> p2AttackTypesCurrentlyActive = new Hashtable<AttackType, Integer>(AttackType.values().length);
 	
+	// Keep track of the number of active attacks that are group limited (i.e., only so many can be active at a given time)
+	protected int numP1GroupLimitedActiveAttacks = 0;
+	protected int numP2GroupLimitedActiveAttacks = 0;
+	
 	protected final boolean applyActionLimits;
 	
 	public PlayerFightingGameState(GameModel gameModel, boolean applyActionLimits) {
@@ -62,20 +66,31 @@ abstract class PlayerFightingGameState extends GameState {
 		PlayerAttackAction attackAction = (PlayerAttackAction)action;
 		assert(attackAction != null);
 		
+		AttackType attackType = attackAction.getAttackType();
+		
 		// Remove one of the active attacks from the appropriate map for mapping player attack type to number of active attacks
 		switch (action.getContributorEntity()) {
 		
 		case PLAYER1_ENTITY: {
-			Integer value = this.p1AttackTypesCurrentlyActive.get(attackAction.getAttackType());
-			this.p1AttackTypesCurrentlyActive.put(attackAction.getAttackType(), Math.max(0, value-1));
+			if (attackType.getIsActivationGroupLimited()) {
+				this.numP1GroupLimitedActiveAttacks--;
+			}
+			
+			Integer value = this.p1AttackTypesCurrentlyActive.get(attackType);
+			this.p1AttackTypesCurrentlyActive.put(attackType, Math.max(0, value-1));
 			break;
 		}
 		
-		case PLAYER2_ENTITY:
-			Integer value = this.p2AttackTypesCurrentlyActive.get(attackAction.getAttackType());
-			this.p2AttackTypesCurrentlyActive.put(attackAction.getAttackType(), Math.max(0, value-1));
-			break;
+		case PLAYER2_ENTITY: {
+			if (attackType.getIsActivationGroupLimited()) {
+				this.numP2GroupLimitedActiveAttacks--;
+			}
 			
+			Integer value = this.p2AttackTypesCurrentlyActive.get(attackType);
+			this.p2AttackTypesCurrentlyActive.put(attackType, Math.max(0, value-1));
+			break;
+		}
+		
 		default:
 			assert(false);
 			break;
@@ -111,7 +126,8 @@ abstract class PlayerFightingGameState extends GameState {
 		
 		case PLAYER1_ENTITY: {
 			if (!this.checkPlayerAction(action, this.gameModel.getPlayer1(),
-				this.secsSinceLastP1Action, this.p1AttacksExecuted, this.p1AttackTypesCurrentlyActive)) {
+				this.secsSinceLastP1Action, this.p1AttacksExecuted, this.p1AttackTypesCurrentlyActive,
+				this.numP1GroupLimitedActiveAttacks)) {
 				return;
 			}
 
@@ -121,7 +137,8 @@ abstract class PlayerFightingGameState extends GameState {
 			
 		case PLAYER2_ENTITY: {
 			if (!this.checkPlayerAction(action, this.gameModel.getPlayer2(),
-				this.secsSinceLastP2Action, this.p2AttacksExecuted, this.p2AttackTypesCurrentlyActive)) {
+				this.secsSinceLastP2Action, this.p2AttacksExecuted, this.p2AttackTypesCurrentlyActive,
+				this.numP2GroupLimitedActiveAttacks)) {
 				return;
 			}
 			
@@ -158,10 +175,11 @@ abstract class PlayerFightingGameState extends GameState {
 	 * @param secsSinceLastAction The time since the last action for the given player.
 	 * @param attacksExecuted The number of attacks of each type currently being executed for the given player.
 	 * @param attacksCurrentlyActive The number of attacks of each type that are currently active for the given player.
+	 * @param numGroupLimitedActiveAttacks The number of attacks that are currently active which are 'group limited'.
 	 * @return false if the action doesn't pass the check, true if it does.
 	 */
 	private boolean checkPlayerAction(Action action, Player player, double secsSinceLastAction, Map<AttackType, Integer> attacksExecuted,
-		                              Map<AttackType, Integer> attacksCurrentlyActive) {
+		                              Map<AttackType, Integer> attacksCurrentlyActive, int numGroupLimitedActiveAttacks) {
 		
 		if (secsSinceLastAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs() &&
 			action.getActionFlameType() != FireEmitter.FlameType.BLOCK_FLAME) {
@@ -173,26 +191,66 @@ abstract class PlayerFightingGameState extends GameState {
 		if (this.applyActionLimits) {
 			
 			if (action.getActionFlameType() == FireEmitter.FlameType.ATTACK_FLAME) {
-				AttackType atkType = ((PlayerAttackAction)action).getAttackType();
+				PlayerAttackAction attackAction = ((PlayerAttackAction)action);
+				AttackType attackType = attackAction.getAttackType();
 				
 				// Determine whether the attack can even be executed based on how many of the same type are
 				// already currently active - if there are already too many of the same attack active then we do not allow it
-				int numAttacksCurrentlyActive = attacksCurrentlyActive.get(atkType);
-				if (numAttacksCurrentlyActive >= atkType.getNumAllowedActiveAtATime()) {
+				int numAttacksCurrentlyActive = attacksCurrentlyActive.get(attackType);
+				if (numAttacksCurrentlyActive >= attackType.getNumAllowedActiveAtATime()) {
 					return false;
 				}
-					
-				// Check to see if the attack is limited by other active attacks of the same type...
-				int numAttacks = attacksExecuted.get(atkType);
+				
+				// If the player is not allowed to have unlimited attacks and if the attack is not allowed to have
+				// more than x use(s) per round then we do not allow it
+				int numAttacks = attacksExecuted.get(attackType);
 				if (!player.getHasInfiniteMoves()) {
-					// If the attack is not allowed to have more than x use(s) per round then we do not allow the attack
-					if (atkType.getMaxUsesPerRound() <= numAttacks) {
+					if (attackType.getMaxUsesPerRound() <= numAttacks) {
+						return false;
+					}
+				}
+				
+				// If there is already an attack present on the first relevant fire emitter(s) for the player
+				// then don't allow it
+
+				int playerNum = player.getPlayerNumber();
+				FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
+				assert(fireEmitterModel != null);
+				
+				if (attackAction.hasLeftHandedAttack()) {
+					FireEmitter firstLeftEmitter  = fireEmitterModel.getPlayerLeftEmitters(playerNum).get(0);
+					
+					if (firstLeftEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
+						return false;
+					}
+				}
+				
+				if (attackAction.hasRightHandedAttack()) {
+					FireEmitter firstRightEmitter = fireEmitterModel.getPlayerRightEmitters(playerNum).get(0);
+					
+					if (firstRightEmitter.getContributingEntityFlameTypes(player.getEntity()).contains(FlameType.ATTACK_FLAME)) {
 						return false;
 					}
 				}
 
-				attacksExecuted.put(atkType, numAttacks + 1);
-				attacksCurrentlyActive.put(atkType, numAttacksCurrentlyActive + 1);
+				// Determine whether the attack is group limited, if it is check to see the number of group limited attacks
+				// that are currently active, if the number exceeds or is equal to the limit number then we do not allow it
+				if (attackType.getIsActivationGroupLimited()) {
+					if (numGroupLimitedActiveAttacks > attackType.getNumActivationsInGroupAtATime()) {
+						return false;
+					}
+					
+					if (playerNum == 1) {
+						this.numP1GroupLimitedActiveAttacks++;
+					}
+					else {
+						this.numP2GroupLimitedActiveAttacks++;
+					}
+				}
+				
+
+				attacksExecuted.put(attackType, numAttacks + 1);
+				attacksCurrentlyActive.put(attackType, numAttacksCurrentlyActive + 1);
 			}
 		}
 	
