@@ -27,6 +27,8 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	private SoundPlayerManager soundPlayerMgr;
+	
 	private String resourcePath;
 	private Properties configProperties;
 	private AudioSettings settings;
@@ -42,6 +44,9 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		assert(settings != null);
 		this.settings = settings;
 		this.setConfigFile(DEFAULT_CONFIG_FILEPATH);
+		
+		// Order matters - this needs to be made last
+		this.soundPlayerMgr = new SoundPlayerManager(this);
 	}
 	
 	String getResourcePath() {
@@ -136,7 +141,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 				continue;
 			}
 			
-			SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
+			SoundPlayer soundPlayer = this.soundPlayerMgr.build(gameModelEvent);
 			if (soundPlayer != null) {
 				soundPlayer.execute(gameModelEvent);
 			}
