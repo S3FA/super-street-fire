@@ -7,20 +7,16 @@ import java.util.List;
 
 import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
-import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
-import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
-import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
-import ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType;
-import ca.site3.ssf.guiprotocol.GuiCommand.Command.Player;
+import ca.site3.ssf.guiprotocol.Common.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.RingmasterAction;
 
@@ -28,11 +24,10 @@ import ca.site3.ssf.guiprotocol.GuiCommand.Command.RingmasterAction;
  * Utility methods for converting between enums etc. in the
  * GameModel and in the protobuf definitions
  * 
- * @author greg
+ * @author greg, Callum
  */
 class SerializationHelper {
 
-	
 	static Player entityToProtobuf(Entity player) {
 		switch (player) {
 		case PLAYER1_ENTITY:
@@ -70,7 +65,7 @@ class SerializationHelper {
 	
 	
 	static Collection<Player> entitiesToProtobuf(EnumSet<Entity> entities) {
-		Collection<Player> players = new ArrayList<GuiCommand.Command.Player>(entities.size());
+		Collection<Player> players = new ArrayList<Common.Player>(entities.size());
 		for (Entity e : entities) {
 			players.add(entityToProtobuf(e));
 		}

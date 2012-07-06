@@ -29,11 +29,9 @@ import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
-import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
@@ -46,10 +44,10 @@ import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
+import ca.site3.ssf.gamemodel.UnrecognizedGestureEvent;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.EventType;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter;
-import ca.site3.ssf.guiprotocol.Event.GameEvent.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType;
 
@@ -63,7 +61,7 @@ import ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType;
  * 
  * This class is thread-safe.
  * 
- * @author greg
+ * @author greg, Callum
  */
 public class StreetFireServer implements Runnable {
 
@@ -229,7 +227,7 @@ public class StreetFireServer implements Runnable {
 		case PLAYER_ATTACK_ACTION: {
 			PlayerAttackActionEvent e = (PlayerAttackActionEvent)evt;
 			b.setType(EventType.PLAYER_ATTACK_ACTION)
-				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2)
+				.setPlayer(e.getPlayerNum() == 1 ? Common.Player.P1 : Common.Player.P2)
 				.setAttackType(SerializationHelper.attackTypeToProtobuf(e.getAttackType()));
 			break;
 		}
@@ -237,14 +235,14 @@ public class StreetFireServer implements Runnable {
 		case PLAYER_BLOCK_ACTION: {
 			PlayerBlockActionEvent e = (PlayerBlockActionEvent)evt;
 			b.setType(EventType.PLAYER_BLOCK_ACTION)
-				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2);
+				.setPlayer(e.getPlayerNum() == 1 ? Common.Player.P1 : Common.Player.P2);
 			break;
 		}
 		
 		case PLAYER_HEALTH_CHANGED: {
 			PlayerHealthChangedEvent e = (PlayerHealthChangedEvent)evt;
 			b.setType(EventType.PLAYER_HEALTH_CHANGED)
-				.setPlayer(e.getPlayerNum() == 1 ? Player.P1 : Player.P2)
+				.setPlayer(e.getPlayerNum() == 1 ? Common.Player.P1 : Common.Player.P2)
 				.setOldHealth(e.getPrevLifePercentage())
 				.setNewHealth(e.getNewLifePercentage());
 			break;
@@ -279,6 +277,12 @@ public class StreetFireServer implements Runnable {
 			b.setType(EventType.ROUND_PLAY_TIMER_CHANGED)
 				.setTimeInSecs(e.getTimeInSecs());
 			break;
+		}
+		
+		case UNRECOGNIZED_GESTURE: {
+			UnrecognizedGestureEvent e = (UnrecognizedGestureEvent)evt;
+			b.setType(EventType.UNRECOGNIZED_GESTURE)
+				.setPlayer(SerializationHelper.entityToProtobuf(e.getEntity()));
 		}
 		
 		default:

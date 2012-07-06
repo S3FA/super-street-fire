@@ -19,9 +19,9 @@ public final class GuiCommand {
     boolean hasPlayerAction();
     ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction getPlayerAction();
     
-    // optional .guiprotocol.Command.Player player = 3;
+    // optional .guiprotocol.Player player = 3;
     boolean hasPlayer();
-    ca.site3.ssf.guiprotocol.GuiCommand.Command.Player getPlayer();
+    ca.site3.ssf.guiprotocol.Common.Player getPlayer();
     
     // optional bool leftHand = 4;
     boolean hasLeftHand();
@@ -43,10 +43,10 @@ public final class GuiCommand {
     boolean hasEmitterIndex();
     int getEmitterIndex();
     
-    // repeated .guiprotocol.Command.Player emitterEntities = 9;
-    java.util.List<ca.site3.ssf.guiprotocol.GuiCommand.Command.Player> getEmitterEntitiesList();
+    // repeated .guiprotocol.Player emitterEntities = 9;
+    java.util.List<ca.site3.ssf.guiprotocol.Common.Player> getEmitterEntitiesList();
     int getEmitterEntitiesCount();
-    ca.site3.ssf.guiprotocol.GuiCommand.Command.Player getEmitterEntities(int index);
+    ca.site3.ssf.guiprotocol.Common.Player getEmitterEntities(int index);
     
     // optional float dmgPerFlame = 10;
     boolean hasDmgPerFlame();
@@ -398,78 +398,6 @@ public final class GuiCommand {
       // @@protoc_insertion_point(enum_scope:guiprotocol.Command.RingmasterAction)
     }
     
-    public enum Player
-        implements com.google.protobuf.ProtocolMessageEnum {
-      RINGMASTER(0, 0),
-      P1(1, 1),
-      P2(2, 2),
-      ;
-      
-      public static final int RINGMASTER_VALUE = 0;
-      public static final int P1_VALUE = 1;
-      public static final int P2_VALUE = 2;
-      
-      
-      public final int getNumber() { return value; }
-      
-      public static Player valueOf(int value) {
-        switch (value) {
-          case 0: return RINGMASTER;
-          case 1: return P1;
-          case 2: return P2;
-          default: return null;
-        }
-      }
-      
-      public static com.google.protobuf.Internal.EnumLiteMap<Player>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<Player>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Player>() {
-              public Player findValueByNumber(int number) {
-                return Player.valueOf(number);
-              }
-            };
-      
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return ca.site3.ssf.guiprotocol.GuiCommand.Command.getDescriptor().getEnumTypes().get(3);
-      }
-      
-      private static final Player[] VALUES = {
-        RINGMASTER, P1, P2, 
-      };
-      
-      public static Player valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-      
-      private final int index;
-      private final int value;
-      
-      private Player(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-      
-      // @@protoc_insertion_point(enum_scope:guiprotocol.Command.Player)
-    }
-    
     public enum FireEmitterType
         implements com.google.protobuf.ProtocolMessageEnum {
       LEFT_RAIL(0, 0),
@@ -515,7 +443,7 @@ public final class GuiCommand {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.GuiCommand.Command.getDescriptor().getEnumTypes().get(4);
+        return ca.site3.ssf.guiprotocol.GuiCommand.Command.getDescriptor().getEnumTypes().get(3);
       }
       
       private static final FireEmitterType[] VALUES = {
@@ -563,13 +491,13 @@ public final class GuiCommand {
       return playerAction_;
     }
     
-    // optional .guiprotocol.Command.Player player = 3;
+    // optional .guiprotocol.Player player = 3;
     public static final int PLAYER_FIELD_NUMBER = 3;
-    private ca.site3.ssf.guiprotocol.GuiCommand.Command.Player player_;
+    private ca.site3.ssf.guiprotocol.Common.Player player_;
     public boolean hasPlayer() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
-    public ca.site3.ssf.guiprotocol.GuiCommand.Command.Player getPlayer() {
+    public ca.site3.ssf.guiprotocol.Common.Player getPlayer() {
       return player_;
     }
     
@@ -623,16 +551,16 @@ public final class GuiCommand {
       return emitterIndex_;
     }
     
-    // repeated .guiprotocol.Command.Player emitterEntities = 9;
+    // repeated .guiprotocol.Player emitterEntities = 9;
     public static final int EMITTERENTITIES_FIELD_NUMBER = 9;
-    private java.util.List<ca.site3.ssf.guiprotocol.GuiCommand.Command.Player> emitterEntities_;
-    public java.util.List<ca.site3.ssf.guiprotocol.GuiCommand.Command.Player> getEmitterEntitiesList() {
+    private java.util.List<ca.site3.ssf.guiprotocol.Common.Player> emitterEntities_;
+    public java.util.List<ca.site3.ssf.guiprotocol.Common.Player> getEmitterEntitiesList() {
       return emitterEntities_;
     }
     public int getEmitterEntitiesCount() {
       return emitterEntities_.size();
     }
-    public ca.site3.ssf.guiprotocol.GuiCommand.Command.Player getEmitterEntities(int index) {
+    public ca.site3.ssf.guiprotocol.Common.Player getEmitterEntities(int index) {
       return emitterEntities_.get(index);
     }
     
@@ -709,7 +637,7 @@ public final class GuiCommand {
     private void initFields() {
       type_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType.EXECUTE_GENERIC_ACTION;
       playerAction_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction.BLOCK;
-      player_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.Player.RINGMASTER;
+      player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
       leftHand_ = false;
       rightHand_ = false;
       emitterType_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType.LEFT_RAIL;
@@ -994,7 +922,7 @@ public final class GuiCommand {
         bitField0_ = (bitField0_ & ~0x00000001);
         playerAction_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction.BLOCK;
         bitField0_ = (bitField0_ & ~0x00000002);
-        player_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.Player.RINGMASTER;
+        player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
         bitField0_ = (bitField0_ & ~0x00000004);
         leftHand_ = false;
         bitField0_ = (bitField0_ & ~0x00000008);
@@ -1255,7 +1183,7 @@ public final class GuiCommand {
             }
             case 24: {
               int rawValue = input.readEnum();
-              ca.site3.ssf.guiprotocol.GuiCommand.Command.Player value = ca.site3.ssf.guiprotocol.GuiCommand.Command.Player.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Common.Player value = ca.site3.ssf.guiprotocol.Common.Player.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(3, rawValue);
               } else {
@@ -1297,7 +1225,7 @@ public final class GuiCommand {
             }
             case 72: {
               int rawValue = input.readEnum();
-              ca.site3.ssf.guiprotocol.GuiCommand.Command.Player value = ca.site3.ssf.guiprotocol.GuiCommand.Command.Player.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Common.Player value = ca.site3.ssf.guiprotocol.Common.Player.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(9, rawValue);
               } else {
@@ -1310,7 +1238,7 @@ public final class GuiCommand {
               int oldLimit = input.pushLimit(length);
               while(input.getBytesUntilLimit() > 0) {
                 int rawValue = input.readEnum();
-                ca.site3.ssf.guiprotocol.GuiCommand.Command.Player value = ca.site3.ssf.guiprotocol.GuiCommand.Command.Player.valueOf(rawValue);
+                ca.site3.ssf.guiprotocol.Common.Player value = ca.site3.ssf.guiprotocol.Common.Player.valueOf(rawValue);
                 if (value == null) {
                   unknownFields.mergeVarintField(9, rawValue);
                 } else {
@@ -1421,15 +1349,15 @@ public final class GuiCommand {
         return this;
       }
       
-      // optional .guiprotocol.Command.Player player = 3;
-      private ca.site3.ssf.guiprotocol.GuiCommand.Command.Player player_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.Player.RINGMASTER;
+      // optional .guiprotocol.Player player = 3;
+      private ca.site3.ssf.guiprotocol.Common.Player player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
       public boolean hasPlayer() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
-      public ca.site3.ssf.guiprotocol.GuiCommand.Command.Player getPlayer() {
+      public ca.site3.ssf.guiprotocol.Common.Player getPlayer() {
         return player_;
       }
-      public Builder setPlayer(ca.site3.ssf.guiprotocol.GuiCommand.Command.Player value) {
+      public Builder setPlayer(ca.site3.ssf.guiprotocol.Common.Player value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -1440,7 +1368,7 @@ public final class GuiCommand {
       }
       public Builder clearPlayer() {
         bitField0_ = (bitField0_ & ~0x00000004);
-        player_ = ca.site3.ssf.guiprotocol.GuiCommand.Command.Player.RINGMASTER;
+        player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
         onChanged();
         return this;
       }
@@ -1553,26 +1481,26 @@ public final class GuiCommand {
         return this;
       }
       
-      // repeated .guiprotocol.Command.Player emitterEntities = 9;
-      private java.util.List<ca.site3.ssf.guiprotocol.GuiCommand.Command.Player> emitterEntities_ =
+      // repeated .guiprotocol.Player emitterEntities = 9;
+      private java.util.List<ca.site3.ssf.guiprotocol.Common.Player> emitterEntities_ =
         java.util.Collections.emptyList();
       private void ensureEmitterEntitiesIsMutable() {
         if (!((bitField0_ & 0x00000100) == 0x00000100)) {
-          emitterEntities_ = new java.util.ArrayList<ca.site3.ssf.guiprotocol.GuiCommand.Command.Player>(emitterEntities_);
+          emitterEntities_ = new java.util.ArrayList<ca.site3.ssf.guiprotocol.Common.Player>(emitterEntities_);
           bitField0_ |= 0x00000100;
         }
       }
-      public java.util.List<ca.site3.ssf.guiprotocol.GuiCommand.Command.Player> getEmitterEntitiesList() {
+      public java.util.List<ca.site3.ssf.guiprotocol.Common.Player> getEmitterEntitiesList() {
         return java.util.Collections.unmodifiableList(emitterEntities_);
       }
       public int getEmitterEntitiesCount() {
         return emitterEntities_.size();
       }
-      public ca.site3.ssf.guiprotocol.GuiCommand.Command.Player getEmitterEntities(int index) {
+      public ca.site3.ssf.guiprotocol.Common.Player getEmitterEntities(int index) {
         return emitterEntities_.get(index);
       }
       public Builder setEmitterEntities(
-          int index, ca.site3.ssf.guiprotocol.GuiCommand.Command.Player value) {
+          int index, ca.site3.ssf.guiprotocol.Common.Player value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -1581,7 +1509,7 @@ public final class GuiCommand {
         onChanged();
         return this;
       }
-      public Builder addEmitterEntities(ca.site3.ssf.guiprotocol.GuiCommand.Command.Player value) {
+      public Builder addEmitterEntities(ca.site3.ssf.guiprotocol.Common.Player value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -1591,7 +1519,7 @@ public final class GuiCommand {
         return this;
       }
       public Builder addAllEmitterEntities(
-          java.lang.Iterable<? extends ca.site3.ssf.guiprotocol.GuiCommand.Command.Player> values) {
+          java.lang.Iterable<? extends ca.site3.ssf.guiprotocol.Common.Player> values) {
         ensureEmitterEntitiesIsMutable();
         super.addAll(values, emitterEntities_);
         onChanged();
@@ -1783,45 +1711,44 @@ public final class GuiCommand {
   static {
     java.lang.String[] descriptorData = {
       "\n\021gui_command.proto\022\013guiprotocol\032\014common" +
-      ".proto\"\336\013\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
+      ".proto\"\244\013\n\007Command\022.\n\004type\030\001 \002(\0162 .guipr" +
       "otocol.Command.CommandType\0227\n\014playerActi" +
       "on\030\002 \001(\0162!.guiprotocol.Command.PlayerAct" +
-      "ion\022+\n\006player\030\003 \001(\0162\033.guiprotocol.Comman" +
-      "d.Player\022\020\n\010leftHand\030\004 \001(\010\022\021\n\trightHand\030" +
-      "\005 \001(\010\0229\n\013emitterType\030\006 \001(\0162$.guiprotocol" +
-      ".Command.FireEmitterType\022\021\n\tintensity\030\007 " +
-      "\001(\002\022\024\n\014emitterIndex\030\010 \001(\005\0224\n\017emitterEnti" +
-      "ties\030\t \003(\0162\033.guiprotocol.Command.Player\022",
-      "\023\n\013dmgPerFlame\030\n \001(\002\022\022\n\nflameWidth\030\013 \001(\005" +
-      "\022\031\n\021durationInSeconds\030\014 \001(\001\022\024\n\014accelerat" +
-      "ion\030\r \001(\001\022)\n\tnextState\030\016 \001(\0162\026.guiprotoc" +
-      "ol.GameState\022?\n\020ringmasterAction\030\017 \001(\0162%" +
-      ".guiprotocol.Command.RingmasterAction\022\030\n" +
-      "\020unlimitedMovesOn\030\020 \001(\010\"\365\001\n\013CommandType\022" +
-      "\032\n\026EXECUTE_GENERIC_ACTION\020\000\022\031\n\025EXECUTE_P" +
-      "LAYER_ACTION\020\001\022\020\n\014TOGGLE_PAUSE\020\002\022\r\n\tKILL" +
-      "_GAME\020\003\022\016\n\nNEXT_STATE\020\004\022\021\n\rTOUCH_EMITTER" +
-      "\020\005\022\033\n\027QUERY_GAME_INFO_REFRESH\020\006\022\035\n\031EXECU",
-      "TE_RINGMASTER_ACTION\020\007\022\025\n\021QUERY_SYSTEM_I" +
-      "NFO\020\010\022\030\n\024UPDATE_PLAYER_STATUS\020\t\"\260\003\n\014Play" +
-      "erAction\022\t\n\005BLOCK\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013H" +
-      "OOK_ATTACK\020\002\022\023\n\017UPPERCUT_ATTACK\020\003\022\017\n\013CHO" +
-      "P_ATTACK\020\004\022\023\n\017HADOUKEN_ATTACK\020\005\022\025\n\021SONIC" +
-      "_BOOM_ATTACK\020\006\022\024\n\020SHORYUKEN_ATTACK\020\007\022\030\n\024" +
-      "DOUBLE_LARIAT_ATTACK\020\010\022\033\n\027QUADRUPLE_LARI" +
-      "AT_ATTACK\020\t\022\030\n\024SUMO_HEADBUTT_ATTACK\020\n\022 \n" +
-      "\034ONE_HUNDRED_HAND_SLAP_ATTACK\020\013\022\031\n\025PSYCH" +
-      "O_CRUSHER_ATTACK\020\014\022\017\n\013YMCA_ATTACK\020\r\022\023\n\017N",
-      "YAN_CAT_ATTACK\020\016\022\024\n\020DISCO_STU_ATTACK\020\017\022\027" +
-      "\n\023ARM_WINDMILL_ATTACK\020\020\022\022\n\016SUCK_IT_ATTAC" +
-      "K\020\021\022\025\n\021VAFANAPOLI_ATTACK\020\022\"\206\001\n\020Ringmaste" +
-      "rAction\022\024\n\020HALF_RING_ACTION\020\000\022\016\n\nJAB_ACT" +
-      "ION\020\001\022\023\n\017ERUPTION_ACTION\020\002\022\021\n\rCIRCLE_ACT" +
-      "ION\020\003\022\023\n\017HADOUKEN_ACTION\020\004\022\017\n\013DRUM_ACTIO" +
-      "N\020\005\"(\n\006Player\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n" +
-      "\002P2\020\002\"@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022" +
-      "\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002B\032\n\030ca.si" +
-      "te3.ssf.guiprotocol"
+      "ion\022#\n\006player\030\003 \001(\0162\023.guiprotocol.Player" +
+      "\022\020\n\010leftHand\030\004 \001(\010\022\021\n\trightHand\030\005 \001(\010\0229\n" +
+      "\013emitterType\030\006 \001(\0162$.guiprotocol.Command" +
+      ".FireEmitterType\022\021\n\tintensity\030\007 \001(\002\022\024\n\014e" +
+      "mitterIndex\030\010 \001(\005\022,\n\017emitterEntities\030\t \003" +
+      "(\0162\023.guiprotocol.Player\022\023\n\013dmgPerFlame\030\n",
+      " \001(\002\022\022\n\nflameWidth\030\013 \001(\005\022\031\n\021durationInSe" +
+      "conds\030\014 \001(\001\022\024\n\014acceleration\030\r \001(\001\022)\n\tnex" +
+      "tState\030\016 \001(\0162\026.guiprotocol.GameState\022?\n\020" +
+      "ringmasterAction\030\017 \001(\0162%.guiprotocol.Com" +
+      "mand.RingmasterAction\022\030\n\020unlimitedMovesO" +
+      "n\030\020 \001(\010\"\365\001\n\013CommandType\022\032\n\026EXECUTE_GENER" +
+      "IC_ACTION\020\000\022\031\n\025EXECUTE_PLAYER_ACTION\020\001\022\020" +
+      "\n\014TOGGLE_PAUSE\020\002\022\r\n\tKILL_GAME\020\003\022\016\n\nNEXT_" +
+      "STATE\020\004\022\021\n\rTOUCH_EMITTER\020\005\022\033\n\027QUERY_GAME" +
+      "_INFO_REFRESH\020\006\022\035\n\031EXECUTE_RINGMASTER_AC",
+      "TION\020\007\022\025\n\021QUERY_SYSTEM_INFO\020\010\022\030\n\024UPDATE_" +
+      "PLAYER_STATUS\020\t\"\260\003\n\014PlayerAction\022\t\n\005BLOC" +
+      "K\020\000\022\016\n\nJAB_ATTACK\020\001\022\017\n\013HOOK_ATTACK\020\002\022\023\n\017" +
+      "UPPERCUT_ATTACK\020\003\022\017\n\013CHOP_ATTACK\020\004\022\023\n\017HA" +
+      "DOUKEN_ATTACK\020\005\022\025\n\021SONIC_BOOM_ATTACK\020\006\022\024" +
+      "\n\020SHORYUKEN_ATTACK\020\007\022\030\n\024DOUBLE_LARIAT_AT" +
+      "TACK\020\010\022\033\n\027QUADRUPLE_LARIAT_ATTACK\020\t\022\030\n\024S" +
+      "UMO_HEADBUTT_ATTACK\020\n\022 \n\034ONE_HUNDRED_HAN" +
+      "D_SLAP_ATTACK\020\013\022\031\n\025PSYCHO_CRUSHER_ATTACK" +
+      "\020\014\022\017\n\013YMCA_ATTACK\020\r\022\023\n\017NYAN_CAT_ATTACK\020\016",
+      "\022\024\n\020DISCO_STU_ATTACK\020\017\022\027\n\023ARM_WINDMILL_A" +
+      "TTACK\020\020\022\022\n\016SUCK_IT_ATTACK\020\021\022\025\n\021VAFANAPOL" +
+      "I_ATTACK\020\022\"\206\001\n\020RingmasterAction\022\024\n\020HALF_" +
+      "RING_ACTION\020\000\022\016\n\nJAB_ACTION\020\001\022\023\n\017ERUPTIO" +
+      "N_ACTION\020\002\022\021\n\rCIRCLE_ACTION\020\003\022\023\n\017HADOUKE" +
+      "N_ACTION\020\004\022\017\n\013DRUM_ACTION\020\005\"@\n\017FireEmitt" +
+      "erType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n" +
+      "\nOUTER_RING\020\002B\032\n\030ca.site3.ssf.guiprotoco" +
+      "l"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

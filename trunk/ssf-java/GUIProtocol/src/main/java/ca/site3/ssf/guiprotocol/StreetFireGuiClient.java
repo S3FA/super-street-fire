@@ -23,21 +23,17 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
-import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
-import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
-import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
+import ca.site3.ssf.gamemodel.UnrecognizedGestureEvent;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
-import ca.site3.ssf.guiprotocol.Event.GameEvent.EventType;
-import ca.site3.ssf.guiprotocol.Event.GameEvent.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.Builder;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType;
@@ -57,7 +53,7 @@ import ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType;
  * returned by {@link #getEventQueue()}.
  * 
  * 
- * @author greg
+ * @author greg, Callum
  */
 public class StreetFireGuiClient {
 
@@ -377,6 +373,9 @@ public class StreetFireGuiClient {
 			
 		case ROUND_PLAY_TIMER_CHANGED:
 			return new RoundPlayTimerChangedEvent(e.getTimeInSecs());
+		
+		case UNRECOGNIZED_GESTURE:
+			return new UnrecognizedGestureEvent(SerializationHelper.playerToGame(e.getPlayer()));
 			
 		default:
 			log.error("Unknown GameEvent type: " + e.getType());
@@ -384,11 +383,11 @@ public class StreetFireGuiClient {
 		}
 	}
 	
-	private int playerNumFromPlayer(Player p) {
-		if (p == Player.RINGMASTER) {
+	private int playerNumFromPlayer(Common.Player p) {
+		if (p == Common.Player.RINGMASTER) {
 			throw new IllegalArgumentException("Ringmaster is not a valid player");
 		}
-		return p == Player.P1 ? 1 : 2;
+		return p == Common.Player.P1 ? 1 : 2;
 	}
 	
 	private FireEmitter createFireEmitter(GameEvent e) {
@@ -404,19 +403,22 @@ public class StreetFireGuiClient {
 				case RINGMASTER_ENTITY:
 					return fe.getIntensityRingmaster();
 				default:
-					throw new IllegalArgumentException("Unknown entity: "+contributor);
+					throw new IllegalArgumentException("Unknown entity: " + contributor);
 				}
 			}
 
 			@Override
 			protected EnumSet<Entity> getContributingEntities() {
 				EnumSet<Entity> entities = EnumSet.noneOf(Entity.class);
-				if (fe.getIntensityPlayer1() > MIN_INTENSITY)
+				if (fe.getIntensityPlayer1() > MIN_INTENSITY) {
 					entities.add(Entity.PLAYER1_ENTITY);
-				if (fe.getIntensityPlayer2() > MIN_INTENSITY)
+				}
+				if (fe.getIntensityPlayer2() > MIN_INTENSITY) {
 					entities.add(Entity.PLAYER2_ENTITY);
-				if (fe.getIntensityRingmaster() > MIN_INTENSITY)
+				}
+				if (fe.getIntensityRingmaster() > MIN_INTENSITY) {
 					entities.add(Entity.RINGMASTER_ENTITY);
+				}
 				return entities;
 			}
 		};

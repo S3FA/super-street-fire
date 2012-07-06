@@ -21,13 +21,7 @@ message GameEvent {
     PLAYER_BLOCK_ACTION       = 9;
     RINGMASTER_ACTION         = 10;
     SYSTEM_INFO_REFRESH       = 11;
-  }
-  
-  // for PlayerEvents, FireEmitterChanged etc.
-  enum Player {
-    RINGMASTER = 0;
-    P1         = 1;
-    P2         = 2;
+    UNRECOGNIZED_GESTURE      = 12;
   }
   
   enum RoundResult {

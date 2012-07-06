@@ -4,7 +4,7 @@ public final class UnrecognizedGestureEvent implements IGameModelEvent {
 
 	private final IGameModel.Entity entity;
 	
-	UnrecognizedGestureEvent(IGameModel.Entity entity) {
+	public UnrecognizedGestureEvent(IGameModel.Entity entity) {
 		assert(entity != null);
 		this.entity = entity;
 	}
