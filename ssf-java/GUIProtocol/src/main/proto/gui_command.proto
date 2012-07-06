@@ -60,13 +60,6 @@ message Command {
     DRUM_ACTION      = 5;
   }
   
-  // For EXECUTE_ACTION or TOUCH_EMITTER
-  enum Player {
-    RINGMASTER = 0;
-    P1 = 1;
-    P2 = 2;
-  }
-  
   // For TOUCH_EMITTER
   enum FireEmitterType {
     LEFT_RAIL = 0;

@@ -16,3 +16,9 @@ enum GameState {
   IDLE_STATE              = 8;
   TEST_ROUND_STATE        = 9;
 }
+
+enum Player {
+  RINGMASTER = 0;
+  P1 = 1;
+  P2 = 2;
+}

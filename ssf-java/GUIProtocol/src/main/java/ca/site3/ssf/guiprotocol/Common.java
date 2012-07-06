@@ -101,6 +101,78 @@ public final class Common {
     // @@protoc_insertion_point(enum_scope:guiprotocol.GameState)
   }
   
+  public enum Player
+      implements com.google.protobuf.ProtocolMessageEnum {
+    RINGMASTER(0, 0),
+    P1(1, 1),
+    P2(2, 2),
+    ;
+    
+    public static final int RINGMASTER_VALUE = 0;
+    public static final int P1_VALUE = 1;
+    public static final int P2_VALUE = 2;
+    
+    
+    public final int getNumber() { return value; }
+    
+    public static Player valueOf(int value) {
+      switch (value) {
+        case 0: return RINGMASTER;
+        case 1: return P1;
+        case 2: return P2;
+        default: return null;
+      }
+    }
+    
+    public static com.google.protobuf.Internal.EnumLiteMap<Player>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<Player>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<Player>() {
+            public Player findValueByNumber(int number) {
+              return Player.valueOf(number);
+            }
+          };
+    
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return ca.site3.ssf.guiprotocol.Common.getDescriptor().getEnumTypes().get(1);
+    }
+    
+    private static final Player[] VALUES = {
+      RINGMASTER, P1, P2, 
+    };
+    
+    public static Player valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+    
+    private final int index;
+    private final int value;
+    
+    private Player(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+    
+    // @@protoc_insertion_point(enum_scope:guiprotocol.Player)
+  }
+  
   
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -116,8 +188,9 @@ public final class Common {
       "ED_STATE\020\003\022\033\n\027TIE_BREAKER_ROUND_STATE\020\004\022" +
       "\025\n\021MATCH_ENDED_STATE\020\005\022\020\n\014PAUSED_STATE\020\006" +
       "\022\024\n\020RINGMASTER_STATE\020\007\022\016\n\nIDLE_STATE\020\010\022\024" +
-      "\n\020TEST_ROUND_STATE\020\tB\032\n\030ca.site3.ssf.gui" +
-      "protocol"
+      "\n\020TEST_ROUND_STATE\020\t*(\n\006Player\022\016\n\nRINGMA" +
+      "STER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002B\032\n\030ca.site3.ssf.g" +
+      "uiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {

@@ -32,9 +32,9 @@ public final class Event {
     boolean hasMatchResult();
     ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult getMatchResult();
     
-    // optional .guiprotocol.GameEvent.Player player = 6;
+    // optional .guiprotocol.Player player = 6;
     boolean hasPlayer();
-    ca.site3.ssf.guiprotocol.Event.GameEvent.Player getPlayer();
+    ca.site3.ssf.guiprotocol.Common.Player getPlayer();
     
     // optional .guiprotocol.GameEvent.AttackType attackType = 7;
     boolean hasAttackType();
@@ -143,6 +143,7 @@ public final class Event {
       PLAYER_BLOCK_ACTION(9, 9),
       RINGMASTER_ACTION(10, 10),
       SYSTEM_INFO_REFRESH(11, 11),
+      UNRECOGNIZED_GESTURE(12, 12),
       ;
       
       public static final int GAME_INFO_REFRESH_VALUE = 0;
@@ -157,6 +158,7 @@ public final class Event {
       public static final int PLAYER_BLOCK_ACTION_VALUE = 9;
       public static final int RINGMASTER_ACTION_VALUE = 10;
       public static final int SYSTEM_INFO_REFRESH_VALUE = 11;
+      public static final int UNRECOGNIZED_GESTURE_VALUE = 12;
       
       
       public final int getNumber() { return value; }
@@ -175,6 +177,7 @@ public final class Event {
           case 9: return PLAYER_BLOCK_ACTION;
           case 10: return RINGMASTER_ACTION;
           case 11: return SYSTEM_INFO_REFRESH;
+          case 12: return UNRECOGNIZED_GESTURE;
           default: return null;
         }
       }
@@ -205,7 +208,7 @@ public final class Event {
       }
       
       private static final EventType[] VALUES = {
-        GAME_INFO_REFRESH, FIRE_EMITTER_CHANGED, GAME_STATE_CHANGED, PLAYER_HEALTH_CHANGED, ROUND_PLAY_TIMER_CHANGED, ROUND_BEGIN_TIMER_CHANGED, ROUND_ENDED, MATCH_ENDED, PLAYER_ATTACK_ACTION, PLAYER_BLOCK_ACTION, RINGMASTER_ACTION, SYSTEM_INFO_REFRESH, 
+        GAME_INFO_REFRESH, FIRE_EMITTER_CHANGED, GAME_STATE_CHANGED, PLAYER_HEALTH_CHANGED, ROUND_PLAY_TIMER_CHANGED, ROUND_BEGIN_TIMER_CHANGED, ROUND_ENDED, MATCH_ENDED, PLAYER_ATTACK_ACTION, PLAYER_BLOCK_ACTION, RINGMASTER_ACTION, SYSTEM_INFO_REFRESH, UNRECOGNIZED_GESTURE, 
       };
       
       public static EventType valueOf(
@@ -226,78 +229,6 @@ public final class Event {
       }
       
       // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.EventType)
-    }
-    
-    public enum Player
-        implements com.google.protobuf.ProtocolMessageEnum {
-      RINGMASTER(0, 0),
-      P1(1, 1),
-      P2(2, 2),
-      ;
-      
-      public static final int RINGMASTER_VALUE = 0;
-      public static final int P1_VALUE = 1;
-      public static final int P2_VALUE = 2;
-      
-      
-      public final int getNumber() { return value; }
-      
-      public static Player valueOf(int value) {
-        switch (value) {
-          case 0: return RINGMASTER;
-          case 1: return P1;
-          case 2: return P2;
-          default: return null;
-        }
-      }
-      
-      public static com.google.protobuf.Internal.EnumLiteMap<Player>
-          internalGetValueMap() {
-        return internalValueMap;
-      }
-      private static com.google.protobuf.Internal.EnumLiteMap<Player>
-          internalValueMap =
-            new com.google.protobuf.Internal.EnumLiteMap<Player>() {
-              public Player findValueByNumber(int number) {
-                return Player.valueOf(number);
-              }
-            };
-      
-      public final com.google.protobuf.Descriptors.EnumValueDescriptor
-          getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
-      }
-      public final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptorForType() {
-        return getDescriptor();
-      }
-      public static final com.google.protobuf.Descriptors.EnumDescriptor
-          getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(1);
-      }
-      
-      private static final Player[] VALUES = {
-        RINGMASTER, P1, P2, 
-      };
-      
-      public static Player valueOf(
-          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-        if (desc.getType() != getDescriptor()) {
-          throw new java.lang.IllegalArgumentException(
-            "EnumValueDescriptor is not for this type.");
-        }
-        return VALUES[desc.getIndex()];
-      }
-      
-      private final int index;
-      private final int value;
-      
-      private Player(int index, int value) {
-        this.index = index;
-        this.value = value;
-      }
-      
-      // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.Player)
     }
     
     public enum RoundResult
@@ -345,7 +276,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(2);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(1);
       }
       
       private static final RoundResult[] VALUES = {
@@ -414,7 +345,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(3);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(2);
       }
       
       private static final MatchResult[] VALUES = {
@@ -486,7 +417,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(4);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(3);
       }
       
       private static final FireEmitterType[] VALUES = {
@@ -558,7 +489,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(5);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(4);
       }
       
       private static final FlameEmitterType[] VALUES = {
@@ -702,7 +633,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(6);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(5);
       }
       
       private static final AttackType[] VALUES = {
@@ -792,7 +723,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(7);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(6);
       }
       
       private static final RingmasterActionType[] VALUES = {
@@ -867,7 +798,7 @@ public final class Event {
       }
       public static final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptor() {
-        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(8);
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(7);
       }
       
       private static final RoundBeginCountdownTime[] VALUES = {
@@ -1563,13 +1494,13 @@ public final class Event {
       return matchResult_;
     }
     
-    // optional .guiprotocol.GameEvent.Player player = 6;
+    // optional .guiprotocol.Player player = 6;
     public static final int PLAYER_FIELD_NUMBER = 6;
-    private ca.site3.ssf.guiprotocol.Event.GameEvent.Player player_;
+    private ca.site3.ssf.guiprotocol.Common.Player player_;
     public boolean hasPlayer() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
-    public ca.site3.ssf.guiprotocol.Event.GameEvent.Player getPlayer() {
+    public ca.site3.ssf.guiprotocol.Common.Player getPlayer() {
       return player_;
     }
     
@@ -1742,7 +1673,7 @@ public final class Event {
       oldGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       newGameState_ = ca.site3.ssf.guiprotocol.Common.GameState.NO_STATE;
       matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
-      player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+      player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
       attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
       oldHealth_ = 0F;
       newHealth_ = 0F;
@@ -2089,7 +2020,7 @@ public final class Event {
         bitField0_ = (bitField0_ & ~0x00000008);
         matchResult_ = ca.site3.ssf.guiprotocol.Event.GameEvent.MatchResult.PLAYER_1_MATCH_WIN;
         bitField0_ = (bitField0_ & ~0x00000010);
-        player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+        player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
         bitField0_ = (bitField0_ & ~0x00000020);
         attackType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackType.CUSTOM_UNDEFINED;
         bitField0_ = (bitField0_ & ~0x00000040);
@@ -2439,7 +2370,7 @@ public final class Event {
             }
             case 48: {
               int rawValue = input.readEnum();
-              ca.site3.ssf.guiprotocol.Event.GameEvent.Player value = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.valueOf(rawValue);
+              ca.site3.ssf.guiprotocol.Common.Player value = ca.site3.ssf.guiprotocol.Common.Player.valueOf(rawValue);
               if (value == null) {
                 unknownFields.mergeVarintField(6, rawValue);
               } else {
@@ -2770,15 +2701,15 @@ public final class Event {
         return this;
       }
       
-      // optional .guiprotocol.GameEvent.Player player = 6;
-      private ca.site3.ssf.guiprotocol.Event.GameEvent.Player player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+      // optional .guiprotocol.Player player = 6;
+      private ca.site3.ssf.guiprotocol.Common.Player player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
       public boolean hasPlayer() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
-      public ca.site3.ssf.guiprotocol.Event.GameEvent.Player getPlayer() {
+      public ca.site3.ssf.guiprotocol.Common.Player getPlayer() {
         return player_;
       }
-      public Builder setPlayer(ca.site3.ssf.guiprotocol.Event.GameEvent.Player value) {
+      public Builder setPlayer(ca.site3.ssf.guiprotocol.Common.Player value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2789,7 +2720,7 @@ public final class Event {
       }
       public Builder clearPlayer() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        player_ = ca.site3.ssf.guiprotocol.Event.GameEvent.Player.RINGMASTER;
+        player_ = ca.site3.ssf.guiprotocol.Common.Player.RINGMASTER;
         onChanged();
         return this;
       }
@@ -3206,74 +3137,73 @@ public final class Event {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022\013guiprotocol\032\014common.proto" +
-      "\"\344\024\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
+      "\"\312\024\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
       "ol.GameEvent.EventType\0223\n\007emitter\030\002 \001(\0132" +
       "\".guiprotocol.GameEvent.FireEmitter\022,\n\014o" +
       "ldGameState\030\003 \001(\0162\026.guiprotocol.GameStat" +
       "e\022,\n\014newGameState\030\004 \001(\0162\026.guiprotocol.Ga" +
       "meState\0227\n\013matchResult\030\005 \001(\0162\".guiprotoc" +
-      "ol.GameEvent.MatchResult\022-\n\006player\030\006 \001(\016" +
-      "2\035.guiprotocol.GameEvent.Player\0225\n\nattac" +
-      "kType\030\007 \001(\0162!.guiprotocol.GameEvent.Atta",
-      "ckType\022\021\n\toldHealth\030\t \001(\002\022\021\n\tnewHealth\030\n" +
-      " \001(\002\022\023\n\013roundNumber\030\013 \001(\005\022G\n\017roundBeginT" +
-      "imer\030\014 \001(\0162..guiprotocol.GameEvent.Round" +
-      "BeginCountdownTime\0227\n\013roundResult\030\r \001(\0162" +
-      "\".guiprotocol.GameEvent.RoundResult\022\020\n\010t" +
-      "imedOut\030\016 \001(\010\022\022\n\ntimeInSecs\030\017 \001(\005\022)\n\tgam" +
-      "eState\030\020 \001(\0162\026.guiprotocol.GameState\0228\n\014" +
-      "roundResults\030\021 \003(\0162\".guiprotocol.GameEve" +
-      "nt.RoundResult\022\025\n\rplayer1Health\030\022 \001(\002\022\025\n" +
-      "\rplayer2Health\030\023 \001(\002\022\030\n\020roundInPlayTimer",
-      "\030\024 \001(\005\022\037\n\027player1UnlimitedMovesOn\030\026 \001(\010\022" +
-      "\037\n\027player2UnlimitedMovesOn\030\027 \001(\010\022I\n\024ring" +
-      "masterActionType\030\030 \001(\0162+.guiprotocol.Gam" +
-      "eEvent.RingmasterActionType\032\261\001\n\013FireEmit" +
-      "ter\022\024\n\014emitterIndex\030\001 \002(\005\022;\n\013emitterType" +
-      "\030\002 \002(\0162&.guiprotocol.GameEvent.FireEmitt" +
-      "erType\022\033\n\023intensityRingmaster\030\003 \002(\002\022\030\n\020i" +
-      "ntensityPlayer1\030\004 \002(\002\022\030\n\020intensityPlayer" +
-      "2\030\005 \002(\002\"\261\002\n\tEventType\022\025\n\021GAME_INFO_REFRE" +
-      "SH\020\000\022\030\n\024FIRE_EMITTER_CHANGED\020\001\022\026\n\022GAME_S",
-      "TATE_CHANGED\020\002\022\031\n\025PLAYER_HEALTH_CHANGED\020" +
-      "\003\022\034\n\030ROUND_PLAY_TIMER_CHANGED\020\004\022\035\n\031ROUND" +
-      "_BEGIN_TIMER_CHANGED\020\005\022\017\n\013ROUND_ENDED\020\006\022" +
-      "\017\n\013MATCH_ENDED\020\007\022\030\n\024PLAYER_ATTACK_ACTION" +
-      "\020\010\022\027\n\023PLAYER_BLOCK_ACTION\020\t\022\025\n\021RINGMASTE" +
-      "R_ACTION\020\n\022\027\n\023SYSTEM_INFO_REFRESH\020\013\"(\n\006P" +
-      "layer\022\016\n\nRINGMASTER\020\000\022\006\n\002P1\020\001\022\006\n\002P2\020\002\"L\n" +
-      "\013RoundResult\022\r\n\tROUND_TIE\020\000\022\026\n\022PLAYER_1_" +
-      "ROUND_WIN\020\001\022\026\n\022PLAYER_2_ROUND_WIN\020\002\"=\n\013M" +
-      "atchResult\022\026\n\022PLAYER_1_MATCH_WIN\020\000\022\026\n\022PL",
-      "AYER_2_MATCH_WIN\020\001\"@\n\017FireEmitterType\022\r\n" +
-      "\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL\020\001\022\016\n\nOUTER_RI" +
-      "NG\020\002\"I\n\020FlameEmitterType\022\020\n\014ATTACK_FLAME" +
-      "\020\000\022\017\n\013BLOCK_FLAME\020\001\022\022\n\016NON_GAME_FLAME\020\002\"" +
-      "\203\005\n\nAttackType\022\024\n\020CUSTOM_UNDEFINED\020\000\022\014\n\010" +
-      "LEFT_JAB\020\001\022\r\n\tRIGHT_JAB\020\002\022\r\n\tLEFT_HOOK\020\003" +
-      "\022\016\n\nRIGHT_HOOK\020\004\022\021\n\rLEFT_UPPERCUT\020\005\022\022\n\016R" +
-      "IGHT_UPPERCUT\020\006\022\r\n\tLEFT_CHOP\020\007\022\016\n\nRIGHT_" +
-      "CHOP\020\010\022\014\n\010HADOUKEN\020\t\022\016\n\nSONIC_BOOM\020\n\022\031\n\025" +
-      "LEFT_SHORYUKEN_ATTACK\020\013\022\032\n\026RIGHT_SHORYUK",
-      "EN_ATTACK\020\014\022\030\n\024DOUBLE_LARIAT_ATTACK\020\r\022\033\n" +
-      "\027QUADRUPLE_LARIAT_ATTACK\020\016\022\030\n\024SUMO_HEADB" +
-      "UTT_ATTACK\020\017\022%\n!LEFT_ONE_HUNDRED_HAND_SL" +
-      "AP_ATTACK\020\020\022&\n\"RIGHT_ONE_HUNDRED_HAND_SL" +
-      "AP_ATTACK\020\021\022+\n\'TWO_HANDED_ONE_HUNDRED_HA" +
-      "ND_SLAP_ATTACK\020\022\022\031\n\025PSYCHO_CRUSHER_ATTAC" +
-      "K\020\023\022\017\n\013YMCA_ATTACK\020\024\022\023\n\017NYAN_CAT_ATTACK\020" +
-      "\025\022\024\n\020DISCO_STU_ATTACK\020\026\022\027\n\023ARM_WINDMILL_" +
-      "ATTACK\020\027\022\022\n\016SUCK_IT_ATTACK\020\030\022\032\n\026LEFT_VAF" +
-      "ANAPOLI_ATTACK\020\031\022\033\n\027RIGHT_VAFANAPOLI_ATT",
-      "ACK\020\032\"\344\001\n\024RingmasterActionType\022\031\n\025LEFT_H" +
-      "ALF_RING_ACTION\020\000\022\032\n\026RIGHT_HALF_RING_ACT" +
-      "ION\020\001\022\023\n\017LEFT_JAB_ACTION\020\002\022\024\n\020RIGHT_JAB_" +
-      "ACTION\020\003\022\023\n\017ERUPTION_ACTION\020\004\022\026\n\022LEFT_CI" +
-      "RCLE_ACTION\020\005\022\027\n\023RIGHT_CIRCLE_ACTION\020\006\022\023" +
-      "\n\017HADOUKEN_ACTION\020\007\022\017\n\013DRUM_ACTION\020\010\"A\n\027" +
-      "RoundBeginCountdownTime\022\t\n\005THREE\020\000\022\007\n\003TW" +
-      "O\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n\030ca.site3.ssf." +
-      "guiprotocol"
+      "ol.GameEvent.MatchResult\022#\n\006player\030\006 \001(\016" +
+      "2\023.guiprotocol.Player\0225\n\nattackType\030\007 \001(" +
+      "\0162!.guiprotocol.GameEvent.AttackType\022\021\n\t",
+      "oldHealth\030\t \001(\002\022\021\n\tnewHealth\030\n \001(\002\022\023\n\013ro" +
+      "undNumber\030\013 \001(\005\022G\n\017roundBeginTimer\030\014 \001(\016" +
+      "2..guiprotocol.GameEvent.RoundBeginCount" +
+      "downTime\0227\n\013roundResult\030\r \001(\0162\".guiproto" +
+      "col.GameEvent.RoundResult\022\020\n\010timedOut\030\016 " +
+      "\001(\010\022\022\n\ntimeInSecs\030\017 \001(\005\022)\n\tgameState\030\020 \001" +
+      "(\0162\026.guiprotocol.GameState\0228\n\014roundResul" +
+      "ts\030\021 \003(\0162\".guiprotocol.GameEvent.RoundRe" +
+      "sult\022\025\n\rplayer1Health\030\022 \001(\002\022\025\n\rplayer2He" +
+      "alth\030\023 \001(\002\022\030\n\020roundInPlayTimer\030\024 \001(\005\022\037\n\027",
+      "player1UnlimitedMovesOn\030\026 \001(\010\022\037\n\027player2" +
+      "UnlimitedMovesOn\030\027 \001(\010\022I\n\024ringmasterActi" +
+      "onType\030\030 \001(\0162+.guiprotocol.GameEvent.Rin" +
+      "gmasterActionType\032\261\001\n\013FireEmitter\022\024\n\014emi" +
+      "tterIndex\030\001 \002(\005\022;\n\013emitterType\030\002 \002(\0162&.g" +
+      "uiprotocol.GameEvent.FireEmitterType\022\033\n\023" +
+      "intensityRingmaster\030\003 \002(\002\022\030\n\020intensityPl" +
+      "ayer1\030\004 \002(\002\022\030\n\020intensityPlayer2\030\005 \002(\002\"\313\002" +
+      "\n\tEventType\022\025\n\021GAME_INFO_REFRESH\020\000\022\030\n\024FI" +
+      "RE_EMITTER_CHANGED\020\001\022\026\n\022GAME_STATE_CHANG",
+      "ED\020\002\022\031\n\025PLAYER_HEALTH_CHANGED\020\003\022\034\n\030ROUND" +
+      "_PLAY_TIMER_CHANGED\020\004\022\035\n\031ROUND_BEGIN_TIM" +
+      "ER_CHANGED\020\005\022\017\n\013ROUND_ENDED\020\006\022\017\n\013MATCH_E" +
+      "NDED\020\007\022\030\n\024PLAYER_ATTACK_ACTION\020\010\022\027\n\023PLAY" +
+      "ER_BLOCK_ACTION\020\t\022\025\n\021RINGMASTER_ACTION\020\n" +
+      "\022\027\n\023SYSTEM_INFO_REFRESH\020\013\022\030\n\024UNRECOGNIZE" +
+      "D_GESTURE\020\014\"L\n\013RoundResult\022\r\n\tROUND_TIE\020" +
+      "\000\022\026\n\022PLAYER_1_ROUND_WIN\020\001\022\026\n\022PLAYER_2_RO" +
+      "UND_WIN\020\002\"=\n\013MatchResult\022\026\n\022PLAYER_1_MAT" +
+      "CH_WIN\020\000\022\026\n\022PLAYER_2_MATCH_WIN\020\001\"@\n\017Fire",
+      "EmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIGHT_RAIL" +
+      "\020\001\022\016\n\nOUTER_RING\020\002\"I\n\020FlameEmitterType\022\020" +
+      "\n\014ATTACK_FLAME\020\000\022\017\n\013BLOCK_FLAME\020\001\022\022\n\016NON" +
+      "_GAME_FLAME\020\002\"\203\005\n\nAttackType\022\024\n\020CUSTOM_U" +
+      "NDEFINED\020\000\022\014\n\010LEFT_JAB\020\001\022\r\n\tRIGHT_JAB\020\002\022" +
+      "\r\n\tLEFT_HOOK\020\003\022\016\n\nRIGHT_HOOK\020\004\022\021\n\rLEFT_U" +
+      "PPERCUT\020\005\022\022\n\016RIGHT_UPPERCUT\020\006\022\r\n\tLEFT_CH" +
+      "OP\020\007\022\016\n\nRIGHT_CHOP\020\010\022\014\n\010HADOUKEN\020\t\022\016\n\nSO" +
+      "NIC_BOOM\020\n\022\031\n\025LEFT_SHORYUKEN_ATTACK\020\013\022\032\n" +
+      "\026RIGHT_SHORYUKEN_ATTACK\020\014\022\030\n\024DOUBLE_LARI",
+      "AT_ATTACK\020\r\022\033\n\027QUADRUPLE_LARIAT_ATTACK\020\016" +
+      "\022\030\n\024SUMO_HEADBUTT_ATTACK\020\017\022%\n!LEFT_ONE_H" +
+      "UNDRED_HAND_SLAP_ATTACK\020\020\022&\n\"RIGHT_ONE_H" +
+      "UNDRED_HAND_SLAP_ATTACK\020\021\022+\n\'TWO_HANDED_" +
+      "ONE_HUNDRED_HAND_SLAP_ATTACK\020\022\022\031\n\025PSYCHO" +
+      "_CRUSHER_ATTACK\020\023\022\017\n\013YMCA_ATTACK\020\024\022\023\n\017NY" +
+      "AN_CAT_ATTACK\020\025\022\024\n\020DISCO_STU_ATTACK\020\026\022\027\n" +
+      "\023ARM_WINDMILL_ATTACK\020\027\022\022\n\016SUCK_IT_ATTACK" +
+      "\020\030\022\032\n\026LEFT_VAFANAPOLI_ATTACK\020\031\022\033\n\027RIGHT_" +
+      "VAFANAPOLI_ATTACK\020\032\"\344\001\n\024RingmasterAction",
+      "Type\022\031\n\025LEFT_HALF_RING_ACTION\020\000\022\032\n\026RIGHT" +
+      "_HALF_RING_ACTION\020\001\022\023\n\017LEFT_JAB_ACTION\020\002" +
+      "\022\024\n\020RIGHT_JAB_ACTION\020\003\022\023\n\017ERUPTION_ACTIO" +
+      "N\020\004\022\026\n\022LEFT_CIRCLE_ACTION\020\005\022\027\n\023RIGHT_CIR" +
+      "CLE_ACTION\020\006\022\023\n\017HADOUKEN_ACTION\020\007\022\017\n\013DRU" +
+      "M_ACTION\020\010\"A\n\027RoundBeginCountdownTime\022\t\n" +
+      "\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIGHT\020\003B\032\n" +
+      "\030ca.site3.ssf.guiprotocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
