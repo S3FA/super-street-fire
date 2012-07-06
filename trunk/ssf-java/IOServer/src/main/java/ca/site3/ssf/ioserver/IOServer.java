@@ -212,6 +212,11 @@ public class IOServer {
 				if (recognizedAction != null) {
 					getGameModel().executeGenericAction(recognizedAction);
 				}
+				else {
+					// Gesture was unrecognized, inform the gamemodel that there was a 'bad' gesture for
+					// a particular player, this will raise an event that allows feedback to be had
+					//TODO: getGameModel().raiseUnrecognizedGestureEvent(gesture.getEntity());
+				}
 			}
 			
 			// Forward the general stream of headset events to the game model - this provides information for affecting

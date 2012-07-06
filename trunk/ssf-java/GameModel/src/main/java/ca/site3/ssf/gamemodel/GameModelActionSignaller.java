@@ -162,4 +162,12 @@ class GameModelActionSignaller {
 		this.fireGameModelEvent(event);
 	}
 	
+	/**
+	 * Triggers each of the listener's callbacks for a unrecognized gesture event.
+	 * @param entity The entity whose gesture was unrecognized.
+	 */
+	void fireOnUnrecognizedGestureEvent(IGameModel.Entity entity) {
+		UnrecognizedGestureEvent event = new UnrecognizedGestureEvent(entity);
+		this.fireGameModelEvent(event);
+	}
 }

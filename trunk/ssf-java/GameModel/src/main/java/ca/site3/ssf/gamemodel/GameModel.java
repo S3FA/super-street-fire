@@ -7,6 +7,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
@@ -97,6 +98,10 @@ public class GameModel implements IGameModel {
 	public void updatePlayerHeadsetData(int playerNum, HeadsetData data) {
 		// TODO: What do we do with the headset data? ... moves document needs to specify this.
 		//this.currState.updatePlayerHeadsetData(playerNum, data);
+	}
+	
+	public void raiseUnrecognizedGestureEvent(Entity entity) {
+		this.actionSignaller.fireOnUnrecognizedGestureEvent(entity);
 	}
 	
 	public void touchFireEmitter(FireEmitter.Location location, int index,

@@ -41,7 +41,8 @@ public class GameEventRouter implements IGameModelListener {
 		
 		if (event.getType() == Type.FIRE_EMITTER_CHANGED) {
 			serialComm.notifyFireEmitters((FireEmitterChangedEvent) event);
-		} else if (event.getType() == Type.PLAYER_HEALTH_CHANGED) {
+		}
+		else if (event.getType() == Type.PLAYER_HEALTH_CHANGED) {
 			
 		} else if (event.getType() == Type.ROUND_PLAY_TIMER_CHANGED) {
 			

@@ -22,53 +22,7 @@ abstract class SoundPlayer implements ISoundPlayer {
 		this.controller = controller;
 	}
 	
-	/**
-	 * Factory method for building the appropriate SoundPlayer for the given gameModelEvent.
-	 * @param resourcePath The path to the sound resources.
-	 * @param configFile The configuration/properties file for audio lookup.
-	 * @param gameModelEvent The game model event to base the creation of the sound player off of.
-	 * @return The resulting SoundPlayer, null on error.
-	 */
-	public static SoundPlayer build(SoundPlayerController controller, IGameModelEvent gameModelEvent) {
-		if (controller == null || gameModelEvent == null) {
-			return null;
-		}
-		
-		SoundPlayer result = null;
-		switch (gameModelEvent.getType()) {
-		
-		case GAME_STATE_CHANGED: {
-			result = new GameStateChangedSoundPlayer(controller);
-			break;
-		}
-		case PLAYER_ATTACK_ACTION: {
-			result = new PlayerAttackActionSoundPlayer(controller);
-			break;
-		}
-		case ROUND_ENDED: {
-			result = new RoundEndedSoundPlayer(controller);
-			break;
-		}
-		case MATCH_ENDED: {
-			result = new MatchEndedSoundPlayer(controller);
-			break;
-		}
-		case RINGMASTER_ACTION: {
-			result = new RingmasterActionSoundPlayer(controller);
-			break;
-		}
-		case ROUND_BEGIN_TIMER_CHANGED: {
-			result = new RoundBeginTimerChangedSoundPlayer(controller);
-			break;
-		}
-		default:
-			break;
-		}
-		
-		return result;
-	}
-	
-	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
+	PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
 		assert(globalSettings != null);
 		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
 	}

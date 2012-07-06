@@ -17,7 +17,8 @@ public interface IGameModelEvent {
 		PLAYER_ATTACK_ACTION,
 		PLAYER_BLOCK_ACTION,
 		RINGMASTER_ACTION,
-		SYSTEM_INFO_REFRESH // this doens't strictly belong here
+		UNRECOGNIZED_GESTURE,
+		SYSTEM_INFO_REFRESH // this doens't strictly belong here... Callum: I don't think we need this in the game model, couldn't we just keep this stuff in the IOServer?
 	};
 		
 	public Type getType();

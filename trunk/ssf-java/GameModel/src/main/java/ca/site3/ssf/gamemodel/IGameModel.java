@@ -13,16 +13,22 @@ import java.util.EnumSet;
 public interface IGameModel {
 	
 	public enum Entity {
-		PLAYER1_ENTITY("Player 1"),
-		PLAYER2_ENTITY("Player 2"),
-		RINGMASTER_ENTITY("Ringmaster");
+		PLAYER1_ENTITY("Player 1", true),
+		PLAYER2_ENTITY("Player 2", true),
+		RINGMASTER_ENTITY("Ringmaster", false);
 		
 		private final String name;
+		private final boolean isPlayer;
 		
-		Entity(String name) {
+		Entity(String name, boolean isPlayer) {
 			this.name = name;
+			this.isPlayer = isPlayer;
 		}
 	
+		public boolean getIsPlayer() {
+			return this.isPlayer;
+		}
+		
 		public String toString() {
 			return this.name;
 		}
@@ -37,6 +43,7 @@ public interface IGameModel {
 	void initiateNextState(GameState.GameStateType nextState);	   // Or use the InitiateNextStateCommand class
 	void togglePauseGame();					                       // Or use the TogglePauseGameCommand class
 	void updatePlayerHeadsetData(int playerNum, HeadsetData data); // Or use the UpdateHeadsetDataCommand class
+	void raiseUnrecognizedGestureEvent(Entity entity);             // Or use the RaiseUnrecognizedGestureEventCommand class
 	
 	void touchFireEmitter(FireEmitter.Location location, int index,
 			float intensity, EnumSet<Entity> contributors);     // Or use the TouchFireEmitterCommand class
