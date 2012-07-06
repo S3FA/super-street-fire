@@ -34,7 +34,7 @@ public class GloveEventCoalescer implements Runnable {
 	private BlockingQueue<DeviceEvent> deviceEventQueue;
 	
 	// Output queue(s)
-	private BlockingQueue<PlayerGestureInstance> gestureInstanceQueue;
+	private BlockingQueue<EntityGestureInstance> gestureInstanceQueue;
 	private BlockingQueue<HeadsetEvent> externalP1HeadsetQueue = new LinkedBlockingQueue<HeadsetEvent>();
 	private BlockingQueue<HeadsetEvent> externalP2HeadsetQueue = new LinkedBlockingQueue<HeadsetEvent>();
 	
@@ -97,7 +97,7 @@ public class GloveEventCoalescer implements Runnable {
 	 */
 	public GloveEventCoalescer(long startTime, double bothButtonsDownThresholdInSecs,
 							   BlockingQueue<DeviceEvent> deviceEventQueue,
-							   BlockingQueue<PlayerGestureInstance> gestureInstanceQueue) {
+							   BlockingQueue<EntityGestureInstance> gestureInstanceQueue) {
 		
 		this.deviceEventQueue = deviceEventQueue;
 		this.gestureInstanceQueue = gestureInstanceQueue;
@@ -280,7 +280,7 @@ public class GloveEventCoalescer implements Runnable {
 							
 							if (eventQueue.size() > GLOVE_DATA_CACHE_SIZE) {
 								log.info("Full GloveEvent queue. Creating GestureInstance.");
-								List<PlayerGestureInstance> gestures = this.aggregateForPlayer(ge.getSource());
+								List<EntityGestureInstance> gestures = this.aggregateForPlayer(ge.getSource());
 								if (gestures != null && !gestures.isEmpty()) {
 									gestureInstanceQueue.addAll(gestures);
 								}
@@ -330,7 +330,7 @@ public class GloveEventCoalescer implements Runnable {
 	}
 	
 	private void aggregateAndAdd(Entity player) {
-		List<PlayerGestureInstance> gestures = this.aggregateForPlayer(player);
+		List<EntityGestureInstance> gestures = this.aggregateForPlayer(player);
 		if (gestures != null && !gestures.isEmpty()) {
 			gestureInstanceQueue.addAll(gestures);
 		}
@@ -341,21 +341,18 @@ public class GloveEventCoalescer implements Runnable {
 	 * GloveEvent caches.
 	 * 
 	 * @param player the player to create a GestureInstance for
-	 * @return the created {@link PlayerGestureInstance}
+	 * @return the created {@link EntityGestureInstance}
 	 */
-	protected List<PlayerGestureInstance> aggregateForPlayer(Entity player) {
+	protected List<EntityGestureInstance> aggregateForPlayer(Entity player) {
 		assert (player == Entity.PLAYER1_ENTITY || player == Entity.PLAYER2_ENTITY);
 		
 		Queue<GloveEvent> left;
 		Queue<GloveEvent> right;
-		int playerNum;
 		if (player == Entity.PLAYER1_ENTITY) {
-			playerNum = 1;
 			left = p1LeftQueue;
 			right = p1RightQueue;
 		}
 		else if (player == Entity.PLAYER2_ENTITY) {
-			playerNum = 2;
 			left = p2LeftQueue;
 			right = p2RightQueue;
 		}
@@ -363,7 +360,7 @@ public class GloveEventCoalescer implements Runnable {
 			throw new IllegalArgumentException("Invalid player for glove data aggregation");
 		}
 		
-		List<PlayerGestureInstance> gestures = new ArrayList<PlayerGestureInstance>();
+		List<EntityGestureInstance> gestures = new ArrayList<EntityGestureInstance>();
 		
 		List<Double> timePts = null;
 		List<GloveData> leftGloveData = null;
@@ -393,7 +390,7 @@ public class GloveEventCoalescer implements Runnable {
 				timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 			}
 			
-			gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+			gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
 		}
 		else if (left.isEmpty() == false && right.isEmpty() == true) {
 			if (this.isAlmostEmptyGloveEventQueue(left)) {
@@ -414,7 +411,7 @@ public class GloveEventCoalescer implements Runnable {
 				timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 			}
 			
-			gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+			gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
 		}
 		else {
 			
@@ -448,7 +445,7 @@ public class GloveEventCoalescer implements Runnable {
 						timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 					}
 					
-					gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+					gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
 				}
 				else {
 					log.info("Mostly empty left-handed gesture, discarding.");
@@ -466,7 +463,7 @@ public class GloveEventCoalescer implements Runnable {
 						timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 					}
 					
-					gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+					gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
 				}
 				else {
 					log.info("Mostly empty right-handed gesture, discarding.");
@@ -515,7 +512,7 @@ public class GloveEventCoalescer implements Runnable {
 					}
 				}
 				
-				gestures.add(new PlayerGestureInstance(playerNum, leftGloveData, rightGloveData, timePts));
+				gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
 				left.clear();
 				right.clear();
 			}

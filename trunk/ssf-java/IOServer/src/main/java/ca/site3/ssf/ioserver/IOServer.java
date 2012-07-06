@@ -205,17 +205,25 @@ public class IOServer {
 			
 			// Recognize gestures and execute any recognized gestures on the GameModel
 			while (!commManager.getGestureQueue().isEmpty()) {
-				PlayerGestureInstance gesture = commManager.getGestureQueue().remove();
+				EntityGestureInstance gesture = commManager.getGestureQueue().remove();
 				
-				// TODO: Forwarding of headset data with the Action to the GameModel as well?
-				Action recognizedAction = gestureRecognizer.recognizePlayerGesture(getGameModel().getActionFactory(), gesture.getPlayerNum(), gesture);
+				Action recognizedAction = null;
+				if (gesture.getEntity().getIsPlayer()) {
+					// TODO: Forwarding of headset data with the Action to the GameModel as well?
+					recognizedAction = gestureRecognizer.recognizePlayerGesture(getGameModel().getActionFactory(),
+							gesture.getEntity().getPlayerNum(), gesture);
+				}
+				else {
+					recognizedAction = gestureRecognizer.recognizeRingmasterGesture(getGameModel().getActionFactory(), gesture);
+				}
+				
 				if (recognizedAction != null) {
 					getGameModel().executeGenericAction(recognizedAction);
 				}
 				else {
 					// Gesture was unrecognized, inform the gamemodel that there was a 'bad' gesture for
 					// a particular player, this will raise an event that allows feedback to be had
-					//TODO: getGameModel().raiseUnrecognizedGestureEvent(gesture.getEntity());
+					getGameModel().raiseUnrecognizedGestureEvent(gesture.getEntity());
 				}
 			}
 			

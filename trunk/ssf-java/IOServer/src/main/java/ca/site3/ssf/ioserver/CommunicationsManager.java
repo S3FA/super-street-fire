@@ -24,7 +24,7 @@ public class CommunicationsManager {
 	
 	private BlockingQueue<AbstractGameModelCommand> commandQueue = new LinkedBlockingQueue<AbstractGameModelCommand>();
 	
-	private BlockingQueue<PlayerGestureInstance> gestureQueue = new LinkedBlockingQueue<PlayerGestureInstance>();
+	private BlockingQueue<EntityGestureInstance> gestureQueue = new LinkedBlockingQueue<EntityGestureInstance>();
 	
 	
 	@SuppressWarnings("unchecked")
@@ -65,7 +65,7 @@ public class CommunicationsManager {
 	 * 
 	 * @return
 	 */
-	BlockingQueue<PlayerGestureInstance> getGestureQueue() {
+	BlockingQueue<EntityGestureInstance> getGestureQueue() {
 		return gestureQueue;
 	}
 }

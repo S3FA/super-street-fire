@@ -28,7 +28,7 @@ import ca.site3.ssf.ioserver.DeviceStatus;
 import ca.site3.ssf.ioserver.GloveEvent;
 import ca.site3.ssf.ioserver.GloveEventCoalescer;
 import ca.site3.ssf.ioserver.HeartbeatListener;
-import ca.site3.ssf.ioserver.PlayerGestureInstance;
+import ca.site3.ssf.ioserver.EntityGestureInstance;
 
 /**
  * The main GUI class and driver for the gesture recorder
@@ -49,7 +49,7 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 	private volatile boolean isListeningForEvents = true;
 	
 	// Pieces of the IOServer that are required to capture glove data and aggregate that data into gesture instances
-	private BlockingQueue<PlayerGestureInstance> gestureQueue = new LinkedBlockingQueue<PlayerGestureInstance>();
+	private BlockingQueue<EntityGestureInstance> gestureQueue = new LinkedBlockingQueue<EntityGestureInstance>();
 	private BlockingQueue<DeviceEvent> eventQueue = new LinkedBlockingQueue<DeviceEvent>();
 	private DeviceStatus deviceStatus = new DeviceStatus();
 	private HeartbeatListener heartbeatListener  = new HeartbeatListener(DEFAULT_GLOVE_NETWORK_INTERFACE_IP, 55555, deviceStatus);
@@ -98,7 +98,7 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 		this.consumerThread = new Thread(new Runnable() {
 			public void run() {
 
-				PlayerGestureInstance currGestureInst = null;
+				EntityGestureInstance currGestureInst = null;
 				
 				while (isListeningForEvents) {
 					
@@ -146,7 +146,7 @@ public class GestureRecorderGUIMainWindow extends JFrame {
         SwingUtilities.invokeLater(doCreateAndShowGUI);
 	}
 
-	public void exportGatheredData(PlayerGestureInstance recordedGestureInstance) {
+	public void exportGatheredData(EntityGestureInstance recordedGestureInstance) {
 		
 		int selectedTab = this.tabbedPane.getSelectedIndex();
 		GestureInstance instance = recordedGestureInstance;

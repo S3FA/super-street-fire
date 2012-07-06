@@ -17,7 +17,7 @@ class RingmasterInfoPanel extends JPanel {
 	RingmasterInfoPanel() {
 		super();
 		
-		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(ArenaDisplay.RINGMASTER_COLOUR), "Ringmaster");
+		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(ArenaDisplay.RINGMASTER_COLOUR), "Ringmaster/Master of Games");
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 		

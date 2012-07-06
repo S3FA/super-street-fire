@@ -12,23 +12,30 @@ import java.util.EnumSet;
  */
 public interface IGameModel {
 	
+	public final static int PLAYER_1_NUM = 1;
+	public final static int PLAYER_2_NUM = 2;
+	
 	public enum Entity {
-		PLAYER1_ENTITY("Player 1", true),
-		PLAYER2_ENTITY("Player 2", true),
-		RINGMASTER_ENTITY("Ringmaster", false);
+		PLAYER1_ENTITY("Player 1", true, PLAYER_1_NUM),
+		PLAYER2_ENTITY("Player 2", true, PLAYER_2_NUM),
+		RINGMASTER_ENTITY("Ringmaster", false, -1);
 		
 		private final String name;
 		private final boolean isPlayer;
+		private final int playerNum;
 		
-		Entity(String name, boolean isPlayer) {
+		Entity(String name, boolean isPlayer, int playerNum) {
 			this.name = name;
 			this.isPlayer = isPlayer;
+			this.playerNum = playerNum;
 		}
 	
 		public boolean getIsPlayer() {
 			return this.isPlayer;
 		}
-		
+		public int getPlayerNum() {
+			return this.playerNum;
+		}
 		public String toString() {
 			return this.name;
 		}

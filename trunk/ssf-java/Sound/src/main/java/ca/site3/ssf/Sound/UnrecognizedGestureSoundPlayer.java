@@ -1,6 +1,7 @@
 package ca.site3.ssf.Sound;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.UnrecognizedGestureEvent;
 
 class UnrecognizedGestureSoundPlayer extends SoundPlayer {
 
@@ -27,7 +28,13 @@ class UnrecognizedGestureSoundPlayer extends SoundPlayer {
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.UNRECOGNIZED_GESTURE) {
 			return null;
 		}
-		return this.unrecognizedGestureSound;
+		
+		UnrecognizedGestureEvent event = (UnrecognizedGestureEvent)gameModelEvent;
+		if (event.getEntity().getIsPlayer()) {
+			return this.unrecognizedGestureSound;
+		}
+		
+		return null;
 	}
 
 }
