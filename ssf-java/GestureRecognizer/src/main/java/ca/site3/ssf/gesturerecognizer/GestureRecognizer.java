@@ -99,13 +99,22 @@ public class GestureRecognizer {
 	// REAL-TIME GESTURE RECOGNITION FUNCTIONALITY **********************************************************
 	
 	/**
-	 * Use the gesture recognizer to recognize the given gesture as it would if the game were
+	 * Use the gesture recognizer to recognize the given player gesture as it would if the game were
 	 * being played.
 	 * @param gestureInstance The gesture instance to recognize.
 	 * @return The winning gesture that would be executed in-game, null if no gesture was suitable.
 	 */
-	public GestureType recognizerPlayerGestureAsGameWould(GestureInstance gestureInstance) {
+	public GestureType recognizePlayerGestureAsGameWould(GestureInstance gestureInstance) {
 		return this.recognizerMgr.recognize(gestureInstance, false);
+	}
+	
+	/**
+	 * Use the gesture recognizer to recognize the given ringmaster gesture as it would if the game were being played.
+	 * @param gestureInstance The gesture instance to recognize.
+	 * @return The winning gesture that would be executed in-game, null if no gesture was suitable.
+	 */
+	public GestureType recognizeRingmasterGestureAsGameWould(GestureInstance gestureInstance) {
+		return this.recognizerMgr.recognize(gestureInstance, true);
 	}
 	
 	/**
@@ -122,16 +131,39 @@ public class GestureRecognizer {
 		assert(gestureInstance != null);
 
 		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
-		GestureType result = this.recognizerPlayerGestureAsGameWould(gestureInstance);
+		GestureType result = this.recognizePlayerGestureAsGameWould(gestureInstance);
 		if (result == null) {
 			// No gesture was recognized
-			this.logger.info("Failed to recognize gesture.");
+			this.logger.info("Failed to recognize player gesture.");
 			return null;
 		}
 		
 		// We have a gesture! Tell the gamemodel about it in order to execute that gesture within
 		// the context of the current game
 		return actionFactory.buildPlayerAction(playerNum, result.getActionFactoryType(),
+				result.getUsesLeftHand(), result.getUsesRightHand());
+	}
+	
+	/**
+	 * Use the gesture recognizer to recognize a given gesture instance executed by the ringmaster.
+	 * This function will both recognize the gesture and, if the gesture is identified, it will build
+	 * the appropriate Action for the gamemodel to consume.
+	 * @param actionFactory The game model's action factory, used to construct the gesture action if one is identified.
+	 * @param gestureInstance The gesture instance data to recognize.
+	 * @return The Action for the game model to consume if one was recognized, if not then null is returned.
+	 */
+	public Action recognizeRingmasterGesture(ActionFactory actionFactory, GestureInstance gestureInstance) {
+		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
+		GestureType result = this.recognizeRingmasterGestureAsGameWould(gestureInstance);
+		if (result == null) {
+			// No gesture was recognized
+			this.logger.info("Failed to recognize ringmaster gesture.");
+			return null;
+		}
+		
+		// We have a gesture! Tell the gamemodel about it in order to execute that gesture within
+		// the context of the current game
+		return actionFactory.buildRingmasterAction(result.getActionFactoryType(),
 				result.getUsesLeftHand(), result.getUsesRightHand());
 	}
 	
@@ -146,6 +178,13 @@ public class GestureRecognizer {
 
 		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
 		GestureRecognitionResult result = this.recognizerMgr.recognizeWithFullResult(gestureInstance, false);
+		return result;
+	}
+	public GestureRecognitionResult recognizeRingmasterGesture(GestureInstance gestureInstance) {
+		assert(gestureInstance != null);
+
+		// Attempt to recognize the gesture as one of the archetypal SSF gestures...
+		GestureRecognitionResult result = this.recognizerMgr.recognizeWithFullResult(gestureInstance, true);
 		return result;
 	}
 	

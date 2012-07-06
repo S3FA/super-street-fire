@@ -158,7 +158,7 @@ class TestingPanel extends JPanel implements ActionListener {
 		this.loggerPanel.appendLogTextLine("\n------------------------------------------------------");
 		this.loggerPanel.appendLogTextLine(result.toString());
 		
-		GestureType winnerInGame = this.gestureRecognizer.recognizerPlayerGestureAsGameWould(instance);
+		GestureType winnerInGame = this.gestureRecognizer.recognizePlayerGestureAsGameWould(instance);
 		if (winnerInGame == null) {
 			this.loggerPanel.appendLogTextLine("No gesture was suitable.");
 		}

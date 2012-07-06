@@ -45,8 +45,8 @@ public class GameModel implements IGameModel {
 		
 		this.actionSignaller = new GameModelActionSignaller();
 		
-		this.player1 = new Player(1, this.actionSignaller, this.config);
-		this.player2 = new Player(2, this.actionSignaller, this.config);
+		this.player1 = new Player(PLAYER_1_NUM, this.actionSignaller, this.config);
+		this.player2 = new Player(PLAYER_2_NUM, this.actionSignaller, this.config);
 		
 		this.fireEmitterModel = new FireEmitterModel(new FireEmitterConfig(true, 16, 8), this.actionSignaller);
 		
