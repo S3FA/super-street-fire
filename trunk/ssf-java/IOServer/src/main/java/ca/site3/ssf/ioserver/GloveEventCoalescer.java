@@ -68,6 +68,8 @@ public class GloveEventCoalescer implements Runnable {
 	protected Queue<GloveEvent> p1RightQueue = new LinkedList<GloveEvent>();
 	protected Queue<GloveEvent> p2LeftQueue  = new LinkedList<GloveEvent>();
 	protected Queue<GloveEvent> p2RightQueue = new LinkedList<GloveEvent>();
+	protected Queue<GloveEvent> ringmasterLeftQueue  = new LinkedList<GloveEvent>();
+	protected Queue<GloveEvent> ringmasterRightQueue = new LinkedList<GloveEvent>();
 	
 	// These are used to measure headset information for the creation of gestures - these cache
 	// the headset data over the course of a gesture
@@ -78,11 +80,15 @@ public class GloveEventCoalescer implements Runnable {
 	protected boolean p1RightBtnDown = false;
 	protected boolean p2LeftBtnDown  = false;
 	protected boolean p2RightBtnDown = false;
+	protected boolean ringmasterLeftBtnDown  = false;
+	protected boolean ringmasterRightBtnDown = false;
 	
 	private long p1LeftGloveLastPkgTimestamp  = 0;
 	private long p1RightGloveLastPkgTimestamp = 0;
 	private long p2LeftGloveLastPkgTimestamp  = 0;
 	private long p2RightGloveLastPkgTimestamp = 0;
+	private long ringmasterLeftGloveLastPkgTimestamp  = 0;
+	private long ringmasterRightGloveLastPkgTimestamp = 0;
 	
 	protected final long startTime;
 	protected final double bothButtonsDownThreshold; // In milliseconds
@@ -153,6 +159,7 @@ public class GloveEventCoalescer implements Runnable {
 							}
 							this.p1RightGloveLastPkgTimestamp = currentTimestamp;
 						}
+						
 						if (!this.p2LeftQueue.isEmpty()) {
 							this.p2LeftBtnDown = false;
 							
@@ -168,6 +175,23 @@ public class GloveEventCoalescer implements Runnable {
 								this.aggregateAndAdd(Entity.PLAYER2_ENTITY);
 							}
 							this.p2RightGloveLastPkgTimestamp = currentTimestamp;
+						}
+						
+						if (!this.ringmasterLeftQueue.isEmpty()) {
+							this.ringmasterLeftBtnDown = false;
+							
+							if (!this.ringmasterRightBtnDown) {
+								this.aggregateAndAdd(Entity.RINGMASTER_ENTITY);
+							}
+							this.ringmasterLeftGloveLastPkgTimestamp = currentTimestamp;
+						}
+						if (!this.ringmasterRightQueue.isEmpty()) {
+							this.ringmasterRightBtnDown = false;
+							
+							if (!this.ringmasterLeftBtnDown) {
+								this.aggregateAndAdd(Entity.RINGMASTER_ENTITY);
+							}
+							this.ringmasterRightGloveLastPkgTimestamp = currentTimestamp;
 						}
 						
 						continue;
@@ -193,6 +217,7 @@ public class GloveEventCoalescer implements Runnable {
 							}
 							this.p1RightGloveLastPkgTimestamp = currentTimestamp;
 						}
+						
 						if (!this.p2LeftQueue.isEmpty() && (currentTimestamp - this.p2LeftGloveLastPkgTimestamp) >= MAX_TIME_TO_WAIT_FOR_BUTTON_UP_EVENT_MS) {
 							this.p2LeftBtnDown = false;
 							
@@ -208,6 +233,23 @@ public class GloveEventCoalescer implements Runnable {
 								this.aggregateAndAdd(Entity.PLAYER2_ENTITY);
 							}
 							this.p2RightGloveLastPkgTimestamp = currentTimestamp;
+						}
+						
+						if (!this.ringmasterLeftQueue.isEmpty() && (currentTimestamp - this.ringmasterLeftGloveLastPkgTimestamp) >= MAX_TIME_TO_WAIT_FOR_BUTTON_UP_EVENT_MS) {
+							this.ringmasterLeftBtnDown = false;
+							
+							if (!this.ringmasterRightBtnDown) {
+								this.aggregateAndAdd(Entity.RINGMASTER_ENTITY);
+							}
+							this.ringmasterLeftGloveLastPkgTimestamp = currentTimestamp;
+						}
+						if (!this.ringmasterRightQueue.isEmpty() && (currentTimestamp - this.ringmasterRightGloveLastPkgTimestamp) >= MAX_TIME_TO_WAIT_FOR_BUTTON_UP_EVENT_MS) {
+							this.ringmasterRightBtnDown = false;
+							
+							if (!this.ringmasterLeftBtnDown) {
+								this.aggregateAndAdd(Entity.RINGMASTER_ENTITY);
+							}
+							this.ringmasterRightGloveLastPkgTimestamp = currentTimestamp;
 						}
 					}
 				}
@@ -280,7 +322,7 @@ public class GloveEventCoalescer implements Runnable {
 							
 							if (eventQueue.size() > GLOVE_DATA_CACHE_SIZE) {
 								log.info("Full GloveEvent queue. Creating GestureInstance.");
-								List<EntityGestureInstance> gestures = this.aggregateForPlayer(ge.getSource());
+								List<EntityGestureInstance> gestures = this.aggregateForEntity(ge.getSource());
 								if (gestures != null && !gestures.isEmpty()) {
 									gestureInstanceQueue.addAll(gestures);
 								}
@@ -326,41 +368,51 @@ public class GloveEventCoalescer implements Runnable {
 	
 	private boolean existsNonEmptyGloveEventQueue() {
 		return (!this.p1LeftQueue.isEmpty() || !this.p1RightQueue.isEmpty() ||
-				!this.p2LeftQueue.isEmpty() || !this.p2RightQueue.isEmpty());
+				!this.p2LeftQueue.isEmpty() || !this.p2RightQueue.isEmpty() ||
+				!this.ringmasterLeftQueue.isEmpty() || !this.ringmasterRightQueue.isEmpty());
 	}
 	
-	private void aggregateAndAdd(Entity player) {
-		List<EntityGestureInstance> gestures = this.aggregateForPlayer(player);
+	private void aggregateAndAdd(Entity entity) {
+		List<EntityGestureInstance> gestures = this.aggregateForEntity(entity);
 		if (gestures != null && !gestures.isEmpty()) {
 			gestureInstanceQueue.addAll(gestures);
 		}
 	}
 	
 	/**
-	 * Create a GestureInstance for the given player based on the current state of the
+	 * Create a GestureInstance for the given entity based on the current state of the
 	 * GloveEvent caches.
 	 * 
-	 * @param player the player to create a GestureInstance for
+	 * @param entity the entity to create a GestureInstance for
 	 * @return the created {@link EntityGestureInstance}
 	 */
-	protected List<EntityGestureInstance> aggregateForPlayer(Entity player) {
-		assert (player == Entity.PLAYER1_ENTITY || player == Entity.PLAYER2_ENTITY);
+	protected List<EntityGestureInstance> aggregateForEntity(Entity entity) {
+
+		List<EntityGestureInstance> gestures = new ArrayList<EntityGestureInstance>();
 		
 		Queue<GloveEvent> left;
 		Queue<GloveEvent> right;
-		if (player == Entity.PLAYER1_ENTITY) {
-			left = p1LeftQueue;
-			right = p1RightQueue;
-		}
-		else if (player == Entity.PLAYER2_ENTITY) {
-			left = p2LeftQueue;
-			right = p2RightQueue;
-		}
-		else {
-			throw new IllegalArgumentException("Invalid player for glove data aggregation");
-		}
 		
-		List<EntityGestureInstance> gestures = new ArrayList<EntityGestureInstance>();
+		switch (entity) {
+		
+		case PLAYER1_ENTITY:
+			left  = this.p1LeftQueue;
+			right = this.p1RightQueue;
+			break;
+		
+		case PLAYER2_ENTITY:
+			left  = this.p2LeftQueue;
+			right = this.p2RightQueue;
+			break;
+
+		case RINGMASTER_ENTITY:
+			left  = this.ringmasterLeftQueue;
+			right = this.ringmasterRightQueue;
+		
+		default:
+			assert(false);
+			return gestures;
+		}
 		
 		List<Double> timePts = null;
 		List<GloveData> leftGloveData = null;
@@ -390,7 +442,7 @@ public class GloveEventCoalescer implements Runnable {
 				timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 			}
 			
-			gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
+			gestures.add(new EntityGestureInstance(entity, leftGloveData, rightGloveData, timePts));
 		}
 		else if (left.isEmpty() == false && right.isEmpty() == true) {
 			if (this.isAlmostEmptyGloveEventQueue(left)) {
@@ -411,7 +463,7 @@ public class GloveEventCoalescer implements Runnable {
 				timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 			}
 			
-			gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
+			gestures.add(new EntityGestureInstance(entity, leftGloveData, rightGloveData, timePts));
 		}
 		else {
 			
@@ -445,7 +497,7 @@ public class GloveEventCoalescer implements Runnable {
 						timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 					}
 					
-					gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
+					gestures.add(new EntityGestureInstance(entity, leftGloveData, rightGloveData, timePts));
 				}
 				else {
 					log.info("Mostly empty left-handed gesture, discarding.");
@@ -463,7 +515,7 @@ public class GloveEventCoalescer implements Runnable {
 						timePts.add((ge.getTimestamp() - startTime) / 1000.0);
 					}
 					
-					gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
+					gestures.add(new EntityGestureInstance(entity, leftGloveData, rightGloveData, timePts));
 				}
 				else {
 					log.info("Mostly empty right-handed gesture, discarding.");
@@ -483,8 +535,8 @@ public class GloveEventCoalescer implements Runnable {
 				Queue<GloveEvent> mainCache  = usingLeft ? left  : right;
 				Queue<GloveEvent> otherCache = usingLeft ? right : left;
 				
-				timePts = new ArrayList<Double>(mainCache.size());
-				leftGloveData = new ArrayList<GloveData>(mainCache.size());
+				timePts        = new ArrayList<Double>(mainCache.size());
+				leftGloveData  = new ArrayList<GloveData>(mainCache.size());
 				rightGloveData = new ArrayList<GloveData>(mainCache.size());
 				
 				// Do nothing if the main cache is empty
@@ -512,7 +564,7 @@ public class GloveEventCoalescer implements Runnable {
 					}
 				}
 				
-				gestures.add(new EntityGestureInstance(player, leftGloveData, rightGloveData, timePts));
+				gestures.add(new EntityGestureInstance(entity, leftGloveData, rightGloveData, timePts));
 				left.clear();
 				right.clear();
 			}
@@ -546,20 +598,42 @@ public class GloveEventCoalescer implements Runnable {
 	
 	
 	private Queue<GloveEvent> gloveEventQueueForDeviceEvent(DeviceEvent e) {
-		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return p1LeftQueue;
-		}
-		else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return p1RightQueue;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return p2LeftQueue;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return p2RightQueue;
+		switch (e.getSource()) {
+		case PLAYER1_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.p1LeftQueue;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.p1RightQueue;
+			}
+			break;
 		}
 		
-		log.error("No queue for event with device type: ", e.getDevice());
+		case PLAYER2_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.p2LeftQueue;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.p2RightQueue;
+			}
+			break;
+		}
+		case RINGMASTER_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.ringmasterLeftQueue;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.ringmasterRightQueue;
+			}
+			break;
+		}
+		
+		default:
+			assert(false);
+			break;
+		}
+		
+		log.error("No queue for event with device type {}", e.getDevice());
 		return null;
 	}
 	
@@ -575,7 +649,7 @@ public class GloveEventCoalescer implements Runnable {
 			break;
 		}
 		
-		log.error("No queue for event with device type: ", e.getDevice());
+		log.error("No queue for event with device type {}", e.getDevice());
 		return null;
 	}
 	
@@ -591,7 +665,7 @@ public class GloveEventCoalescer implements Runnable {
 			break;
 		}
 		
-		log.error("No queue for event with device type: ", e.getDevice());
+		log.error("No queue for event with device type {}", e.getDevice());
 		return null;
 	}
 	
@@ -602,8 +676,12 @@ public class GloveEventCoalescer implements Runnable {
 			
 		case PLAYER2_ENTITY:
 			return this.p2LeftBtnDown || this.p2RightBtnDown;
+		
+		case RINGMASTER_ENTITY:
+			return this.ringmasterLeftBtnDown || this.ringmasterRightBtnDown;
 			
 		default:
+			assert(false);
 			break;
 		}
 
@@ -614,48 +692,88 @@ public class GloveEventCoalescer implements Runnable {
 	 * Sets the p{1,2}{Left,Right}BtnDown boolean to false if e is a button up event,
 	 * or to true if it's a button down event.
 	 * 
-	 * @param e the GloveEvent used to determine the device/player and event type
+	 * @param e the GloveEvent used to determine the device/entity and event type
 	 */
 	private void updateButtonState(GloveEvent e) {
-		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			this.p1LeftBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+		switch (e.getSource()) {
+		case PLAYER1_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.p1LeftBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.p1RightBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			this.p1RightBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+		
+		case PLAYER2_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.p2LeftBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.p2RightBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			this.p2LeftBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+		case RINGMASTER_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.ringmasterLeftBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.ringmasterRightBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			this.p2RightBtnDown = (e.getEventType() == EventType.BUTTON_DOWN_EVENT);
+		
+		default:
+			assert(false);
+			break;
 		}
-		else {
-			throw new IllegalArgumentException("Non-player GloveEvent passed to updateButtonState");
-		}
+		
 	}
 	
 	/**
-	 * Sets the button down state to true or false based on the given boolean for the player-glove associated
+	 * Sets the button down state to true or false based on the given boolean for the entity-glove associated
 	 * with the given GloveEvent.
-	 * @param e The glove event that contains the player and glove that will have its button down state changed.
+	 * @param e The glove event that contains the entity and glove that will have its button down state changed.
 	 * @param buttonDown The new button down state to set.
 	 */
 	private void setButtonDownState(GloveEvent e, boolean buttonDown) {
-		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			this.p1LeftBtnDown = buttonDown;
+		switch (e.getSource()) {
+		case PLAYER1_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.p1LeftBtnDown = buttonDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.p1RightBtnDown = buttonDown;
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			this.p1RightBtnDown = buttonDown;
+		
+		case PLAYER2_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.p2LeftBtnDown = buttonDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.p2RightBtnDown = buttonDown;
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			this.p2LeftBtnDown = buttonDown;
+		case RINGMASTER_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.ringmasterLeftBtnDown = buttonDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.ringmasterRightBtnDown = buttonDown;
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			this.p2RightBtnDown = buttonDown;
+		
+		default:
+			assert(false);
+			break;
 		}
-		else {
-			throw new IllegalArgumentException("Non-player GloveEvent passed to setButtonState");
-		}
+		
 	}
 	
 	
@@ -664,73 +782,124 @@ public class GloveEventCoalescer implements Runnable {
 	 * @param e the event
 	 */
 	private boolean isOtherButtonDown(GloveEvent e) {
-		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return this.p1RightBtnDown;
-		}
-		else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return this.p1LeftBtnDown;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return this.p2RightBtnDown;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return this.p2LeftBtnDown;
+		switch (e.getSource()) {
+		case PLAYER1_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.p1RightBtnDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.p1LeftBtnDown;
+			}
+			break;
 		}
 		
-		throw new IllegalArgumentException("Non-player GloveEvent passed to isOtherButtonDown");
+		case PLAYER2_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.p2RightBtnDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.p2LeftBtnDown;
+			}
+			break;
+		}
+		
+		case RINGMASTER_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.ringmasterRightBtnDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.ringmasterLeftBtnDown;
+			}
+			break;
+		}
+		
+		default:
+			assert(false);
+			break;
+		}
+		
+		throw new IllegalArgumentException("Non-entity GloveEvent passed to isOtherButtonDown");
 	}
 	
 	private boolean isButtonDown(GloveEvent e) {
-		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return this.p1LeftBtnDown;
-		}
-		else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return this.p1RightBtnDown;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return this.p2LeftBtnDown;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return this.p2RightBtnDown;
+		
+		switch (e.getSource()) {
+		case PLAYER1_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.p1LeftBtnDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.p1RightBtnDown;
+			}
+			break;
 		}
 		
-		throw new IllegalArgumentException("Non-player GloveEvent passed to isButtonDown");
-	}
-
-	private long getGloveLastPkgTimestamp(GloveEvent e) {
-		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return this.p1LeftGloveLastPkgTimestamp;
+		case PLAYER2_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.p2LeftBtnDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.p2RightBtnDown;
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return this.p1RightGloveLastPkgTimestamp;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			return this.p2LeftGloveLastPkgTimestamp;
-		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			return this.p2RightGloveLastPkgTimestamp;
+		case RINGMASTER_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				return this.ringmasterLeftBtnDown;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				return this.ringmasterRightBtnDown;
+			}
+			break;
 		}
 		
-		throw new IllegalArgumentException("Non-player GloveEvent passed to getGloveLastPkgTimestamp");
+		default:
+			assert(false);
+			break;
+		}
+		
+		throw new IllegalArgumentException("Non-entity GloveEvent passed to isButtonDown");
 	}
 	
 	private void updateGlovePkgTimestamp(GloveEvent e) {
 		long currTimestamp = System.currentTimeMillis();
-		if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			this.p1LeftGloveLastPkgTimestamp = currTimestamp;
+		
+		switch (e.getSource()) {
+		case PLAYER1_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.p1LeftGloveLastPkgTimestamp = currTimestamp;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.p1RightGloveLastPkgTimestamp = currTimestamp;
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER1_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			this.p1RightGloveLastPkgTimestamp = currTimestamp;
+		
+		case PLAYER2_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.p2LeftGloveLastPkgTimestamp = currTimestamp;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.p2RightGloveLastPkgTimestamp = currTimestamp;
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.LEFT_GLOVE) {
-			this.p2LeftGloveLastPkgTimestamp = currTimestamp;
+		case RINGMASTER_ENTITY: {
+			if (e.getDevice() == DeviceType.LEFT_GLOVE) {
+				this.ringmasterLeftGloveLastPkgTimestamp = currTimestamp;
+			}
+			else if (e.getDevice() == DeviceType.RIGHT_GLOVE) {
+				this.ringmasterRightGloveLastPkgTimestamp = currTimestamp;
+			}
+			break;
 		}
-		else if (e.getSource() == Entity.PLAYER2_ENTITY && e.getDevice() == DeviceType.RIGHT_GLOVE) {
-			this.p2RightGloveLastPkgTimestamp = currTimestamp;
+		
+		default:
+			assert(false);
+			break;
 		}
-		else {
-			throw new IllegalArgumentException("Non-player GloveEvent passed to updateGlovePkgTimestamp");
-		}
+		
+		throw new IllegalArgumentException("Non-entity GloveEvent passed to updateGlovePkgTimestamp");
 	}
 	
 	/**
