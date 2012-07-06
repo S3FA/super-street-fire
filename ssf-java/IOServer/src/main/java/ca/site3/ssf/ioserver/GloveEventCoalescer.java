@@ -818,7 +818,7 @@ public class GloveEventCoalescer implements Runnable {
 			break;
 		}
 		
-		throw new IllegalArgumentException("Non-entity GloveEvent passed to isOtherButtonDown");
+		return false;
 	}
 	
 	private boolean isButtonDown(GloveEvent e) {
@@ -858,7 +858,7 @@ public class GloveEventCoalescer implements Runnable {
 			break;
 		}
 		
-		throw new IllegalArgumentException("Non-entity GloveEvent passed to isButtonDown");
+		return false;
 	}
 	
 	private void updateGlovePkgTimestamp(GloveEvent e) {
@@ -899,7 +899,6 @@ public class GloveEventCoalescer implements Runnable {
 			break;
 		}
 		
-		throw new IllegalArgumentException("Non-entity GloveEvent passed to updateGlovePkgTimestamp");
 	}
 	
 	/**
