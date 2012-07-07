@@ -54,7 +54,6 @@ public abstract class GameState {
 		public List<GameStateType> nextControllableGoToStates() {
 			return this.nextControllableGoToStates;
 		}
-		
 		public String toString() {
 			return this.name;
 		}
@@ -72,6 +71,10 @@ public abstract class GameState {
 		assert(this.gameModel != null);
 	}
 
+	boolean isFightingState() {
+		return false;
+	}
+	
 	// Event methods that must be implemented by child classes
 	abstract void tick(double dT);
 	abstract void killToIdle();

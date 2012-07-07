@@ -283,6 +283,7 @@ public class StreetFireServer implements Runnable {
 			UnrecognizedGestureEvent e = (UnrecognizedGestureEvent)evt;
 			b.setType(EventType.UNRECOGNIZED_GESTURE)
 				.setPlayer(SerializationHelper.entityToProtobuf(e.getEntity()));
+			break;
 		}
 		
 		default:

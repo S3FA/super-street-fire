@@ -101,7 +101,10 @@ public class GameModel implements IGameModel {
 	}
 	
 	public void raiseUnrecognizedGestureEvent(Entity entity) {
-		this.actionSignaller.fireOnUnrecognizedGestureEvent(entity);
+		// Only raise the event if the game is in-play
+		if (this.currState != null && this.currState.isFightingState()) {
+			this.actionSignaller.fireOnUnrecognizedGestureEvent(entity);
+		}
 	}
 	
 	public void touchFireEmitter(FireEmitter.Location location, int index,
