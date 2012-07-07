@@ -57,6 +57,10 @@ abstract class PlayerFightingGameState extends GameState {
 		}
 	}
 
+	boolean isFightingState() {
+		return true;
+	}
+	
 	/**
 	 * Called from child classes whenever an action is removed from play.
 	 * @param action The action being removed.
@@ -131,6 +135,8 @@ abstract class PlayerFightingGameState extends GameState {
 				this.secsSinceLastP1LeftAction, this.secsSinceLastP1RightAction,
 				this.p1AttacksExecuted, this.p1AttackTypesCurrentlyActive,
 				this.numP1GroupLimitedActiveAttacks)) {
+				
+				this.gameModel.getActionSignaller().fireOnUnrecognizedGestureEvent(IGameModel.Entity.PLAYER1_ENTITY);
 				return;
 			}
 
@@ -142,6 +148,8 @@ abstract class PlayerFightingGameState extends GameState {
 				this.secsSinceLastP2LeftAction, this.secsSinceLastP2RightAction, 
 				this.p2AttacksExecuted, this.p2AttackTypesCurrentlyActive,
 				this.numP2GroupLimitedActiveAttacks)) {
+				
+				this.gameModel.getActionSignaller().fireOnUnrecognizedGestureEvent(IGameModel.Entity.PLAYER2_ENTITY);
 				return;
 			}
 
