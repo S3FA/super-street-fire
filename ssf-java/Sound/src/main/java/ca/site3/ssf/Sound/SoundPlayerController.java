@@ -8,9 +8,6 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +24,6 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private SoundPlayerManager soundPlayerMgr;
-	
 	private String resourcePath;
 	private Properties configProperties;
 	private AudioSettings settings;
@@ -44,9 +39,6 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		assert(settings != null);
 		this.settings = settings;
 		this.setConfigFile(DEFAULT_CONFIG_FILEPATH);
-		
-		// Order matters - this needs to be made last
-		this.soundPlayerMgr = new SoundPlayerManager(this);
 	}
 	
 	String getResourcePath() {
@@ -141,7 +133,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 				continue;
 			}
 			
-			SoundPlayer soundPlayer = this.soundPlayerMgr.build(gameModelEvent);
+			SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
 			if (soundPlayer != null) {
 				soundPlayer.execute(gameModelEvent);
 			}
