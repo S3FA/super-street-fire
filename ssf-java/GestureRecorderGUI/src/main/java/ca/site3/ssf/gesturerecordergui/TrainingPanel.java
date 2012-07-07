@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -337,11 +338,11 @@ class TrainingPanel extends JPanel implements ActionListener {
 				}
 			}
 			
+			this.loggingPanel.appendLogTextLine("");
 			for (Entry<GestureType, List<File>> entry : trainingFiles.entrySet()) {
 				this.loggingPanel.appendLogTextLine("Peforming more training for " + entry.getKey().toString() + "...");
-				if (this.trainGestureRecognitionEngineFromFileList(entry.getKey(), entry.getValue())) {
-					this.loggingPanel.appendLogTextLine("Gesture " + entry.getKey().toString() + " is now trained with the additional gesture instances.");
-				}
+				this.trainGestureRecognitionEngineFromFileList(entry.getKey(), entry.getValue());
+				this.loggingPanel.appendLogTextLine("");
 			}
 			if (!trainingFiles.isEmpty()) {
 				this.loggingPanel.appendLogTextLine("Done.");
@@ -493,6 +494,15 @@ class TrainingPanel extends JPanel implements ActionListener {
             
             List<File> result = new ArrayList<File>(selectedFiles.length);
             Collections.addAll(result, selectedFiles);
+            
+            Iterator<File> iter = result.iterator();
+            while (iter.hasNext()) {
+            	File currFile = iter.next();
+            	if (!currFile.getName().contains(gesture.toString())) {
+            		iter.remove();
+            	}
+            }
+            
             return result;
 		}
 		else {
@@ -524,8 +534,19 @@ class TrainingPanel extends JPanel implements ActionListener {
 			if (success) {
 				this.loggingPanel.appendLogTextLine("Gesture recognizer engine loaded successfully!");
 				this.saveGestureEngineButton.setEnabled(false);
-				this.untrainGestureButton.setEnabled(true);
 				this.loadedEngineLabel.setText(selectedFile.getAbsolutePath());
+				
+				if (this.toTrainListModel.isEmpty()) {
+					this.trainFilesButton.setEnabled(false);
+					this.trainMoreButton.setEnabled(false);
+					this.untrainGestureButton.setEnabled(false);
+				}
+				else {
+					this.trainFilesButton.setEnabled(true);
+					this.trainMoreButton.setEnabled(true);
+					this.untrainGestureButton.setEnabled(true);
+				}
+				
 			}
 			else {
 				this.loggingPanel.appendLogTextLine("Failed to load gesture recognizer engine file, bad file format: " + selectedFile.getAbsolutePath());
@@ -582,8 +603,6 @@ class TrainingPanel extends JPanel implements ActionListener {
 	
 	// Trains the gesture recognizer using the data set from the selected files
 	public boolean trainGestureRecognitionEngineFromFileList(GestureType gestureToTrain, List<File> files) {
-		
-		
 		// Get a list of files from the log
 		GestureDataSet gestureDataSet = new GestureDataSet();
 
@@ -628,7 +647,6 @@ class TrainingPanel extends JPanel implements ActionListener {
 			this.loggingPanel.appendLogTextLine(gestureFiles.substring(0, gestureFiles.length() - 2));
 			
 			this.saveGestureEngineButton.setEnabled(true);
-			this.untrainGestureButton.setEnabled(true);
 		}
 		else {
 			this.loggingPanel.appendLogTextLine("The gesture instances selected cannot be trained!\n");
