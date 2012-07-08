@@ -25,6 +25,8 @@ class TestRoundGameState extends PlayerFightingGameState {
 		
 		p1.setInvincible(true);
 		p2.setInvincible(true);
+		
+		this.gameModel.getActionSignaller().fireOnRoundPlayTimerChanged(0);
 	}
 
 	@Override
@@ -52,8 +54,13 @@ class TestRoundGameState extends PlayerFightingGameState {
 		this.secsSinceLastP2LeftAction  += dT;
 		this.secsSinceLastP2RightAction += dT;
 		
+		// Update the round time, send an event if the time changed by a whole integer
+		int lastRoundTimeCeiled = (int)Math.ceil(this.roundTime);
 		this.roundTime += dT;
-		this.gameModel.getActionSignaller().fireOnRoundPlayTimerChanged((int)Math.ceil(this.roundTime));
+		int currRoundTimeCeiled = (int)Math.ceil(this.roundTime);
+		if (currRoundTimeCeiled != lastRoundTimeCeiled) {
+			this.gameModel.getActionSignaller().fireOnRoundPlayTimerChanged(currRoundTimeCeiled);
+		}
 	}
 
 	@Override
