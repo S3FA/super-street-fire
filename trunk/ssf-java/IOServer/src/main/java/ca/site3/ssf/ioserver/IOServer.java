@@ -316,12 +316,7 @@ public class IOServer {
 		try {
 			commPortId = CommPortIdentifier.getPortIdentifier(args.serialDevice);
 		} catch (NoSuchPortException ex) {
-			CommPortIdentifier.addPortName(args.serialDevice, CommPortIdentifier.PORT_SERIAL, null);
-			try {
-				commPortId = CommPortIdentifier.getPortIdentifier(args.serialDevice);
-			} catch (NoSuchPortException ex2) {
-				log.error("Could not open or add serial port '"+ args.serialDevice+"'",ex2);
-			}
+			log.error("Could not open serial port '"+ args.serialDevice+"'",ex);
 		} catch (UnsatisfiedLinkError ex) {
 			log.error("Could not load rxtx serial comm native library.\n" + 
 						"If you're on a Mac, copy IOServer/src/main/resources/librxtxSerial.jnilib to ~/Library/Java/Extensions/\n" +
