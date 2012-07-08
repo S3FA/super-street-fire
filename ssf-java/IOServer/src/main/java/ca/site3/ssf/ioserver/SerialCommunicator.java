@@ -25,7 +25,13 @@ import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent.OutputDeviceStatus;
  */
 public class SerialCommunicator implements Runnable {
 
+	private static final byte[] STOP_SENTINEL = new byte[] { (byte)0 };
+	private static final byte[] QUERY_SYSTEM_SENTINEL = new byte[] { (byte)'?' };
+	
+	
 	private Logger log = LoggerFactory.getLogger(getClass());
+	
+	private volatile boolean shouldStop = false;
 	
 	private OutputDeviceStatus[] systemStatus = null;
 	
@@ -45,19 +51,29 @@ public class SerialCommunicator implements Runnable {
 //		this.out = serialOut;
 	}
 	
-		
+	/**
+	 * Puts a sentinel value onto the message queue that will stop
+	 * this SerialCommunicator from listening for events to
+	 * broadcast out.
+	 */
+	public void stop() {
+		messageQueue.add(STOP_SENTINEL);
+	}
 	
 	public void run() {
-		while (true) {
+		while ( ! shouldStop ) {
 			try {
 				byte[] message = messageQueue.take();
-				if (message.length == 1 && message[0] == 63) {
-					// signal to query system status ('?' == ascii 63)
+				if (message.equals(STOP_SENTINEL)) {
+					log.info("SerialCommunicator stopping");
+					break;
+				}
+				if (message.equals(QUERY_SYSTEM_SENTINEL)) {
 					doSystemQuery();
 				} else {
 					this.out.write(message);
 					this.out.flush();
-log.debug("wrote message: {}", bytesToHexString(message));
+					// log.debug("wrote message: {}", bytesToHexString(message));
 				}
 			} catch (IOException ex) {
 				log.error("Error writing to serial device",ex);
@@ -125,14 +141,14 @@ log.debug("wrote message: {}", bytesToHexString(message));
 			values[2] = (byte)(100 * event.getMaxIntensity()); // other option to sum P1 and P2 intensities
 			values[3] = 0; // ringmaster
 		} else if (event.getContributingEntities().contains(Entity.PLAYER1_ENTITY)) {
-			values[0] = (byte) (100 * event.getIntensity(Entity.PLAYER1_ENTITY));
-			values[1] = 0;
+			values[0] = 0;
+			values[1] = (byte) (100 * event.getIntensity(Entity.PLAYER1_ENTITY));
 			values[2] = 0;
 			values[3] = 0;
 		} else if (event.getContributingEntities().contains(Entity.PLAYER2_ENTITY)) {
 			values[0] = 0;
-			values[1] = (byte) (100 * event.getIntensity(Entity.PLAYER2_ENTITY));
-			values[2] = 0;
+			values[1] = 0;
+			values[2] = (byte) (100 * event.getIntensity(Entity.PLAYER2_ENTITY));
 			values[3] = 0;
 		} else if (event.getContributingEntities().contains(Entity.RINGMASTER_ENTITY)) {
 			values[0] = 0;
@@ -151,13 +167,13 @@ log.debug("wrote message: {}", bytesToHexString(message));
 			payload[effectOutputIndex*2 + 2] = values[effectOutputIndex];
 		}
 
-		byte[] message = new byte[payload.length + 3];
+		byte[] message = new byte[payload.length + 4];
 		message[0] = message[1] = (byte) 0xAA; // framing bytes
-		message[2] = 9; // payload length
+		message[2] = (byte)payload.length;
 		for (int i=0; i < payload.length; i++) {
 			message[i+3] = payload[i];
 		}
-		message[11] = getChecksum(payload);
+		message[12] = getChecksum(payload);
 		enqueueMessage(message);
 	}
 	
@@ -168,7 +184,7 @@ log.debug("wrote message: {}", bytesToHexString(message));
 	 * done while a game is actually going on.
 	 */
 	void querySystemStatus() {
-		enqueueMessage( "?".getBytes() ); // sentinel value to trigger system query
+		enqueueMessage( QUERY_SYSTEM_SENTINEL ); // sentinel value to trigger system query
 	}
 	
 	
@@ -293,15 +309,15 @@ log.debug("wrote message: {}", bytesToHexString(message));
 	 */
 	private byte getChecksum(byte[] payload) {
 		/*
-		 * Note: bytes are signed in Java and represented as 2's complement. 
-		 * I have my doubts whether this algorithm will be equivalent to whatever 
-		 * the boards are doing.
+		 *  Note: bytes are signed in Java and represented as 2's complement.
+		 *  We'll sum with a byte and let it roll over (could also use an int and 
+		 *  use the least significant byte).
 		 */
 		byte sum = 0;
 		for (byte b : payload) {
 			sum += b; // seems likely that this will roll over
 		}
-		return (byte) ~sum;
+		return (byte) ~sum; // tilde operator flips each bit (aka 1's complement)
 	}
 	
 	

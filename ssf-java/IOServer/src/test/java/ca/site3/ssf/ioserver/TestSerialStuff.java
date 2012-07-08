@@ -5,13 +5,23 @@ import static org.junit.Assert.fail;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
-import gnu.io.RXTXCommDriver;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.EnumSet;
 import java.util.Enumeration;
+
+import org.slf4j.LoggerFactory;
+
+import ca.site3.ssf.gamemodel.FireEmitter;
+import ca.site3.ssf.gamemodel.FireEmitter.Location;
+import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ch.qos.logback.classic.Level;
 
 public class TestSerialStuff {
 
@@ -20,7 +30,7 @@ public class TestSerialStuff {
 //	@Test
 	public void test() {
 		
-		initSerialStuff();
+		initSerialStuff("/dev/master");
 		
 		assertNotNull(serialPort);
 		
@@ -49,23 +59,15 @@ public class TestSerialStuff {
 	/**
 	 * Initialize the serial comm port.
 	 */
-	private void initSerialStuff() {
+	private void initSerialStuff(String serialDevice) {
 		
-		String serialDevice = "/dev/master";
 		
 		CommPortIdentifier commPortId = null;
+		
 		try {
 			commPortId = CommPortIdentifier.getPortIdentifier(serialDevice);
 		} catch (NoSuchPortException ex) {
 			ex.printStackTrace();
-			CommPortIdentifier.addPortName(serialDevice, CommPortIdentifier.PORT_SERIAL, new RXTXCommDriver());
-			try {
-				commPortId = CommPortIdentifier.getPortIdentifier(serialDevice);
-			} catch (NoSuchPortException ex2) {
-				System.out.println("Could not open or add serial port '"+ serialDevice+"'");
-				ex.printStackTrace();
-				fail();
-			}
 		} catch (UnsatisfiedLinkError ex) {
 			System.out.println("Could not load rxtx serial comm native library.\n" + 
 						"If you're on a Mac, copy IOServer/src/main/resources/librxtxSerial.jnilib to ~/Library/Java/Extensions/\n" +
@@ -109,6 +111,8 @@ public class TestSerialStuff {
 		}
 	}
 	
+	
+	
 	private void closeSerialStuff() {
 		if (serialPort != null) {
 			try {
@@ -124,8 +128,80 @@ public class TestSerialStuff {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
+		configureLogging(1);
+		
 		TestSerialStuff tss = new TestSerialStuff();
-		tss.test();
+//		tss.initSerialStuff("/dev/master");
+//		tss.test();
+		tss.testBoard32();
+	}
+	
+	
+	private void testBoard32() {
+		initSerialStuff("/dev/tty.usbserial-A40081Z7");
+		assertNotNull(serialPort);
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = serialPort.getInputStream();
+			out = serialPort.getOutputStream();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		
+		SerialCommunicator sc = new SerialCommunicator(in, out);
+		
+		Thread commThread = new Thread(sc);
+		commThread.start();
+		
+		
+		for (int i=0; i<10; i++) {
+			final Entity entity = i % 2 == 0 ? Entity.PLAYER1_ENTITY : Entity.PLAYER2_ENTITY;
+			final float intensity = i == 9 ? 0f : 1f;
+			
+			FireEmitter emitter = new FireEmitter(32,8,Location.OUTER_RING) {
+				protected @Override float getContributorIntensity(Entity contributor) {
+					if (contributor == entity) {
+						return intensity;
+					} else {
+						return 0f;
+					}
+				}
+				protected @Override EnumSet<Entity> getContributingEntities() {
+					return EnumSet.of(entity);
+				}
+			};
+			FireEmitterChangedEvent event = new FireEmitterChangedEvent(emitter);
+			
+			sc.notifyFireEmitters(event);
+			try { Thread.sleep(1000); } catch (InterruptedException ex) { ex.printStackTrace(); }
+		}
+		sc.stop();
+		closeSerialStuff();
+	}
+	
+	
+
+	private static void configureLogging(int level) {
+		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
+				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+		
+		switch (level) {
+			case 0:
+				root.setLevel(Level.OFF); break;
+			case 1:
+				root.setLevel(Level.TRACE); break;
+			case 2:
+				root.setLevel(Level.DEBUG); break;
+			case 3:
+				root.setLevel(Level.INFO); break;
+			case 4:
+				root.setLevel(Level.WARN); break;
+			case 5:
+				root.setLevel(Level.ERROR); break;
+			default:
+				root.setLevel(Level.INFO);
+		}
 	}
 }
