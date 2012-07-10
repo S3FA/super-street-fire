@@ -24,6 +24,8 @@ public class FireEmitter {
 	final private Location location;    // The location of the emitter within the game arena (see FireEmitter.Location)
 	final private int globalEmitterID;  // Unique identifier among all other fire emitters in the simulation
 	
+	private boolean hasFiredLastestChangeEvent = false;
+	
 	// Mapping of contributors to this flame emitter
 	private Map<GameModel.Entity, FireEmitterContributor> contributors =
 			new HashMap<GameModel.Entity, FireEmitterContributor>(GameModel.Entity.values().length);
@@ -101,6 +103,8 @@ public class FireEmitter {
 		for (FireEmitterContributor contributor : this.contributors.values()) {
 			contributor.reset();
 		}
+		
+		this.hasFiredLastestChangeEvent = false;
 	}
 	
 	/**
@@ -112,6 +116,8 @@ public class FireEmitter {
 		FireEmitterContributor fireEmitterContrib = this.contributors.get(action.getContributorEntity());
 		assert(fireEmitterContrib != null);
 		fireEmitterContrib.setIntensity(action, intensity);
+		
+		this.hasFiredLastestChangeEvent = false;
 	}
 	
 	/**
@@ -146,6 +152,13 @@ public class FireEmitter {
 				player2FlameTypes.contains(FireEmitter.FlameType.BLOCK_FLAME)) ||
 		       (player1FlameTypes.contains(FireEmitter.FlameType.BLOCK_FLAME)  &&
 		    	player2FlameTypes.contains(FireEmitter.FlameType.ATTACK_FLAME));
+	}
+	
+	void fireOnFireEmitterChanged(GameModelActionSignaller actionSignaller) {
+		if (!this.hasFiredLastestChangeEvent) {
+			actionSignaller.fireOnFireEmitterChanged(this);
+			this.hasFiredLastestChangeEvent = true;
+		}
 	}
 	
 }

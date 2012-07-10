@@ -280,7 +280,7 @@ public class IOServer {
 		configureLogging(args.verbosity);
 		
 		final IOServer ioserver = new IOServer(args);
-		ioserver.runLoop();
+		ioserver.start();
 	}
 	
 

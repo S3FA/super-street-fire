@@ -274,19 +274,20 @@ class FireEmitterModel {
 		this.fireAllLeftRailChangedEvent();
 		this.fireAllRightRailChangedEvent();
 	}
+	
 	void fireAllOuterRingChangedEvent() {
 		for (FireEmitter emitter : this.outerRingEmitters) {
-			this.actionSignaller.fireOnFireEmitterChanged(emitter);
+			emitter.fireOnFireEmitterChanged(this.actionSignaller);
 		}
 	}
 	void fireAllRightRailChangedEvent() {
 		for (FireEmitter emitter : this.rightRailEmitters) {
-			this.actionSignaller.fireOnFireEmitterChanged(emitter);
+			emitter.fireOnFireEmitterChanged(this.actionSignaller);
 		}
 	}
 	void fireAllLeftRailChangedEvent() {
 		for (FireEmitter emitter : this.leftRailEmitters) {
-			this.actionSignaller.fireOnFireEmitterChanged(emitter);
+			emitter.fireOnFireEmitterChanged(this.actionSignaller);
 		}
 	}
 
