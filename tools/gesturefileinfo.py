@@ -76,6 +76,8 @@ class GestureFileInfo:
         return self._get_normalized_accel_at_normalized_time_pt(normalizedTimePt, self.normalized_time_pts, self.normalized_accel_right_pts)      
       
     def _get_normalized_accel_at_normalized_time_pt(self, normalizedTimePt, normalized_time_pts, normalized_accel_pts):
+        assert(len(normalized_time_pts) == len(normalized_accel_pts))
+
         for i in xrange(0, len(normalized_time_pts), 2):
             pt0, pt1 = normalized_time_pts[i:i+2]
             
@@ -182,11 +184,15 @@ def from_gesture_file_string(fileName, fileStr):
     result.normalized_time_pts = [(item - startingTimePt) / timeLength for item in result.normalized_time_pts]
     
     # Get full normalized results, interpolated over the gesture
-    for i in range(GestureFileInfo.NUM_DEVIATION_COMPARISON_PTS+1):
+    if len(result.normalized_accel_left_pts) > 0:
+        for i in range(GestureFileInfo.NUM_DEVIATION_COMPARISON_PTS+1):
+            percent = float(i) / float(GestureFileInfo.NUM_DEVIATION_COMPARISON_PTS) 
+            result.interpolated_accel_left_pts.append(result.get_normalized_left_accel_at_normalized_time_pt(percent))
         
-        percent = float(i) / float(GestureFileInfo.NUM_DEVIATION_COMPARISON_PTS) 
-        result.interpolated_accel_left_pts.append(result.get_normalized_left_accel_at_normalized_time_pt(percent))
-        result.interpolated_accel_right_pts.append(result.get_normalized_right_accel_at_normalized_time_pt(percent))
+    if len(result.normalized_accel_right_pts) > 0:
+        for i in range(GestureFileInfo.NUM_DEVIATION_COMPARISON_PTS+1):
+            percent = float(i) / float(GestureFileInfo.NUM_DEVIATION_COMPARISON_PTS) 
+            result.interpolated_accel_right_pts.append(result.get_normalized_right_accel_at_normalized_time_pt(percent))
         
     return result
 
