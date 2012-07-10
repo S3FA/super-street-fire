@@ -30,6 +30,9 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		tempPath = resourcePath + configProperties.getProperty("RoundResult.Tie");
 		this.tieAudioHandler = new PlaybackHandler(controller, tempPath,
 			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		
+		// Stop all other controller sounds...
+		controller.stopAllSounds();
 	}
 	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {

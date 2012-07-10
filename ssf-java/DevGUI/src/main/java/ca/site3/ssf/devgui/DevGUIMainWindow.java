@@ -91,19 +91,17 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
     private IGameModel gameModel      = null;	
     private IOServer ioserver         = null;
     
-    private CommandLineArgs args       = null;
+    private final CommandLineArgs args;
     private StreetFireGuiClient client = null;
 
     /** thread that monitors the queue for game model events */
     private Thread gameEventThread;
-    
     
 	public DevGUIMainWindow(IOServer ioserver, CommandLineArgs args) {
 		this.args = args;
 		this.ioserver = ioserver;
 		this.gameModel = ioserver.getGameModel();
 	}
-	
 	
 	private void getThisPartyStarted() {
 		
@@ -546,7 +544,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		window.setVisible(true);
 	}
 
-	private static void configureLogging(int level) {
+	public static void configureLogging(int level) {
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
 				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 		
