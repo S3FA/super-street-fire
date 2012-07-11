@@ -308,8 +308,10 @@ public class GloveEventCoalescer implements Runnable {
 						if (!this.isButtonDown(ge)) {
 							this.setButtonDownState(ge, true);
 							
-							Queue<HeadsetEvent> headsetEventQueue = this.internalHeadsetEventQueueForDeviceEvent(ge);
-							headsetEventQueue.clear();
+							if (ge.getSource() != Entity.RINGMASTER_ENTITY) {
+								Queue<HeadsetEvent> headsetEventQueue = this.internalHeadsetEventQueueForDeviceEvent(ge);
+								headsetEventQueue.clear();
+							}
 						}
 						
 						Queue<GloveEvent> eventQueue = this.gloveEventQueueForDeviceEvent(ge);
@@ -347,7 +349,7 @@ public class GloveEventCoalescer implements Runnable {
 						
 						// When we start a new gesture (i.e., the button is pressed down) we need to clear any previous
 						// headset data for the gestures.
-						if (ge.getEventType() == EventType.BUTTON_DOWN_EVENT) {
+						if (ge.getEventType() == EventType.BUTTON_DOWN_EVENT && ge.getSource() != Entity.RINGMASTER_ENTITY) {
 							Queue<HeadsetEvent> headsetEventQueue = this.internalHeadsetEventQueueForDeviceEvent(ge);
 							headsetEventQueue.clear();
 						}
