@@ -115,7 +115,7 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double JAB_BASE_ACCELERATION   = 0.0;
-				final double JAB_TIME_LENGTH_IN_SECS = 4.0;
+				final double JAB_TIME_LENGTH_IN_SECS = 4.25;
 				final float JAB_DAMAGE_PER_FLAME     = 5.0f;
 				final int JAB_NUM_FLAMES             = 1;
 				
@@ -138,7 +138,7 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double BASE_ACCELERATION   = 0.25;
-				final double TIME_LENGTH_IN_SECS = 5.0;
+				final double TIME_LENGTH_IN_SECS = 5.25;
 				final float DAMAGE_PER_FLAME     = 7.0f;
 				final int NUM_FLAMES             = 1;
 				
@@ -159,7 +159,7 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double CHOP_BASE_ACCELERATION   = 0.25;
-				final double CHOP_TIME_LENGTH_IN_SECS = 4.25;
+				final double CHOP_TIME_LENGTH_IN_SECS = 4.50;
 				final float CHOP_DAMAGE_PER_FLAME     = 6.0f;
 				final int CHOP_NUM_FLAMES             = 1;
 				
@@ -204,7 +204,7 @@ final public class ActionFactory {
 			case SHORYUKEN_ATTACK: {
 				
 				final double SHORYUKEN_BASE_ACCELERATION   = 0.25;
-				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 4.25;
+				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 4.5;
 				final float SHORYUKEN_DAMAGE_PER_FLAME    = 5.0f;
 				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 3;
 				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 2;
@@ -262,7 +262,7 @@ final public class ActionFactory {
 			case SONIC_BOOM_ATTACK: {
 				
 				final double SONIC_BOOM_BASE_ACCELERATION   = 0.75;
-				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 2.75;
+				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 3.0;
 				final float SONIC_BOOM_DAMAGE_PER_FLAME     = 4.0f;
 				final int SONIC_BOOM_NUM_FLAMES             = 1;
 				
@@ -342,7 +342,7 @@ final public class ActionFactory {
 			case SUMO_HEADBUTT_ATTACK: {
 				
 				final double SUMO_HEADBUTT_BASE_ACCELERATION   = 0.1;
-				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 5.0;
+				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 5.25;
 				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME     = 3.0f;
 				final int SUMO_HEADBUTT_NUM_FLAMES             = 2;
 				
@@ -369,7 +369,7 @@ final public class ActionFactory {
 			case ONE_HUNDRED_HAND_SLAP_ATTACK: {
 				
 				final double ONE_HUND_HAND_SLAP_BASE_ACCELERATION   = 0.0;
-				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 4.5;
+				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 4.75;
 				final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME     = 3.0f;
 				final int ONE_HUND_HAND_SLAP_NUM_FLAMES             = 3;
 				
@@ -442,7 +442,7 @@ final public class ActionFactory {
 			
 			case PSYCHO_CRUSHER_ATTACK: {
 				
-				final double PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS = 5.25;
+				final double PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS = 5.5;
 				final float PSYCHO_CRUSHER_DAMAGE_PER_FLAME     = 4.0f;
 				final int PSYCHO_CRUSHER_NUM_FLAMES             = 3;
 				final double PSYCHO_CRUSHER_BASE_ACCELERATION   = 0.0;
@@ -576,7 +576,7 @@ final public class ActionFactory {
 			case ARM_WINDMILL_ATTACK: {
 				
 				final double ARM_WINDMILL_BASE_ACCELERATION   = 1.5;
-				final double ARM_WINDMILL_TIME_LENGTH_IN_SECS = 3.0;
+				final double ARM_WINDMILL_TIME_LENGTH_IN_SECS = 3.25;
 				final float ARM_WINDMILL_DAMAGE_PER_FLAME     = 3.0f;
 				final int ARM_WINDMILL_NUM_FLAMES             = 4;
 				
@@ -610,7 +610,7 @@ final public class ActionFactory {
 			case SUCK_IT_ATTACK: {
 				
 				final double SUCK_IT_BASE_ACCELERATION   = 0;
-				final double SUCK_IT_TIME_LENGTH_IN_SECS = 5.0;
+				final double SUCK_IT_TIME_LENGTH_IN_SECS = 5.25;
 				final float SUCK_IT_DAMAGE_PER_FLAME     = 4.0f;
 				final int SUCK_IT_NUM_FLAMES = 3;
 				
@@ -627,7 +627,7 @@ final public class ActionFactory {
 			case VAFANAPOLI_ATTACK: {
 				
 				final double FAFANAPOLI_BASE_ACCELERATION   = 0;
-				final double FAFANAPOLI_TIME_LENGTH_IN_SECS = 4.0;
+				final double FAFANAPOLI_TIME_LENGTH_IN_SECS = 4.25;
 				final float FAFANAPOLI_DAMAGE_PER_FLAME     = 5.0f;
 				final int FAFANAPOLI_MAIN_HAND_NUM_FLAMES   = 2;
 				final int FAFANAPOLI_OFF_HAND_NUM_FLAMES    = 1;
@@ -729,7 +729,7 @@ final public class ActionFactory {
 		}
 		
 		case RINGMASTER_JAB_ACTION: {
-			final double JAB_DURATION_IN_SECS = 2.0;
+			final double JAB_DURATION_IN_SECS = 1.0;
 			final int JAB_FLAME_WIDTH = 2;
 			
 			FireEmitterIterator fireEmitterIter = null;
@@ -819,8 +819,8 @@ final public class ActionFactory {
 		case RINGMASTER_DRUM_ACTION: {
 			
 			final double DRUM_DURATION_IN_SECS = 5.0;
-			final int NUM_RANDOM_BURSTS = 20;
-			final double BURST_DURATION_IN_SECS = 0.75;
+			final int NUM_RANDOM_BURSTS = 30;
+			final double BURST_DURATION_IN_SECS = 1.0;
 			final double BURST_DIV_SECS = (DRUM_DURATION_IN_SECS / (double)NUM_RANDOM_BURSTS);
 			
 			// Decoration in the outer ring of fire emitters is random bursts all over the ring
