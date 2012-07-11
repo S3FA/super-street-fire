@@ -408,7 +408,8 @@ public class GloveEventCoalescer implements Runnable {
 		case RINGMASTER_ENTITY:
 			left  = this.ringmasterLeftQueue;
 			right = this.ringmasterRightQueue;
-		
+			break;
+			
 		default:
 			assert(false);
 			return gestures;
