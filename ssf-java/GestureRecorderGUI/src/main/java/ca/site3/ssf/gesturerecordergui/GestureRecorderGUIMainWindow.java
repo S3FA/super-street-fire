@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.gesturerecognizer.GestureType;
@@ -194,7 +195,7 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 		}
 		else if (selectedTab == TESTING_TAB_IDX && this.testingPanel.isEngineLoaded()) {
 			// If we're on the testing
-			this.testingPanel.testGestureInstance(instance);
+			this.testingPanel.testGestureInstance(instance, recordedGestureInstance.getEntity() == Entity.RINGMASTER_ENTITY);
 		}
 		
 		this.recordingPanel.setRecordMode(false);
