@@ -435,7 +435,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 							continue;
 						}
 						
-						if (subdirChild.getName().contains(gesture.toString())) {
+						if (subdirChild.getName().contains(gesture.toString()) || gesture.getIsRingmasterGesture()) {
 							result.add(subdirChild);
 						}
 					}

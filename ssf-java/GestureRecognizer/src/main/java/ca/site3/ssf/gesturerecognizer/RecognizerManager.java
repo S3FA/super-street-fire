@@ -24,8 +24,11 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
  */
 class RecognizerManager {
 	
-	static final int NUM_ONE_HANDED_NODES = 6;
-	static final int NUM_TWO_HANDED_NODES = 9;
+	static final int NUM_ONE_HANDED_PLAYER_GESTURE_NODES = 6;
+	static final int NUM_TWO_HANDED_PLAYER_GESTURE_NODES = 9;
+	
+	static final int NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES = 5;
+	static final int NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES = 8;
 	
 	private final static double SPECIAL_EASTEREGG_PROB_COMPARISON_THRESHOLD = 10;
 	private final static double BASIC_SPECIAL_PROB_COMPARISON_THRESHOLD     = 10;
