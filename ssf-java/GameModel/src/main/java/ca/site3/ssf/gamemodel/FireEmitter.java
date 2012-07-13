@@ -115,9 +115,12 @@ public class FireEmitter {
 	void setIntensity(Action action, float intensity) {
 		FireEmitterContributor fireEmitterContrib = this.contributors.get(action.getContributorEntity());
 		assert(fireEmitterContrib != null);
-		fireEmitterContrib.setIntensity(action, intensity);
 		
-		this.hasFiredLastestChangeEvent = false;
+		// Only change and updated it if the intensity has changed!
+		if (fireEmitterContrib.getIntensity(action) != intensity) {
+			fireEmitterContrib.setIntensity(action, intensity);
+			this.hasFiredLastestChangeEvent = false;
+		}
 	}
 	
 	/**
