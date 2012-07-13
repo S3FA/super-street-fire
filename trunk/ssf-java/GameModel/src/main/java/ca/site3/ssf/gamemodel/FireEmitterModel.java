@@ -18,7 +18,6 @@ class FireEmitterModel {
 	final static int RINGMASTER_9OCLOCK_OUTER_RING_CLOSE_EMITTER  = 8;
 	final static int RINGMASTER_9OCLOCK_OUTER_RING_FAR_EMITTER    = 7;
 	
-	
 	final private FireEmitterConfig config;
 	
 	private GameModelActionSignaller actionSignaller = null;
@@ -208,23 +207,32 @@ class FireEmitterModel {
 	 * assumed to be "behind and to the right" of the player.
 	 * @return The index of the appropriate outer ring emitter.
 	 */
-	int getSemanticOuterRingEmitterIndex(int playerNum, boolean behindAndToTheLeft) {
+	int getSemanticOuterRingEmitterIndex(int playerNum, boolean behindAndToTheLeft, int distanceAway) {
+		int idx = 0;
 		if (playerNum == 1) {
 			if (behindAndToTheLeft) {
-				return this.outerRingEmitters.size();
+				idx = this.outerRingEmitters.size() - distanceAway;
 			}
 			else {
-				return 0;
+				idx = distanceAway;
 			}
 		}
 		else {
 			if (behindAndToTheLeft) {
-				return this.outerRingEmitters.size() / 2 - 1;
+				idx = this.outerRingEmitters.size() / 2 - 1 - distanceAway;
 			}
 			else {
-				return (this.outerRingEmitters.size() / 2);
+				idx = (this.outerRingEmitters.size() / 2) + distanceAway;
 			}
 		}
+		
+		if (idx > this.outerRingEmitters.size()) {
+			return idx % this.outerRingEmitters.size();
+		}
+		while (idx < 0) {
+			idx += this.outerRingEmitters.size();
+		}
+		return idx;
 	}
 	
 	int getRandomOneSidedOuterRingEmitterIndex(int playerNum, boolean leftSide) {
