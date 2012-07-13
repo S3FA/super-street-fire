@@ -96,7 +96,7 @@ class Player {
 		this.health = Math.min(Player.FULL_HEALTH, health);
 		
 		// If the health actually changed then trigger an event to indicate the change to all gamemodel listeners
-		if (this.health != healthBefore) {
+		if (Math.floor(this.health) != Math.floor(healthBefore)) {
 			this.actionSignaller.fireOnPlayerHealthChanged(this.playerNum, healthBefore, this.health);
 		}
 	}
