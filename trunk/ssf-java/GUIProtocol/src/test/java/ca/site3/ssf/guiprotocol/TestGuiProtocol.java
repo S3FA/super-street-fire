@@ -1,6 +1,7 @@
 package ca.site3.ssf.guiprotocol;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -14,9 +15,9 @@ import org.junit.Test;
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
-import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 
@@ -37,8 +38,8 @@ public class TestGuiProtocol {
 		
 		IGameModel game = new GameModel(new GameConfig(true,3,60,3,0.1f));
 		Queue<AbstractGameModelCommand> commandQueue = new LinkedList<AbstractGameModelCommand>();
-		
-		StreetFireServer server = new StreetFireServer(port, game.getActionFactory(), commandQueue);
+		Queue<SystemCommand> systemCommandQueue = new LinkedList<SystemCommand>();
+		StreetFireServer server = new StreetFireServer(port, game.getActionFactory(), commandQueue, null);
 		Thread serverThread = new Thread(server);
 		serverThread.start();
 		try { Thread.sleep(500); } catch (InterruptedException ex) { ex.printStackTrace(); }

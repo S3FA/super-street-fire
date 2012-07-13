@@ -26,13 +26,13 @@ import ca.site3.ssf.gamemodel.ExecutePlayerActionCommand;
 import ca.site3.ssf.gamemodel.ExecuteRingmasterActionCommand;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
+import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
-import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
@@ -42,6 +42,7 @@ import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.TogglePauseGameCommand;
 import ca.site3.ssf.gamemodel.TouchFireEmitterCommand;
 import ca.site3.ssf.gamemodel.UnrecognizedGestureEvent;
@@ -50,6 +51,7 @@ import ca.site3.ssf.guiprotocol.Event.GameEvent.EventType;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.CommandType;
+import ca.site3.ssf.guiprotocol.SystemCommand.SystemCommandType;
 
 /**
  * Accepts connections from a {@link StreetFireGuiClient} and handles
@@ -75,7 +77,9 @@ public class StreetFireServer implements Runnable {
 	
 	private ServerSocket socket;
 	
-	private Queue<AbstractGameModelCommand> commandQueue;
+	private Queue<AbstractGameModelCommand> gameCommandQueue;
+	
+	private Queue<SystemCommand> systemCommandQueue;
 	
 	private BlockingQueue<GameEvent> eventQueue = new LinkedBlockingQueue<Event.GameEvent>();
 	
@@ -87,10 +91,11 @@ public class StreetFireServer implements Runnable {
 	
 	
 	
-	public StreetFireServer(int port, ActionFactory actionFactory, Queue<AbstractGameModelCommand> commandQueue) {
+	public StreetFireServer(int port, ActionFactory actionFactory, Queue<AbstractGameModelCommand> gameQueue, Queue<SystemCommand> systemQueue) {
 		this.port = port;
 		this.actionFactory = actionFactory;
-		this.commandQueue = commandQueue;
+		this.gameCommandQueue = gameQueue;
+		this.systemCommandQueue = systemQueue;
 	}
 	
 
@@ -286,6 +291,12 @@ public class StreetFireServer implements Runnable {
 			break;
 		}
 		
+		case SYSTEM_INFO_REFRESH: {
+			SystemInfoRefreshEvent e = (SystemInfoRefreshEvent)evt;
+			b.setType(EventType.SYSTEM_INFO_REFRESH)
+				.addAllBoardStatus(SerializationHelper.boardInfoToProtobuf(e));
+			break;
+		}
 		default:
 			throw new IllegalArgumentException("Unknown game event type: "+evt.getType());
 		}
@@ -326,15 +337,13 @@ public class StreetFireServer implements Runnable {
 
 					if (cmd != null) {
 						if (cmd.getType() == CommandType.QUERY_SYSTEM_INFO) {
-							// The query system info command is special - we need to poll the wifire boards for
-							// their information and then eventually return the info back to the clients...
-							
+							systemCommandQueue.add(new SystemCommand(SystemCommandType.QUERY_SYSTEM_INFO));
 						}
 						else {
 						
 							AbstractGameModelCommand gameCmd = parseCommand(cmd); 
 							if (gameCmd != null) {
-								commandQueue.add(gameCmd);
+								gameCommandQueue.add(gameCmd);
 							}
 						}
 					}

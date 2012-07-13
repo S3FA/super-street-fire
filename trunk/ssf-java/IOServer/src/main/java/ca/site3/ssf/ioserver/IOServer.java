@@ -26,6 +26,8 @@ import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
+import ca.site3.ssf.guiprotocol.SystemCommand;
+import ca.site3.ssf.guiprotocol.SystemCommand.SystemCommandType;
 import ch.qos.logback.classic.Level;
 
 import com.beust.jcommander.JCommander;
@@ -71,6 +73,8 @@ public class IOServer {
 	
 	private HeartbeatListener heartbeatListener;
 	
+	private SerialCommunicator serialComm;
+	
 	
 	public IOServer(CommandLineArgs args) {
 		this.args = args;
@@ -97,7 +101,7 @@ public class IOServer {
 		Thread heartbeatListenerThread = new Thread(heartbeatListener, "Glove heartbeat listener thread");
 		heartbeatListenerThread.start();
 		
-		StreetFireServer guiServer = new StreetFireServer(args.guiPort, game.getActionFactory(), commManager.getCommandQueue());
+		StreetFireServer guiServer = new StreetFireServer(args.guiPort, game.getActionFactory(), commManager.getGameCommandQueue(), commManager.getSystemCommandQueue());
 		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
 		guiServerThread.start();
 		
@@ -121,7 +125,7 @@ public class IOServer {
 			serialIn = new InputStream() { public @Override int read() throws IOException { return 0; } }; // /dev/null
 		}
 		
-		SerialCommunicator serialComm = new SerialCommunicator(serialIn, serialOut);
+		serialComm = new SerialCommunicator(serialIn, serialOut, guiServer);
 		Thread serialCommThread = new Thread(serialComm, "Serial communications thread");
 		serialCommThread.start();
 		
@@ -152,6 +156,8 @@ public class IOServer {
 		isStopped = false;
 		runLoop();
 		log.info("I/O server terminating");
+		commManager.shutdown();
+		serialComm.stop();
 		
 		closeSerialDevice();
 		
@@ -169,7 +175,7 @@ public class IOServer {
 	}
 	
 	public Queue<AbstractGameModelCommand> getCommandQueue() {
-		return commManager.getCommandQueue();
+		return commManager.getGameCommandQueue();
 	}
 	
 	
@@ -196,12 +202,18 @@ public class IOServer {
 			//millisSinceStart = currentTime - startTime;
 			
 			// Go through our various queues of data that has been aggregated and concentrated from
-			// the various clients of the IOServer, execute that data on the GameModel
+			// the various clients of the IOServer, execute that data on the system and GameModel
 			
-			// Commands to the GameModel
-			while (!commManager.getCommandQueue().isEmpty() ) {
-				game.executeCommand(commManager.getCommandQueue().remove());
+			while (!commManager.getSystemCommandQueue().isEmpty() ) {
+				SystemCommand cmd = commManager.getSystemCommandQueue().remove();
+				if (cmd.getType() == SystemCommandType.QUERY_SYSTEM_INFO) {
+					serialComm.querySystemStatus();
+				}
 			}
+			while (!commManager.getGameCommandQueue().isEmpty() ) {
+				game.executeCommand(commManager.getGameCommandQueue().remove());
+			}
+			
 			
 			// Recognize gestures and execute any recognized gestures on the GameModel
 			while (!commManager.getGestureQueue().isEmpty()) {

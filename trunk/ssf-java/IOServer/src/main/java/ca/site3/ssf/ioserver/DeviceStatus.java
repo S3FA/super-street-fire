@@ -15,7 +15,9 @@ import ca.site3.ssf.ioserver.DeviceConstants.Device;
 
 /**
  * Model for storing information about all connected devices.
- * Currently no listener interface; clients must poll for changes.
+ * This means things like gloves and headsets (wireless).
+ * 
+ * For info about wifire board status, see {@link PeripheralStatus}.
  * 
  * @author greg
  */

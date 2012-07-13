@@ -113,6 +113,13 @@ message GameEvent {
      required float intensityPlayer2 = 5;
   }
   
+  // status updates from serial boards
+  message BoardStatus {
+  	required int32 deviceId = 1;
+  	required bool responding = 2;
+  	required bool armed = 3;
+  	required bool flame = 4;
+  }
   
   // lets deserializer know which fields to look for
   required EventType type = 1;
@@ -159,6 +166,10 @@ message GameEvent {
   optional float player1Health       = 18;
   optional float player2Health       = 19;
   optional int32 roundInPlayTimer    = 20;
+  
+  // SystemInfoRefreshEvent -- a list of device IDs that responded to status query
+  repeated BoardStatus boardStatus = 21;
+  
   
   optional bool player1UnlimitedMovesOn = 22;
   optional bool player2UnlimitedMovesOn = 23;

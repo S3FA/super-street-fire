@@ -9,14 +9,17 @@ import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
-import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
+import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent.OutputDeviceStatus;
+import ca.site3.ssf.guiprotocol.Common.Player;
 import ca.site3.ssf.guiprotocol.Event.GameEvent;
+import ca.site3.ssf.guiprotocol.Event.GameEvent.BoardStatus;
 import ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.FireEmitterType;
-import ca.site3.ssf.guiprotocol.Common.Player;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.PlayerAction;
 import ca.site3.ssf.guiprotocol.GuiCommand.Command.RingmasterAction;
 
@@ -649,4 +652,64 @@ class SerializationHelper {
 		}
 	}
 	
+	
+	static Iterable<BoardStatus> boardInfoToProtobuf(SystemInfoRefreshEvent e) {
+		List<BoardStatus> statuses = new ArrayList<Event.GameEvent.BoardStatus>(32);
+		
+		// left rail
+		int i;
+		for (i=0; i<8; i++) {
+			OutputDeviceStatus s = e.getDeviceStatus(Location.LEFT_RAIL, i);
+			BoardStatus.Builder b = BoardStatus.newBuilder();
+			b.setDeviceId(i)
+				.setResponding(s.isResponding)	
+				.setArmed(s.isArmed)
+				.setFlame(s.isFlame);
+			statuses.add(b.build());
+		}
+		// right rail
+		for (i=8; i<16; i++) {
+			OutputDeviceStatus s = e.getDeviceStatus(Location.RIGHT_RAIL, i-8);
+			BoardStatus.Builder b = BoardStatus.newBuilder();
+			b.setDeviceId(i)
+				.setResponding(s.isResponding)	
+				.setArmed(s.isArmed)
+				.setFlame(s.isFlame);
+			statuses.add(b.build());
+		}
+		// outer ring
+		for (i=16; i<32; i++) {
+			OutputDeviceStatus s = e.getDeviceStatus(Location.OUTER_RING, i-16);
+			BoardStatus.Builder b = BoardStatus.newBuilder();
+			b.setDeviceId(i)
+				.setResponding(s.isResponding)	
+				.setArmed(s.isArmed)
+				.setFlame(s.isFlame);
+			statuses.add(b.build());
+		}
+		
+		return statuses;
+	}
+	
+	
+	static SystemInfoRefreshEvent protobufToBoardInfo(Iterable<BoardStatus> statuses) {
+		
+		OutputDeviceStatus[] leftRail = new OutputDeviceStatus[8];
+		OutputDeviceStatus[] rightRail = new OutputDeviceStatus[8];
+		OutputDeviceStatus[] outerRing = new OutputDeviceStatus[16];
+		
+		int i=0;
+		for (BoardStatus s : statuses) {
+			if (i < 8) {
+				leftRail[i] = new OutputDeviceStatus(i, s.getResponding(), s.getArmed(), s.getFlame());
+			} else if (i < 16) {
+				rightRail[i-8] = new OutputDeviceStatus(i, s.getResponding(), s.getArmed(), s.getFlame());
+			} else {
+				outerRing[i-16] = new OutputDeviceStatus(i, s.getResponding(), s.getArmed(), s.getFlame());
+			}
+			i++;
+		}
+		
+		return new SystemInfoRefreshEvent(leftRail, rightRail, outerRing);
+	}
 }
