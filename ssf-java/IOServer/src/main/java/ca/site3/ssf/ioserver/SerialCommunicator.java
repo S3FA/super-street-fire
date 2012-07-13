@@ -1,19 +1,21 @@
 package ca.site3.ssf.ioserver;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent.OutputDeviceStatus;
+import ca.site3.ssf.guiprotocol.StreetFireServer;
 
 /**
  * Contains logic for converting game event data to the format expected by the
@@ -25,30 +27,28 @@ import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent.OutputDeviceStatus;
  */
 public class SerialCommunicator implements Runnable {
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+	
 	private static final byte[] STOP_SENTINEL = new byte[] { (byte)0 };
 	private static final byte[] QUERY_SYSTEM_SENTINEL = new byte[] { (byte)'?' };
 	
 	
-	private Logger log = LoggerFactory.getLogger(getClass());
-	
-	private volatile boolean shouldStop = false;
-	
 	private OutputDeviceStatus[] systemStatus = null;
 	
 	private BufferedOutputStream out;
-	private BufferedInputStream in;
-	
-//	private OutputStream out;
-//	private InputStream in;
 	
 	private BlockingQueue<byte[]> messageQueue = new LinkedBlockingQueue<byte[]>();
 	
+	private SerialDataReader reader;
 	
-	public SerialCommunicator(InputStream serialIn, OutputStream serialOut) {
-		this.in = new BufferedInputStream(serialIn);
+	/** not ideal that this is here. used to fire system info refresh event to GUIs */
+	private StreetFireServer server;
+	
+	
+	public SerialCommunicator(InputStream serialIn, OutputStream serialOut, StreetFireServer guiOut) {
+		this.reader = new SerialDataReader(serialIn);
 		this.out = new BufferedOutputStream(serialOut);
-//		this.in = serialIn;
-//		this.out = serialOut;
+		this.server = guiOut;
 	}
 	
 	/**
@@ -61,7 +61,10 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	public void run() {
-		while ( ! shouldStop ) {
+		Thread inThread = new Thread(reader, "Serial input reader");
+		inThread.start();
+		
+		while ( true ) {
 			try {
 				byte[] message = messageQueue.take();
 				if (message.equals(STOP_SENTINEL)) {
@@ -73,7 +76,7 @@ public class SerialCommunicator implements Runnable {
 				} else {
 					this.out.write(message);
 					this.out.flush();
-					// log.debug("wrote message: {}", bytesToHexString(message));
+//					 log.debug("wrote message: {}", bytesToHexString(message));
 				}
 			} catch (IOException ex) {
 				log.error("Error writing to serial device",ex);
@@ -81,10 +84,12 @@ public class SerialCommunicator implements Runnable {
 				log.warn("Interrupted trying to get message from queue",ex);
 			}
 		}
+		reader.stop();
 	}
 
 	
 	final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+	@SuppressWarnings("unused")
 	private String bytesToHexString(byte[] bytes) {
 	    char[] hexChars = new char[bytes.length * 2];
 	    int v;
@@ -124,40 +129,27 @@ public class SerialCommunicator implements Runnable {
 		 * 
 		 * i'm not sure my sure this mapping is correct but the way this is currently implemented is:
 		 * 
-		 * effect output 1 -> player 1 colour
-		 * effect output 2 -> player 2 colour
-		 * effect output 3 -> both players colour
-		 * effect output 4 -> ringmaster colour
+		 * effect output 1 -> fire!
+		 * effect output 2 -> player 1 colour
+		 * effect output 3 -> player 2 colour
+		 * effect output 4 -> currently unused
 		 */
 		
 		// corresponds to effect outputs '1' to '4' (i _think_ this is meant to be ASCII)
 		byte[] commands = new byte[] { (byte)49,(byte)50,(byte)51,(byte)52 }; 
-		byte[] values = new byte[4]; // the values for the commands
+		byte[] values = new byte[] { 0, 0, 0, 0 }; // the values for the commands
 		
-		if (event.getContributingEntities().size() > 1) {
-			// multiple contributing entities must be P1 and P2 (i think)  so turn off other effect heads 
-			values[0] = 0; // (byte)(100 * event.getIntensity(Entity.PLAYER1_ENTITY);
-			values[1] = 0; // (byte)(100 * event.getIntensity(Entity.PLAYER2_ENTITY);
-			values[2] = (byte)(100 * event.getMaxIntensity()); // other option to sum P1 and P2 intensities
-			values[3] = 0; // ringmaster
-		} else if (event.getContributingEntities().contains(Entity.PLAYER1_ENTITY)) {
-			values[0] = 0;
-			values[1] = (byte) (100 * event.getIntensity(Entity.PLAYER1_ENTITY));
-			values[2] = 0;
-			values[3] = 0;
-		} else if (event.getContributingEntities().contains(Entity.PLAYER2_ENTITY)) {
-			values[0] = 0;
-			values[1] = 0;
-			values[2] = (byte) (100 * event.getIntensity(Entity.PLAYER2_ENTITY));
-			values[3] = 0;
-		} else if (event.getContributingEntities().contains(Entity.RINGMASTER_ENTITY)) {
-			values[0] = 0;
-			values[1] = 0;
-			values[2] = 0;
-			values[3] = (byte) (100 * event.getIntensity(Entity.RINGMASTER_ENTITY));
-		} else {
-			values[0] = values[1] = values[2] = values[3] = 0;
+		if (event.getContributingEntities().size() > 0) {
+			values[0] = (byte)(100 * event.getMaxIntensity()); // other option is to sum intensities
+			
+			if (event.getContributingEntities().contains(Entity.PLAYER1_ENTITY)) {
+				values[1] = (byte) (100 * event.getIntensity(Entity.PLAYER1_ENTITY));
+			}
+			if (event.getContributingEntities().contains(Entity.PLAYER2_ENTITY)) {
+				values[2] = (byte) (100 * event.getIntensity(Entity.PLAYER2_ENTITY));
+			}
 		}
+		
 		
 		byte[] payload = new byte[9]; // 1 byte for dest node + 4*2 bytes command/values 
 		payload[0] = getHardwareIdFromEvent(event);
@@ -190,13 +182,20 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	/**
-	 * Queries each emitter sequentially for its status.
-	 * Note that this method gets called on the comm thread, so it
-	 * directly reads/writes the serial streams.
+	 * Queries each emitter sequentially for its status. Waits a bit
+	 * for a response then moves to the next if nothing after 100 ms.
+	 * 
+	 * This method gets called on the comm thread, so it
+	 * directly writes to the serial out stream.
 	 */
 	private void doSystemQuery() {
 		
+		log.info("Querying boards...");
+		
 		systemStatus = new OutputDeviceStatus[32]; // indexes are off-by-one compared to device IDs
+		for (int i=0; i<32; i++) {
+			systemStatus[i] = new OutputDeviceStatus(i, false, false, false);
+		}
 		
 		// sent out to each emitter in turn
 		byte[] messageTemplate = new byte[] { 
@@ -207,20 +206,59 @@ public class SerialCommunicator implements Runnable {
 			0 // checksum to be replaced within the loop
 		};
 		
-		byte[] buffer = new byte[6]; // used to read in responses
-		int len = -1;
 		
+		reader.clear();
 		for (int i=1; i<=32; i++) {
 			messageTemplate[3] = (byte)i;
 			messageTemplate[5] = (byte) ~(i + 63);
 			try {
 				this.out.write(messageTemplate);
 				this.out.flush();
+				try {
+					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(100, TimeUnit.MILLISECONDS);
+					if (status != null) {
+						systemStatus[status.deviceId - 1] = status;
+					}
+				} catch (InterruptedException ex) {
+					log.warn("Interrupted while waiting for device status",ex);
+				}
+				
 			} catch (IOException ex) {
 				log.error("Error reading or writing status query for node", ex);
-				systemStatus[i-1] = new OutputDeviceStatus(false, false, false);
 			}
 		}
+		
+		
+		/*
+		 * Convert from device ID to GameModel. Inverse of getHardwareIdFromEvent
+		 */
+		OutputDeviceStatus[] leftRailStatus = new OutputDeviceStatus[8];
+		for (int i=0; i<8; i++) {
+			leftRailStatus[i] = systemStatus[8+i];
+		}
+		OutputDeviceStatus[] rightRailStatus = new OutputDeviceStatus[8];
+		for (int i=0; i<8; i++) {
+			rightRailStatus[i] = systemStatus[i];
+		}
+		OutputDeviceStatus[] outerRingStatus = new OutputDeviceStatus[16];
+		for (int i=0; i<8; i++) {
+			outerRingStatus[i] = systemStatus[16+i];
+		}
+		for (int i=8; i<16; i++) {
+			outerRingStatus[i] = systemStatus[31-(i-8)];
+		}
+		
+		/*
+		 * The organization of this code is not ideal. For convenience,
+		 * SystemInfoRefreshEvent implements IGameModelEvent even though it
+		 * doesn't originate from the GameModel. I'm leaving it that way for
+		 * now because I can't bear the thought of adding yet another queue
+		 * somewhere. Only the GUIs get notified of this, not any other
+		 * IGameModelListeners
+		 */
+		SystemInfoRefreshEvent refreshEvent = new SystemInfoRefreshEvent(leftRailStatus, rightRailStatus, outerRingStatus);
+		log.debug("Notifying GUI of system status");
+		server.notifyGUI(refreshEvent);
 	}
 	
 	
@@ -280,7 +318,7 @@ public class SerialCommunicator implements Runnable {
 	 * @param e
 	 * @return
 	 */
-	private byte getHardwareIdFromEvent(FireEmitterChangedEvent e) {
+	private static byte getHardwareIdFromEvent(FireEmitterChangedEvent e) {
 		
 		switch (e.getLocation()) {
 		case RIGHT_RAIL:
@@ -300,6 +338,8 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	
+	
+	
 	/**
 	 * The checksum is one byte and computed by summing each of the payload bytes, 
 	 * then taking the one's complement of the sum.
@@ -317,7 +357,7 @@ public class SerialCommunicator implements Runnable {
 		for (byte b : payload) {
 			sum += b; // seems likely that this will roll over
 		}
-		return (byte) ~sum; // tilde operator flips each bit (aka 1's complement)
+		return (byte) ~sum; // tilde operator flips each bit (aka 1's complement) 
 	}
 	
 	

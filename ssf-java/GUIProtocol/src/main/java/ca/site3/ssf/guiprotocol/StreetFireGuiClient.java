@@ -337,8 +337,7 @@ public class StreetFireGuiClient {
 				e.getRoundInPlayTimer(), e.getTimedOut());
 		
 		case SYSTEM_INFO_REFRESH:
-			// TODO
-			return null;
+			return SerializationHelper.protobufToBoardInfo(e.getBoardStatusList());
 			
 		case FIRE_EMITTER_CHANGED:
 			return new FireEmitterChangedEvent(createFireEmitter(e));

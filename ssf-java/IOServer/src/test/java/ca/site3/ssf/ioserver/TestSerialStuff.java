@@ -150,7 +150,7 @@ public class TestSerialStuff {
 			ex.printStackTrace();
 		}
 		
-		SerialCommunicator sc = new SerialCommunicator(in, out);
+		SerialCommunicator sc = new SerialCommunicator(in, out, null);
 		
 		Thread commThread = new Thread(sc);
 		commThread.start();

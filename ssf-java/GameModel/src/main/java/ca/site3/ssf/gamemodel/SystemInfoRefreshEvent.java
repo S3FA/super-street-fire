@@ -19,10 +19,13 @@ public class SystemInfoRefreshEvent implements IGameModelEvent {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	public static class OutputDeviceStatus {
+		/** deviceId from <em>hardware</em>, doesn't correspond to GameModel index/ID */
+		public final int deviceId;
 		public final boolean isResponding;
 		public final boolean isArmed;
 		public final boolean isFlame;
-		public OutputDeviceStatus(boolean isResponding, boolean isArmed, boolean isFlame) {
+		public OutputDeviceStatus(int deviceId, boolean isResponding, boolean isArmed, boolean isFlame) {
+			this.deviceId = deviceId;
 			this.isResponding = isResponding;
 			this.isArmed = isArmed;
 			this.isFlame = isFlame;
