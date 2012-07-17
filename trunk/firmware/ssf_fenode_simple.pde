@@ -8,7 +8,7 @@
 #define RE 8
 #define IRLED 14
 
-#define NODE 1
+#define NODE 0x20
 #define BROADCAST 0xFF
 #define FRAME 0xAA
 
@@ -220,6 +220,7 @@ void loop() {
                     digitalWrite(DE, LOW);
                     digitalWrite(RE, LOW);
                   }
+   
                 }  
               }
             }
