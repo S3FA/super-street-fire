@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.common.CommUtil;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
@@ -76,7 +77,7 @@ public class SerialCommunicator implements Runnable {
 				} else {
 					this.out.write(message);
 					this.out.flush();
-//					 log.debug("wrote message: {}", bytesToHexString(message));
+//					log.debug("wrote message: {}", CommUtil.bytesToHexString(message));
 				}
 			} catch (IOException ex) {
 				log.error("Error writing to serial device",ex);
@@ -86,20 +87,7 @@ public class SerialCommunicator implements Runnable {
 		}
 		reader.stop();
 	}
-
 	
-	final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-	@SuppressWarnings("unused")
-	private String bytesToHexString(byte[] bytes) {
-	    char[] hexChars = new char[bytes.length * 2];
-	    int v;
-	    for ( int j = 0; j < bytes.length; j++ ) {
-	        v = bytes[j] & 0xFF;
-	        hexChars[j * 2] = hexArray[v >>> 4];
-	        hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-	    }
-	    return new String(hexChars);
-	}
 	
 
 	/**
@@ -215,7 +203,7 @@ public class SerialCommunicator implements Runnable {
 				this.out.write(messageTemplate);
 				this.out.flush();
 				try {
-					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(100, TimeUnit.MILLISECONDS);
+					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(500, TimeUnit.MILLISECONDS);
 					if (status != null) {
 						systemStatus[status.deviceId - 1] = status;
 					}
@@ -347,7 +335,7 @@ public class SerialCommunicator implements Runnable {
 	 * @param payload
 	 * @return
 	 */
-	private byte getChecksum(byte[] payload) {
+	static byte getChecksum(byte[] payload) {
 		/*
 		 *  Note: bytes are signed in Java and represented as 2's complement.
 		 *  We'll sum with a byte and let it roll over (could also use an int and 
@@ -369,5 +357,12 @@ public class SerialCommunicator implements Runnable {
 		if (messageQueue.offer(message) == false) {
 			log.warn("No room on queue for serial message");
 		}
+	}
+	
+	
+	public static void main(String... args) {
+		byte[] payload = new byte[] {(byte)0x00, (byte)0x20, (byte)0x53, (byte)0x31, (byte)0x46 };
+		byte checksum = getChecksum(payload);
+		System.out.println("checksum for "+CommUtil.bytesToHexString(payload)+" = "+ checksum);
 	}
 }
