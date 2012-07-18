@@ -20,7 +20,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.io.File;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.EnumSet;
 
@@ -65,12 +65,13 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	final static Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
 	final static Color RINGMASTER_COLOUR = Color.orange;
 	
-	// Colours used to indicate status of emitters
-	final static Color DEVICE_UNKNOWN_STATUS_COLOUR = Color.BLACK;
-	final static Color DEVICE_RESPONDING_COLOUR = Color.GREEN;
-	final static Color DEVICE_ARMED_COLOUR = Color.MAGENTA;
-	final static Color DEVICE_FLAME_COLOUR = Color.ORANGE;
-	final static Color DEVICE_NOT_RESPONDING_COLOUR = Color.RED;
+	// Emitter status indicators
+	BufferedImage DEVICE_UNKNOWN_STATUS_IMAGE;
+	BufferedImage DEVICE_NOT_RESPONDING_IMAGE;
+	BufferedImage DEVICE_RESPONDING_IMAGE;
+	BufferedImage DEVICE_ARMED_IMAGE;
+	BufferedImage DEVICE_FLAME_IMAGE;
+	
 	
 	final private FireEmitterConfig fireEmitterConfig;
 	
@@ -119,9 +120,18 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		
 		
 		try {
-			this.ssfImage = ImageIO.read(new File(this.getClass().getResource("/ssfsmall.jpg").getFile()));
+			this.ssfImage = ImageIO.read(getClass().getResource("ssfsmall.jpg"));
+			
+			DEVICE_UNKNOWN_STATUS_IMAGE = ImageIO.read(getClass().getResource("flame_question_mark_12px.png"));
+			DEVICE_NOT_RESPONDING_IMAGE = ImageIO.read(getClass().getResource("flame_greyscale_12px.png"));
+			DEVICE_RESPONDING_IMAGE = ImageIO.read(getClass().getResource("flame_sepia_12px.png"));
+			DEVICE_ARMED_IMAGE = ImageIO.read(getClass().getResource("flame_12px.png"));
+			DEVICE_FLAME_IMAGE = ImageIO.read(getClass().getResource("flame_on_12px.png"));
+			
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("Couldn't load image", e);
+		} catch (IllegalArgumentException e) {
+			log.error("Couldn't load image", e);
 		}
 		
 		assert(client != null);
@@ -233,11 +243,20 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			
 			String leftEmitterPercentStr = "" + (int)(this.leftRailEmitterData[i].maxIntensity * 100) + "%";
 			String rightEmitterPercentStr = "" + (int)(this.rightRailEmitterData[i].maxIntensity * 100) + "%";
-			g2.setPaint(getStatusColorForEmitter(Location.LEFT_RAIL, i));
 			g2.drawString(leftEmitterPercentStr, leftRailEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(leftEmitterPercentStr),
 					leftRailEmitterPos.y + EMITTER_RADIUS);
-			g2.setPaint(getStatusColorForEmitter(Location.RIGHT_RAIL, i));
 			g2.drawString(rightEmitterPercentStr, rightRailEmitterPos.x + EMITTER_DIAMETER + 2, rightRailEmitterPos.y + EMITTER_RADIUS);
+			
+			g2.drawImage(getIconForEmitter(Location.LEFT_RAIL, i), 
+					(int)leftRailEmitterPos.x - 2 - DEVICE_FLAME_IMAGE.getWidth(), 
+					(int)leftRailEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
+					
+					null);
+			g2.drawImage(getIconForEmitter(Location.RIGHT_RAIL, i), 
+					(int)(rightRailEmitterPos.x + EMITTER_DIAMETER) + 2, 
+					(int)rightRailEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
+					null);
+			
 			
 			g2.setPaint(Color.black);
 			currPosition -= (EMITTER_DIAMETER + DISTANCE_BETWEEN_RAIL_EMITTERS);
@@ -282,6 +301,11 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			g2.drawString("" + (int)(this.outerRingEmitterData[i].maxIntensity * 100) + "%",
 					outerRingEmitterPos.x + EMITTER_DIAMETER + 2, outerRingEmitterPos.y + EMITTER_RADIUS);
 			
+			g2.drawImage(getIconForEmitter(Location.OUTER_RING, i), 
+					(int)(outerRingEmitterPos.x + EMITTER_DIAMETER) + 2, 
+					(int)outerRingEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
+					null);
+			
 			currAngle += INCREMENT_ANGLE;
 		}
 
@@ -305,6 +329,11 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			String emitterPercentStr = "" + (int)(this.outerRingEmitterData[i].maxIntensity * 100) + "%";
 			g2.drawString(emitterPercentStr, outerRingEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(emitterPercentStr),
 					outerRingEmitterPos.y + EMITTER_RADIUS);
+			
+			g2.drawImage(getIconForEmitter(Location.OUTER_RING, i), 
+					(int)outerRingEmitterPos.x - 2 - DEVICE_FLAME_IMAGE.getWidth(), 
+					(int)outerRingEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
+					null);
 			
 			currAngle += INCREMENT_ANGLE;
 		}
@@ -513,24 +542,24 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	}
 
 	
-	private Color getStatusColorForEmitter(Location location, int index) {
+	private Image getIconForEmitter(Location location, int index) {
 		if (latestSystemStatus == null) {
-			return DEVICE_UNKNOWN_STATUS_COLOUR;
+			return DEVICE_UNKNOWN_STATUS_IMAGE;
 		}
 		try {
 			OutputDeviceStatus status = latestSystemStatus.getDeviceStatus(location, index);
 			if (status.isFlame) {
-				return DEVICE_FLAME_COLOUR;
+				return DEVICE_FLAME_IMAGE;
 			} else if (status.isArmed) {
-				return DEVICE_ARMED_COLOUR;
+				return DEVICE_ARMED_IMAGE;
 			} else if (status.isResponding) {
-				return DEVICE_RESPONDING_COLOUR;
+				return DEVICE_RESPONDING_IMAGE;
 			} else {
-				return DEVICE_NOT_RESPONDING_COLOUR;
+				return DEVICE_NOT_RESPONDING_IMAGE;
 			}
 		} catch (IllegalArgumentException ex) {
 			log.error("Invalid location / index",ex);
-			return DEVICE_UNKNOWN_STATUS_COLOUR;
+			return DEVICE_UNKNOWN_STATUS_IMAGE;
 		}
 		
 	}
