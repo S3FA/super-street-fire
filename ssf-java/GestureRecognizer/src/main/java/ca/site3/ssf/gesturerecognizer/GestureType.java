@@ -54,15 +54,15 @@ public enum GestureType {
 	LEFT_VAFANAPOLI_ATTACK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, true, false, false, Arrays.asList("left_vafanapoli")),
 	RIGHT_VAFANAPOLI_ATTACK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, false, true, false, Arrays.asList("right_vafanapoli")),
 	
-	RINGMASTER_LEFT_HALF_RING(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HALF_RING_ACTION, GestureGenre.BASIC, 6200, 8, true, false, true, Arrays.asList("rm_left_half_rings")),
-	RINGMASTER_RIGHT_HALF_RING(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HALF_RING_ACTION, GestureGenre.BASIC, 6200, 8, false, true, true, Arrays.asList("rm_right_half_rings")),
-	RINGMASTER_LEFT_JAB(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_JAB_ACTION, GestureGenre.BASIC, 6200, 8, true, false, true, Arrays.asList("rm_left_jabs", "left_jabs")),
-	RINGMASTER_RIGHT_JAB(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_JAB_ACTION, GestureGenre.BASIC, 6200, 8, false, true, true, Arrays.asList("rm_right_jabs", "right_jabs")),
-	RINGMASTER_ERUPTION(RecognizerManager.NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_ERUPTION_ACTION, GestureGenre.BASIC, 6200, 8, true, true, true, Arrays.asList("rm_eruptions")),
-	RINGMASTER_LEFT_CIRCLE(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_CIRCLE_ACTION, GestureGenre.BASIC, 6200, 8, true, false, true, Arrays.asList("rm_left_circles")),
-	RINGMASTER_RIGHT_CIRCLE(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_CIRCLE_ACTION, GestureGenre.BASIC, 6200, 8, false, true, true, Arrays.asList("rm_right_circles")),
-	RINGMASTER_HADOUKEN(RecognizerManager.NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HADOUKEN_ACTION, GestureGenre.BASIC, 7000, 10, true, true, true, Arrays.asList("rm_hadoukens", "hadoukens")),
-	RINGMASTER_DRUM(RecognizerManager.NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_DRUM_ACTION, GestureGenre.BASIC, 7000, 10, true, true, true, Arrays.asList("rm_drums"));
+	RINGMASTER_LEFT_HALF_RING(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HALF_RING_ACTION, GestureGenre.BASIC, 9000, 7, true, false, true, Arrays.asList("rm_left_half_rings")),
+	RINGMASTER_RIGHT_HALF_RING(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HALF_RING_ACTION, GestureGenre.BASIC, 9000, 7, false, true, true, Arrays.asList("rm_right_half_rings")),
+	RINGMASTER_LEFT_JAB(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_JAB_ACTION, GestureGenre.BASIC, 9000, 7, true, false, true, Arrays.asList("rm_left_jabs", "left_jabs")),
+	RINGMASTER_RIGHT_JAB(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_JAB_ACTION, GestureGenre.BASIC, 9000, 7, false, true, true, Arrays.asList("rm_right_jabs", "right_jabs")),
+	RINGMASTER_ERUPTION(RecognizerManager.NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_ERUPTION_ACTION, GestureGenre.BASIC, 18000, 10, true, true, true, Arrays.asList("rm_eruptions")),
+	RINGMASTER_LEFT_CIRCLE(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_CIRCLE_ACTION, GestureGenre.BASIC, 18000, 15, true, false, true, Arrays.asList("rm_left_circles")),
+	RINGMASTER_RIGHT_CIRCLE(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_CIRCLE_ACTION, GestureGenre.BASIC, 18000, 15, false, true, true, Arrays.asList("rm_right_circles")),
+	RINGMASTER_HADOUKEN(RecognizerManager.NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HADOUKEN_ACTION, GestureGenre.BASIC, 12000, 10, true, true, true, Arrays.asList("rm_hadoukens", "hadoukens")),
+	RINGMASTER_DRUM(RecognizerManager.NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_DRUM_ACTION, GestureGenre.BASIC, 30000, 10, true, true, true, Arrays.asList("rm_drums"));
 	
 	final private ActionType actionFactoryType; // The corresponding gamemodel factory type for when
 													  // it comes time to build the gesture for the gamemodel
