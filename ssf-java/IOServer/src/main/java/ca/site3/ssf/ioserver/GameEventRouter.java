@@ -5,6 +5,8 @@ import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.IGameModelListener;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
 
 
@@ -43,9 +45,9 @@ public class GameEventRouter implements IGameModelListener {
 			serialComm.notifyFireEmitters((FireEmitterChangedEvent) event);
 		}
 		else if (event.getType() == Type.PLAYER_HEALTH_CHANGED) {
-			
+			serialComm.notifyTimerAndLifeBars((PlayerHealthChangedEvent) event);
 		} else if (event.getType() == Type.ROUND_PLAY_TIMER_CHANGED) {
-			
+			serialComm.notifyTimerAndLifeBars((RoundPlayTimerChangedEvent) event);
 		}
 	}
 }

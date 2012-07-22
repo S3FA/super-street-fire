@@ -11,9 +11,10 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.common.CommUtil;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent.OutputDeviceStatus;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
@@ -21,6 +22,10 @@ import ca.site3.ssf.guiprotocol.StreetFireServer;
 /**
  * Contains logic for converting game event data to the format expected by the
  * output hardware, and writes it out to the serial device.
+ * 
+ * It also caches the most recent health values for each player and the last
+ * timer value received in order to properly send out the messages to those
+ * boards.
  * 
  * Also stuff for sending query commands to the boards and awaiting their responses.
  * 
@@ -32,6 +37,32 @@ public class SerialCommunicator implements Runnable {
 	
 	private static final byte[] STOP_SENTINEL = new byte[] { (byte)0 };
 	private static final byte[] QUERY_SYSTEM_SENTINEL = new byte[] { (byte)'?' };
+	
+	/** 0 - 100 */
+	private short lastP1Health = 0;
+	/** 0 - 100 */
+	private short lastP2Health = 0;
+	private int lastTimerVal = 0;
+	
+	private static final int NUM_LIFE_BARS = 16;
+	private static final float LIFE_PER_BAR = 100f / NUM_LIFE_BARS;
+	
+	private int[] timerBoardIds = new int[] { 35, 36 };
+	
+	/**
+	 * <pre>
+	 *	   x0x          x8x
+	 *	 x     x      x     x
+	 *	 5     1      d     9
+	 *	 x     x      x     x
+	 *	   x6x          xex
+	 *	 x     x      x     x
+	 *	 4     2      c     a
+	 *	 x     x      x     x
+	 *	   x3x          xbx
+	 *	</pre>     
+	 */
+	private byte[] digitMap = new byte[] { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 	
 	
 	private OutputDeviceStatus[] systemStatus = null;
@@ -147,6 +178,12 @@ public class SerialCommunicator implements Runnable {
 			payload[effectOutputIndex*2 + 2] = values[effectOutputIndex];
 		}
 
+		enqueueMessage(getMessageForPayload(payload));
+	}
+	
+	
+	
+	private byte[] getMessageForPayload(byte[] payload) {
 		byte[] message = new byte[payload.length + 4];
 		message[0] = message[1] = (byte) 0xAA; // framing bytes
 		message[2] = (byte)payload.length;
@@ -154,9 +191,67 @@ public class SerialCommunicator implements Runnable {
 			message[i+3] = payload[i];
 		}
 		message[12] = getChecksum(payload);
-		enqueueMessage(message);
+		return message;
 	}
 	
+	
+	void notifyTimerAndLifeBars(PlayerHealthChangedEvent e) {
+		if (e.getPlayerNum() == 1) {
+			lastP1Health = (short)e.getNewLifePercentage();
+		} else if (e.getPlayerNum() == 2) {
+			lastP2Health = (short)e.getNewLifePercentage();
+		} else {
+			log.warn("Invalid player number: " + e.getPlayerNum());
+		}
+		notifyTimerAndLifeBars();
+	}
+	
+	
+	void notifyTimerAndLifeBars(RoundPlayTimerChangedEvent e) {
+		if (e.getTimeInSecs() < 0 || e.getTimeInSecs() > 99) {
+			log.warn("Unsupported timer value {}", e.getTimeInSecs());
+			return;
+		}
+		lastTimerVal = e.getTimeInSecs();
+		notifyTimerAndLifeBars();
+	}
+	
+	
+	/**
+	 * Sends values of {@link #lastP1Health}, {@link #lastP2Health}
+	 * and {@link #lastTimerVal} to the timer/life boards
+	 * 
+	 * <p>The payload format for the life bars and timer is:</p>
+	 * 		
+	 * <pre>[dest node] [2 bytes P1 life] [2 bytes P2 life] [2 bytes timer]</pre>
+	 */
+	private void notifyTimerAndLifeBars() {
+		for (int id : timerBoardIds) {
+			byte[] payload = new byte[7];
+			
+			// target board
+			payload[0] = (byte)id;
+			
+			populateLifeData(lastP1Health, payload, 1);
+			populateLifeData(lastP2Health, payload, 3);
+			payload[5] = digitMap[lastTimerVal / 10]; 
+			payload[6] = digitMap[lastTimerVal % 10];
+			
+			enqueueMessage(getMessageForPayload(payload));
+		}
+	}
+	
+	private void populateLifeData(short life, byte[] buffer, int offset) {
+		if (life == 100) {
+			buffer[offset] = buffer[offset+1] = (byte)0xFF;
+		} else if (life == 0) {
+			buffer[offset] = buffer[offset+1] = 0;
+		} else {
+			int bars = (1 << (int)(life / LIFE_PER_BAR) + 1) - 1;
+			buffer[offset] = (byte) ( (bars >> 8) & 0xFF);
+			buffer[offset+1] = (byte) (bars & 0xFF);
+		}
+	}
 	
 	/**
 	 * Sends out a query command to the devices one at a time.
@@ -203,7 +298,7 @@ public class SerialCommunicator implements Runnable {
 				this.out.write(messageTemplate);
 				this.out.flush();
 				try {
-					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(500, TimeUnit.MILLISECONDS);
+					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(20, TimeUnit.MILLISECONDS);
 					if (status != null) {
 						systemStatus[status.deviceId - 1] = status;
 					}
@@ -359,10 +454,4 @@ public class SerialCommunicator implements Runnable {
 		}
 	}
 	
-	
-	public static void main(String... args) {
-		byte[] payload = new byte[] {(byte)0x00, (byte)0x20, (byte)0x53, (byte)0x31, (byte)0x46 };
-		byte checksum = getChecksum(payload);
-		System.out.println("checksum for "+CommUtil.bytesToHexString(payload)+" = "+ checksum);
-	}
 }
