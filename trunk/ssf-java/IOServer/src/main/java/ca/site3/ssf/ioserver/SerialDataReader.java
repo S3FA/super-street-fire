@@ -58,7 +58,7 @@ public class SerialDataReader implements Runnable {
 					log.warn("End of serial data stream");
 					break;
 				}
-				log.debug("Read {} bytes of serial data: {}", len, CommUtil.bytesToHexString(buffer));
+//				log.debug("Read {} bytes of serial data: {}", len, CommUtil.bytesToHexString(buffer));
 				
 				int msgStart = -1;
 				for (int i=0; i<len; i++) {
@@ -107,7 +107,9 @@ public class SerialDataReader implements Runnable {
 		byte checksum = SerialCommunicator.getChecksum(payload);
 		int checksumIndex = offset+3+payloadLength;
 		if (checksum != (byte)message[checksumIndex]) {
-			log.warn("Invalid message checksum");
+			byte[] stuff = new byte[] { (byte)message[checksumIndex], (byte)checksumIndex, (byte)checksum };
+			System.out.println("message[checksumIndex] checksumIndex checksum" + CommUtil.bytesToHexString(stuff));
+			log.warn("Invalid message checksum. Received [checksum, index, calculated: {}", stuff); 
 			return false;
 		}
 		return true;
