@@ -73,7 +73,7 @@ public class IOServer {
 	
 	private HeartbeatListener heartbeatListener;
 	
-	private SerialCommunicator serialComm;
+	SerialCommunicator serialComm;
 	
 	
 	public IOServer(CommandLineArgs args) {
@@ -271,6 +271,7 @@ public class IOServer {
 	
 	public void stop() {
 		isStopped = true;
+		serialComm.ESTOP();
 		
 		/*
 		 *  give main thread time to clean up (this typically gets called on

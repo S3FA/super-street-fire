@@ -1,6 +1,9 @@
 package ca.site3.ssf.ioserver;
 
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
+import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
+import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
@@ -49,5 +52,23 @@ public class GameEventRouter implements IGameModelListener {
 		} else if (event.getType() == Type.ROUND_PLAY_TIMER_CHANGED) {
 			serialComm.notifyTimerAndLifeBars((RoundPlayTimerChangedEvent) event);
 		}
+		
+		else if (event.getType() == Type.GAME_STATE_CHANGED) {
+			GameStateChangedEvent e = (GameStateChangedEvent)event;
+			if (e.getNewState() == GameStateType.IDLE_STATE) {
+				serialComm.setGlowfliesOn(false);
+			} else {
+				serialComm.setGlowfliesOn(true);
+			}
+		}
+		else if (event.getType() == Type.GAME_INFO_REFRESH) {
+			GameInfoRefreshEvent e = (GameInfoRefreshEvent)event;
+			if (e.getCurrentGameState() == GameStateType.IDLE_STATE) {
+				serialComm.setGlowfliesOn(false);
+			} else {
+				serialComm.setGlowfliesOn(true);
+			}
+		}
+		
 	}
 }

@@ -53,6 +53,7 @@ import ca.site3.ssf.ioserver.DeviceConstants.Device;
 import ca.site3.ssf.ioserver.DeviceStatus;
 import ca.site3.ssf.ioserver.DeviceStatus.IDeviceStatusListener;
 import ca.site3.ssf.ioserver.IOServer;
+import ca.site3.ssf.ioserver.SerialTestWindow;
 import ch.qos.logback.classic.Level;
 
 import com.beust.jcommander.JCommander;
@@ -73,6 +74,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	private JMenu windowMenu = null;
 	private JMenuItem gloveInfoWindowMenuItem = null;
 	private JMenuItem customActionMenuItem = null;
+	private JMenuItem glowflyTestMenuItem = null;
 	
 	private JFrame gloveDataWindow = null;
 	private GloveDataInfoPanel p1LeftGloveInfoPanel  = null;
@@ -84,12 +86,14 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	
 	private JFrame customActionWindow = null;
 	private CustomActionPanel customActionPanel = null;
+	private SerialTestWindow glowflyTestWindow = null;
 	
 	private ArenaDisplay arenaDisplay = null;
 	private GameInfoPanel infoPanel   = null;
 	private ControlPanel controlPanel = null;
     private IGameModel gameModel      = null;	
     private IOServer ioserver         = null;
+    
     
     private final CommandLineArgs args;
     private StreetFireGuiClient client = null;
@@ -98,9 +102,12 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
     private Thread gameEventThread;
     
 	public DevGUIMainWindow(IOServer ioserver, CommandLineArgs args) {
+		
 		this.args = args;
 		this.ioserver = ioserver;
 		this.gameModel = ioserver.getGameModel();
+		
+		this.glowflyTestWindow = new SerialTestWindow(ioserver);
 	}
 	
 	private void getThisPartyStarted() {
@@ -127,7 +134,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.ioserver.getGameModel().addGameModelListener(soundPlayerController);
 		
 		// Setup the frame's basic characteristics...
-		this.setTitle("Super Street Fire (Developer GUI)");
+		this.setTitle("Super Street Fire (Developer GUI) - " + args.serialDevice);
 		this.setPreferredSize(new Dimension(1250, 750));
 		this.setMinimumSize(new Dimension(1250, 750));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -139,8 +146,13 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.gloveInfoWindowMenuItem.addActionListener(this);
 		this.customActionMenuItem = new JMenuItem("Action Prototyping");
 		this.customActionMenuItem.addActionListener(this);
+		this.glowflyTestMenuItem = new JMenuItem("Glowfly Test UI");
+		this.glowflyTestMenuItem.addActionListener(this);
+		
 		this.windowMenu.add(this.gloveInfoWindowMenuItem);
 		this.windowMenu.add(this.customActionMenuItem);
+		this.windowMenu.add(this.glowflyTestMenuItem);
+		
 		this.menuBar.add(this.windowMenu);
 		
 		this.setJMenuBar(this.menuBar);
@@ -449,6 +461,9 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		}
 		else if (event.getSource() == this.customActionMenuItem) {
 			this.customActionWindow.setVisible(true);
+		}
+		else if (event.getSource() == this.glowflyTestMenuItem) {
+			this.glowflyTestWindow.setVisible(true);
 		}
 	}
 	

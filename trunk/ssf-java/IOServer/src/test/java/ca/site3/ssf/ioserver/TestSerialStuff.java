@@ -134,7 +134,9 @@ public class TestSerialStuff {
 		TestSerialStuff tss = new TestSerialStuff();
 //		tss.initSerialStuff("/dev/master");
 //		tss.test();
-		tss.testBoard32();
+//		tss.testBoard32();
+		
+		tss.testGlowflies();
 	}
 	
 	
@@ -178,11 +180,51 @@ public class TestSerialStuff {
 			try { Thread.sleep(1000); } catch (InterruptedException ex) { ex.printStackTrace(); }
 		}
 		sc.stop();
+		sc.ESTOP();
 		closeSerialStuff();
 	}
 	
 	
+	private void testGlowflies() {
+		System.out.println("testing the fucking glowflies");
+		
+		initSerialStuff("/dev/tty.usbserial-A40081Z7");
+		assertNotNull(serialPort);
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = serialPort.getInputStream();
+			out = serialPort.getOutputStream();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		
+		SerialCommunicator sc = new SerialCommunicator(in, out, null);
+		
+		Thread commThread = new Thread(sc);
+		commThread.start();
+		
+		sc.setGlowfliesOn(true);
+		
+//		sc.setGlowfliesOn(false);
+		
+		try {
+			Thread.sleep(60000);
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		} finally {
+			sc.setGlowfliesOn(false);
+		}
+		
+		
+		
+		sc.stop();
+		sc.ESTOP();
+		closeSerialStuff();
+	}
 
+	
+	
 	private static void configureLogging(int level) {
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
 				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
@@ -204,4 +246,8 @@ public class TestSerialStuff {
 				root.setLevel(Level.INFO);
 		}
 	}
+	
+	
+	
+	
 }
