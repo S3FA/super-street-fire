@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.common.CommUtil;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
@@ -77,6 +78,10 @@ public class SerialCommunicator implements Runnable {
 	private StreetFireServer server;
 	
 	
+	private volatile boolean glowfliesOn = false;
+	
+	
+	
 	public SerialCommunicator(InputStream serialIn, OutputStream serialOut, StreetFireServer guiOut) {
 		this.reader = new SerialDataReader(serialIn);
 		this.out = new BufferedOutputStream(serialOut);
@@ -90,6 +95,10 @@ public class SerialCommunicator implements Runnable {
 	 */
 	public void stop() {
 		messageQueue.add(STOP_SENTINEL);
+	}
+	
+	public void ESTOP() {
+		setGlowfliesOn(false);
 	}
 	
 	public void run() {
@@ -108,7 +117,7 @@ public class SerialCommunicator implements Runnable {
 				} else {
 					this.out.write(message);
 					this.out.flush();
-//					log.debug("wrote message: {}", CommUtil.bytesToHexString(message));
+					log.debug("wrote message: {}", CommUtil.bytesToHexString(message));
 				}
 			} catch (IOException ex) {
 				log.error("Error writing to serial device",ex);
@@ -116,6 +125,7 @@ public class SerialCommunicator implements Runnable {
 				log.warn("Interrupted trying to get message from queue",ex);
 			}
 		}
+		setGlowfliesOn(false);
 		reader.stop();
 	}
 	
@@ -169,18 +179,61 @@ public class SerialCommunicator implements Runnable {
 			}
 		}
 		
-		
-		byte[] payload = new byte[9]; // 1 byte for dest node + 4*2 bytes command/values 
+		byte[] payload = new byte[11]; // 1 byte for dest node + 4*2 bytes command/values + 2 bytes for HSI 
 		payload[0] = getHardwareIdFromEvent(event);
 		
 		for (int effectOutputIndex=0; effectOutputIndex < 4; effectOutputIndex++) {
 			payload[effectOutputIndex*2 + 1] = commands[effectOutputIndex];
 			payload[effectOutputIndex*2 + 2] = values[effectOutputIndex];
 		}
-
+		payload[9] = (byte) 0x41; // 'A' for A/C out (hot surface igniter)
+		if (glowfliesOn) {
+			payload[10] = (byte) 0x31; // '1' is ascii 31
+		} else {
+			payload[10] = (byte) 0x30; // '0' is ascii 30
+		}
 		enqueueMessage(getMessageForPayload(payload));
 	}
 	
+	
+	void setGlowfliesOn(boolean makeSurfaceHot, boolean broadcast) {
+		log.info("Setting glowflies on: "+makeSurfaceHot);
+		this.glowfliesOn = makeSurfaceHot;
+		
+		if (broadcast) {
+			byte[] payload = new byte[3];
+			payload[0] = (byte) 0xFF; // broadcast
+			payload[1] = (byte) 0x41; // 'A' for A/C
+			if (glowfliesOn) {
+				payload[2] = (byte) 0x31; // '1' in ascii
+			} else {
+				payload[2] = (byte) 0x30; // '0'
+			}
+			enqueueMessage(getMessageForPayload(payload));
+		} else {
+			for (int i=1; i<=32; i++) {
+				toggleGlowfly(glowfliesOn, i);
+			}
+		}
+	}
+	
+	
+	void toggleGlowfly(boolean on, int id) {
+		byte[] payload = new byte[3];
+		payload[0] = (byte)id;
+		payload[1] = (byte) 0x41; // 'A' for A/C
+		if (on) {
+			payload[2] = (byte) 0x31; // '1' in ascii
+		} else {
+			payload[2] = (byte) 0x30; // '0'
+		}
+		enqueueMessage(getMessageForPayload(payload));
+	}
+	
+	
+	void setGlowfliesOn(boolean makeSurfaceHot) {
+		setGlowfliesOn(makeSurfaceHot, true);
+	}
 	
 	
 	private byte[] getMessageForPayload(byte[] payload) {
@@ -190,7 +243,7 @@ public class SerialCommunicator implements Runnable {
 		for (int i=0; i < payload.length; i++) {
 			message[i+3] = payload[i];
 		}
-		message[12] = getChecksum(payload);
+		message[payload.length + 3] = getChecksum(payload);
 		return message;
 	}
 	
