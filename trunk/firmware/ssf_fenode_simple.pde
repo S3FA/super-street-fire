@@ -8,7 +8,7 @@
 #define RE 8
 #define IRLED 14
 
-#define NODE 0x20
+#define NODE 12
 #define BROADCAST 0xFF
 #define FRAME 0xAA
 
@@ -86,14 +86,14 @@ void loop() {
               //Serial.println("listening to message for me");
             }
             i = 0;
-            Serial.print(" |");
+            //Serial.print(" |");
             for(c=0;c<length;c++) {
               i += cmd[c];
-              Serial.print(" ");
-              Serial.print(cmd[c], HEX);
-              Serial.print(" ");
+              //Serial.print(" ");
+              //Serial.print(cmd[c], HEX);
+              //Serial.print(" ");
             }
-            Serial.print("| ");
+            //Serial.print("| ");
             c = ~i;
             if( (c != csum) && DEBUG ) {
               Serial.print("bad checksum, received ");
@@ -200,7 +200,7 @@ void loop() {
                   Serial.print(0, BYTE);
                   Serial.print(NODE, BYTE);
                   Serial.print('S');
-                  csum = 0xAA + 0xAA + 0x6 + NODE + 0x53;
+                  csum = NODE + 0x53;
                   if(digitalRead(ARMED) == HIGH) { 
                     Serial.print('0');
                     csum += 0x30;
@@ -211,11 +211,13 @@ void loop() {
                   }
                   Serial.print('F');
                   csum += 0x46;
-                  Serial.print('?');
+                  Serial.print(0x3F, BYTE);
                   csum += 0x3F;
                   csum = csum % 256;
                   c = ~csum;
                   Serial.print(c, BYTE);
+                  Serial.flush();
+                  delay(5);
                   if( !DEBUG ) {
                     digitalWrite(DE, LOW);
                     digitalWrite(RE, LOW);
