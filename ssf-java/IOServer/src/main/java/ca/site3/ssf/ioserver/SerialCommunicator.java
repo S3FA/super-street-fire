@@ -285,8 +285,17 @@ public class SerialCommunicator implements Runnable {
 			// target board
 			payload[0] = (byte)id;
 			
+//			payload[0] = digitMap[lastTimerVal / 10];
+//			payload[1] = digitMap[lastTimerVal % 10];
+//			populateLifeData(lastP2Health, payload, 1);
+//			populateLifeData(lastP1Health, payload, 3);
+			
 			populateLifeData(lastP1Health, payload, 1);
 			populateLifeData(lastP2Health, payload, 3);
+			
+System.out.println("lastTimerVal = "+lastTimerVal);;
+System.out.println("Timer lastTimerVal/10: "+(lastTimerVal/10));
+System.out.println("Timer lastTimerVal%10: "+(lastTimerVal%10));
 			payload[5] = digitMap[lastTimerVal / 10]; 
 			payload[6] = digitMap[lastTimerVal % 10];
 			
@@ -351,7 +360,7 @@ public class SerialCommunicator implements Runnable {
 				this.out.write(messageTemplate);
 				this.out.flush();
 				try {
-					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(20, TimeUnit.MILLISECONDS);
+					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(30, TimeUnit.MILLISECONDS);
 					if (status != null) {
 						systemStatus[status.deviceId - 1] = status;
 					}
@@ -394,7 +403,9 @@ public class SerialCommunicator implements Runnable {
 		 */
 		SystemInfoRefreshEvent refreshEvent = new SystemInfoRefreshEvent(leftRailStatus, rightRailStatus, outerRingStatus);
 		log.debug("Notifying GUI of system status");
-		server.notifyGUI(refreshEvent);
+		if (server != null) {
+			server.notifyGUI(refreshEvent);
+		}
 	}
 	
 	

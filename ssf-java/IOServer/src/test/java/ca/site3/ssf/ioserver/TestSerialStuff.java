@@ -18,6 +18,8 @@ import java.util.Enumeration;
 import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.FireEmitter;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
@@ -134,13 +136,14 @@ public class TestSerialStuff {
 		TestSerialStuff tss = new TestSerialStuff();
 //		tss.initSerialStuff("/dev/master");
 //		tss.test();
-//		tss.testBoard32();
+//		tss.testFireBoard(25);
+		tss.testScoreBoard(35);
 		
-		tss.testGlowflies();
+//		tss.testGlowflies();
 	}
 	
 	
-	private void testBoard32() {
+	private void testFireBoard(int boardId) {
 		initSerialStuff("/dev/tty.usbserial-A40081Z7");
 		assertNotNull(serialPort);
 		InputStream in = null;
@@ -162,7 +165,7 @@ public class TestSerialStuff {
 			final Entity entity = i % 2 == 0 ? Entity.PLAYER1_ENTITY : Entity.PLAYER2_ENTITY;
 			final float intensity = i == 9 ? 0f : 1f;
 			
-			FireEmitter emitter = new FireEmitter(32,8,Location.OUTER_RING) {
+			FireEmitter emitter = new FireEmitter(boardId,getIndexForHardwareId(boardId),getLocationForHardwareId(boardId)) {
 				protected @Override float getContributorIntensity(Entity contributor) {
 					if (contributor == entity) {
 						return intensity;
@@ -177,12 +180,61 @@ public class TestSerialStuff {
 			FireEmitterChangedEvent event = new FireEmitterChangedEvent(emitter);
 			
 			sc.notifyFireEmitters(event);
-			try { Thread.sleep(1000); } catch (InterruptedException ex) { ex.printStackTrace(); }
+			try { Thread.sleep(250); } catch (InterruptedException ex) { ex.printStackTrace(); }
 		}
+		
+		sc.setGlowfliesOn(true, false);
+		try { Thread.sleep(500); } catch (InterruptedException ex) { ex.printStackTrace(); }
+		sc.querySystemStatus();
+		
 		sc.stop();
 		sc.ESTOP();
 		closeSerialStuff();
 	}
+	
+	
+	
+	
+	private void testScoreBoard(int boardId) {
+		initSerialStuff("/dev/tty.usbserial-A40081Z7");
+		assertNotNull(serialPort);
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = serialPort.getInputStream();
+			out = serialPort.getOutputStream();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		
+		SerialCommunicator sc = new SerialCommunicator(in, out, null);
+		
+		Thread commThread = new Thread(sc);
+		commThread.start();
+		
+		
+		
+//		for (int timer = 99; timer >= 0; timer--) {
+//			RoundPlayTimerChangedEvent roundEvent = new RoundPlayTimerChangedEvent(timer);
+//			sc.notifyTimerAndLifeBars(roundEvent);
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException ex) {
+//				ex.printStackTrace();
+//			}
+//			
+//		}
+		
+		RoundPlayTimerChangedEvent roundEvent = new RoundPlayTimerChangedEvent(1);
+		sc.notifyTimerAndLifeBars(roundEvent);
+		
+		sc.querySystemStatus();
+		
+		sc.stop();
+		sc.ESTOP();
+		closeSerialStuff();
+	}
+	
 	
 	
 	private void testGlowflies() {
@@ -249,5 +301,29 @@ public class TestSerialStuff {
 	
 	
 	
+	private Location getLocationForHardwareId(int boardId) {
+		if (boardId >=1 && boardId <= 8) {
+			return Location.RIGHT_RAIL;
+		} else if (boardId >= 9 && boardId <= 16) {
+			return Location.LEFT_RAIL;
+		} else if (boardId > 0 && boardId <=32) {
+			return Location.OUTER_RING;
+		}
+		return null;
+	}
 	
+	private int getIndexForHardwareId(int boardId) {
+		if (boardId >=1 && boardId <= 8) {
+			return boardId - 1;
+		} else if (boardId >= 9 && boardId <= 16) {
+			return boardId - 9;
+		} else if (boardId > 0 && boardId <=32) {
+			if (boardId >= 17 && boardId <= 24) {
+				return boardId - 17;
+			} else if (boardId <= 32) {
+				return 32 + 8 - boardId; // see SerialCommunicator
+			}
+		}
+		return -1;
+	}
 }

@@ -58,7 +58,7 @@ public class SerialDataReader implements Runnable {
 					log.warn("End of serial data stream");
 					break;
 				}
-//				log.debug("Read {} bytes of serial data: {}", len, CommUtil.bytesToHexString(buffer));
+				log.debug("Read {} bytes of serial data: {}", len, CommUtil.bytesToHexString(buffer));
 				
 				int msgStart = -1;
 				for (int i=0; i<len; i++) {
