@@ -293,9 +293,9 @@ public class SerialCommunicator implements Runnable {
 			populateLifeData(lastP1Health, payload, 1);
 			populateLifeData(lastP2Health, payload, 3);
 			
-System.out.println("lastTimerVal = "+lastTimerVal);;
-System.out.println("Timer lastTimerVal/10: "+(lastTimerVal/10));
-System.out.println("Timer lastTimerVal%10: "+(lastTimerVal%10));
+			System.out.println("lastTimerVal = "+lastTimerVal);;
+			System.out.println("Timer lastTimerVal/10: "+(lastTimerVal/10));
+			System.out.println("Timer lastTimerVal%10: "+(lastTimerVal%10));
 			payload[5] = digitMap[lastTimerVal / 10]; 
 			payload[6] = digitMap[lastTimerVal % 10];
 			
