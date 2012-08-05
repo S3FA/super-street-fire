@@ -1,5 +1,6 @@
 package ca.site3.ssf.ioserver;
 
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -8,12 +9,13 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 
 @SuppressWarnings("serial")
 public class SerialTestWindow extends JFrame implements ActionListener {
-
+	private static final int NUM_BOARDS = 32;
 	
 	private IOServer ioserver;
 	
@@ -28,10 +30,10 @@ public class SerialTestWindow extends JFrame implements ActionListener {
 		setLocationRelativeTo(null);
 		
 		ioserver = server;
+
+		this.getContentPane().setLayout(new GridLayout(NUM_BOARDS / 2 + 1, 2));
 		
-		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(),BoxLayout.Y_AXIS));
-		
-		for (int i=1; i<=32; i++) {
+		for (int i = 1; i <= NUM_BOARDS; i++) {
 			JButton btn = new JButton("Turn board " + i + " on");
 			boardButtons.add(btn);
 			btn.addActionListener(this);

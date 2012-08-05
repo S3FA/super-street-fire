@@ -57,7 +57,7 @@ class Recognizer {
 	}
 	
 	double getLowestAcceptableLnProbability() {
-		return this.lowestLnProbability + ((this.highestLnProbability - this.lowestLnProbability) / 4.0);
+		return this.lowestLnProbability + ((this.highestLnProbability - this.lowestLnProbability) / 10.0);
 	}
 	
 	/**
