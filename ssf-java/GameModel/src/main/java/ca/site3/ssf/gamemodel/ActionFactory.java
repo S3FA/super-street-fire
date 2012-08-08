@@ -115,8 +115,8 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double JAB_BASE_ACCELERATION   = 0.0;
-				final double JAB_TIME_LENGTH_IN_SECS = 4.25;
-				final float JAB_DAMAGE_PER_FLAME     = 5.0f;
+				final double JAB_TIME_LENGTH_IN_SECS = 2.0;
+				final float JAB_DAMAGE_PER_FLAME     = 4.0f;
 				final int JAB_NUM_FLAMES             = 1;
 				
 				if (leftHand) {
@@ -138,8 +138,8 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double BASE_ACCELERATION   = 0.25;
-				final double TIME_LENGTH_IN_SECS = 5.25;
-				final float DAMAGE_PER_FLAME     = 7.0f;
+				final double TIME_LENGTH_IN_SECS = 2.5;
+				final float DAMAGE_PER_FLAME     = 5.0f;
 				final int NUM_FLAMES             = 1;
 				
 				if (leftHand) {
@@ -159,8 +159,8 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double CHOP_BASE_ACCELERATION   = 0.25;
-				final double CHOP_TIME_LENGTH_IN_SECS = 4.50;
-				final float CHOP_DAMAGE_PER_FLAME     = 6.0f;
+				final double CHOP_TIME_LENGTH_IN_SECS = 2.25;
+				final float CHOP_DAMAGE_PER_FLAME     = 5.0f;
 				final int CHOP_NUM_FLAMES             = 1;
 				
 				if (leftHand) {
@@ -179,7 +179,7 @@ final public class ActionFactory {
 			case HADOUKEN_ATTACK: {
 				
 				final double HADOUKEN_BASE_ACCELERATION   = 0.0;
-				final double HADOUKEN_TIME_LENGTH_IN_SECS = 5.0;
+				final double HADOUKEN_TIME_LENGTH_IN_SECS = 3.0;
 				final float HADOUKEN_DAMAGE_PER_FLAME     = 4.0f;
 				final int HADOUKEN_NUM_FLAMES             = 2;
 				
@@ -204,7 +204,7 @@ final public class ActionFactory {
 			case SHORYUKEN_ATTACK: {
 				
 				final double SHORYUKEN_BASE_ACCELERATION   = 0.25;
-				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 4.5;
+				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 4.0;
 				final float SHORYUKEN_DAMAGE_PER_FLAME    = 5.0f;
 				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 3;
 				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 2;
@@ -262,7 +262,7 @@ final public class ActionFactory {
 			case SONIC_BOOM_ATTACK: {
 				
 				final double SONIC_BOOM_BASE_ACCELERATION   = 0.75;
-				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 3.0;
+				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 2.5;
 				final float SONIC_BOOM_DAMAGE_PER_FLAME     = 4.0f;
 				final int SONIC_BOOM_NUM_FLAMES             = 1;
 				
@@ -289,7 +289,7 @@ final public class ActionFactory {
 			case DOUBLE_LARIAT_ATTACK: {
 				
 				final double DOUBLE_LARIAT_BASE_ACCELERATION   = 0.0;
-				final double DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 6.5;
+				final double DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 3.75;
 				final float DOUBLE_LARIAT_DAMAGE_PER_FLAME     = 6.0f;
 				final int DOUBLE_LARIAT_NUM_FLAMES             = 2;
 				
@@ -342,7 +342,7 @@ final public class ActionFactory {
 			case SUMO_HEADBUTT_ATTACK: {
 				
 				final double SUMO_HEADBUTT_BASE_ACCELERATION   = 0.1;
-				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 5.25;
+				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 3.0;
 				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME     = 3.0f;
 				final int SUMO_HEADBUTT_NUM_FLAMES             = 2;
 				
@@ -369,11 +369,11 @@ final public class ActionFactory {
 			case ONE_HUNDRED_HAND_SLAP_ATTACK: {
 				
 				final double ONE_HUND_HAND_SLAP_BASE_ACCELERATION   = 0.0;
-				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 4.75;
+				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 3.25;
 				final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME     = 3.0f;
 				final int ONE_HUND_HAND_SLAP_NUM_FLAMES             = 3;
 				
-				final int TWO_HANDED_NUM_RANDOM_BURSTS = 25;
+				final int TWO_HANDED_NUM_RANDOM_BURSTS = 16;
 				final int ONE_HANDED_NUM_RANDOM_BURSTS = TWO_HANDED_NUM_RANDOM_BURSTS / 2;
 				
 				Random randomNumGen = new Random();
@@ -440,8 +440,8 @@ final public class ActionFactory {
 			
 			case PSYCHO_CRUSHER_ATTACK: {
 				
-				final double PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS = 5.5;
-				final float PSYCHO_CRUSHER_DAMAGE_PER_FLAME     = 4.0f;
+				final double PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS = 4.9;
+				final float PSYCHO_CRUSHER_DAMAGE_PER_FLAME     = 3.25f;
 				final int PSYCHO_CRUSHER_NUM_FLAMES             = 3;
 				final double PSYCHO_CRUSHER_BASE_ACCELERATION   = 0.0;
 				
@@ -608,7 +608,7 @@ final public class ActionFactory {
 			case SUCK_IT_ATTACK: {
 				
 				final double SUCK_IT_BASE_ACCELERATION   = 0;
-				final double SUCK_IT_TIME_LENGTH_IN_SECS = 5.25;
+				final double SUCK_IT_TIME_LENGTH_IN_SECS = 4.25;
 				final float SUCK_IT_DAMAGE_PER_FLAME     = 4.0f;
 				final int SUCK_IT_NUM_FLAMES = 3;
 				

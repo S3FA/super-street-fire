@@ -151,8 +151,11 @@ public class StreetFireServer implements Runnable {
 	 */
 	private class SendThread extends Thread {
 		@Override
+		
+		
 		public void run() {
-			while (true) {
+			boolean isDone = false;
+			while (!isDone) {
 				try {
 					GameEvent event = eventQueue.take();
 					
@@ -162,6 +165,11 @@ public class StreetFireServer implements Runnable {
 						}
 						catch (IOException ex) {
 							log.error("Exception sending GameEvent to GUI client", ex);
+							
+							if (!socket.isBound() || socket.isClosed()) {
+								isDone = true;
+								break;
+							}
 						}
 
 					}
