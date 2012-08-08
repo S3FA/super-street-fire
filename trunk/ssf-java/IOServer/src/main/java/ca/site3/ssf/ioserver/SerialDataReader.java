@@ -58,7 +58,7 @@ public class SerialDataReader implements Runnable {
 					log.warn("End of serial data stream");
 					break;
 				}
-				log.debug("Read {} bytes of serial data: {}", len, CommUtil.bytesToHexString(buffer));
+				log.trace("Read {} bytes of serial data: {}", len, CommUtil.bytesToHexString(buffer));
 				
 				int msgStart = -1;
 				for (int i=0; i<len; i++) {
@@ -68,16 +68,16 @@ public class SerialDataReader implements Runnable {
 					}
 				}
 				if (msgStart == -1) {
-					log.warn("No framing bytes found");
+					log.debug("No framing bytes found");
 					continue;
 				}
-				if ( ! validateMessage(buffer, msgStart) ) {
-					log.warn("Ignoring invalid message");
+				if (!validateMessage(buffer, msgStart) ) {
+					log.debug("Ignoring invalid message");
 					continue;
 				}
 				
 				if (buffer[msgStart+3] != 0) {
-					log.warn("Discarding message not addressed to server");
+					log.debug("Discarding message not addressed to server");
 					continue;
 				}
 				
