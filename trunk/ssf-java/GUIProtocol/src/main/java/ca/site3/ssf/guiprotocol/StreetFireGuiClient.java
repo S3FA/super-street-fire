@@ -2,10 +2,12 @@ package ca.site3.ssf.guiprotocol;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.EnumSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,7 @@ public class StreetFireGuiClient {
 	private int port;
 	private InetAddress serverAddress;
 	
-	private Socket socket;
+	private SSLSocket socket;
 	
 	/** contains messages to be sent to server */
 	private BlockingQueue<Command> commandQueue = new LinkedBlockingQueue<Command>();
@@ -91,7 +93,11 @@ public class StreetFireGuiClient {
 	 * @throws IOException
 	 */
 	public boolean connect() throws IOException {
-		socket = new Socket(serverAddress, port);
+		//System.setProperty("javax.net.ssl.trustStore", "cacerts.jks");
+    	//System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+    	
+        SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        socket = (SSLSocket) ssf.createSocket(serverAddress, port);
 		
 		if (socket.isConnected()) {
 			sendThread = new SendThread();

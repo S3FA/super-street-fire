@@ -14,6 +14,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +79,7 @@ public class StreetFireServer implements Runnable {
 	
 	private ActionFactory actionFactory;
 	
-	private ServerSocket socket;
+	private SSLServerSocket socket;
 	
 	private Queue<AbstractGameModelCommand> gameCommandQueue;
 	
@@ -98,14 +102,16 @@ public class StreetFireServer implements Runnable {
 		this.systemCommandQueue = systemQueue;
 	}
 	
-
-	
 	public void run() {
-		//SSLServerSocketFactory f = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-		
+		System.setProperty("javax.net.ssl.keyStore", "../GUIProtocol/Certificates/keystore.jks");
+ 	    System.setProperty("javax.net.ssl.keyStorePassword", "changeit");
+ 	    System.setProperty("javax.net.ssl.trustStore", "../GUIProtocol/Certificates/cacerts.jks");
+ 	    System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+
+ 	    SSLServerSocketFactory ssf = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+
 		try {
-			//socket = f.createServerSocket(port);
-			socket = new ServerSocket(port);
+			socket = (SSLServerSocket) ssf.createServerSocket(port);
 		} catch (SocketException ex) {
 			log.error("Exception setting timeout on server socket",ex);
 		} catch (IOException ex) {
@@ -119,7 +125,7 @@ public class StreetFireServer implements Runnable {
 		while ( ! stop ) {
 			try {
 				// Accept incoming connections from GUI clients
-				Socket s = socket.accept();
+				SSLSocket s = (SSLSocket) socket.accept();
 				log.info("Accepted connection from " + s.getInetAddress());
 				
 				// A connection has been accepted, build a handler for the new connection and start it up
@@ -328,12 +334,12 @@ public class StreetFireServer implements Runnable {
 	 */
 	private class GuiHandler implements Runnable {
 	
-		private final Socket socket;
+		private final SSLSocket socket;
 		
 		private volatile boolean shouldListen = true;
 		
 		
-		public GuiHandler(Socket s) {
+		public GuiHandler(SSLSocket s) {
 			this.socket = s;
 		}
 		
