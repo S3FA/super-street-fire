@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Plays a .wav file by file name.
+ * Plays a .ogg file by file name.
  * @author Mike, Callum
  */
 class PlaybackHandler implements LineListener {
@@ -28,7 +28,8 @@ class PlaybackHandler implements LineListener {
 	
 	private AudioInputStream audioInputStream = null;
 	private Clip clip = null;
-
+	private OggClip ogg = null;
+	
 	private final SoundPlayerController controller;
 	private final String audioFilepath;
 	private PlaybackSettings settings;
@@ -46,16 +47,22 @@ class PlaybackHandler implements LineListener {
 	}
 	
 	private void init() {
-		
-		// Open the audio file from disk (make sure it even exists)
-		File audioFile = new File(this.audioFilepath);
-		if (!audioFile.canRead()) {
+		try{
+			this.ogg = new OggClip(this.audioFilepath);
+		}
+		catch(IOException ex){
 			logger.warn("Failed to read audio file " + audioFilepath);
 			return;
 		}
+		// Open the audio file from disk (make sure it even exists)
+		//File audioFile = new File(this.audioFilepath);
+		//if (!audioFile.canRead()) {
+		//	logger.warn("Failed to read audio file " + audioFilepath);
+		//	return;
+		//}
 		
 		// Create an audio input stream for the file
-		try {
+		//try {
 			/*
 			// This doesn't work properly on a mac...
 			AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(audioFile);
@@ -66,59 +73,66 @@ class PlaybackHandler implements LineListener {
 					new AudioFormat(format.getSampleRate(), format.getSampleSizeInBits(), 2, false, format.isBigEndian()),
 					AudioSystem.getAudioInputStream(audioFile));
 			*/
-			this.audioInputStream = AudioSystem.getAudioInputStream(audioFile);
-		} catch (UnsupportedAudioFileException e1) {
-			logger.warn("Failed to get a supported audio input stream.", e1);
-			return;
-		} catch (IOException e1) {
-			logger.warn("Failed to open audio input stream.", e1);
-			return;
-		}
+		//	this.audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+		//} catch (UnsupportedAudioFileException e1) {
+		//	logger.warn("Failed to get a supported audio input stream.", e1);
+		//	return;
+		//} catch (IOException e1) {
+		//	logger.warn("Failed to open audio input stream.", e1);
+		//	return;
+		//}
 		
-		if (this.audioInputStream == null) {
-			logger.warn("Failed to create audio input stream for file " + audioFilepath);
-			return;
-		}
+		//if (this.audioInputStream == null) {
+		//	logger.warn("Failed to create audio input stream for file " + audioFilepath);
+		//	return;
+		//}
 
-		try {
-			this.clip = AudioSystem.getClip();
-		} catch (LineUnavailableException e) {
-			logger.warn("Failed to get clip for audio playback.", e);
-			return;
-		}
+		//try {
+		//	this.clip = AudioSystem.getClip();
+		//} catch (LineUnavailableException e) {
+		//	logger.warn("Failed to get clip for audio playback.", e);
+		//	return;
+		//}
 				
-		this.clip.addLineListener(this);
+		//this.clip.addLineListener(this);
+		//this.ogg.addLineListener(this);
 	}
 	
 	void play() {
-		if (this.clip == null) {
+		if (this.ogg == null) {
 			this.controller.removePlaybackHandler(this);
 			return;
 		}
 		
 		try {
-			this.clip.open(this.audioInputStream);
+			//this.clip.open(this.audioInputStream);
 			this.updateSettings();
 			
 			if (this.settings.getNumPlays() == PlaybackSettings.INFINITE_NUM_PLAYS) {
-				this.clip.loop(Clip.LOOP_CONTINUOUSLY);
+				//this.clip.loop(Clip.LOOP_CONTINUOUSLY);
+				this.ogg.loop();
 			}
 			else {
-				this.clip.loop(this.settings.getNumPlays() - 1);
+				//this.clip.loop(this.settings.getNumPlays() - 1);
+				this.ogg.loop(this.settings.getNumPlays() - 1);
 			}
 			
-		} catch (LineUnavailableException e) {
-			logger.warn("Exception while attempting to get and open a clip for audio stream.", e);
-			return;
-		} catch (IOException e) {
-			logger.warn("Audio input stream read fail.", e);
+		//} catch (LineUnavailableException e) {
+		//	logger.warn("Exception while attempting to get and open a clip for audio stream.", e);
+		//	return;
+		//} catch (IOException e) {
+		//	logger.warn("Audio input stream read fail.", e);
+		//	return;
+		//}
+		}catch (Exception e) {
+			logger.warn("Exception while attempting to play the ogg in playbackHandler.", e);
 			return;
 		}
 	}
 
 	void stop() {
-		if (this.clip != null) {
-			this.clip.stop();
+		if (this.ogg != null) {
+			this.ogg.stop();
 		}
 	}
 	
@@ -133,24 +147,27 @@ class PlaybackHandler implements LineListener {
 	}
 	
 	private void updateSettings() {
-		if (this.clip == null) {
+		if (this.ogg == null) {
 			return;
 		}
 		
 		// Adjust the volume on the audio clip
-		if (this.clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-			FloatControl volume = (FloatControl)this.clip.getControl(FloatControl.Type.MASTER_GAIN);
-			volume.setValue(Math.min(volume.getMaximum(), Math.max(volume.getMinimum(), this.settings.getVolume())));
-		}
+		
+		ogg.setGain(Math.min(1.0f, Math.max(0.0f, this.settings.getVolume())));
+		//if (this.clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+		//	FloatControl volume = (FloatControl)this.clip.getControl(FloatControl.Type.MASTER_GAIN);
+		//	volume.setValue(Math.min(volume.getMaximum(), Math.max(volume.getMinimum(), this.settings.getVolume())));
+		//}
 		// Adjust the pan of the audio clip
-		if (this.clip.isControlSupported(FloatControl.Type.PAN)) {
-			FloatControl pan = (FloatControl)this.clip.getControl(FloatControl.Type.PAN);
-			pan.setValue(Math.min(pan.getMaximum(), Math.max(pan.getMinimum(), this.settings.getPan())));
-		}
-		else if (this.clip.isControlSupported(FloatControl.Type.BALANCE)) {
-			FloatControl balance = (FloatControl)this.clip.getControl(FloatControl.Type.BALANCE);
-			balance.setValue(Math.min(balance.getMaximum(), Math.max(balance.getMinimum(), this.settings.getPan())));
-		}
+		ogg.setBalance(Math.min(1.0f, Math.max(-1.0f, this.settings.getVolume())));
+		//if (this.clip.isControlSupported(FloatControl.Type.PAN)) {
+		//	FloatControl pan = (FloatControl)this.clip.getControl(FloatControl.Type.PAN);
+		//	pan.setValue(Math.min(pan.getMaximum(), Math.max(pan.getMinimum(), this.settings.getPan())));
+		//}
+		//else if (this.clip.isControlSupported(FloatControl.Type.BALANCE)) {
+		//	FloatControl balance = (FloatControl)this.clip.getControl(FloatControl.Type.BALANCE);
+		//	balance.setValue(Math.min(balance.getMaximum(), Math.max(balance.getMinimum(), this.settings.getPan())));
+		//}
 		
 	}
 	
