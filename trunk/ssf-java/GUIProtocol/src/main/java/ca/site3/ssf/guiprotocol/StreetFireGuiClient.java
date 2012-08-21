@@ -2,11 +2,12 @@ package ca.site3.ssf.guiprotocol;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.EnumSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.net.ssl.SSLSocket;
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import org.slf4j.Logger;
@@ -64,7 +65,9 @@ public class StreetFireGuiClient {
 	private int port;
 	private InetAddress serverAddress;
 	
-	private SSLSocket socket;
+	private boolean useSSL;
+	
+	private Socket socket;
 	
 	/** contains messages to be sent to server */
 	private BlockingQueue<Command> commandQueue = new LinkedBlockingQueue<Command>();
@@ -79,9 +82,10 @@ public class StreetFireGuiClient {
 	
 	
 	
-	public StreetFireGuiClient(InetAddress ioserver, int port) {
+	public StreetFireGuiClient(InetAddress ioserver, int port, boolean useSSL) {
 		serverAddress = ioserver;
 		this.port = port;
+		this.useSSL = useSSL;
 	}
 	
 	
@@ -96,8 +100,13 @@ public class StreetFireGuiClient {
 		//System.setProperty("javax.net.ssl.trustStore", "cacerts.jks");
     	//System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
     	
-        SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
-        socket = (SSLSocket) ssf.createSocket(serverAddress, port);
+		SocketFactory socketFactory = null;
+		if (useSSL) {
+			socketFactory = SSLSocketFactory.getDefault();
+		} else {
+			socketFactory = SocketFactory.getDefault();
+		}
+        socket = socketFactory.createSocket(serverAddress, port);
 		
 		if (socket.isConnected()) {
 			sendThread = new SendThread();

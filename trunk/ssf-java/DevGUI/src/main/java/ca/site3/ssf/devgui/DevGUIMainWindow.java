@@ -118,7 +118,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		} catch (UnknownHostException ex) {
 			log.error("Could not find localhost",ex);
 		}
-		client = new StreetFireGuiClient(localhost, args.guiPort);
+		client = new StreetFireGuiClient(localhost, args.guiPort, args.useSSL);
 		
 		try {
 			client.connect();

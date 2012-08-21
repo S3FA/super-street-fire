@@ -52,6 +52,9 @@ public class CommandLineArgs {
 	@Parameter(names={"-gestureEngine", "-ge"}, description="File path to the gesture recognition engine used for recongnizing game gestures")
 	public String gestureEngineFilepath = new File(System.getProperty("user.dir"), "../GestureRecorderGUI/Data/gesture_recognizer_engine.eng").toString();
 	
+	@Parameter(names={"-encrypt", "-e"}, description="Use SSL to encrypt wifi communications")
+	public Boolean useSSL = true;
+	
 	
 	public CommandLineArgs() {
 		try {
@@ -76,6 +79,7 @@ public class CommandLineArgs {
 		buf.append("\nPeripheral port: "+ devicePort);
 		buf.append("\nHeartbeat port: "+ heartbeatPort);
 		buf.append("\nGUI port: "+ guiPort);
+		buf.append("\nUsing SSL: "+ useSSL);
 		buf.append("\nSerial device: "+ serialDevice);
 		buf.append("\nI/O Server IP: "+ gloveInterfaceIP);
 		

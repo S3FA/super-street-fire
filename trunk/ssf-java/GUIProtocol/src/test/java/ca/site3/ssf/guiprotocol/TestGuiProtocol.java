@@ -38,13 +38,12 @@ public class TestGuiProtocol {
 		
 		IGameModel game = new GameModel(new GameConfig(true,3,60,3,0.1f));
 		Queue<AbstractGameModelCommand> commandQueue = new LinkedList<AbstractGameModelCommand>();
-		Queue<SystemCommand> systemCommandQueue = new LinkedList<SystemCommand>();
-		StreetFireServer server = new StreetFireServer(port, game.getActionFactory(), commandQueue, null);
+		StreetFireServer server = new StreetFireServer(port, true, game.getActionFactory(), commandQueue, null);
 		Thread serverThread = new Thread(server);
 		serverThread.start();
 		try { Thread.sleep(500); } catch (InterruptedException ex) { ex.printStackTrace(); }
 		
-		StreetFireGuiClient client = new StreetFireGuiClient(localhost, port);
+		StreetFireGuiClient client = new StreetFireGuiClient(localhost, port, true);
 		try {
 			client.connect();
 			

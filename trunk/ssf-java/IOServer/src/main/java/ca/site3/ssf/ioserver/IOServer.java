@@ -101,7 +101,7 @@ public class IOServer {
 		Thread heartbeatListenerThread = new Thread(heartbeatListener, "Glove heartbeat listener thread");
 		heartbeatListenerThread.start();
 		
-		StreetFireServer guiServer = new StreetFireServer(args.guiPort, game.getActionFactory(), commManager.getGameCommandQueue(), commManager.getSystemCommandQueue());
+		StreetFireServer guiServer = new StreetFireServer(args.guiPort, args.useSSL, game.getActionFactory(), commManager.getGameCommandQueue(), commManager.getSystemCommandQueue());
 		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
 		guiServerThread.start();
 		
