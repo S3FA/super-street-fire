@@ -34,6 +34,10 @@
   		<artifactId>Sound</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
-  	
+  	<dependency>
+  	    <groupId>ymasory</groupId>
+  	    <artifactId>OrangeExtensions</artifactId>
+  	    <version>1.2</version>
+  	</dependency>
   </dependencies>
 </project>

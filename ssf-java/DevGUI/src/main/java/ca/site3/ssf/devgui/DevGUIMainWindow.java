@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -14,6 +15,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -56,6 +58,7 @@ import ca.site3.ssf.ioserver.IOServer;
 import ca.site3.ssf.ioserver.SerialTestWindow;
 import ch.qos.logback.classic.Level;
 
+import com.apple.eawt.Application;
 import com.beust.jcommander.JCommander;
 
 
@@ -108,6 +111,10 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.gameModel = ioserver.getGameModel();
 		
 		this.glowflyTestWindow = new SerialTestWindow(ioserver);
+		
+		if (System.getProperty("os.name").startsWith("Mac OS X") == true) {
+			initMacStuff();
+		}
 	}
 	
 	private void getThisPartyStarted() {
@@ -532,6 +539,17 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.gloveDataWindow.setLocationRelativeTo(null);
 	}
 	
+	private void initMacStuff() {
+		Application app = Application.getApplication();
+		try {
+			Image ssfImage = ImageIO.read(getClass().getResource("ssfsmall.jpg"));
+			app.setDockIconImage(ssfImage);
+		} catch (IOException ex) {
+			log.warn("Couldn't set dock image on Mac");
+		}
+		
+	}
+	
 	public static void main(String[] argv) {
 		
 		final CommandLineArgs args = new CommandLineArgs();
@@ -539,6 +557,9 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		new JCommander(args, argv);
 		
 		configureLogging(args.verbosity);
+		
+		// mac
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Super Street Fire");
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
