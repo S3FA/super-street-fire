@@ -11,7 +11,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
+import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 
 /**
@@ -133,9 +136,14 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 				continue;
 			}
 			
-			SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
-			if (soundPlayer != null) {
-				soundPlayer.execute(gameModelEvent);
+			if (gameModelEvent.getType() == Type.GAME_STATE_CHANGED && 
+				((GameStateChangedEvent)gameModelEvent).getNewState() == GameStateType.IDLE_STATE) {
+				stopAllSounds();
+			} else {
+				SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
+				if (soundPlayer != null) {
+					soundPlayer.execute(gameModelEvent);
+				}
 			}
 		}
 	}
