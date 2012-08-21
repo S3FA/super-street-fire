@@ -558,9 +558,6 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		
 		configureLogging(args.verbosity);
 		
-		// mac
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Super Street Fire");
-		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception ex) {
