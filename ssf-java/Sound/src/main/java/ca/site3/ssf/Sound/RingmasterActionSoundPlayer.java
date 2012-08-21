@@ -5,10 +5,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.RingmasterAction.ActionType;
 import ca.site3.ssf.gamemodel.RingmasterActionEvent;
-import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 
 class RingmasterActionSoundPlayer extends SoundPlayer {
 	

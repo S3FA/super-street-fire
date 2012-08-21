@@ -1,19 +1,9 @@
 package ca.site3.ssf.Sound;
 
-import java.io.File;
 import java.io.IOException;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.Mixer;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +16,6 @@ class PlaybackHandler implements LineListener {
 	
 	private static Logger logger = LoggerFactory.getLogger(PlaybackHandler.class);
 	
-	private AudioInputStream audioInputStream = null;
-	private Clip clip = null;
 	private OggClip ogg = null;
 	
 	private final SoundPlayerController controller;

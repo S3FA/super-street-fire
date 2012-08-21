@@ -1,7 +1,6 @@
 package ca.site3.ssf.Sound;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -635,6 +634,7 @@ public class OggClip {
 		oy.clear();
 	}
 	
+	@SuppressWarnings("serial")
 	private class InternalException extends Exception {
 		public InternalException(Exception e) {
 			super(e);

@@ -1,9 +1,6 @@
 package ca.site3.ssf.Sound;
 
-import java.util.Properties;
-
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 
 /**
  * Super class for all sound players - implements the ISoundPlayer. Classes

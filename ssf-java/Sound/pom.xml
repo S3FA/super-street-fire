@@ -7,7 +7,6 @@
     <groupId>ca.site3.ssf</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>ca.site3.ssf</groupId>
   <artifactId>Sound</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Sound</name>
@@ -19,8 +18,11 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jogg</artifactId>
     </dependency>
     <dependency>
     	<groupId>ca.site3.ssf</groupId>

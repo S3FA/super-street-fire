@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
-import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 

@@ -1,7 +1,5 @@
 package ca.site3.ssf.Sound;
 
-import ca.site3.ssf.gamemodel.GameState.GameStateType;
-import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackAction;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 
