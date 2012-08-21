@@ -81,8 +81,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	private GloveDataInfoPanel p1RightGloveInfoPanel = null;
 	private GloveDataInfoPanel p2LeftGloveInfoPanel  = null;
 	private GloveDataInfoPanel p2RightGloveInfoPanel = null;
-	private GloveDataInfoPanel ringmasterLeftGloveInfoPanel  = null;
-	private GloveDataInfoPanel ringmasterRightGloveInfoPanel = null;
+	private GloveDataInfoPanel rmLeftGloveInfoPanel  = null;
+	private GloveDataInfoPanel rmRightGloveInfoPanel = null;
 	
 	private JFrame customActionWindow = null;
 	private CustomActionPanel customActionPanel = null;
@@ -135,8 +135,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI) - " + args.serialDevice);
-		this.setPreferredSize(new Dimension(1250, 725));
-		this.setMinimumSize(new Dimension(1250, 720));
+		this.setPreferredSize(new Dimension(1200, 725));
+		this.setMinimumSize(new Dimension(1200, 720));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		
@@ -161,8 +161,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.p1RightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);
 		this.p2LeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
 		this.p2RightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);		
-		this.ringmasterLeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
-		this.ringmasterRightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);	
+		this.rmLeftGloveInfoPanel  = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.LEFT_GLOVE);
+		this.rmRightGloveInfoPanel = new GloveDataInfoPanel(GloveDataInfoPanel.GloveType.RIGHT_GLOVE);	
 		this.setupGloveDataFrame();
 		
 		this.customActionPanel = new CustomActionPanel(client);
@@ -518,10 +518,10 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		border.setTitleColor(Color.black);
 		ringmasterGloveDataPanel.setBorder(border);
 		ringmasterGloveDataPanel.setLayout(new GridLayout(0, 2));
-		assert(this.ringmasterLeftGloveInfoPanel  != null);
-		assert(this.ringmasterRightGloveInfoPanel != null);
-		ringmasterGloveDataPanel.add(this.ringmasterLeftGloveInfoPanel);
-		ringmasterGloveDataPanel.add(this.ringmasterRightGloveInfoPanel);
+		assert(this.rmLeftGloveInfoPanel  != null);
+		assert(this.rmRightGloveInfoPanel != null);
+		ringmasterGloveDataPanel.add(this.rmLeftGloveInfoPanel);
+		ringmasterGloveDataPanel.add(this.rmRightGloveInfoPanel);
 		basePanel.add(ringmasterGloveDataPanel);
 		
 		this.gloveDataWindow.setTitle("Glove Information");
@@ -607,6 +607,9 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 					
 			this.p1LeftGloveInfoPanel.setBatteryPercent(100.0f * p1LeftGloveBatteryPercent);
 			this.p1RightGloveInfoPanel.setBatteryPercent(100.0f * p1RightGloveBatteryPercent);
+			
+			this.p1LeftGloveInfoPanel.setLastUpdateTime(status.getLastUpdateTime(Device.P1_LEFT_GLOVE));
+			this.p1RightGloveInfoPanel.setLastUpdateTime(status.getLastUpdateTime(Device.P1_RIGHT_GLOVE));
 		}
 		
 		{
@@ -632,7 +635,37 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 			float p2RightGloveBatteryPercent = status.getDeviceBattery(Device.P2_RIGHT_GLOVE);
 					
 			this.p2LeftGloveInfoPanel.setBatteryPercent(100.0f * p2LeftGloveBatteryPercent);
-			this.p2RightGloveInfoPanel.setBatteryPercent(100.0f * p2RightGloveBatteryPercent);			
+			this.p2RightGloveInfoPanel.setBatteryPercent(100.0f * p2RightGloveBatteryPercent);
+			
+			this.p2LeftGloveInfoPanel.setLastUpdateTime(status.getLastUpdateTime(Device.P2_LEFT_GLOVE));
+			this.p2RightGloveInfoPanel.setLastUpdateTime(status.getLastUpdateTime(Device.P2_RIGHT_GLOVE));
+		}
+		
+		{
+			InetAddress rmLeftGloveAddr  = status.getDeviceAddress(Device.RM_LEFT_GLOVE);
+			InetAddress rmRightGloveAddr = status.getDeviceAddress(Device.RM_RIGHT_GLOVE);
+			
+			String rmLeftGloveAddrStr  = (rmLeftGloveAddr == null)  ? "" : rmLeftGloveAddr.getHostAddress();
+			String rmRightGloveAddrStr = (rmRightGloveAddr == null) ? "" : rmRightGloveAddr.getHostAddress();
+			
+			//this.p2HeadsetInfoPanel.setIPAddress(p2HeadsetAddrStr);
+			this.rmLeftGloveInfoPanel.setIPAddress(rmLeftGloveAddrStr);
+			this.rmRightGloveInfoPanel.setIPAddress(rmRightGloveAddrStr);
+			
+			float rmLeftGloveSignalPercent = status.getDeviceRssi(Device.RM_LEFT_GLOVE);
+			float rmRightGloveSignalPercent = status.getDeviceRssi(Device.RM_RIGHT_GLOVE);
+			
+			this.rmLeftGloveInfoPanel.setSignalPercent(100.0f * rmLeftGloveSignalPercent);
+			this.rmRightGloveInfoPanel.setSignalPercent(100.0f * rmRightGloveSignalPercent);
+			
+			float rmLeftGloveBatteryPercent  = status.getDeviceBattery(Device.RM_LEFT_GLOVE);
+			float rmRightGloveBatteryPercent = status.getDeviceBattery(Device.RM_RIGHT_GLOVE);
+					
+			this.rmLeftGloveInfoPanel.setBatteryPercent(100.0f * rmLeftGloveBatteryPercent);
+			this.rmRightGloveInfoPanel.setBatteryPercent(100.0f * rmRightGloveBatteryPercent);
+			
+			this.rmLeftGloveInfoPanel.setLastUpdateTime(status.getLastUpdateTime(Device.RM_LEFT_GLOVE));
+			this.rmRightGloveInfoPanel.setLastUpdateTime(status.getLastUpdateTime(Device.RM_RIGHT_GLOVE));
 		}
 	}
 

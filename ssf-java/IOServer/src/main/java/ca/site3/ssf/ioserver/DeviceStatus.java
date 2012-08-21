@@ -113,6 +113,15 @@ public class DeviceStatus {
 		return battery;
 	}
 	
+	public long getLastUpdateTime(Device d) {
+		Long t = latestHeartbeats.get(d);
+		if (t == null) {
+			return -1;
+		} else {
+			return t;
+		}
+	}
+	
 	public void addListener(IDeviceStatusListener l) {
 		listeners.add(l);
 	}
