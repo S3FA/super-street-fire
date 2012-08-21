@@ -1,13 +1,9 @@
 package ca.site3.ssf.devgui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -15,10 +11,6 @@ import java.net.UnknownHostException;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -26,27 +18,15 @@ import javax.swing.WindowConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.Sound.AudioSettings;
-import ca.site3.ssf.Sound.SoundPlayerController;
-import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
-import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.MatchEndedEvent;
-import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
-import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
-import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
-import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
-import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
-import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
 import ca.site3.ssf.guiprotocol.StreetFireGuiClient;
 import ca.site3.ssf.ioserver.CommandLineArgs;
-import ca.site3.ssf.ioserver.IOServer;
 
 import com.beust.jcommander.JCommander;
 
@@ -76,7 +56,7 @@ class PureClientTest extends JFrame implements ActionListener {
 		} catch (UnknownHostException ex) {
 			log.error("Could not find localhost",ex);
 		}
-		client = new StreetFireGuiClient(localhost, args.guiPort);
+		client = new StreetFireGuiClient(localhost, args.guiPort, true);
 		
 		try {
 			client.connect();

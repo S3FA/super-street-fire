@@ -74,14 +74,37 @@
 	      <version>4.8.1</version>
 	      <scope>test</scope>
 	    </dependency>
+	    <dependency>
+	  	  <groupId>com.jcraft</groupId>
+	  	  <artifactId>jogg</artifactId>
+	  	  <version>0.0.7</version>
+  		</dependency>
 	  </dependencies>
   </dependencyManagement>
+  
+  <build>
+  <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+  </plugins>
+  </build>
   
   <repositories>
    <repository>
           <id>Jahmm</id>
           <name>Jahmm HMM library repository</name>
           <url>http://jahmm.googlecode.com/svn/repo</url>
+    </repository>
+    <repository>
+      <id>ooo-maven-repo</id>
+      <url>http://ooo-maven.googlecode.com/hg/repository</url>
     </repository>
   </repositories>
   

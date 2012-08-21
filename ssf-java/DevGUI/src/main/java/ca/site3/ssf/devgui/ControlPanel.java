@@ -1,6 +1,5 @@
 package ca.site3.ssf.devgui;
 
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,13 +9,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +41,11 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JButton executeP2ActionButton 			= null;
 	private JButton executeRingmasterActionButton	= null;
 	
-	@SuppressWarnings("rawtypes")
 	private JComboBox playerActionComboBox     = null;
-	@SuppressWarnings("rawtypes")
 	private JComboBox ringmasterActionComboBox = null;
 	
 	List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	ControlPanel(ActionFactory actionFactory, StreetFireGuiClient client) {
 		super();
 		
