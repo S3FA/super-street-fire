@@ -51,8 +51,8 @@ public enum GestureType {
 	//DISCO_STU(RecognizerManager.NUM_ONE_HANDED_NODES, PlayerActionType.DISCO_STU_ATTACK, GestureGenre.EASTER_EGG, 10000, 14, true, true, Arrays.asList("disco_stus")),
 	ARM_WINDMILL(RecognizerManager.NUM_TWO_HANDED_PLAYER_GESTURE_NODES, ActionType.ARM_WINDMILL_ATTACK, GestureGenre.EASTER_EGG, 18000, 38, true, true, false, Arrays.asList("arm_windmills")),
 	SUCK_IT(RecognizerManager.NUM_TWO_HANDED_PLAYER_GESTURE_NODES, ActionType.SUCK_IT_ATTACK, GestureGenre.EASTER_EGG, 12000, 10, true, true, false, Arrays.asList("suck_its")),
-	LEFT_VAFANAPOLI_ATTACK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, true, false, false, Arrays.asList("left_vafanapoli")),
-	RIGHT_VAFANAPOLI_ATTACK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, false, true, false, Arrays.asList("right_vafanapoli")),
+	//LEFT_VAFANAPOLI_ATTACK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, true, false, false, Arrays.asList("left_vafanapoli")),
+	//RIGHT_VAFANAPOLI_ATTACK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.VAFANAPOLI_ATTACK, GestureGenre.EASTER_EGG, 5700, 9, false, true, false, Arrays.asList("right_vafanapoli")),
 	
 	RINGMASTER_LEFT_HALF_RING(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HALF_RING_ACTION, GestureGenre.BASIC, 9000, 7, true, false, true, Arrays.asList("rm_left_half_rings")),
 	RINGMASTER_RIGHT_HALF_RING(RecognizerManager.NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES, ActionType.RINGMASTER_HALF_RING_ACTION, GestureGenre.BASIC, 9000, 7, false, true, true, Arrays.asList("rm_right_half_rings")),

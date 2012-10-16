@@ -36,10 +36,14 @@ public class SystemInfoRefreshEvent implements IGameModelEvent {
 	private OutputDeviceStatus[] rightRail;
 	private OutputDeviceStatus[] outerRing;
 	
+	private final long timestamp;
+	
 	public SystemInfoRefreshEvent(OutputDeviceStatus[] leftRail, OutputDeviceStatus[] rightRail, OutputDeviceStatus[] outerRing) {
 		this.leftRail = leftRail;
 		this.rightRail = rightRail;
 		this.outerRing = outerRing;
+		
+		this.timestamp = System.currentTimeMillis();
 	}
 	
 	public Type getType() {
@@ -63,4 +67,8 @@ public class SystemInfoRefreshEvent implements IGameModelEvent {
 		throw new IllegalArgumentException("Invalid device location/index: "+ location + "/" + index); 
 	}
 	
+	
+	public long getTimestamp() {
+		return timestamp;
+	}
 }

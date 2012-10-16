@@ -1,10 +1,12 @@
 package ca.site3.ssf.gamemodel;
 
+import java.io.Serializable;
+
 /**
  * Interface for the various events that are raised by the GameModel.
  * @author Callum
  */
-public interface IGameModelEvent {
+public interface IGameModelEvent extends Serializable {
 	public enum Type {
 		GAME_INFO_REFRESH,
 		FIRE_EMITTER_CHANGED,

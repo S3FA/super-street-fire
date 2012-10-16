@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 class RoundEndedGameState extends GameState {
 
-	final static private double ROUND_ENDED_LENGTH_IN_SECS = 4.0;
+	final static private double ROUND_ENDED_LENGTH_IN_SECS = 1.75;
 	
 	private final Player roundVictor;
 	private final boolean roundTimedOut;
@@ -44,12 +44,11 @@ class RoundEndedGameState extends GameState {
 		Action tempAction = null;
 		
 		// Action for the various of fire emitter areas in the game arena...
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.RINGMASTER_ENTITY,
-				FireEmitter.Location.OUTER_RING, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 1, 0.0);
-		assert(tempAction != null);
-		this.roundEndActions.add(tempAction);
-		
 		if (roundVictor != null) {
+			tempAction = actionFactory.buildPlayerWinAction(roundVictor.getPlayerNumber(), RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 1, 0.0);
+			assert(tempAction != null);
+			this.roundEndActions.add(tempAction);
+			
 			tempAction  = actionFactory.buildCrowdPleaserBurstAction(roundVictor.getEntity(),
 					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0);
 			assert(tempAction != null);

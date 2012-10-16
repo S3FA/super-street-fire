@@ -57,6 +57,8 @@ public class GameEventRouter implements IGameModelListener {
 			GameStateChangedEvent e = (GameStateChangedEvent)event;
 			if (e.getNewState() == GameStateType.IDLE_STATE) {
 				serialComm.setGlowfliesOn(false);
+				serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(1, 0, 0));
+				serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(2, 0, 0));
 			} else {
 				serialComm.setGlowfliesOn(true);
 			}

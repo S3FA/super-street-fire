@@ -61,9 +61,11 @@ final public class ActionFactory {
 		}
 		
 	};
+	
+	final static private double EPSILON = 0.000000001;
 
-	final static public float DEFAULT_FULL_ON_FRACTION  = 0.70f;
-	final static public float DEFAULT_FULL_OFF_FRACTION = 0.20f;
+	final static public double DEFAULT_FULL_ON_FRACTION  = 0.50;
+	final static public double DEFAULT_FULL_OFF_FRACTION = 0.50;
 	
 	final private GameModel gameModel;
 	
@@ -115,8 +117,8 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double JAB_BASE_ACCELERATION   = 0.0;
-				final double JAB_TIME_LENGTH_IN_SECS = 2.0;
-				final float JAB_DAMAGE_PER_FLAME     = 4.0f;
+				final double JAB_TIME_LENGTH_IN_SECS = 1.33333;
+				final float JAB_DAMAGE_PER_FLAME     = 3.5f;
 				final int JAB_NUM_FLAMES             = 1;
 				
 				if (leftHand) {
@@ -137,8 +139,8 @@ final public class ActionFactory {
 			case UPPERCUT_ATTACK: {
 				assert(leftHand || rightHand);
 				
-				final double BASE_ACCELERATION   = 0.25;
-				final double TIME_LENGTH_IN_SECS = 2.5;
+				final double BASE_ACCELERATION   = 0.0;
+				final double TIME_LENGTH_IN_SECS = 2.0;
 				final float DAMAGE_PER_FLAME     = 5.0f;
 				final int NUM_FLAMES             = 1;
 				
@@ -159,8 +161,8 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double CHOP_BASE_ACCELERATION   = 0.25;
-				final double CHOP_TIME_LENGTH_IN_SECS = 2.25;
-				final float CHOP_DAMAGE_PER_FLAME     = 5.0f;
+				final double CHOP_TIME_LENGTH_IN_SECS = 1.75;
+				final float CHOP_DAMAGE_PER_FLAME     = 4.0f;
 				final int CHOP_NUM_FLAMES             = 1;
 				
 				if (leftHand) {
@@ -179,8 +181,8 @@ final public class ActionFactory {
 			case HADOUKEN_ATTACK: {
 				
 				final double HADOUKEN_BASE_ACCELERATION   = 0.0;
-				final double HADOUKEN_TIME_LENGTH_IN_SECS = 3.0;
-				final float HADOUKEN_DAMAGE_PER_FLAME     = 4.0f;
+				final double HADOUKEN_TIME_LENGTH_IN_SECS = 2.25;
+				final float HADOUKEN_DAMAGE_PER_FLAME     = 3.0f;
 				final int HADOUKEN_NUM_FLAMES             = 2;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.HADOUKEN_ATTACK, playerNum,
@@ -191,12 +193,12 @@ final public class ActionFactory {
 				success &= this.addConstantVelocityWaveToAction(action,
 						fireEmitterModel.getOuterRingStartEmitterIter(
 								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true, 0), true),
-						fireEmitterConfig.getNumOuterRingEmitters()/2, HADOUKEN_NUM_FLAMES, HADOUKEN_TIME_LENGTH_IN_SECS,
+						fireEmitterConfig.getNumOuterRingEmitters()/2, 1, HADOUKEN_TIME_LENGTH_IN_SECS,
 						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				success &= this.addConstantVelocityWaveToAction(action,
 						fireEmitterModel.getOuterRingStartEmitterIter(
 								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, false, 0), false),
-						fireEmitterConfig.getNumOuterRingEmitters()/2, HADOUKEN_NUM_FLAMES, HADOUKEN_TIME_LENGTH_IN_SECS,
+						fireEmitterConfig.getNumOuterRingEmitters()/2, 1, HADOUKEN_TIME_LENGTH_IN_SECS,
 						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				break;
 			}
@@ -204,10 +206,10 @@ final public class ActionFactory {
 			case SHORYUKEN_ATTACK: {
 				
 				final double SHORYUKEN_BASE_ACCELERATION   = 0.25;
-				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 4.0;
-				final float SHORYUKEN_DAMAGE_PER_FLAME    = 5.0f;
-				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 3;
-				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 2;
+				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 2.0;
+				final float SHORYUKEN_DAMAGE_PER_FLAME    = 6.0f;
+				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 2;
+				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 1;
 
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_SHORYUKEN_ATTACK, blockerOrAttacker, attackee, SHORYUKEN_DAMAGE_PER_FLAME);
@@ -261,9 +263,9 @@ final public class ActionFactory {
 			
 			case SONIC_BOOM_ATTACK: {
 				
-				final double SONIC_BOOM_BASE_ACCELERATION   = 0.75;
-				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 2.5;
-				final float SONIC_BOOM_DAMAGE_PER_FLAME     = 4.0f;
+				final double SONIC_BOOM_BASE_ACCELERATION   = 0.0;
+				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 1.4;
+				final float SONIC_BOOM_DAMAGE_PER_FLAME     = 3.5f;
 				final int SONIC_BOOM_NUM_FLAMES             = 1;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum,
@@ -289,8 +291,8 @@ final public class ActionFactory {
 			case DOUBLE_LARIAT_ATTACK: {
 				
 				final double DOUBLE_LARIAT_BASE_ACCELERATION   = 0.0;
-				final double DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 3.75;
-				final float DOUBLE_LARIAT_DAMAGE_PER_FLAME     = 6.0f;
+				final double DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 2.5;
+				final float DOUBLE_LARIAT_DAMAGE_PER_FLAME     = 3.5f;
 				final int DOUBLE_LARIAT_NUM_FLAMES             = 2;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.DOUBLE_LARIAT_ATTACK, playerNum,
@@ -298,7 +300,7 @@ final public class ActionFactory {
 						DOUBLE_LARIAT_NUM_FLAMES, DOUBLE_LARIAT_DAMAGE_PER_FLAME);
 				
 				// Decorate the outer ring with fire effects that move in a twin, staggered spiral around the ring
-				final int NUM_OUTER_RING_CYCLES = 2;
+				final int NUM_OUTER_RING_CYCLES = 1;
 				success &= this.addConstantVelocityWaveToAction(action,
 						fireEmitterModel.getOuterRingStartEmitterIter(
 								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true, 0), true),
@@ -316,7 +318,7 @@ final public class ActionFactory {
 			case QUADRUPLE_LARIAT_ATTACK: {
 				final double QUADRUPLE_LARIAT_BASE_ACCELERATION   = 0.0;
 				final double QUADRUPLE_LARIAT_TIME_LENGTH_IN_SECS = 7.5;
-				final float QUADRUPLE_LARIAT_DAMAGE_PER_FLAME     = 5.0f;
+				final float QUADRUPLE_LARIAT_DAMAGE_PER_FLAME     = 3.0f;
 				final int QUADRUPLE_LARIAT_NUM_FLAMES             = 4;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.QUADRUPLE_LARIAT_ATTACK, playerNum,
@@ -341,9 +343,9 @@ final public class ActionFactory {
 			
 			case SUMO_HEADBUTT_ATTACK: {
 				
-				final double SUMO_HEADBUTT_BASE_ACCELERATION   = 0.1;
-				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 3.0;
-				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME     = 3.0f;
+				final double SUMO_HEADBUTT_BASE_ACCELERATION   = 0.0;
+				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 2.0;
+				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME     = 2.0f;
 				final int SUMO_HEADBUTT_NUM_FLAMES             = 2;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SUMO_HEADBUTT_ATTACK, playerNum,
@@ -369,15 +371,15 @@ final public class ActionFactory {
 			case ONE_HUNDRED_HAND_SLAP_ATTACK: {
 				
 				final double ONE_HUND_HAND_SLAP_BASE_ACCELERATION   = 0.0;
-				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 3.25;
-				final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME     = 3.0f;
+				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 2.15;
+				final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME     = 2.0f;
 				final int ONE_HUND_HAND_SLAP_NUM_FLAMES             = 3;
 				
-				final int TWO_HANDED_NUM_RANDOM_BURSTS = 16;
+				final int TWO_HANDED_NUM_RANDOM_BURSTS = 12;
 				final int ONE_HANDED_NUM_RANDOM_BURSTS = TWO_HANDED_NUM_RANDOM_BURSTS / 2;
 				
 				Random randomNumGen = new Random();
-				double currDelayCount = ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS * 0.55;
+				double currDelayCount = ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS * 0.1;
 				
 				if (leftHand && rightHand) {
 					action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK, playerNum,
@@ -390,7 +392,7 @@ final public class ActionFactory {
 					
 					for (int i = 0; i < TWO_HANDED_NUM_RANDOM_BURSTS; i++) {
 						success &= this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(
-								fireEmitterModel.getSemanticOuterRingEmitterIndex(attackee.getPlayerNumber(), randomNumGen.nextBoolean(), Math.abs(randomNumGen.nextInt() % 3)), true),
+								fireEmitterModel.getSemanticOuterRingEmitterIndex(attackee.getPlayerNumber(), randomNumGen.nextBoolean(), i % 2), true),
 								1, 1, TIME_PER_RANDOM_BURST, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currDelayCount);
 						currDelayCount += TIME_PER_RANDOM_BURST;
 					}
@@ -410,7 +412,7 @@ final public class ActionFactory {
 						final double TIME_PER_RANDOM_BURST = (ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS - currDelayCount) / (double)ONE_HANDED_NUM_RANDOM_BURSTS;
 						for (int i = 0; i < ONE_HANDED_NUM_RANDOM_BURSTS; i++) {
 							success &= this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(
-									fireEmitterModel.getSemanticOuterRingEmitterIndex(attackee.getPlayerNumber(), false, Math.abs(randomNumGen.nextInt() % 3)), true),
+									fireEmitterModel.getSemanticOuterRingEmitterIndex(attackee.getPlayerNumber(), false, i % 2), true),
 									1, 1, TIME_PER_RANDOM_BURST, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currDelayCount);
 							currDelayCount += TIME_PER_RANDOM_BURST;
 						}
@@ -428,7 +430,7 @@ final public class ActionFactory {
 						for (int i = 0; i < ONE_HANDED_NUM_RANDOM_BURSTS; i++) {
 						
 							success &= this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(
-									fireEmitterModel.getSemanticOuterRingEmitterIndex(attackee.getPlayerNumber(), true, Math.abs(randomNumGen.nextInt() % 3)), true),
+									fireEmitterModel.getSemanticOuterRingEmitterIndex(attackee.getPlayerNumber(), true, i % 2), true),
 									1, 1, TIME_PER_RANDOM_BURST, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, currDelayCount);
 							currDelayCount += TIME_PER_RANDOM_BURST;
 						}
@@ -440,8 +442,8 @@ final public class ActionFactory {
 			
 			case PSYCHO_CRUSHER_ATTACK: {
 				
-				final double PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS = 4.9;
-				final float PSYCHO_CRUSHER_DAMAGE_PER_FLAME     = 3.25f;
+				final double PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS = 2.25;
+				final float PSYCHO_CRUSHER_DAMAGE_PER_FLAME     = 2.5f;
 				final int PSYCHO_CRUSHER_NUM_FLAMES             = 3;
 				final double PSYCHO_CRUSHER_BASE_ACCELERATION   = 0.0;
 				
@@ -467,7 +469,7 @@ final public class ActionFactory {
 			
 			case YMCA_ATTACK: {
 				
-				final double YMCA_BASE_ACCELERATION   = 3.69;
+				final double YMCA_BASE_ACCELERATION   = 0.0;
 				final double YMCA_TIME_LENGTH_IN_SECS = 3.5;
 				final float YMCA_DAMAGE_PER_FLAME     = 2.5f;
 				final int YMCA_NUM_FLAMES             = 4;
@@ -493,10 +495,10 @@ final public class ActionFactory {
 			
 			case NYAN_CAT_ATTACK: {
 				
-				final double NYAN_CAT_BASE_ACCELERATION   = 3.33333333333333333333;
+				final double NYAN_CAT_BASE_ACCELERATION   = 0.0;
 				final double NYAN_CAT_TIME_LENGTH_IN_SECS = 3.33333333333333333333;
 				final float NYAN_CAT_DAMAGE_PER_FLAME     = 1.11111111111111111111f;
-				final int NYAN_CAT_NUM_FLAMES_PER_WAVE    = 3;
+				final int NYAN_CAT_NUM_FLAMES_PER_WAVE    = 2;
 				final int NYAN_CAT_NUM_WAVES              = 3;
 				
 				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.NYAN_CAT_ATTACK,
@@ -519,7 +521,7 @@ final public class ActionFactory {
 				success &= this.addConstantVelocityWaveToAction(action,
 						fireEmitterModel.getOuterRingStartEmitterIter(
 								fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, randomValGen.nextBoolean(), 0), randomValGen.nextBoolean()),
-						fireEmitterConfig.getNumOuterRingEmitters()*NYAN_CAT_NUM_WAVES, 1, NYAN_CAT_TIME_LENGTH_IN_SECS * NYAN_CAT_NUM_WAVES,
+						fireEmitterConfig.getNumOuterRingEmitters()*NYAN_CAT_NUM_WAVES, 1, 2 * NYAN_CAT_TIME_LENGTH_IN_SECS,
 						DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				
 				break;
@@ -573,10 +575,10 @@ final public class ActionFactory {
 			
 			case ARM_WINDMILL_ATTACK: {
 				
-				final double ARM_WINDMILL_BASE_ACCELERATION   = 1.5;
-				final double ARM_WINDMILL_TIME_LENGTH_IN_SECS = 3.25;
-				final float ARM_WINDMILL_DAMAGE_PER_FLAME     = 3.0f;
-				final int ARM_WINDMILL_NUM_FLAMES             = 4;
+				final double ARM_WINDMILL_BASE_ACCELERATION   = 0.75;
+				final double ARM_WINDMILL_TIME_LENGTH_IN_SECS = 2.5;
+				final float ARM_WINDMILL_DAMAGE_PER_FLAME     = 2.0f;
+				final int ARM_WINDMILL_NUM_FLAMES             = 3;
 				
 				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.ARM_WINDMILL_ATTACK,
 						blockerOrAttacker, attackee, ARM_WINDMILL_DAMAGE_PER_FLAME);
@@ -584,7 +586,7 @@ final public class ActionFactory {
 				final int ARM_WINDMILL_DOUBLE_NUM_FLAMES = 2 * ARM_WINDMILL_NUM_FLAMES;
 				
 				for (int i = 0; i < ARM_WINDMILL_DOUBLE_NUM_FLAMES; i++) {
-					double currentDelay = i * (ARM_WINDMILL_TIME_LENGTH_IN_SECS / (double)ARM_WINDMILL_NUM_FLAMES);
+					double currentDelay = i * (ARM_WINDMILL_TIME_LENGTH_IN_SECS / (double)ARM_WINDMILL_NUM_FLAMES) * 0.75;
 					
 					if (i % 2 == 0) {
 						success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum),
@@ -608,8 +610,8 @@ final public class ActionFactory {
 			case SUCK_IT_ATTACK: {
 				
 				final double SUCK_IT_BASE_ACCELERATION   = 0;
-				final double SUCK_IT_TIME_LENGTH_IN_SECS = 4.25;
-				final float SUCK_IT_DAMAGE_PER_FLAME     = 4.0f;
+				final double SUCK_IT_TIME_LENGTH_IN_SECS = 1.5f;
+				final float SUCK_IT_DAMAGE_PER_FLAME     = 3.0f;
 				final int SUCK_IT_NUM_FLAMES = 3;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(AttackType.SUCK_IT_ATTACK,
@@ -617,7 +619,7 @@ final public class ActionFactory {
 				
 				// Decoration for the suck it is a massive burst on all emitters for a small amount of time...
 				success = this.addBurstToAction(action, fireEmitterModel.getOuterRingStartEmitterIter(0, true),
-						fireEmitterConfig.getNumOuterRingEmitters(), 1, 2.5, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
+						fireEmitterConfig.getNumOuterRingEmitters(), 1, 1.0, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 
 				break;
 			}
@@ -706,7 +708,7 @@ final public class ActionFactory {
 		switch (ringmasterActionType) {
 		
 		case RINGMASTER_HALF_RING_ACTION: {
-			final double HALF_RING_DURATION_IN_SECS = 2.5;
+			final double HALF_RING_DURATION_IN_SECS = 1.0;
 			final int HALF_RING_NUM_FLAME_BURSTS = 1;
 			
 			FireEmitterIterator fireEmitterIter = null;
@@ -727,7 +729,7 @@ final public class ActionFactory {
 		}
 		
 		case RINGMASTER_JAB_ACTION: {
-			final double JAB_DURATION_IN_SECS = 1.0;
+			final double JAB_DURATION_IN_SECS = 1.3333333;
 			final int JAB_FLAME_WIDTH = 2;
 			
 			FireEmitterIterator fireEmitterIter = null;
@@ -748,7 +750,7 @@ final public class ActionFactory {
 		}
 
 		case RINGMASTER_ERUPTION_ACTION: {
-			final double ERUPTION_DURATION_IN_SECS = 2.0;
+			final double ERUPTION_DURATION_IN_SECS = 1.0;
 			final int ERUPTION_NUM_BURSTS = 1;
 			
 			success = true;
@@ -797,8 +799,8 @@ final public class ActionFactory {
 		}
 
 		case RINGMASTER_HADOUKEN_ACTION: {
-			final double HADOUKEN_DURATION_IN_SECS = 2.5;
-			final int HADOUKEN_FLAME_WIDTH = 3;
+			final double HADOUKEN_DURATION_IN_SECS = 2.0;
+			final int HADOUKEN_FLAME_WIDTH = 2;
 					
 			FireEmitterIterator fireEmitterIter1 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER, true);
 			FireEmitterIterator fireEmitterIter2 = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_RIGHT_EMITTER, false);
@@ -817,7 +819,7 @@ final public class ActionFactory {
 		case RINGMASTER_DRUM_ACTION: {
 			
 			final double DRUM_DURATION_IN_SECS = 5.0;
-			final int NUM_RANDOM_BURSTS = 30;
+			final int NUM_RANDOM_BURSTS = 25;
 			final double BURST_DURATION_IN_SECS = 1.0;
 			final double BURST_DIV_SECS = (DRUM_DURATION_IN_SECS / (double)NUM_RANDOM_BURSTS);
 			
@@ -958,6 +960,32 @@ final public class ActionFactory {
 		Action action = new CrowdPleaserAction(fireEmitterModel, colourEntity);
 		this.addBurstToAction(action, emitterIter, numEmitters, numBursts, totalDurationInSecs, 0.8f, 0.05f, delayInSecs);
 		return action;
+	}
+	
+	final Action buildPlayerWinAction(int victoryPlayerNum, double totalDurationInSecs, int numBursts, double delayInSecs) {
+		
+		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
+		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
+		
+		FireEmitterIterator fireEmitterIter = null;
+		
+		Player victoryPlayer = this.gameModel.getPlayer(victoryPlayerNum);
+		assert(victoryPlayer != null);
+		
+		Action result = new CrowdPleaserAction(fireEmitterModel, victoryPlayer.getEntity());
+		if (victoryPlayerNum == 1) {
+			fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_12OCLOCK_OUTER_RING_RIGHT_EMITTER, true);
+		}
+		else {
+			assert(victoryPlayerNum == 2);
+			fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER, true);
+		}
+
+		assert(fireEmitterIter != null);
+		this.addBurstToAction(result, fireEmitterIter, fireEmitterConfig.getNumOuterRingEmitters()/2, numBursts,
+				totalDurationInSecs, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, delayInSecs);
+		
+		return result;
 	}
 
 	
@@ -1105,7 +1133,7 @@ final public class ActionFactory {
 		// Make sure all the provided parameters are correct
 		if (action == null || emitterIter == null || totalDurationInSecs < 0.001 || travelLength <= 0 || width <= 0 ||
 			fullOnFraction < 0.0 || fullOnFraction > 1.0 || fullOffFraction < 0.0 || fullOffFraction > 1.0 ||
-			(fullOnFraction + fullOffFraction) > 1.0 || delayInSecs < 0.0) {
+			(fullOnFraction + fullOffFraction) > 1.0 + EPSILON || delayInSecs < 0.0) {
 			
 			assert(false);
 			return false;
@@ -1120,7 +1148,7 @@ final public class ActionFactory {
 		double maxOnTimePerLerp = durationPerLerp * fullOnFraction;
 		
 		assert(onTimePerLerp >= maxOnTimePerLerp);
-		double startMaxIntensityTime = (onTimePerLerp - maxOnTimePerLerp) / 2.0;
+		double startMaxIntensityTime = Math.max(0.0, (onTimePerLerp - maxOnTimePerLerp) / 2.0);
 		double endMaxIntensityTime   = startMaxIntensityTime + maxOnTimePerLerp;
 		double startDelayTime        = onTimePerLerp;
 		
@@ -1154,7 +1182,7 @@ final public class ActionFactory {
 		// Make sure all the provided parameters are correct
 		if (action == null || emitterIter == null || totalDurationInSecs < 0.001 || travelLength <= 0 || width <= 0 ||
 			fullOnFraction < 0.0 || fullOnFraction > 1.0 || fullOffFraction < 0.0 || fullOffFraction > 1.0 ||
-			(fullOnFraction + fullOffFraction) > 1.0 || delayInSecs < 0.0) {
+			(fullOnFraction + fullOffFraction) > 1.0 + EPSILON || delayInSecs < 0.0) {
 			
 			assert(false);
 			return false;
@@ -1226,7 +1254,7 @@ final public class ActionFactory {
 		// Make sure all the provided parameters are correct
 		if (action == null || emitterIter == null || totalDurationInSecs < 0.001 || width <= 0 || numBursts <= 0 ||
 			fullOnFraction < 0.0 || fullOnFraction > 1.0 || fullOffFraction < 0.0 || fullOffFraction > 1.0 ||
-			(fullOnFraction + fullOffFraction) > 1.0 || delayInSecs < 0.0) {
+			(fullOnFraction + fullOffFraction) > 1.0 + EPSILON || delayInSecs < 0.0) {
 			
 			assert(false);
 			return false;
@@ -1276,8 +1304,8 @@ final public class ActionFactory {
 			                                        double startDelayTime, double endDelayTime) {
 		
 		// Make sure the provided parameters are in sequential order from least to greatest
-		if (startMaxIntensityTime < 0.0 || startMaxIntensityTime > endMaxIntensityTime ||
-		    endMaxIntensityTime > startDelayTime || startDelayTime > endDelayTime) {
+		if (startMaxIntensityTime < -EPSILON || startMaxIntensityTime > (endMaxIntensityTime + EPSILON) ||
+		    endMaxIntensityTime > (startDelayTime + EPSILON) || startDelayTime > (endDelayTime + EPSILON)) {
 			assert(false);
 			return null;
 		}

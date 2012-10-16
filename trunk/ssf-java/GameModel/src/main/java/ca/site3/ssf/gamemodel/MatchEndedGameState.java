@@ -36,15 +36,15 @@ class MatchEndedGameState extends GameState {
 		
 		Action tempAction = null;
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.OUTER_RING, 4.0, 1, 0.0);
+		tempAction = actionFactory.buildPlayerWinAction(victoryPlayer.getPlayerNumber(), 2.75, 1, 0.0);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 4.0, 4, 0.0);
+		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 2.75, 4, 0.0);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 4.0, 4, 0.0);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 2.75, 4, 0.0);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		

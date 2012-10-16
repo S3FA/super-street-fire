@@ -16,7 +16,7 @@ public class SoundPlayerControllerTester {
 		PlayerAttackActionEvent player2AttackActionEvent = new PlayerAttackActionEvent(2, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
 		//GameStateChangedEvent gameStateChangedEvent = new GameStateChangedEvent(GameStateType.IDLE_STATE, GameStateType.ROUND_BEGINNING_STATE);
 		
-		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f));
+		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f, 0.33f));
 		
 		try {
 			

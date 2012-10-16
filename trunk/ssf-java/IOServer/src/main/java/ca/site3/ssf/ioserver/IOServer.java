@@ -24,6 +24,7 @@ import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.HeadsetData;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelListener;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
 import ca.site3.ssf.guiprotocol.SystemCommand;
@@ -128,6 +129,11 @@ public class IOServer {
 		serialComm = new SerialCommunicator(serialIn, serialOut, guiServer);
 		Thread serialCommThread = new Thread(serialComm, "Serial communications thread");
 		serialCommThread.start();
+		
+		// launch with lifebars at 0. not the best place for this code but it'll do for now.
+		serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(1, 0, 0));
+		serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(2, 0, 0));
+		
 		
 		gameEventRouter = new GameEventRouter(guiServer, serialComm);
 		game.addGameModelListener(gameEventRouter);

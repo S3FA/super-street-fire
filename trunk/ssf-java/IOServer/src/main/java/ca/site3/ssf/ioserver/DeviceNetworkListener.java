@@ -92,7 +92,7 @@ public class DeviceNetworkListener implements Runnable {
 				log.debug("Device listener timed out");
 			}
 			catch (SocketException ex) {
-				log.info("Device listener socket closed",ex);
+				log.info("Device listener socket closed.");
 				break;
 			}
 			catch (IOException ex) {

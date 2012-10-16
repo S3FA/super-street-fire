@@ -21,19 +21,19 @@ class RoundBeginTimerChangedSoundPlayer extends SoundPlayer {
 		
 		String tempPath = "";
 		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Three");
-		this.threeAudioHandler = new PlaybackHandler(controller, tempPath,
+		this.threeAudioHandler = PlaybackHandler.build(controller, tempPath,
 			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 		
 		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Two");
-		this.twoAudioHandler = new PlaybackHandler(controller, tempPath,
+		this.twoAudioHandler = PlaybackHandler.build(controller, tempPath,
 				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 		
 		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.One");
-		this.oneAudioHandler = new PlaybackHandler(controller, tempPath,
+		this.oneAudioHandler = PlaybackHandler.build(controller, tempPath,
 				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 		
 		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Fight");
-		this.fightAudioHandler = new PlaybackHandler(controller, tempPath,
+		this.fightAudioHandler = PlaybackHandler.build(controller, tempPath,
 				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 	}
 	

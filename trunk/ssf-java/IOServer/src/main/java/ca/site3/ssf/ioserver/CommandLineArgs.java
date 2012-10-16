@@ -25,7 +25,7 @@ public class CommandLineArgs {
 	public Double minTimeBetweenPlayerActionsInSecs = 0.75;
 	
 	@Parameter(names="-roundLength", description="Length of rounds (in seconds)")
-	public Integer roundTimeInSecs = 60;
+	public Integer roundTimeInSecs = 45;
 	
 	@Parameter(names="-numRounds", description="Number of rounds per match")
 	public Integer numRoundsPerMatch = 3;
@@ -53,7 +53,7 @@ public class CommandLineArgs {
 	public String gestureEngineFilepath = new File(System.getProperty("user.dir"), "../GestureRecorderGUI/Data/gesture_recognizer_engine.eng").toString();
 	
 	@Parameter(names={"-encrypt", "-e"}, description="Use SSL to encrypt wifi communications")
-	public Boolean useSSL = true;
+	public Boolean useSSL = false;
 	
 	
 	public CommandLineArgs() {
@@ -82,6 +82,7 @@ public class CommandLineArgs {
 		buf.append("\nUsing SSL: "+ useSSL);
 		buf.append("\nSerial device: "+ serialDevice);
 		buf.append("\nI/O Server IP: "+ gloveInterfaceIP);
+		buf.append("\nLoading Gesture file: "+ gestureEngineFilepath);
 		
 		return buf.toString();
 	}

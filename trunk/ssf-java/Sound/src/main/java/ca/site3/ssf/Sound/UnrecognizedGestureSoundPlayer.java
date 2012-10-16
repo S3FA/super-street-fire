@@ -15,7 +15,7 @@ class UnrecognizedGestureSoundPlayer extends SoundPlayer {
 		
 		tempPath = controller.getResourcePath() +
 				controller.getConfigProperties().getProperty("Action.UnrecognizedGesture");
-		this.unrecognizedGestureSound = new PlaybackHandler(controller, tempPath,
+		this.unrecognizedGestureSound = PlaybackHandler.build(controller, tempPath,
 				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 	}
 	

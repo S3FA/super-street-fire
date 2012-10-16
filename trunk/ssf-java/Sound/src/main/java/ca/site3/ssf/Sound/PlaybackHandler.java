@@ -22,25 +22,34 @@ class PlaybackHandler implements LineListener {
 	private final String audioFilepath;
 	private PlaybackSettings settings;
 
-	PlaybackHandler(SoundPlayerController controller, String audioFilepath, PlaybackSettings settings) {
+	static PlaybackHandler build(SoundPlayerController controller, String audioFilepath, PlaybackSettings settings) {
+		PlaybackHandler result = new PlaybackHandler(controller, audioFilepath, settings);
+		boolean isInit = result.init();
+		result.setSettings(settings);
+		
+		if (!isInit) {
+			return null;
+		}
+		
+		return result;
+	}
+	
+	private PlaybackHandler(SoundPlayerController controller, String audioFilepath, PlaybackSettings settings) {
 		assert(controller != null);
 		assert(audioFilepath != null);
 		assert(settings != null);
 		
 		this.controller = controller;
 		this.audioFilepath = audioFilepath;
-		
-		this.init();
-		this.setSettings(settings);
 	}
 	
-	private void init() {
+	private boolean init() {
 		try{
 			this.ogg = new OggClip(this.audioFilepath);
 		}
 		catch(IOException ex){
 			logger.warn("Failed to read audio file " + audioFilepath);
-			return;
+			return false;
 		}
 		// Open the audio file from disk (make sure it even exists)
 		//File audioFile = new File(this.audioFilepath);
@@ -84,6 +93,8 @@ class PlaybackHandler implements LineListener {
 				
 		//this.clip.addLineListener(this);
 		//this.ogg.addLineListener(this);
+		
+		return true;
 	}
 	
 	void play() {

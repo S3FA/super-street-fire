@@ -20,15 +20,15 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		
 		String tempPath = "";
 		tempPath = resourcePath + configProperties.getProperty("RoundResult.PlayerOneVictory");
-		this.p1VictoryAudioHandler = new PlaybackHandler(controller, tempPath,
+		this.p1VictoryAudioHandler = PlaybackHandler.build(controller, tempPath,
 			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 		
 		tempPath = resourcePath + configProperties.getProperty("RoundResult.PlayerTwoVictory");
-		this.p2VictoryAudioHandler = new PlaybackHandler(controller, tempPath,
+		this.p2VictoryAudioHandler = PlaybackHandler.build(controller, tempPath,
 			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 		
 		tempPath = resourcePath + configProperties.getProperty("RoundResult.Tie");
-		this.tieAudioHandler = new PlaybackHandler(controller, tempPath,
+		this.tieAudioHandler = PlaybackHandler.build(controller, tempPath,
 			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 		
 		// Stop all other controller sounds...
