@@ -59,6 +59,9 @@ import ca.site3.ssf.ioserver.SerialTestWindow;
 import ch.qos.logback.classic.Level;
 
 import com.apple.eawt.Application;
+import com.apple.eawt.QuitHandler;
+import com.apple.eawt.QuitResponse;
+import com.apple.eawt.AppEvent.QuitEvent;
 import com.beust.jcommander.JCommander;
 
 
@@ -97,10 +100,13 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
     private IGameModel gameModel      = null;	
     private IOServer ioserver         = null;
     
+    private SoundPlayerController soundPlayerController;
     
     private final CommandLineArgs args;
     private StreetFireGuiClient client = null;
 
+    static final int PREF_WINDOW_WIDTH = 1250;
+    
     /** thread that monitors the queue for game model events */
     private Thread gameEventThread;
     
@@ -136,14 +142,15 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		// NOTE: If we setup the sound player to be a direct listener of the game model then the 
 		// the sound player will be touched by the ioserver's thread. This is why we don't keep a
 		// member of it, so that we don't make the mistake of touching it with any of the GUI threads.
-		SoundPlayerController soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f));
-		new Thread(soundPlayerController).start();
+		// GW: how about we just be careful. Need a reference to this to cleanly stop sound on quit.
+		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f, 0.33f));
+		new Thread(soundPlayerController, "Sound Player Controller").start();
 		this.ioserver.getGameModel().addGameModelListener(soundPlayerController);
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI) - " + args.serialDevice);
-		this.setPreferredSize(new Dimension(1200, 725));
-		this.setMinimumSize(new Dimension(1200, 720));
+		this.setPreferredSize(new Dimension(PREF_WINDOW_WIDTH, 725));
+		this.setMinimumSize(new Dimension(PREF_WINDOW_WIDTH, 720));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		
@@ -544,6 +551,13 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		try {
 			Image ssfImage = ImageIO.read(getClass().getResource("ssfsmall.jpg"));
 			app.setDockIconImage(ssfImage);
+			app.setQuitHandler(new QuitHandler() {
+				public @Override void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
+					soundPlayerController.stop();
+					DevGUIMainWindow.this.ioserver.stop();
+					response.performQuit();
+				}
+			});
 		} catch (IOException ex) {
 			log.warn("Couldn't set dock image on Mac");
 		}
