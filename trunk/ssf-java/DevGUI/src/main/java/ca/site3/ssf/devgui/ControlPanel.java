@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -47,7 +48,8 @@ class ControlPanel extends JPanel implements ActionListener {
 	List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
 	
 	ControlPanel(ActionFactory actionFactory, StreetFireGuiClient client) {
-		super();
+		
+		//setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
 		this.actionFactory = actionFactory;
 		this.client = client;
@@ -58,17 +60,15 @@ class ControlPanel extends JPanel implements ActionListener {
 		
 		JPanel generalButtonPanel = new JPanel();
 		generalButtonPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
-		generalButtonPanel.setLayout(new FlowLayout());
 		
-		this.nextStateButton1 = new JButton("Next State");
+		this.nextStateButton1 = new JButton("Enter Ringmaster State");
 		this.nextStateButton1.addActionListener(this);
 		generalButtonPanel.add(this.nextStateButton1);
 		
-		this.nextStateButton2 = new JButton("Next State");
+		this.nextStateButton2 = new JButton("Test Round");
 		this.nextStateButton2.addActionListener(this);
 		generalButtonPanel.add(this.nextStateButton2);
-		this.nextStateButton2.setVisible(false);
-	
+
 		this.killButton = new JButton("Kill Game");
 		this.killButton.addActionListener(this);
 		generalButtonPanel.add(this.killButton);
@@ -104,14 +104,8 @@ class ControlPanel extends JPanel implements ActionListener {
 		this.executeRingmasterActionButton = new JButton("Execute for Ringmaster");
 		this.executeRingmasterActionButton.addActionListener(this);
 		
-		this.playerActionComboBox.setVisible(false);
-		this.ringmasterActionComboBox.setVisible(false);
-		this.executeP1ActionButton.setVisible(false);
-		this.executeP2ActionButton.setVisible(false);
-		this.executeRingmasterActionButton.setVisible(false);
 		
 		JPanel actionPanel = new JPanel();
-		actionPanel.setLayout(new FlowLayout());
 		actionPanel.add(this.playerActionComboBox);
 		actionPanel.add(this.executeP1ActionButton);
 		actionPanel.add(this.executeP2ActionButton);
@@ -235,6 +229,8 @@ class ControlPanel extends JPanel implements ActionListener {
 				this.setEnableActionControls(false, false);
 				break;
 		}
+		
+		this.invalidate();
 	}
 
 	private void executePlayerAction(int playerNum) {

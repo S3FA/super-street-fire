@@ -61,8 +61,8 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 	final static private Font ROUND_FONT      = new Font("SansSerif", Font.BOLD, 24);
 	
 	// Colours used when drawing the fire emitters whose flame belongs to a particular entity in the game...
-	final static Color PLAYER_1_COLOUR   = new Color(1.0f, 0.0f, 0.0f);
-	final static Color PLAYER_2_COLOUR   = new Color(0.0f, 0.0f, 1.0f);
+	final static Color PLAYER_1_COLOUR   = Color.blue;
+	final static Color PLAYER_2_COLOUR   = Color.green;
 	final static Color RINGMASTER_COLOUR = Color.orange;
 	
 	// Emitter status indicators
