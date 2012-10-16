@@ -296,8 +296,8 @@ public class SerialCommunicator implements Runnable {
 			//System.out.println("lastTimerVal = "+lastTimerVal);;
 			//System.out.println("Timer lastTimerVal/10: "+(lastTimerVal/10));
 			//System.out.println("Timer lastTimerVal%10: "+(lastTimerVal%10));
-			payload[5] = digitMap[lastTimerVal / 10]; 
-			payload[6] = digitMap[lastTimerVal % 10];
+			payload[6] = digitMap[lastTimerVal / 10]; 
+			payload[5] = digitMap[lastTimerVal % 10];
 			
 			enqueueMessage(getMessageForPayload(payload));
 		}
@@ -310,6 +310,7 @@ public class SerialCommunicator implements Runnable {
 			buffer[offset] = buffer[offset+1] = 0;
 		} else {
 			int bars = (1 << (int)(life / LIFE_PER_BAR) + 1) - 1;
+			//int bars = 1 << (int)Math.ceil(((float)life / LIFE_PER_BAR));
 			buffer[offset] = (byte) ( (bars >> 8) & 0xFF);
 			buffer[offset+1] = (byte) (bars & 0xFF);
 		}

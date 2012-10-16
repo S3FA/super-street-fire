@@ -18,11 +18,11 @@ import java.util.Enumeration;
 import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.FireEmitter;
-import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
-import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ch.qos.logback.classic.Level;
 
 public class TestSerialStuff {
@@ -137,7 +137,8 @@ public class TestSerialStuff {
 //		tss.initSerialStuff("/dev/master");
 //		tss.test();
 //		tss.testFireBoard(25);
-		tss.testScoreBoard(35);
+		tss.testTimer(35);
+		tss.testTimer(36);
 		
 //		tss.testGlowflies();
 	}
@@ -195,8 +196,8 @@ public class TestSerialStuff {
 	
 	
 	
-	private void testScoreBoard(int boardId) {
-		initSerialStuff("/dev/tty.usbserial-A40081Z7");
+	private void testTimer(int boardId) {
+		initSerialStuff("/dev/cu.usbserial-A800K75T");
 		assertNotNull(serialPort);
 		InputStream in = null;
 		OutputStream out = null;
@@ -212,21 +213,8 @@ public class TestSerialStuff {
 		Thread commThread = new Thread(sc);
 		commThread.start();
 		
-		
-		
-//		for (int timer = 99; timer >= 0; timer--) {
-//			RoundPlayTimerChangedEvent roundEvent = new RoundPlayTimerChangedEvent(timer);
-//			sc.notifyTimerAndLifeBars(roundEvent);
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException ex) {
-//				ex.printStackTrace();
-//			}
-//			
-//		}
-		
-		RoundPlayTimerChangedEvent roundEvent = new RoundPlayTimerChangedEvent(1);
-		sc.notifyTimerAndLifeBars(roundEvent);
+//		testTimer(sc, 88);
+		testLifeBar(sc);
 		
 		sc.querySystemStatus();
 		
@@ -236,6 +224,27 @@ public class TestSerialStuff {
 	}
 	
 	
+	private void testTimer(SerialCommunicator sc, int countDownStart) {
+		for (int timer = countDownStart; timer >= 0; timer--) {
+			RoundPlayTimerChangedEvent roundEvent = new RoundPlayTimerChangedEvent(timer);
+			sc.notifyTimerAndLifeBars(roundEvent);
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	
+	private void testLifeBar(SerialCommunicator sc) {
+		
+		int prevHealth = 100;
+		for (int health = 100; health >=0; health -= Math.round(100/16)) {
+			PlayerHealthChangedEvent healthEvent = new PlayerHealthChangedEvent(1, prevHealth, health);
+			prevHealth = health;
+		}
+	}
 	
 	private void testGlowflies() {
 		System.out.println("testing the fucking glowflies");

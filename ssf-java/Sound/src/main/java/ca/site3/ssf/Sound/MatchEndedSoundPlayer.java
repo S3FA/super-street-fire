@@ -16,12 +16,12 @@ class MatchEndedSoundPlayer extends SoundPlayer {
 		
 		tempPath = controller.getResourcePath() +
 				controller.getConfigProperties().getProperty("MatchResult.PlayerOneVictory");
-		this.p1VictoryPlayback = new PlaybackHandler(controller, tempPath,
+		this.p1VictoryPlayback = PlaybackHandler.build(controller, tempPath,
 				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 		
 		tempPath = controller.getResourcePath() +
 				controller.getConfigProperties().getProperty("MatchResult.PlayerTwoVictory");
-		this.p2VictoryPlayback = new PlaybackHandler(controller, tempPath,
+		this.p2VictoryPlayback = PlaybackHandler.build(controller, tempPath,
 				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
 	}
 	

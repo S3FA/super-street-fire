@@ -285,6 +285,7 @@ public class StreetFireGuiClient {
 			while (true) {
 				try {
 					Command cmd = commandQueue.take();
+					log.debug("SendThread "+System.identityHashCode(this) + " sending command: "+cmd.getType());
 					cmd.writeDelimitedTo(socket.getOutputStream());
 				} catch (InterruptedException ex) {
 					log.warn("Interrupted waiting for a command",ex);

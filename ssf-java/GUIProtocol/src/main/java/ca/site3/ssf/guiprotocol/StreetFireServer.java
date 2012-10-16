@@ -3,9 +3,11 @@ package ca.site3.ssf.guiprotocol;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -15,7 +17,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSocket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,7 @@ public class StreetFireServer implements Runnable {
 	
 	private boolean useSSL;
 	
-	private ServerSocket socket;
+	private ServerSocket serverSocket;
 	
 	private Queue<AbstractGameModelCommand> gameCommandQueue;
 	
@@ -118,7 +119,7 @@ public class StreetFireServer implements Runnable {
 		}
 		
 		try {
-			socket = ssFactory.createServerSocket(port);
+			serverSocket = ssFactory.createServerSocket(port);
 		} catch (SocketException ex) {
 			log.error("Exception setting timeout on server socket",ex);
 		} catch (IOException ex) {
@@ -132,7 +133,7 @@ public class StreetFireServer implements Runnable {
 		while ( ! stop ) {
 			try {
 				// Accept incoming connections from GUI clients
-				SSLSocket s = (SSLSocket) socket.accept();
+				Socket s = serverSocket.accept();
 				log.info("Accepted connection from " + s.getInetAddress());
 				
 				// A connection has been accepted, build a handler for the new connection and start it up
@@ -140,6 +141,7 @@ public class StreetFireServer implements Runnable {
 				activeHandlers.add(handler);
 				Thread t = new Thread(handler, "GuiHandler - " + handler.hashCode());
 				t.start();
+				// Don't touch the socket ('s') again, leave it to the new thread.
 				
 			} catch (SocketTimeoutException ex) {
 				log.info("Server socket timeout",ex);
@@ -160,36 +162,48 @@ public class StreetFireServer implements Runnable {
 	
 	
 	/**
-	 * Monitors eventQueue and sends commands along to the server
+	 * Monitors eventQueue and sends commands along to the clients.
 	 */
 	private class SendThread extends Thread {
 		@Override
 		
-		
 		public void run() {
 			boolean isDone = false;
 			while (!isDone) {
+				
+				if (!serverSocket.isBound() || serverSocket.isClosed()) {
+					isDone = true;
+					continue;
+				}
+				
 				try {
+					// Get the next event that occurred in the gamemodel on the server
 					GameEvent event = eventQueue.take();
 					
-					for (GuiHandler guiHandler : activeHandlers) {
+					// Go through and send the event to each client GUI
+					Iterator<GuiHandler> iter = activeHandlers.iterator();
+					while (iter.hasNext()) {
+						GuiHandler guiHandler = iter.next();
 						try {
 							guiHandler.sendGameEvent(event);
 						}
 						catch (IOException ex) {
 							log.error("Exception sending GameEvent to GUI client", ex);
-							
-							if (!socket.isBound() || socket.isClosed()) {
-								isDone = true;
-								break;
-							}
 						}
-
+						
+						if (!serverSocket.isBound() || serverSocket.isClosed()) {
+							isDone = true;
+							break;
+						}
 					}
+					
 				} catch (InterruptedException ex) {
 					log.warn("Interrupted waiting for an event", ex);
 				}
 			}
+			
+			// Make sure we tell the server that it's no longer viable, stop its socket accepting thread.
+			stop = true;
 		}
 	}
 	
@@ -341,18 +355,23 @@ public class StreetFireServer implements Runnable {
 	 */
 	private class GuiHandler implements Runnable {
 	
-		private final SSLSocket socket;
+		private final Socket socket;
 		
 		private volatile boolean shouldListen = true;
 		
 		
-		public GuiHandler(SSLSocket s) {
+		public GuiHandler(Socket s) {
 			this.socket = s;
 		}
 		
-		
 		public void run() {
 			while ( shouldListen ) {
+				
+				if (!this.socket.isBound() || this.socket.isClosed()) {
+					shouldListen = false;
+					continue;
+				}
+				
 				try {
 					Command cmd = Command.parseDelimitedFrom(socket.getInputStream());
 
