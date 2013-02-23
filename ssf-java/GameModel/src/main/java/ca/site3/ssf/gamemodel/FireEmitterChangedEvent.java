@@ -10,6 +10,7 @@ import java.util.Map;
  * @author Callum
  *
  */
+@SuppressWarnings("serial")
 public final class FireEmitterChangedEvent implements IGameModelEvent {
 	
 	final private int index;

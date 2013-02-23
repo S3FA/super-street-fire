@@ -2,13 +2,11 @@ package ca.site3.ssf.gesturerecordergui;
 
 import java.awt.Checkbox;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

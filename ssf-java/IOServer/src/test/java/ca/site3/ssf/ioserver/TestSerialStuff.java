@@ -61,6 +61,7 @@ public class TestSerialStuff {
 	/**
 	 * Initialize the serial comm port.
 	 */
+	@SuppressWarnings("unchecked")
 	private void initSerialStuff(String serialDevice) {
 		
 		
@@ -144,6 +145,7 @@ public class TestSerialStuff {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private void testFireBoard(int boardId) {
 		initSerialStuff("/dev/tty.usbserial-A40081Z7");
 		assertNotNull(serialPort);
@@ -224,6 +226,7 @@ public class TestSerialStuff {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private void testTimer(SerialCommunicator sc, int countDownStart) {
 		for (int timer = countDownStart; timer >= 0; timer--) {
 			RoundPlayTimerChangedEvent roundEvent = new RoundPlayTimerChangedEvent(timer);
@@ -241,11 +244,13 @@ public class TestSerialStuff {
 		
 		int prevHealth = 100;
 		for (int health = 100; health >=0; health -= Math.round(100/16)) {
-			PlayerHealthChangedEvent healthEvent = new PlayerHealthChangedEvent(1, prevHealth, health);
+			new PlayerHealthChangedEvent(1, prevHealth, health);
 			prevHealth = health;
 		}
 	}
 	
+	
+	@SuppressWarnings("unused")
 	private void testGlowflies() {
 		System.out.println("testing the fucking glowflies");
 		

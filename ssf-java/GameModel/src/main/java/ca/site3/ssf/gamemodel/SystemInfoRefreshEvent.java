@@ -14,6 +14,7 @@ import ca.site3.ssf.gamemodel.FireEmitter.Location;
  * 
  * @author greg
  */
+@SuppressWarnings("serial")
 public class SystemInfoRefreshEvent implements IGameModelEvent {
 
 	private Logger log = LoggerFactory.getLogger(getClass());

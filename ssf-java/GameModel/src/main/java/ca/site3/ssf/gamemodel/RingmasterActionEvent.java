@@ -1,5 +1,6 @@
 package ca.site3.ssf.gamemodel;
 
+@SuppressWarnings("serial")
 public final class RingmasterActionEvent implements IGameModelEvent {
 
 	private final RingmasterAction.ActionType ringmasterAction;

@@ -7,6 +7,7 @@ import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
+@SuppressWarnings("serial")
 public final class GameInfoRefreshEvent implements IGameModelEvent {
 
 	private final GameState.GameStateType currGameState;

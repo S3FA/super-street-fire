@@ -1,5 +1,6 @@
 package ca.site3.ssf.gamemodel;
 
+@SuppressWarnings("serial")
 public final class PlayerHealthChangedEvent implements IGameModelEvent {
 
 	final private int playerNum;			// The player whose health amount changed

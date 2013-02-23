@@ -1,5 +1,6 @@
 package ca.site3.ssf.gamemodel;
 
+@SuppressWarnings("serial")
 public final class PlayerBlockActionEvent implements IGameModelEvent {
 
 	final private int playerNum; // The number of the player who is blocking

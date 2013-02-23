@@ -1,5 +1,6 @@
 package ca.site3.ssf.gamemodel;
 
+@SuppressWarnings("serial")
 public final class GameStateChangedEvent implements IGameModelEvent {
 
 	final private GameState.GameStateType oldState;
