@@ -3,7 +3,6 @@ package ca.site3.ssf.gesturerecordergui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -16,7 +15,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,7 +29,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -67,14 +64,10 @@ class TrainingPanel extends JPanel implements ActionListener {
 	private JButton trainFilesButton;
 	private JButton trainMoreButton;
 	private JButton untrainGestureButton;
-	@SuppressWarnings("rawtypes")
 
 	private DefaultListModel gestureListModel = new DefaultListModel();
-	@SuppressWarnings("rawtypes")
 	private DefaultListModel toTrainListModel = new DefaultListModel();
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private JList gestureList = new JList(gestureListModel);
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private JList toTrainList = new JList(toTrainListModel);
 	private JButton toTrainListButton;
 	private JButton fromTrainListButton;
@@ -96,7 +89,6 @@ class TrainingPanel extends JPanel implements ActionListener {
 	
 	private GestureRecognizer gestureRecognizer;
 	
-	@SuppressWarnings("unchecked")
 	TrainingPanel() {
 		super();
 		
@@ -286,7 +278,6 @@ class TrainingPanel extends JPanel implements ActionListener {
 	}
 	
 	// Handles button events
-	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e)
 	{
 		// Add the file to the list of files to convert
@@ -366,7 +357,6 @@ class TrainingPanel extends JPanel implements ActionListener {
 			this.gestureRecognizer.clearEngine();
 		}
 		else if (e.getSource() == this.toTrainListButton) {
-			@SuppressWarnings("deprecation")
 			Object[] selectedGestures = this.gestureList.getSelectedValues();
 			for (Object obj : selectedGestures) {
 				GestureType gesture = (GestureType)obj;
@@ -386,7 +376,6 @@ class TrainingPanel extends JPanel implements ActionListener {
 			}
 		}
 		else if (e.getSource() == this.fromTrainListButton) {
-			@SuppressWarnings("deprecation")
 			Object[] selectedGestures = this.toTrainList.getSelectedValues();
 			for (Object obj : selectedGestures) {
 				GestureType gesture = (GestureType)obj;

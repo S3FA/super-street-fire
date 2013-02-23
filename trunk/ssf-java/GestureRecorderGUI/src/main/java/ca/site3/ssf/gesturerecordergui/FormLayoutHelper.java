@@ -109,7 +109,6 @@ class FormLayoutHelper {
         parent.add(c);
     }
     
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JComboBox constructGestureComboBox()
 	{
 		JComboBox comboBox = new JComboBox();

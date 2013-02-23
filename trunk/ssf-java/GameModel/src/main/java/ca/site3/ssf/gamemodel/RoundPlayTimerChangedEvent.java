@@ -1,5 +1,6 @@
 package ca.site3.ssf.gamemodel;
 
+@SuppressWarnings("serial")
 public final class RoundPlayTimerChangedEvent implements IGameModelEvent {
 	
 	// The current count down time of the current game round. The

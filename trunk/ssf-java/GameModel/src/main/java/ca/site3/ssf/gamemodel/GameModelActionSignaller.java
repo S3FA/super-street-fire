@@ -6,7 +6,6 @@ import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 

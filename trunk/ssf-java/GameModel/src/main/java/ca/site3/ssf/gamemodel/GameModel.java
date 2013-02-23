@@ -7,7 +7,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;

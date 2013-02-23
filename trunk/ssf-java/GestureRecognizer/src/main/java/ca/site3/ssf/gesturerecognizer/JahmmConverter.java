@@ -9,10 +9,8 @@ import org.slf4j.LoggerFactory;
 import be.ac.ulg.montefiore.run.jahmm.Hmm;
 import be.ac.ulg.montefiore.run.jahmm.ObservationVector;
 import be.ac.ulg.montefiore.run.jahmm.OpdfMultiGaussianFactory;
-import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.BaumWelchScaledLearner;
 import be.ac.ulg.montefiore.run.jahmm.learn.KMeansLearner;
-import be.ac.ulg.montefiore.run.jahmm.toolbox.MarkovGenerator;
 
 /**
  * Static class for holding methods for converting native gesturerecognizer package

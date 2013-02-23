@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.gamemodel.Action;
 import ca.site3.ssf.gamemodel.ActionFactory;
-import ca.site3.ssf.gamemodel.IGameModel;
 
 /**
  * Public facade for the gesturerecognizer module. Use this class to perform the following...

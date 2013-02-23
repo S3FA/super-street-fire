@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Sound</name>
+	<name>DevGUI</name>
 	<comment></comment>
 	<projects>
-		<project>GameModel</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
