@@ -105,8 +105,8 @@ public class PlayerAttackAction extends Action {
 	/**
 	 * Inform this action that a block (i.e., an attack from the attacker was carried out on the same
 	 * emitter where a block was simultaneously occurring from the attackee) has occurred on one of 
-	 * its simulators. This function will ensure that the block cancels one of the attack flames in this
-	 * attack action.
+	 * its simulators. This function will ensure that the block cancels at least one of the
+	 * attack flames in this attack action.
 	 */
 	void blockOccurred(int waveIndex, int simulatorIndex) {
 		assert(waveIndex >= 0);
@@ -117,8 +117,13 @@ public class PlayerAttackAction extends Action {
 			return;
 		}
 		
-		// Chip damage...
+		// TODO: Block the attack based on how well-timed the block was...
+		// ...
+		
+		
+		// The attack will still do chip damage...
 		this.attackee.doChipDamage(this.damagePerFlame);
+		
 		
 		// When a block occurs on a particular simulator we need to propagate the effects
 		// of that block to each of the simulators that are after it - this will cancel out

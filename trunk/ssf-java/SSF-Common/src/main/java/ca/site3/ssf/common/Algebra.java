@@ -14,4 +14,9 @@ public class Algebra {
 			   Math.abs(v1.getY() - v2.getY()) < epsilon &&
 			   Math.abs(v1.getZ() - v2.getZ()) < epsilon;
 	}
+	
+	public static float LerpF(double x0, double x1, float y0, float y1, double x) {
+		return (float)(y0 + (y1 - y0) * (x - x0) / (x1 - x0));
+	}
+	
 }
