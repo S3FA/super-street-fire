@@ -106,7 +106,7 @@ class FireEmitterSimulator {
 			if (currLerpWasNotFinishedBeforeTick && intensityLerp.isFinished()) {
 				
 				// If one player's attack flame was on the same emitter as the other player's block flame
-				// then we need to cancel out one of the attack flames...
+				// then we need to cancel out some of the attack flames...
 				// CONSIDERATIONS:
 				// - We should wait for the full flame intensity lerp to complete before indicating the cancellation,
 				// by doing this we ensure that the full flame occurs for the attack on the emitter where it was blocked
@@ -191,6 +191,9 @@ class FireEmitterSimulator {
 			return;
 		}
 		
+		// This simulator will be keeping track of (and simulating) the linear interpolation of the flame intensity
+		// value. That value is then fed to the FireEmitter object (which is responsible for sending events and
+		// basic book-keeping).
 		MultiLerp intensityLerp = this.intensityLerps.peek();
 		float simulatedFlameIntensity = (float)intensityLerp.getInterpolantValue();
 		this.emitter.setIntensity(this.action, simulatedFlameIntensity);

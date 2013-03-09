@@ -19,8 +19,9 @@ public enum GestureType {
 	// TODO: Maximum/Full attack fierceness threshold (where anything at or above this counts as the
 	// fastest and strongest possible version of the attack)
 	
-	LEFT_BLOCK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, false, false, Arrays.asList("left_blocks")),
-	RIGHT_BLOCK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.BLOCK, GestureGenre.BASIC, 0, 3, false, true, false, Arrays.asList("right_blocks")),
+	// NOTE: We are removing only-left and only-right handed blocks, this will make for better and more directed game-play
+	//LEFT_BLOCK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, false, false, Arrays.asList("left_blocks")),
+	//RIGHT_BLOCK(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.BLOCK, GestureGenre.BASIC, 0, 3, false, true, false, Arrays.asList("right_blocks")),
 	TWO_HANDED_BLOCK(RecognizerManager.NUM_TWO_HANDED_PLAYER_GESTURE_NODES, ActionType.BLOCK, GestureGenre.BASIC, 0, 3, true, true, false, Arrays.asList("two_handed_blocks")),
 
 	LEFT_JAB(RecognizerManager.NUM_ONE_HANDED_PLAYER_GESTURE_NODES, ActionType.JAB_ATTACK, GestureGenre.BASIC, 6200, 8, true, false, false, Arrays.asList("left_jabs")),

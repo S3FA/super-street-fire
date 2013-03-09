@@ -104,13 +104,12 @@ final public class ActionFactory {
 		switch (playerActionType) {
 			case BLOCK:
 				action = new PlayerBlockAction(fireEmitterModel, blockerOrAttacker);
-
-				if (leftHand) {  
-					success &= this.addBurstToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), 1, 1, 3.0, 0.99, 0.01, 0.0);
-				}
-				if (rightHand) {
-					success &= this.addBurstToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), 1, 1, 3.0, 0.99, 0.01, 0.0);
-				}
+				
+				// Doesn't matter if it's left or right handed, a block will block
+				// attacks coming in on both rails...
+				success &= this.addBurstToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), 1, 1, 3.0, 0.99, 0.01, 0.0);
+				success &= this.addBurstToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), 1, 1, 3.0, 0.99, 0.01, 0.0);
+				
 				break;
 				
 			case JAB_ATTACK: {
