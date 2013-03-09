@@ -4,9 +4,9 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GameModel"/>
-	<classpathentry kind="lib" path="lib/jogg-0.0.7.jar"/>
-	<classpathentry kind="lib" path="lib/jorbis-0.0.15.jar"/>
-	<classpathentry kind="lib" path="/ssf/lib/slf4j-api-1.6.4.jar"/>
-	<classpathentry kind="lib" path="/ssf/lib/junit-4.8.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jogg-0.0.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jorbis-0.0.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/junit-4.8.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
