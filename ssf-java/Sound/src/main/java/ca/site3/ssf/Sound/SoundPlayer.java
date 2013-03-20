@@ -7,7 +7,7 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
  * that inherit from this are responsible for determining the audio that should play
  * for particular gamemodel events.
  * 
- * @author Callum
+ * @author Callum, Mike
  *
  */
 abstract class SoundPlayer implements ISoundPlayer {
