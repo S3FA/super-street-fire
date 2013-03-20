@@ -154,7 +154,7 @@ public class SoundSystemPlayerApplet extends /*JApplet*/ JFrame implements Runna
         try
         {
             SoundSystemConfig.addLibrary( LibraryLWJGLOpenAL.class );
-            SoundSystemConfig.addLibrary( LibraryJavaSound.class );
+            //SoundSystemConfig.addLibrary( LibraryJavaSound.class );
             SoundSystemConfig.setCodec( "wav", CodecWav.class );
             SoundSystemConfig.setCodec( "ogg", CodecJOgg.class );
         }

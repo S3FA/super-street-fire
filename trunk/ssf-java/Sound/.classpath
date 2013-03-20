@@ -18,7 +18,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/SoundSystem.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/SoundSystemJPCT.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/SoundSystemUtils.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lwjgl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Sound/lib/lwjgl-native"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
