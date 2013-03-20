@@ -17,17 +17,16 @@ public class SoundPlayerControllerTester {
 		//GameStateChangedEvent gameStateChangedEvent = new GameStateChangedEvent(GameStateType.IDLE_STATE, GameStateType.ROUND_BEGINNING_STATE);
 		
 		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f, 0.33f));
+		new Thread(soundPlayerController, "Sound Player Controller").start();
 		
 		try {
-			
 			soundPlayerController.onGameModelEvent(player1AttackActionEvent);
-			Thread.sleep(2000);
-			//soundPlayerController.onGameModelEvent(gameStateChangedEvent);
-			//Thread.sleep(2000);
+			Thread.sleep(500);
 			soundPlayerController.onGameModelEvent(player2AttackActionEvent);
-			Thread.sleep(2000);
+			Thread.sleep(200);
 			
-			soundPlayerController.stopAllSounds();
+			
+			//soundPlayerController.stopAllSounds();
 
 		} 
 		catch (InterruptedException e) {

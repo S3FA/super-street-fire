@@ -6,23 +6,19 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/GameModel"/>
 	<classpathentry exported="true" kind="lib" path="lib/jogg-0.0.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jorbis-0.0.15.jar"/>
-	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/lib/junit-4.8.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/CodecJOgg.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/CodecJOrbis.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/CodecJSpeex.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/CodecWav.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/LibraryJavaSound.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/LibraryJOAL.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/LibraryLWJGLOpenAL.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/SoundSystem.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/SoundSystemJPCT.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/SoundSystemUtils.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jpct.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib/lwjgl.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Sound/lib/lwjgl-native"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/CodecJOgg.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/CodecJOrbis.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/CodecJSpeex.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/CodecWav.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/LibraryJavaSound.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/LibraryJOAL.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/LibraryLWJGLOpenAL.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SoundSystem.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SoundSystemJPCT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/SoundSystemUtils.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lwjgl.jar"/>
+	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
