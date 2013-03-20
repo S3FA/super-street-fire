@@ -15,4 +15,10 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>SoundDependencyLibraries</name>
+			<value>file:/C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/Sound/lib</value>
+		</variable>
+	</variableList>
 </projectDescription>
