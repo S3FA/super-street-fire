@@ -7,14 +7,14 @@ import ca.site3.ssf.gamemodel.GameState.GameStateType;
 
 import paulscode.sound.SoundSystem;
 
-public class SoundPlayerControllerTester implements Runnable{
+public class SoundPlayerControllerTester{
 
 	static SoundPlayerController soundPlayerController;
 
     SoundSystem mySoundSystem;
 	
 	/** Plays audio from given file names. */
-	// A test class that tests a hadouken attack and a game state changed event which causes a looping track (which is then explicitly stopped)
+	// Tests the sound system by initiating a round start action, a hadouken attack and a nyan-cat attack (which pauses and resumes the background theme)
 	public static void main(String[] args) 
 	{
 		new SoundPlayerControllerTester();
@@ -30,7 +30,6 @@ public class SoundPlayerControllerTester implements Runnable{
 	
 	public void init()
 	{
-		//new Thread(this).start();
 		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f, 0.33f));
 		
     	// Create some sample actions
@@ -44,12 +43,4 @@ public class SoundPlayerControllerTester implements Runnable{
 		
 		new Thread(soundPlayerController, "Sound Player Controller").start();
 	}
-	
-	// Demonstrate OpenAL 3D panning with source at various distances:
-    @Override
-    public void run()
-    {
-
-    }
-
 }
