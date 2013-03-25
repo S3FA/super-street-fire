@@ -14,6 +14,10 @@ import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 
 import paulscode.sound.SoundSystem;
+import paulscode.sound.SoundSystemConfig;
+import paulscode.sound.SoundSystemException;
+import paulscode.sound.codecs.CodecJOrbis;
+import paulscode.sound.libraries.LibraryLWJGLOpenAL;
 
 /**
  * Listens for game events and plays sound effects and music as appropriate.
@@ -41,6 +45,33 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		assert(settings != null);
 		this.settings = settings;
 		this.setConfigFile(DEFAULT_CONFIG_FILEPATH);
+		
+		init();
+	}
+	
+	// Initialize the sound player
+	void init()
+	{
+		try
+		{
+			SoundSystemConfig.addLibrary( LibraryLWJGLOpenAL.class );
+            SoundSystemConfig.setCodec( "ogg", CodecJOrbis.class );
+		}
+		catch( SoundSystemException e )
+        {
+            System.out.println("error linking with the plugins" );
+        }
+		
+		 try
+        {
+            mySoundSystem = new SoundSystem( LibraryLWJGLOpenAL.class );
+        }
+        catch( SoundSystemException e )
+        {
+        	System.out.println( "LWJGL OpenAL library is not compatible on this computer" );
+            e.printStackTrace();
+            return;
+        }
 	}
 	
 	String getResourcePath() {
