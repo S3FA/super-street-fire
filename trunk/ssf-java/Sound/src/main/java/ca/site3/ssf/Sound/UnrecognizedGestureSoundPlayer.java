@@ -1,5 +1,7 @@
 package ca.site3.ssf.Sound;
 
+import java.util.Properties;
+
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.UnrecognizedGestureEvent;
 
@@ -9,16 +11,18 @@ class UnrecognizedGestureSoundPlayer extends SoundPlayer {
 	
 	UnrecognizedGestureSoundPlayer(SoundPlayerController controller) {
 		super(controller);
+
+		Properties configProperties = controller.getConfigProperties();
+		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
 		
-		String tempPath = "";
-		AudioSettings globalSettings = controller.getAudioSettings();
-		
-		tempPath = controller.getResourcePath() +
-				controller.getConfigProperties().getProperty("Action.UnrecognizedGesture");
-		this.unrecognizedGestureSound = PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		this.unrecognizedGestureSound = PlaybackHandler.build(controller, configProperties.getProperty("Action.UnrecognizedGesture"), playbackSettings);
 	}
 	
+	// Get the default playback settings for this sound player
+	private PlaybackSettings getDefaultPlaybackSettings()
+	{
+		return new PlaybackSettings(controller.getAudioSettings().getVolume(), false, false);
+	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
 		return false;

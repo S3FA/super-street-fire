@@ -32,76 +32,29 @@ class GameStateChangedSoundPlayer extends SoundPlayer {
 		super(controller);
 		
 		Properties configProperties = controller.getConfigProperties();
-		String resourcePath = controller.getResourcePath();
-		AudioSettings globalSettings = controller.getAudioSettings();
-		
-		String tempPath = "";
-		tempPath = resourcePath + configProperties.getProperty("GameState.IdleState");
-		stateAudioMap.put(GameStateType.IDLE_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.MatchEndedState");
-		stateAudioMap.put(GameStateType.MATCH_ENDED_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.NoState");
-		stateAudioMap.put(GameStateType.NO_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.PausedState");
-		stateAudioMap.put(GameStateType.PAUSED_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.RingmasterState");
-		stateAudioMap.put(GameStateType.RINGMASTER_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty(pickARandomThemeSong());
-		stateAudioMap.put(GameStateType.ROUND_BEGINNING_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.RoundEndedState");
-		stateAudioMap.put(GameStateType.ROUND_ENDED_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.RoundInPlayState");
-		stateAudioMap.put(GameStateType.ROUND_IN_PLAY_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.TestRoundState");
-		stateAudioMap.put(GameStateType.TEST_ROUND_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
-		
-		tempPath = resourcePath + configProperties.getProperty("GameState.TieBreakerRoundState");
-		stateAudioMap.put(GameStateType.TIE_BREAKER_ROUND_STATE, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume() * globalSettings.getBgGainFraction(),
-					PlaybackSettings.BALANCED_PAN,
-					PlaybackSettings.INFINITE_NUM_PLAYS)));
+		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
+
+		stateAudioMap.put(GameStateType.IDLE_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.IdleState"), playbackSettings));
+		stateAudioMap.put(GameStateType.MATCH_ENDED_STATE, PlaybackHandler.build(controller,configProperties.getProperty("GameState.MatchEndedState"), playbackSettings));
+		stateAudioMap.put(GameStateType.NO_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.NoState"), playbackSettings));
+		stateAudioMap.put(GameStateType.RINGMASTER_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.RingmasterState"), playbackSettings));
+		stateAudioMap.put(GameStateType.ROUND_BEGINNING_STATE, PlaybackHandler.build(controller, configProperties.getProperty(pickARandomThemeSong()), playbackSettings));
+		stateAudioMap.put(GameStateType.ROUND_ENDED_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.RoundEndedState"), playbackSettings));
+		stateAudioMap.put(GameStateType.ROUND_IN_PLAY_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.RoundInPlayState"), playbackSettings));
+		stateAudioMap.put(GameStateType.TEST_ROUND_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.TestRoundState"), playbackSettings));
+		stateAudioMap.put(GameStateType.TIE_BREAKER_ROUND_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.TieBreakerRoundState"), playbackSettings));
+	}
+	
+	// Get the default playback settings for this sound player
+	private PlaybackSettings getDefaultPlaybackSettings()
+	{
+		return new PlaybackSettings(controller.getAudioSettings().getVolume(), true, false);
 	}
 	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
-		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN,
-				PlaybackSettings.INFINITE_NUM_PLAYS);
+		return new PlaybackSettings(globalSettings.getVolume(), true, false);
 	}
-
+	
 	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent) {
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.GAME_STATE_CHANGED) {
 			return null;
@@ -114,7 +67,6 @@ class GameStateChangedSoundPlayer extends SoundPlayer {
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
 		return true;
 	}
-	
 	
 	private String pickARandomThemeSong() {
 		Random random = new Random(System.currentTimeMillis());

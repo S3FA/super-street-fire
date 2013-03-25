@@ -16,50 +16,30 @@ class RingmasterActionSoundPlayer extends SoundPlayer {
 		super(controller);
 		
 		Properties configProperties = controller.getConfigProperties();
-		String resourcePath = controller.getResourcePath();
-		AudioSettings globalSettings = controller.getAudioSettings();
+		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
 		
-		String tempPath = "";
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.Drum");
-		actionAudioMap.put(ActionType.RINGMASTER_DRUM_ACTION, PlaybackHandler.build(controller, tempPath,
-			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
-
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.Eruption");
-		actionAudioMap.put(ActionType.RINGMASTER_ERUPTION_ACTION, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
+		actionAudioMap.put(ActionType.RINGMASTER_DRUM_ACTION, PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.Drum"), playbackSettings));
+		actionAudioMap.put(ActionType.RINGMASTER_ERUPTION_ACTION, PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.Eruption"), playbackSettings));
+		actionAudioMap.put(ActionType.RINGMASTER_HADOUKEN_ACTION, PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.Hadouken"), playbackSettings));
+		actionAudioMap.put(ActionType.RINGMASTER_LEFT_CIRCLE_ACTION, PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.LeftCircle"), playbackSettings));
+		actionAudioMap.put(ActionType.RINGMASTER_LEFT_HALF_RING_ACTION, PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.LeftHalf"), playbackSettings));
+		actionAudioMap.put(ActionType.RINGMASTER_RIGHT_CIRCLE_ACTION, PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.RightCircle"), playbackSettings));
+		actionAudioMap.put(ActionType.RINGMASTER_RIGHT_HALF_RING_ACTION, PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.RightHalf"), playbackSettings));
 		
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.Hadouken");
-		actionAudioMap.put(ActionType.RINGMASTER_HADOUKEN_ACTION, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
-		
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.LeftCircle");
-		actionAudioMap.put(ActionType.RINGMASTER_LEFT_CIRCLE_ACTION, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
-		
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.LeftHalf");
-		actionAudioMap.put(ActionType.RINGMASTER_LEFT_HALF_RING_ACTION, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
-		
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.Jab");
-		PlaybackHandler tempHandler = PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		PlaybackHandler tempHandler = PlaybackHandler.build(controller, configProperties.getProperty("RingmasterAttack.Jab"), playbackSettings);
 		actionAudioMap.put(ActionType.RINGMASTER_LEFT_JAB_ACTION, tempHandler);
 		actionAudioMap.put(ActionType.RINGMASTER_RIGHT_JAB_ACTION, tempHandler);
-		
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.RightCircle");
-		actionAudioMap.put(ActionType.RINGMASTER_RIGHT_CIRCLE_ACTION, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
-		
-		tempPath = resourcePath + configProperties.getProperty("RingmasterAttack.RightHalf");
-		actionAudioMap.put(ActionType.RINGMASTER_RIGHT_HALF_RING_ACTION, PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1)));
-		
-
+	}
+	
+	// Get the default playback settings for this sound player
+	private PlaybackSettings getDefaultPlaybackSettings()
+	{
+		return new PlaybackSettings(controller.getAudioSettings().getVolume(), false, false);
 	}
 	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
 		assert(globalSettings != null);
-		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
+		return new PlaybackSettings(globalSettings.getVolume(), false, false);
 	}
 	
 	/**

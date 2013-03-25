@@ -1,29 +1,34 @@
 package ca.site3.ssf.Sound;
 
-import java.io.IOException;
+//import java.io.IOException;
 
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
+//import javax.sound.sampled.LineEvent;
+//import javax.sound.sampled.LineListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import paulscode.sound.SoundSystemConfig;
+
+import java.io.File;
+import java.net.URL;
 
 /**
  * Plays a .ogg file by file name.
  * @author Mike, Callum
  */
-class PlaybackHandler implements LineListener {
+class PlaybackHandler {// implements LineListener {
 	
 	private static Logger logger = LoggerFactory.getLogger(PlaybackHandler.class);
-	
-	private OggClip ogg = null;
-	
+
 	private final SoundPlayerController controller;
-	private final String audioFilepath;
+	private final String sourceName;
+	private String audioFilePath;
+	private URL audioFileURL;
 	private PlaybackSettings settings;
 
-	static PlaybackHandler build(SoundPlayerController controller, String audioFilepath, PlaybackSettings settings) {
-		PlaybackHandler result = new PlaybackHandler(controller, audioFilepath, settings);
+	static PlaybackHandler build(SoundPlayerController controller, String source, PlaybackSettings settings) {
+		PlaybackHandler result = new PlaybackHandler(controller, source, settings);
 		boolean isInit = result.init();
 		result.setSettings(settings);
 		
@@ -34,95 +39,51 @@ class PlaybackHandler implements LineListener {
 		return result;
 	}
 	
-	private PlaybackHandler(SoundPlayerController controller, String audioFilepath, PlaybackSettings settings) {
+	private PlaybackHandler(SoundPlayerController controller, String source, PlaybackSettings settings) {
 		assert(controller != null);
-		assert(audioFilepath != null);
 		assert(settings != null);
+		assert(source != null);
 		
 		this.controller = controller;
-		this.audioFilepath = audioFilepath;
+		this.audioFilePath = controller.getResourcePath() + audioFilePath;
+		this.sourceName = source;
+		
+		try
+		{
+			this.audioFileURL = new File(audioFilePath).toURI().toURL();
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 	
 	private boolean init() {
 		try{
-			this.ogg = new OggClip(this.audioFilepath);
+			this.controller.mySoundSystem.newStreamingSource(true, sourceName, this.audioFileURL, this.audioFilePath, true, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
 		}
-		catch(IOException ex){
-			logger.warn("Failed to read audio file " + audioFilepath);
+		catch(Exception ex){
+			logger.warn("Failed to read audio file " + audioFilePath);
 			return false;
 		}
-		// Open the audio file from disk (make sure it even exists)
-		//File audioFile = new File(this.audioFilepath);
-		//if (!audioFile.canRead()) {
-		//	logger.warn("Failed to read audio file " + audioFilepath);
-		//	return;
-		//}
-		
-		// Create an audio input stream for the file
-		//try {
-			/*
-			// This doesn't work properly on a mac...
-			AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(audioFile);
-			AudioFormat format = fileFormat.getFormat();
-			
-			// We need to alter the format of the audio input stream to ensure that it's in stereo (i.e., it must have 2 channels)
-			this.audioInputStream = AudioSystem.getAudioInputStream(
-					new AudioFormat(format.getSampleRate(), format.getSampleSizeInBits(), 2, false, format.isBigEndian()),
-					AudioSystem.getAudioInputStream(audioFile));
-			*/
-		//	this.audioInputStream = AudioSystem.getAudioInputStream(audioFile);
-		//} catch (UnsupportedAudioFileException e1) {
-		//	logger.warn("Failed to get a supported audio input stream.", e1);
-		//	return;
-		//} catch (IOException e1) {
-		//	logger.warn("Failed to open audio input stream.", e1);
-		//	return;
-		//}
-		
-		//if (this.audioInputStream == null) {
-		//	logger.warn("Failed to create audio input stream for file " + audioFilepath);
-		//	return;
-		//}
-
-		//try {
-		//	this.clip = AudioSystem.getClip();
-		//} catch (LineUnavailableException e) {
-		//	logger.warn("Failed to get clip for audio playback.", e);
-		//	return;
-		//}
-				
-		//this.clip.addLineListener(this);
-		//this.ogg.addLineListener(this);
 		
 		return true;
 	}
 	
 	void play() {
-		if (this.ogg == null) {
-			this.controller.removePlaybackHandler(this);
-			return;
-		}
-		
-		try {
-			//this.clip.open(this.audioInputStream);
-			this.updateSettings();
-			
-			if (this.settings.getNumPlays() == PlaybackSettings.INFINITE_NUM_PLAYS) {
-				//this.clip.loop(Clip.LOOP_CONTINUOUSLY);
-				this.ogg.loop();
+		try 
+		{
+			// Pause the background music if necessary, and queue it up to restart immediately after playback
+			if(this.settings.getIsQuietBackgground())
+			{
+				controller.mySoundSystem.pause(controller.getBackgroundSource());
+				this.controller.mySoundSystem.play(sourceName);
+				controller.mySoundSystem.queueSound(controller.getBackgroundSource(), controller.getBackgroundFileName());
 			}
-			else {
-				//this.clip.loop(this.settings.getNumPlays() - 1);
-				this.ogg.loop(this.settings.getNumPlays() - 1);
+			else
+			{
+				this.controller.mySoundSystem.play(sourceName);
 			}
-			
-		//} catch (LineUnavailableException e) {
-		//	logger.warn("Exception while attempting to get and open a clip for audio stream.", e);
-		//	return;
-		//} catch (IOException e) {
-		//	logger.warn("Audio input stream read fail.", e);
-		//	return;
-		//}
 		}catch (Exception e) {
 			logger.warn("Exception while attempting to play the ogg in playbackHandler.", e);
 			return;
@@ -130,15 +91,14 @@ class PlaybackHandler implements LineListener {
 	}
 
 	void stop() {
-		if (this.ogg != null) {
-			this.ogg.stop();
-		}
+		this.controller.mySoundSystem.stop(sourceName);
 	}
 	
 	void setSettings(PlaybackSettings settings) {
 		assert(settings != null);
 		this.settings = settings;
 		this.updateSettings();
+		
 	}
 	
 	void setGlobalAudioSettings(AudioSettings globalSettings) {
@@ -146,36 +106,17 @@ class PlaybackHandler implements LineListener {
 	}
 	
 	private void updateSettings() {
-		if (this.ogg == null) {
-			return;
-		}
-		
 		// Adjust the volume on the audio clip
-		
-		ogg.setGain(Math.min(1.0f, Math.max(0.0f, this.settings.getVolume())));
-		//if (this.clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-		//	FloatControl volume = (FloatControl)this.clip.getControl(FloatControl.Type.MASTER_GAIN);
-		//	volume.setValue(Math.min(volume.getMaximum(), Math.max(volume.getMinimum(), this.settings.getVolume())));
-		//}
-		// Adjust the pan of the audio clip
-		ogg.setBalance(Math.min(1.0f, Math.max(-1.0f, this.settings.getVolume())));
-		//if (this.clip.isControlSupported(FloatControl.Type.PAN)) {
-		//	FloatControl pan = (FloatControl)this.clip.getControl(FloatControl.Type.PAN);
-		//	pan.setValue(Math.min(pan.getMaximum(), Math.max(pan.getMinimum(), this.settings.getPan())));
-		//}
-		//else if (this.clip.isControlSupported(FloatControl.Type.BALANCE)) {
-		//	FloatControl balance = (FloatControl)this.clip.getControl(FloatControl.Type.BALANCE);
-		//	balance.setValue(Math.min(balance.getMaximum(), Math.max(balance.getMinimum(), this.settings.getPan())));
-		//}
-		
+		this.controller.mySoundSystem.setVolume(sourceName, this.settings.getVolume());
 	}
 	
-	public void update(LineEvent lineEvent) {
-		if (lineEvent.getType() == LineEvent.Type.STOP) {
-			lineEvent.getLine().close();
-			logger.debug("Closing audio source data line.");
-			this.controller.removePlaybackHandler(this);
-		}
-	} 
+	public String getSourceName()
+	{
+		return this.sourceName;
+	}
 	
+	public String getFilePath()
+	{
+		return this.audioFilePath;
+	}
 }

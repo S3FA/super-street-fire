@@ -12,7 +12,6 @@ interface ISoundPlayer {
 
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent);
 	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent);
-	
 	public void execute(IGameModelEvent gameModelEvent);
 	
 }

@@ -1,10 +1,7 @@
 package ca.site3.ssf.Sound;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -15,6 +12,8 @@ import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.IGameModelListener;
+
+import paulscode.sound.SoundSystem;
 
 /**
  * Listens for game events and plays sound effects and music as appropriate.
@@ -29,11 +28,12 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	private String resourcePath;
 	private Properties configProperties;
 	private AudioSettings settings;
-	
-	private Set<PlaybackHandler> fgPlaybackHandlers = new HashSet<PlaybackHandler>(20);
-	private Set<PlaybackHandler> bgPlaybackHandlers = new HashSet<PlaybackHandler>(2);
+	private String backgroundSource;
+	private String backgroundFileName;
 	
 	private BlockingQueue<IGameModelEvent> incomingEvents = new LinkedBlockingQueue<IGameModelEvent>();
+	
+	SoundSystem mySoundSystem;
 	
 	private volatile boolean stop = false;
 	
@@ -65,6 +65,26 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		return result;
 	}
 
+	public String getBackgroundSource()
+	{
+		return backgroundSource;
+	}
+	
+	public String getBackgroundFileName()
+	{
+		return backgroundFileName;
+	}
+	
+	public void setBackgroundSource(String source)
+	{
+		backgroundSource = source;
+	}
+	
+	public void setBackgroundFileName(String fileName)
+	{
+		backgroundFileName = fileName;
+	}
+	
 	public void stop() {
 		this.stop = true;
 	}
@@ -77,32 +97,9 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		this.incomingEvents.add(gameModelEvent);
 	}
 	
-	void addAndPlayForegroundHandler(PlaybackHandler handler) {
-		this.fgPlaybackHandlers.add(handler);
-		handler.play();
-	}
-	
-	void addAndPlayBackgroundHandler(PlaybackHandler handler) {
-		this.bgPlaybackHandlers.add(handler);
-		handler.play();
-	}
-	
-	void stopAllSounds() {
-		Iterator<PlaybackHandler> iter = this.fgPlaybackHandlers.iterator();
-		while (iter.hasNext()) {
-			PlaybackHandler handler = iter.next();
-			handler.stop();
-			iter.remove();
-		}
-		assert(this.fgPlaybackHandlers.isEmpty());
-		
-		iter = this.bgPlaybackHandlers.iterator();
-		while (iter.hasNext()) {
-			PlaybackHandler handler = iter.next();
-			handler.stop();
-			iter.remove();
-		}
-		assert(this.bgPlaybackHandlers.isEmpty());
+	void stopAllSounds() 
+	{
+		mySoundSystem.cleanup();
 	}
 	
 	private void setConfigFile(String configPath) {
@@ -119,11 +116,8 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		}
 	}
 
-	void removePlaybackHandler(PlaybackHandler handler) {
-		assert(handler != null);
-		if (!this.fgPlaybackHandlers.remove(handler)) {
-			this.bgPlaybackHandlers.remove(handler);
-		}
+	void stopSound(String source) {
+		mySoundSystem.stop(source);
 	}
 
 	public void run() {

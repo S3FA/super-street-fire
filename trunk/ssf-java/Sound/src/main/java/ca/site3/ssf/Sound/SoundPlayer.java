@@ -71,7 +71,7 @@ abstract class SoundPlayer implements ISoundPlayer {
 	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
 		assert(globalSettings != null);
-		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
+		return new PlaybackSettings(globalSettings.getVolume(), false, false);
 	}
 	
 	public void execute(IGameModelEvent gameModelEvent) {
@@ -84,12 +84,13 @@ abstract class SoundPlayer implements ISoundPlayer {
 		AudioSettings globalSettings  = controller.getAudioSettings();
 		assert(globalSettings != null);
 		handler.setSettings(this.getPlaybackSettings(globalSettings, gameModelEvent));
-
-		if (this.isBackgroundSoundPlayer(gameModelEvent)) {
-			controller.addAndPlayBackgroundHandler(handler);
+		
+		if(this.isBackgroundSoundPlayer(gameModelEvent))
+		{
+			controller.setBackgroundFileName(handler.getFilePath());
+			controller.setBackgroundSource(handler.getSourceName());
 		}
-		else {
-			controller.addAndPlayForegroundHandler(handler);
-		}
+		
+		handler.play();
 	}
 }
