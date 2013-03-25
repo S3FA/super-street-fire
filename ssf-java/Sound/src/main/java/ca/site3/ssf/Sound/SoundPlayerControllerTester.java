@@ -36,16 +36,22 @@ public class SoundPlayerControllerTester implements Runnable{
 	{
 		System.out.println("Started the SoundPlayerControllerTester.");
 		
-		// Create some sample actions
-		PlayerAttackActionEvent player1AttackActionEvent = new PlayerAttackActionEvent(1, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
-		PlayerAttackActionEvent player2AttackActionEvent = new PlayerAttackActionEvent(2, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
 		
 		init();
 	}
 	
 	public void init()
 	{
-		new Thread(this).start();
+		//new Thread(this).start();
+		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f, 0.33f));
+		
+		// Create some sample actions
+		PlayerAttackActionEvent player1AttackActionEvent = new PlayerAttackActionEvent(1, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
+		PlayerAttackActionEvent player2AttackActionEvent = new PlayerAttackActionEvent(2, PlayerAttackAction.AttackType.HADOUKEN_ATTACK);
+		
+		soundPlayerController.onGameModelEvent(player1AttackActionEvent);
+		
+		new Thread(soundPlayerController, "Sound Player Controller").start();
 	}
 	
 	// Demonstrate OpenAL 3D panning with source at various distances:
@@ -53,7 +59,7 @@ public class SoundPlayerControllerTester implements Runnable{
     public void run()
     {
         // Load some library and codec plugins:
-        try
+      /*  try
         {
             SoundSystemConfig.addLibrary( LibraryLWJGLOpenAL.class );
             SoundSystemConfig.setCodec( "ogg", CodecJOrbis.class );
@@ -128,7 +134,7 @@ public class SoundPlayerControllerTester implements Runnable{
         }
      
         // Always call this after we're done
-        //mySoundSystem.cleanup();
+        //mySoundSystem.cleanup();*/
     }
 
 }

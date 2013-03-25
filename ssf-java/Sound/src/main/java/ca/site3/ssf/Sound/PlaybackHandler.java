@@ -45,7 +45,7 @@ class PlaybackHandler {// implements LineListener {
 		assert(source != null);
 		
 		this.controller = controller;
-		this.audioFilePath = controller.getResourcePath() + audioFilePath;
+		this.audioFilePath = controller.getResourcePath() + source;
 		this.sourceName = source;
 		
 		try
