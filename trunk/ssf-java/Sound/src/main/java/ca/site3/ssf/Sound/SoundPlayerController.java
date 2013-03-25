@@ -34,6 +34,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	private AudioSettings settings;
 	private String backgroundSource;
 	private String backgroundFileName;
+	private String backgroundFilePath;
 	
 	private BlockingQueue<IGameModelEvent> incomingEvents = new LinkedBlockingQueue<IGameModelEvent>();
 	
@@ -106,6 +107,11 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		return backgroundFileName;
 	}
 	
+	public String getBackgroundFilePath()
+	{
+		return backgroundFilePath;
+	}
+	
 	public void setBackgroundSource(String source)
 	{
 		backgroundSource = source;
@@ -114,6 +120,11 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	public void setBackgroundFileName(String fileName)
 	{
 		backgroundFileName = fileName;
+	}
+	
+	public void setBackgroundFilePath(String filePath)
+	{
+		backgroundFilePath = filePath;
 	}
 	
 	public void stop() {

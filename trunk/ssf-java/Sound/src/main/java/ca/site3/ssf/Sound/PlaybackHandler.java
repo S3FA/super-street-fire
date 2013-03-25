@@ -26,6 +26,8 @@ class PlaybackHandler {// implements LineListener {
 	private String audioFilePath;
 	private URL audioFileURL;
 	private PlaybackSettings settings;
+	
+	public boolean isBackgroundPlayer;
 
 	static PlaybackHandler build(SoundPlayerController controller, String source, PlaybackSettings settings) {
 		PlaybackHandler result = new PlaybackHandler(controller, source, settings);
@@ -43,10 +45,12 @@ class PlaybackHandler {// implements LineListener {
 		assert(controller != null);
 		assert(settings != null);
 		assert(source != null);
+		assert(settings != null);
 		
 		this.controller = controller;
 		this.audioFilePath = controller.getResourcePath() + source;
 		this.sourceName = source;
+		this.settings = settings;
 		
 		try
 		{
@@ -60,7 +64,7 @@ class PlaybackHandler {// implements LineListener {
 	
 	private boolean init() {
 		try{
-			this.controller.mySoundSystem.newStreamingSource(true, sourceName, this.audioFileURL, this.audioFilePath, true, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
+			this.controller.mySoundSystem.newStreamingSource(this.isBackgroundPlayer, sourceName, this.audioFileURL, this.audioFilePath, this.settings.getIsLooping(), 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
 		}
 		catch(Exception ex){
 			logger.warn("Failed to read audio file " + audioFilePath);
@@ -76,13 +80,15 @@ class PlaybackHandler {// implements LineListener {
 			// Pause the background music if necessary, and queue it up to restart immediately after playback
 			if(this.settings.getIsQuietBackgground())
 			{
-				controller.mySoundSystem.pause(controller.getBackgroundSource());
-				this.controller.mySoundSystem.play(sourceName);
-				controller.mySoundSystem.queueSound(controller.getBackgroundSource(), controller.getBackgroundFileName());
+				URL queuedFile = new File(controller.getBackgroundFileName()).toURI().toURL();
+				
+				controller.mySoundSystem.stop(controller.getBackgroundSource());
+				controller.mySoundSystem.play(sourceName);
+				controller.mySoundSystem.queueSound(sourceName, queuedFile, controller.getBackgroundSource());
 			}
 			else
 			{
-				this.controller.mySoundSystem.play(sourceName);
+				controller.mySoundSystem.play(this.sourceName);
 			}
 		}catch (Exception e) {
 			logger.warn("Exception while attempting to play the ogg in playbackHandler.", e);
@@ -108,6 +114,11 @@ class PlaybackHandler {// implements LineListener {
 	private void updateSettings() {
 		// Adjust the volume on the audio clip
 		this.controller.mySoundSystem.setVolume(sourceName, this.settings.getVolume());
+	}
+	
+	public void setIsBackground(boolean background)
+	{
+		this.isBackgroundPlayer = background;
 	}
 	
 	public String getSourceName()

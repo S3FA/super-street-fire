@@ -83,12 +83,18 @@ abstract class SoundPlayer implements ISoundPlayer {
 		
 		AudioSettings globalSettings  = controller.getAudioSettings();
 		assert(globalSettings != null);
-		handler.setSettings(this.getPlaybackSettings(globalSettings, gameModelEvent));
+		//handler.setSettings(this.getPlaybackSettings(globalSettings, gameModelEvent));
 		
 		if(this.isBackgroundSoundPlayer(gameModelEvent))
 		{
 			controller.setBackgroundFileName(handler.getFilePath());
+			//controller.setBackgroundFilePath(new File(handler.getFilePath()).toURI().toURL());
 			controller.setBackgroundSource(handler.getSourceName());
+			handler.setIsBackground(true);
+		}
+		else
+		{
+			handler.setIsBackground(false);
 		}
 		
 		handler.play();
