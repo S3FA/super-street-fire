@@ -15,29 +15,25 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		super(controller);
 		
 		Properties configProperties = controller.getConfigProperties();
-		String resourcePath = controller.getResourcePath();
-		AudioSettings globalSettings = controller.getAudioSettings();
-		
-		String tempPath = "";
-		tempPath = resourcePath + configProperties.getProperty("RoundResult.PlayerOneVictory");
-		this.p1VictoryAudioHandler = PlaybackHandler.build(controller, tempPath,
-			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
-		
-		tempPath = resourcePath + configProperties.getProperty("RoundResult.PlayerTwoVictory");
-		this.p2VictoryAudioHandler = PlaybackHandler.build(controller, tempPath,
-			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
-		
-		tempPath = resourcePath + configProperties.getProperty("RoundResult.Tie");
-		this.tieAudioHandler = PlaybackHandler.build(controller, tempPath,
-			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
+
+		this.p1VictoryAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.PlayerOneVictory"), playbackSettings);
+		this.p2VictoryAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.PlayerTwoVictory"), playbackSettings);
+		this.tieAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.Tie"), playbackSettings);
 		
 		// Stop all other controller sounds...
 		controller.stopAllSounds();
 	}
 	
+	// Get the default playback settings for this sound player
+	private PlaybackSettings getDefaultPlaybackSettings()
+	{
+		return new PlaybackSettings(controller.getAudioSettings().getVolume(), false, false);
+	}
+	
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
 		assert(globalSettings != null);
-		return new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1);
+		return new PlaybackSettings(globalSettings.getVolume(), false, false);
 	}
 	
 	// Handle the sounds based on round ending

@@ -9,7 +9,6 @@ import java.net.URL;
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemException;
 import paulscode.sound.SoundSystemConfig;
-import paulscode.sound.codecs.CodecWav;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.libraries.LibraryLWJGLOpenAL;
 
@@ -19,14 +18,12 @@ public class SoundPlayerControllerTester implements Runnable{
 
     SoundSystem mySoundSystem;
 
-    boolean musicPlayStop = false;
-    boolean streamPlayStop = false;
-    boolean JavaOpenAL = true; 
-
     // URLs for all the sound bytes
     private URL hadokenURL = null;
+    private URL fightURL = null;
+    private URL impact_punchfierceURL = null;
     private URL themeRyuURL = null;
-    private URL boingUrl = null;
+    private URL suckitURL = null;
 	
 	/** Plays audio from given file names. */
 	// A test class that tests a hadouken attack and a game state changed event which causes a looping track (which is then explicitly stopped)
@@ -60,7 +57,6 @@ public class SoundPlayerControllerTester implements Runnable{
         {
             SoundSystemConfig.addLibrary( LibraryLWJGLOpenAL.class );
             SoundSystemConfig.setCodec( "ogg", CodecJOrbis.class );
-            SoundSystemConfig.setCodec( "wav", CodecWav.class );
         }
         catch( SoundSystemException e )
         {
@@ -84,7 +80,10 @@ public class SoundPlayerControllerTester implements Runnable{
         {
         	themeRyuURL = new File("resources/ThemeRyu.ogg").toURI().toURL();
         	hadokenURL = new File("resources/Hadoken.ogg").toURI().toURL();
-        	boingUrl = new File("resources/boing.wav").toURI().toURL();
+        	fightURL = new File("resources/fight.ogg").toURI().toURL();
+        	impact_punchfierceURL = new File("resources/impact_punchfierce.ogg").toURI().toURL();
+        	suckitURL = new File("resources/suck_it.ogg").toURI().toURL();
+        	
         }
         catch (Exception ex)
         {
@@ -94,28 +93,34 @@ public class SoundPlayerControllerTester implements Runnable{
         // Set up the sounds as streaming sources. You can set priority and looping here, and this allows us to refer to them easily late
         mySoundSystem.newStreamingSource( true, "ThemeRyu", themeRyuURL, "ThemeRyu.ogg", true, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
         mySoundSystem.newStreamingSource( true, "Hadoken", hadokenURL, "Hadoken.ogg", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, 0 );
+        mySoundSystem.newStreamingSource( true, "Fight", fightURL, "fight.ogg", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, 0 );
+        mySoundSystem.newStreamingSource( true, "Impact", impact_punchfierceURL, "impact_punchfierce.ogg", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, 0 );
+        mySoundSystem.newStreamingSource( true, "Suckit", suckitURL, "suck_it.ogg", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, 0 );
         
         try
         {
+        	for(int i = 0; i < 10; i++)
+        	{
 	        // Test playing a track
-	        mySoundSystem.quickPlay(false, boingUrl, "boing.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
-	        Thread.sleep(500);
+        	mySoundSystem.play("Fight");
+	        Thread.sleep(200);
 	        
             // Play a looping track. You can also use .backgroundMusic to set a looping high priority track
             mySoundSystem.play("ThemeRyu");
 	        //mySoundSystem.backgroundMusic("ThemeRyu", themeRyuURL, "ThemeRyu.ogg", true);
-	        Thread.sleep(500);
+	        Thread.sleep(1000);
 
-	        mySoundSystem.quickPlay(false, boingUrl, "boing.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
-	        Thread.sleep(500);
+	        mySoundSystem.play("Hadoken");
+	        Thread.sleep(1000);
 	        
 	        // You can also set up references to sounds in advance as above and play/loop/stop them anytime
-	        mySoundSystem.play("Hadoken");
-	        Thread.sleep(500);
+	        mySoundSystem.play("Impact");
+	        Thread.sleep(1000);
 	        
 	        // You can also use quickplay to play a sound without having previously defined it as a streaming source
-	        mySoundSystem.quickPlay(false, boingUrl, "boing.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_ROLLOFF, SoundSystemConfig.getDefaultRolloff());
-	        Thread.sleep(500);
+	        mySoundSystem.play("Suckit");
+	        Thread.sleep(1000);
+        	}
         }
         catch(Exception ex)
         {
@@ -123,7 +128,7 @@ public class SoundPlayerControllerTester implements Runnable{
         }
      
         // Always call this after we're done
-        mySoundSystem.cleanup();
+        //mySoundSystem.cleanup();
     }
 
 }

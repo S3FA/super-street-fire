@@ -16,25 +16,18 @@ class RoundBeginTimerChangedSoundPlayer extends SoundPlayer {
 		super(controller);
 		
 		Properties configProperties = controller.getConfigProperties();
-		String resourcePath = controller.getResourcePath();
-		AudioSettings globalSettings = controller.getAudioSettings();
+		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
 		
-		String tempPath = "";
-		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Three");
-		this.threeAudioHandler = PlaybackHandler.build(controller, tempPath,
-			new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
-		
-		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Two");
-		this.twoAudioHandler = PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
-		
-		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.One");
-		this.oneAudioHandler = PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
-		
-		tempPath = resourcePath + configProperties.getProperty("RoundBeginCountdown.Fight");
-		this.fightAudioHandler = PlaybackHandler.build(controller, tempPath,
-				new PlaybackSettings(globalSettings.getVolume(), PlaybackSettings.BALANCED_PAN, 1));
+		this.threeAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundBeginCountdown.Three"), playbackSettings);
+		this.twoAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundBeginCountdown.Two"), playbackSettings);
+		this.oneAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundBeginCountdown.One"), playbackSettings);
+		this.fightAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundBeginCountdown.Fight"), playbackSettings);
+	}
+	
+	// Get the default playback settings for this sound player
+	private PlaybackSettings getDefaultPlaybackSettings()
+	{
+		return new PlaybackSettings(controller.getAudioSettings().getVolume(), false, false);
 	}
 	
 	// Handle the sounds based on round begin timer changing

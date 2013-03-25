@@ -2,40 +2,37 @@ package ca.site3.ssf.Sound;
 
 class PlaybackSettings {
 
-	static final int INFINITE_NUM_PLAYS = 0;
+	private float volume;	
+	private boolean isLooping;
+	private boolean isQuietBackground;
 	
-	static final float BALANCED_PAN = 0.0f;
-	static final float PLAYER_1_PAN = -1.0f;
-	static final float PLAYER_2_PAN = 1.0f;
-	
-	private float volume;
-	private float pan;
-	private int numPlays;
-	
-	PlaybackSettings(float vol, float pan, int numPlays) {
+	PlaybackSettings(float vol, boolean loop, boolean quietBackgroundMusic){
 		this.volume = vol;
-		this.pan    = pan;
-		this.numPlays = numPlays;
+		this.isLooping = loop;
+		this.isQuietBackground = quietBackgroundMusic;
 	}
 	
 	void setVolume(float vol) {
 		this.volume = vol;
 	}
-	
+
 	float getVolume() {
 		return this.volume;
+	}	
+	
+	void setIsLooping(boolean loop) {
+		this.isLooping = loop;
 	}
-	float getPan() {
-		return this.pan;
+	
+	boolean getIsLooping() {
+		return this.isLooping;
 	}
-	int getNumPlays() {
-		return this.numPlays;
+	
+	void setIsQuietBackground(boolean quiet) {
+		this.isQuietBackground = quiet;
 	}
-
-	static float getPlayerPan(int playerNum) {
-		if (playerNum == 1) {
-			return PLAYER_1_PAN;
-		}
-		return PLAYER_2_PAN;
+	
+	boolean getIsQuietBackgground() {
+		return this.isQuietBackground;
 	}
 }
