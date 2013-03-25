@@ -78,7 +78,7 @@ class PlaybackHandler {// implements LineListener {
 		try 
 		{
 			// Pause the background music if necessary, and queue it up to restart immediately after playback
-			if(this.settings.getIsQuietBackgground())
+			if(this.settings.getIsQuietBackground())
 			{
 				URL queuedFile = new File(controller.getBackgroundFileName()).toURI().toURL();
 				
