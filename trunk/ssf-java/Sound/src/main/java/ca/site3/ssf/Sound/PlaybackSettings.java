@@ -32,7 +32,7 @@ class PlaybackSettings {
 		this.isQuietBackground = quiet;
 	}
 	
-	boolean getIsQuietBackgground() {
+	boolean getIsQuietBackground() {
 		return this.isQuietBackground;
 	}
 }
