@@ -10,15 +10,15 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/IOServer"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Sound"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GestureRecognizer"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/commons-math-2.0.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/jahmm-0.6.2.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/jcommander-1.20.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/junit-4.8.1.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/logback-classic-1.0.0.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/logback-core-1.0.0.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/OrangeExtensions-1.2.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/protobuf-java-2.4.1.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/rxtx-2.1.7.jar"/>
-	<classpathentry kind="lib" path="/Users/saravinten/Desktop/ssf2013/ssf-java/lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/commons-math-2.0.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/jahmm-0.6.2.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/jcommander-1.20.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/logback-classic-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/logback-core-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/OrangeExtensions-1.2.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/protobuf-java-2.4.1.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/rxtx-2.1.7.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
