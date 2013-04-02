@@ -6,7 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/GameModel"/>
 	<classpathentry exported="true" kind="lib" path="lib/jogg-0.0.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jorbis-0.0.15.jar"/>
-	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/lib/junit-4.8.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jpct.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/CodecJOgg.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/CodecJOrbis.jar"/>
@@ -23,6 +22,7 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Sound/lib/lwjgl-native"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/super-street-fire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
