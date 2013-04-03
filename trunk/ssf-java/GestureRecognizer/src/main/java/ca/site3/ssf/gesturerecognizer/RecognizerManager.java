@@ -376,7 +376,6 @@ class RecognizerManager {
 		try {
 			
 			// Begin by reading the number of recognizers to read in from the file...
-
 			char[] charArray = new char[1];
  			int numRecognizers = 0;
 			String numRecognizersStr = "";
@@ -399,9 +398,17 @@ class RecognizerManager {
 			}
 	
 			for (int i = 0; i < numRecognizers; i++) {
+				
 				Recognizer newRecognizer = new Recognizer();
-				newRecognizer.load(reader);
-				this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
+				try {
+					newRecognizer.load(reader);
+					this.recognizerMap.put(newRecognizer.getGestureType(), newRecognizer);
+				}
+				catch (SSFEngFileFormatException ex) {
+					// Just keep going, this exception is acceptible, it just means that the file
+					// might have gestures that are no longer supported in it.
+					continue;
+				}
 			}
 		}
 		catch (IOException ex) {

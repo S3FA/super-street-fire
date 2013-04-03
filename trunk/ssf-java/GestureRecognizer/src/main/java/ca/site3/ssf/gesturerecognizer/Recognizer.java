@@ -1,5 +1,6 @@
 package ca.site3.ssf.gesturerecognizer;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -183,12 +184,21 @@ class Recognizer {
 	 * @param reader The reader to read this from.
 	 * @throws IOException Occurs when there's an I/O error while reading.
 	 * @throws FileFormatException Occurs when there's a format error while reading.
+	 * @throws SSFEngFileFormatException Occurs when there's a format error in the SSF-specific part of the file format.
 	 */
-	void load(Reader reader) throws IOException, FileFormatException {
+	void load(Reader reader) throws IOException, FileFormatException, SSFEngFileFormatException {
 		
 		String temp = "";
 		char[] charArray = new char[1];
 
+		// Read until the first non-whitespace character
+		while (reader.read(charArray) != -1) {
+			if (!Character.isWhitespace(charArray[0])) {
+				temp += charArray[0];
+				break;
+			}
+		}
+		
 		// Attempt to read the gesture type
 		GestureType readType = null;
 		do {
@@ -201,6 +211,9 @@ class Recognizer {
 				}
 				if (!Character.isSpaceChar(charArray[0]) && charArray[0] != '\n' && charArray[0] != '\r') {
 					temp += charArray[0];
+				}
+				else if (charArray[0] == '\n') {
+					throw new SSFEngFileFormatException("Failed to read gesture type: " + temp);
 				}
 			}
 		}
@@ -249,11 +262,15 @@ class Recognizer {
 			throw new FileFormatException("Failed to parse highest probability in recognizer.");
 		}
 		
-		// Read whether or not there is a HMM for this recognizer in the file
-		if (reader.read(charArray)== -1) {
-			throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
+		// Read until we get to the HMM
+		while (charArray[0] != '0' && charArray[0] != '1') {
+			if (reader.read(charArray) == -1) {
+				throw new FileFormatException("Reader reached end of stream before recognizer could be read.");
+			}
+			if (charArray[0] == '\n') {
+				break;
+			}
 		}
-		reader.skip(1); // skip the newline
 		
 		if (charArray[0] == '0') {
 			this.recognizer = null;
@@ -267,7 +284,7 @@ class Recognizer {
 				this.recognizer = null;
 				throw ex;
 			}
-		}
+		}	
 	}
 	
 	/**
