@@ -4,21 +4,21 @@
 	<classpathentry kind="src" output="target/classes" path="src/main/resources"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GameModel"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GUIProtocol"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/IOServer"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Sound"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/GestureRecognizer"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/commons-math-2.0.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/jahmm-0.6.2.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/jcommander-1.20.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/junit-4.8.1.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/logback-classic-1.0.0.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/logback-core-1.0.0.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/OrangeExtensions-1.2.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/protobuf-java-2.4.1.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/rxtx-2.1.7.jar"/>
-	<classpathentry kind="lib" path="/superstreetfire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="../lib/commons-math-2.0.jar"/>
+	<classpathentry kind="lib" path="../lib/jahmm-0.6.2.jar"/>
+	<classpathentry kind="lib" path="../lib/jcommander-1.20.jar"/>
+	<classpathentry kind="lib" path="../lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="../lib/logback-classic-1.0.0.jar"/>
+	<classpathentry kind="lib" path="../lib/logback-core-1.0.0.jar"/>
+	<classpathentry kind="lib" path="../lib/OrangeExtensions-1.2.jar"/>
+	<classpathentry kind="lib" path="../lib/protobuf-java-2.4.1.jar"/>
+	<classpathentry kind="lib" path="../lib/rxtx-2.1.7.jar"/>
+	<classpathentry kind="lib" path="../lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
