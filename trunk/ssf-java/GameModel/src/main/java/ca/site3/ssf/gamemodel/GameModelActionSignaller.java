@@ -137,9 +137,10 @@ class GameModelActionSignaller {
 	/**
 	 * Triggers each of the listener's callbacks for a player block event.
 	 * @param playerNum Blocker player number.
+	 * @param blockWasEffective Whether the block was effective or not (i.e., it actually blocked something).
 	 */
-	void fireOnPlayerBlockAction(int playerNum) {
-		PlayerBlockActionEvent event = new PlayerBlockActionEvent(playerNum);
+	void fireOnPlayerBlockAction(int playerNum, boolean blockWasEffective) {
+		PlayerBlockActionEvent event = new PlayerBlockActionEvent(playerNum, blockWasEffective);
 		this.fireGameModelEvent(event);
 	}
 	

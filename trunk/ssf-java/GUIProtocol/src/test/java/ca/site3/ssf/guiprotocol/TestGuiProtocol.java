@@ -15,7 +15,6 @@ import org.junit.Test;
 import ca.site3.ssf.gamemodel.AbstractGameModelCommand;
 import ca.site3.ssf.gamemodel.ActionFactory.ActionType;
 import ca.site3.ssf.gamemodel.FireEmitter.Location;
-import ca.site3.ssf.gamemodel.GameConfig;
 import ca.site3.ssf.gamemodel.GameModel;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel;
@@ -36,7 +35,7 @@ public class TestGuiProtocol {
 		}
 		
 		
-		IGameModel game = new GameModel(new GameConfig(true,3,60,3,0.1f));
+		IGameModel game = new GameModel();
 		Queue<AbstractGameModelCommand> commandQueue = new LinkedList<AbstractGameModelCommand>();
 		StreetFireServer server = new StreetFireServer(port, true, game.getActionFactory(), commandQueue, null);
 		Thread serverThread = new Thread(server);

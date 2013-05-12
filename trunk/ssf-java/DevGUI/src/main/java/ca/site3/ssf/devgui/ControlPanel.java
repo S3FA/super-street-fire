@@ -41,11 +41,16 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JButton executeP2ActionButton 			= null;
 	private JButton executeRingmasterActionButton	= null;
 	
-	private JComboBox playerActionComboBox     = null;
+	@SuppressWarnings("rawtypes")
+	private JComboBox player1ActionComboBox    = null;
+	@SuppressWarnings("rawtypes")
+	private JComboBox player2ActionComboBox    = null;
+	@SuppressWarnings("rawtypes")
 	private JComboBox ringmasterActionComboBox = null;
 	
 	List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	ControlPanel(ActionFactory actionFactory, StreetFireGuiClient client) {
 		
 		//setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -94,7 +99,8 @@ class ControlPanel extends JPanel implements ActionListener {
 			}
 		}
 		
-		this.playerActionComboBox  = new JComboBox(playerActionStrs.toArray());
+		this.player1ActionComboBox    = new JComboBox(playerActionStrs.toArray());
+		this.player2ActionComboBox    = new JComboBox(playerActionStrs.toArray());
 		this.ringmasterActionComboBox = new JComboBox(ringmasterActionStrs.toArray());
 		this.executeP1ActionButton = new JButton("Execute for Player 1");
 		this.executeP1ActionButton.addActionListener(this);
@@ -105,8 +111,9 @@ class ControlPanel extends JPanel implements ActionListener {
 		
 		
 		JPanel actionPanel = new JPanel();
-		actionPanel.add(this.playerActionComboBox);
+		actionPanel.add(this.player1ActionComboBox);
 		actionPanel.add(this.executeP1ActionButton);
+		actionPanel.add(this.player2ActionComboBox);
 		actionPanel.add(this.executeP2ActionButton);
 		actionPanel.add(this.ringmasterActionComboBox);
 		actionPanel.add(this.executeRingmasterActionButton);
@@ -234,8 +241,16 @@ class ControlPanel extends JPanel implements ActionListener {
 
 	private void executePlayerAction(int playerNum) {
 		try {
-			GestureType gesture = GestureType.valueOf(GestureType.class,
-				this.playerActionComboBox.getSelectedItem().toString());
+			GestureType gesture = null;
+			
+			if (playerNum == 1) {
+				gesture = GestureType.valueOf(GestureType.class, this.player1ActionComboBox.getSelectedItem().toString());
+			}
+			else {
+				gesture = GestureType.valueOf(GestureType.class, this.player2ActionComboBox.getSelectedItem().toString());
+			}
+			
+			assert(gesture != null);
 			client.executePlayerAction(playerNum, gesture.getActionFactoryType(), gesture.getUsesLeftHand(), gesture.getUsesRightHand());
 		}
 		catch (IllegalArgumentException ex) {
@@ -261,7 +276,8 @@ class ControlPanel extends JPanel implements ActionListener {
 	}
 	
 	private void setEnableActionControls(boolean enabledPlayerControls, boolean enabledRingmasterControls) {
-		this.playerActionComboBox.setVisible(enabledPlayerControls);
+		this.player1ActionComboBox.setVisible(enabledPlayerControls);
+		this.player2ActionComboBox.setVisible(enabledPlayerControls);
 		this.executeP1ActionButton.setVisible(enabledPlayerControls);
 		this.executeP2ActionButton.setVisible(enabledPlayerControls);
 		this.ringmasterActionComboBox.setVisible(enabledRingmasterControls);

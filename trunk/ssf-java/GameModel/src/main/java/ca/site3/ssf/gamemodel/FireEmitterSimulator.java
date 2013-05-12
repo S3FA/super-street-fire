@@ -11,16 +11,12 @@ class FireEmitterSimulator {
 	final private FireEmitter emitter;
 	final private Action action;
 	
+	private final double initialDelayInSecs;
 	private double initialDelayCounterInSecs = 0.0;
 	
 	final private int waveIndex;
 	final private int simulatorIndex;
-	private Deque<MultiLerp> intensityLerps = null;
-	
-	// Used to track whether an attack from one player went off at the same time as a block
-	// from the other player during the last lerp-per-play
-	private boolean blockAttackCancellationOccurredOnLastLerp; 
-								
+	private Deque<MultiLerp> intensityLerps = null;							
 	
 	FireEmitterSimulator(Action action, FireEmitter emitter, int waveIndex, int simulatorIndex,
 						 double initialDelayInSecs, Deque<MultiLerp> intensityLerps) {
@@ -36,17 +32,20 @@ class FireEmitterSimulator {
 		assert(waveIndex >= 0);
 		assert(simulatorIndex >= 0);
 		
+		this.initialDelayInSecs        = initialDelayInSecs;
 		this.initialDelayCounterInSecs = initialDelayInSecs;
 		assert(initialDelayInSecs >= 0.0);
 
 		this.intensityLerps = intensityLerps;
 		assert(intensityLerps != null);
-
-		this.blockAttackCancellationOccurredOnLastLerp = false;
 	}
 	
 	FireEmitter getEmitter() {
 		return this.emitter;
+	}
+	
+	double getInitialDelayInSecs() {
+		return this.initialDelayInSecs;
 	}
 	
 	boolean merge(FireEmitterSimulator simToMerge) {
@@ -105,29 +104,19 @@ class FireEmitterSimulator {
 			// Check for special issues that are specific to player attacks...
 			if (currLerpWasNotFinishedBeforeTick && intensityLerp.isFinished()) {
 				
-				// If one player's attack flame was on the same emitter as the other player's block flame
-				// then we need to cancel out some of the attack flames...
-				// CONSIDERATIONS:
-				// - We should wait for the full flame intensity lerp to complete before indicating the cancellation,
-				// by doing this we ensure that the full flame occurs for the attack on the emitter where it was blocked
-				// - We check the 'blockAttackCancellationOccurredOnLastLerp' flag, which indicates whether a block
-				// occurred during the entire interval of the current attack flame's lerp
-			    if (this.blockAttackCancellationOccurredOnLastLerp) {
-			    	action.blockOccurred(this.waveIndex, this.simulatorIndex);
-			    }
-				else {
-					// If an attack flame succeeded in getting to the opposing player then we need to tell the
-					// action about it so that the attackee will be damaged
-					
-					// Figure out if this.emitter is an emitter that will cause damage to the attackee...
-					Collection<FireEmitter> atkDmgEmitters = action.getFireEmitterModel().getDamageEmitters(action.getAttackee().getPlayerNumber());
-					for (FireEmitter atkDmgEmitter : atkDmgEmitters) {
-						if (this.emitter == atkDmgEmitter) {
-							action.attackFlameHitOccurred();
-							break;
-						}
+
+				// If an attack flame succeeded in getting to the opposing player then we need to tell the
+				// action about it so that the attackee will be damaged
+				
+				// Figure out if this.emitter is an emitter that will cause damage to the attackee...
+				Collection<FireEmitter> atkDmgEmitters = action.getFireEmitterModel().getDamageEmitters(action.getAttackee().getPlayerNumber());
+				for (FireEmitter atkDmgEmitter : atkDmgEmitters) {
+					if (this.emitter == atkDmgEmitter) {
+						action.attackFlameHitOccurred();
+						break;
 					}
 				}
+
 			}
 		}
 		
@@ -137,20 +126,7 @@ class FireEmitterSimulator {
 	void tick(PlayerBlockAction action, double dT) {
 		assert(this.action == action);
 		if (!this.intensityLerps.isEmpty()) {
-
-			MultiLerp intensityLerp = this.intensityLerps.peek();
-			boolean currLerpWasNotFinishedBeforeTick = !intensityLerp.isFinished();
 			this.tickSim(dT);
-			
-			// Check for special issues that are specific to player blocks...
-			if (currLerpWasNotFinishedBeforeTick && intensityLerp.isFinished()) {
-				
-				// If the block took place on an emitter that already had an attack on it then a
-				// block/attack cancellation occurs...
-			    if (this.blockAttackCancellationOccurredOnLastLerp) {
-			    	action.blockOccurred();
-			    }
-			}
 		}
 		this.updateLerp();
 	}
@@ -197,7 +173,6 @@ class FireEmitterSimulator {
 		MultiLerp intensityLerp = this.intensityLerps.peek();
 		float simulatedFlameIntensity = (float)intensityLerp.getInterpolantValue();
 		this.emitter.setIntensity(this.action, simulatedFlameIntensity);
-		this.blockAttackCancellationOccurredOnLastLerp |= this.emitter.hasAttackBlockConflict();
 		
 		intensityLerp.tick(dT);
 	}
@@ -213,9 +188,8 @@ class FireEmitterSimulator {
 		
 		MultiLerp intensityLerp = this.intensityLerps.peek();
 		if (intensityLerp.isFinished()) {
-			this.intensityLerps.pop();
-			this.blockAttackCancellationOccurredOnLastLerp = false;
 			
+			this.intensityLerps.pop();
 			if (this.isFinished()) {
 				this.emitter.setIntensity(this.action, 0.0f);
 			}

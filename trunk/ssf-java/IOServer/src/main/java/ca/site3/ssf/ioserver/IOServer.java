@@ -80,9 +80,9 @@ public class IOServer {
 	public IOServer(CommandLineArgs args) {
 		this.args = args;
 
-		GameConfig gameConfig = new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
-											   args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage);
-		game = new GameModel(gameConfig);
+		GameModel.setGameConfig(new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
+											   args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage));
+		game = new GameModel();
 	}
 	
 	/**

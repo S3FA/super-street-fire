@@ -275,7 +275,8 @@ public class StreetFireServer implements Runnable {
 		case PLAYER_BLOCK_ACTION: {
 			PlayerBlockActionEvent e = (PlayerBlockActionEvent)evt;
 			b.setType(EventType.PLAYER_BLOCK_ACTION)
-				.setPlayer(e.getPlayerNum() == 1 ? Common.Player.P1 : Common.Player.P2);
+				.setPlayer(e.getPlayerNum() == 1 ? Common.Player.P1 : Common.Player.P2)
+				.setBlockWasEffective(e.getBlockWasEffective());
 			break;
 		}
 		

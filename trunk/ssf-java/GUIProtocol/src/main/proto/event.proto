@@ -140,9 +140,6 @@ message GameEvent {
   // PlayerAttackActionEvent
   optional AttackType attackType = 7;
   
-  // PlayerBlockActionEvent
-  // reuse player
-  
   // PlayerHealthChange
   optional float oldHealth = 9;
   optional float newHealth = 10;
@@ -179,4 +176,7 @@ message GameEvent {
   // RingmasterActionEvent
   optional RingmasterActionType ringmasterActionType = 24;
   
+  // PlayerBlockActionEvent
+  // reuse player
+  optional bool blockWasEffective = 25;
 }

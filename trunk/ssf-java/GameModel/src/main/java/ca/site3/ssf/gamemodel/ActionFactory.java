@@ -29,7 +29,7 @@ final public class ActionFactory {
 		SHORYUKEN_ATTACK(true),
 		SONIC_BOOM_ATTACK(true),
 		DOUBLE_LARIAT_ATTACK(true),
-		QUADRUPLE_LARIAT_ATTACK(true),
+		//QUADRUPLE_LARIAT_ATTACK(true),
 		SUMO_HEADBUTT_ATTACK(true),
 		ONE_HUNDRED_HAND_SLAP_ATTACK(true),
 		PSYCHO_CRUSHER_ATTACK(true),
@@ -37,10 +37,10 @@ final public class ActionFactory {
 		// Easter egg moves
 		YMCA_ATTACK(true),
 		NYAN_CAT_ATTACK(true),
-		DISCO_STU_ATTACK(true),
+		//DISCO_STU_ATTACK(true),
 		ARM_WINDMILL_ATTACK(true),
 		SUCK_IT_ATTACK(true),
-		VAFANAPOLI_ATTACK(true),
+		//VAFANAPOLI_ATTACK(true),
 		
 		// Ringmaster moves
 		RINGMASTER_HALF_RING_ACTION(false),
@@ -107,16 +107,34 @@ final public class ActionFactory {
 				
 				// Doesn't matter if it's left or right handed, a block will block
 				// attacks coming in on both rails...
-				success &= this.addBurstToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), 1, 1, 3.0, 0.99, 0.01, 0.0);
-				success &= this.addBurstToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), 1, 1, 3.0, 0.99, 0.01, 0.0);
+				final int BLOCK_WIDTH = 1;
+				final int BLOCK_NUM_BURSTS = 1;
+				final double BLOCK_DURATION_IN_SECS = 2.0;
+				final double BLOCK_PERCENT_ON = 0.99;
+				final double BLOCK_PERCENT_OFF = 1.0 - BLOCK_PERCENT_ON;
+				final double BLOCK_DELAY = 0.0;
 				
+				// Surround the player in flames
+				// Turn on the flames directly infront of the player on the rails
+				success &= this.addBurstToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), 
+						BLOCK_WIDTH, BLOCK_NUM_BURSTS, BLOCK_DURATION_IN_SECS, BLOCK_PERCENT_ON, BLOCK_PERCENT_OFF, BLOCK_DELAY);
+				success &= this.addBurstToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), 
+						BLOCK_WIDTH, BLOCK_NUM_BURSTS, BLOCK_DURATION_IN_SECS, BLOCK_PERCENT_ON, BLOCK_PERCENT_OFF, BLOCK_DELAY);
+				
+				// Turn on the outer ring emitters to either side behind the player
+				success &= this.addBurstToAction(action, 
+						fireEmitterModel.getOuterRingStartEmitterIter(fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true, 0), true),
+						BLOCK_WIDTH, BLOCK_NUM_BURSTS, BLOCK_DURATION_IN_SECS, BLOCK_PERCENT_ON, BLOCK_PERCENT_OFF, BLOCK_DELAY);
+				success &= this.addBurstToAction(action, 
+						fireEmitterModel.getOuterRingStartEmitterIter(fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, false, 0), false),
+						BLOCK_WIDTH, BLOCK_NUM_BURSTS, BLOCK_DURATION_IN_SECS, BLOCK_PERCENT_ON, BLOCK_PERCENT_OFF, BLOCK_DELAY);
 				break;
 				
 			case JAB_ATTACK: {
 				assert(leftHand || rightHand);
 				
 				final double JAB_BASE_ACCELERATION   = 0.0;
-				final double JAB_TIME_LENGTH_IN_SECS = 1.33333;
+				final double JAB_TIME_LENGTH_IN_SECS = 1.5;
 				final float JAB_DAMAGE_PER_FLAME     = 3.5f;
 				final int JAB_NUM_FLAMES             = 1;
 				
@@ -139,7 +157,7 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double BASE_ACCELERATION   = 0.0;
-				final double TIME_LENGTH_IN_SECS = 2.0;
+				final double TIME_LENGTH_IN_SECS = 2.25;
 				final float DAMAGE_PER_FLAME     = 5.0f;
 				final int NUM_FLAMES             = 1;
 				
@@ -160,7 +178,7 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double CHOP_BASE_ACCELERATION   = 0.25;
-				final double CHOP_TIME_LENGTH_IN_SECS = 1.75;
+				final double CHOP_TIME_LENGTH_IN_SECS = 1.8;
 				final float CHOP_DAMAGE_PER_FLAME     = 4.0f;
 				final int CHOP_NUM_FLAMES             = 1;
 				
@@ -180,7 +198,7 @@ final public class ActionFactory {
 			case HADOUKEN_ATTACK: {
 				
 				final double HADOUKEN_BASE_ACCELERATION   = 0.0;
-				final double HADOUKEN_TIME_LENGTH_IN_SECS = 2.25;
+				final double HADOUKEN_TIME_LENGTH_IN_SECS = 3.0;
 				final float HADOUKEN_DAMAGE_PER_FLAME     = 3.0f;
 				final int HADOUKEN_NUM_FLAMES             = 2;
 				
@@ -205,7 +223,7 @@ final public class ActionFactory {
 			case SHORYUKEN_ATTACK: {
 				
 				final double SHORYUKEN_BASE_ACCELERATION   = 0.25;
-				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 2.0;
+				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 3.0;
 				final float SHORYUKEN_DAMAGE_PER_FLAME    = 6.0f;
 				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 2;
 				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 1;
@@ -263,7 +281,7 @@ final public class ActionFactory {
 			case SONIC_BOOM_ATTACK: {
 				
 				final double SONIC_BOOM_BASE_ACCELERATION   = 0.0;
-				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 1.4;
+				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 2.0;
 				final float SONIC_BOOM_DAMAGE_PER_FLAME     = 3.5f;
 				final int SONIC_BOOM_NUM_FLAMES             = 1;
 				
@@ -290,7 +308,7 @@ final public class ActionFactory {
 			case DOUBLE_LARIAT_ATTACK: {
 				
 				final double DOUBLE_LARIAT_BASE_ACCELERATION   = 0.0;
-				final double DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 2.5;
+				final double DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 4.0;
 				final float DOUBLE_LARIAT_DAMAGE_PER_FLAME     = 3.5f;
 				final int DOUBLE_LARIAT_NUM_FLAMES             = 2;
 				
@@ -314,6 +332,7 @@ final public class ActionFactory {
 				break;
 			}
 			
+			/*
 			case QUADRUPLE_LARIAT_ATTACK: {
 				final double QUADRUPLE_LARIAT_BASE_ACCELERATION   = 0.0;
 				final double QUADRUPLE_LARIAT_TIME_LENGTH_IN_SECS = 7.5;
@@ -339,13 +358,14 @@ final public class ActionFactory {
 				
 				break;
 			}
+			*/
 			
 			case SUMO_HEADBUTT_ATTACK: {
 				
 				final double SUMO_HEADBUTT_BASE_ACCELERATION   = 0.0;
-				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 2.0;
+				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 3.0;
 				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME     = 2.0f;
-				final int SUMO_HEADBUTT_NUM_FLAMES             = 2;
+				final int SUMO_HEADBUTT_NUM_FLAMES             = 1;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SUMO_HEADBUTT_ATTACK, playerNum,
 						SUMO_HEADBUTT_TIME_LENGTH_IN_SECS, SUMO_HEADBUTT_BASE_ACCELERATION,
@@ -370,7 +390,7 @@ final public class ActionFactory {
 			case ONE_HUNDRED_HAND_SLAP_ATTACK: {
 				
 				final double ONE_HUND_HAND_SLAP_BASE_ACCELERATION   = 0.0;
-				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 2.15;
+				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 3.0;
 				final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME     = 2.0f;
 				final int ONE_HUND_HAND_SLAP_NUM_FLAMES             = 3;
 				
@@ -526,6 +546,7 @@ final public class ActionFactory {
 				break;
 			}
 			
+			/*
 			case DISCO_STU_ATTACK: {
 				
 				final double DISCO_STU_BASE_ACCELERATION   = 1.0;
@@ -571,6 +592,7 @@ final public class ActionFactory {
 				
 				break;
 			}
+			*/
 			
 			case ARM_WINDMILL_ATTACK: {
 				
@@ -623,6 +645,7 @@ final public class ActionFactory {
 				break;
 			}
 			
+			/*
 			case VAFANAPOLI_ATTACK: {
 				
 				final double FAFANAPOLI_BASE_ACCELERATION   = 0;
@@ -675,6 +698,7 @@ final public class ActionFactory {
 				
 				break;
 			}
+			*/
 			
 			default:
 				return null;
@@ -1338,117 +1362,4 @@ final public class ActionFactory {
 		return new MultiLerp(timeValues, intensityValues);
 	}
 	
-	public static void main(String[] args) {
-		GameModel model = new GameModel(new GameConfig(true, 1.0, 60, 3, 0.1f));
-		ActionFactory actionFactory = model.getActionFactory();
-		
-		// One handed attacks...
-		
-		/*
-		// Player one, left handed attack, 1 flame...
-		Action p1LHAttack = actionFactory.buildPlayerLeftHandAttack(1, 10.0, 1, 10.0f);
-		assert(p1LHAttack != null);
-		while (!p1LHAttack.isFinished()) {
-			p1LHAttack.tick(0.05);
-			
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getLeftRailEmitter(i).getIntensity() + "|");
-			}
-			System.out.println();
-		}
-		
-		
-		// Player one, right handed attack, 1 flame...
-		Action p1RHAttack = actionFactory.buildPlayerRightHandAttack(1, 10.0, 1, 10.0f);
-		assert(p1RHAttack != null);
-		while (!p1RHAttack.isFinished()) {
-			p1RHAttack.tick(0.01666);
-			
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getRightRailEmitter(i).getIntensity() + "|");
-			}
-			System.out.println();
-		}
-		
-		
-		// Player two, left handed attack, 1 flame...
-		Action p2LHAttack = actionFactory.buildPlayerLeftHandAttack(2, 10.0, 1, 10.0f);
-		assert(p2LHAttack != null);
-		while (!p2LHAttack.isFinished()) {
-			p2LHAttack.tick(0.05);
-			
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getRightRailEmitter(i).getIntensity() + "|");
-			}
-			System.out.println();
-		}
-		
-		
-		// Player two, right handed attack, 1 flame...
-		Action p2RHAttack = actionFactory.buildPlayerRightHandAttack(2, 10.0, 1, 10.0f);
-		assert(p2RHAttack != null);
-		while (!p2RHAttack.isFinished()) {
-			p2RHAttack.tick(0.01666);
-			
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getLeftRailEmitter(i).getIntensity() + "|");
-			}
-			System.out.println();
-		}
-		
-		// Player one, two handed attack, 1 flame
-		Action p1TwoHAttack = actionFactory.buildPlayerTwoHandedSymetricalAttack(1, 10.0, 1, 10.0f);
-		assert(p1TwoHAttack != null);
-		while (!p1TwoHAttack.isFinished()) {
-			p1TwoHAttack.tick(0.01666);
-			
-			System.out.print("LEFT RAIL: ");
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getLeftRailEmitter(i).getIntensity() + "|");
-			}
-			System.out.print(" || RIGHT RAIL: ");
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getRightRailEmitter(i).getIntensity() + "|");
-			}			
-			System.out.println();
-		}
-
-		Action outerRingVictoryAction = actionFactory.buildBurstAction(GameModel.Entity.RINGMASTER_ENTITY, FireEmitter.Location.OUTER_RING, 1.0, 1);
-		assert(outerRingVictoryAction != null);
-		while (!outerRingVictoryAction.isFinished()) {
-			outerRingVictoryAction.tick(0.01666);
-			
-			System.out.print("OUTER RING: ");
-			for (int i = 0; i < 16; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getOuterRingEmitter(i, false).getIntensity() + "|");
-			}	
-			System.out.println();
-		}
-		
-		
-		Action leftRailBurst = actionFactory.buildBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.LEFT_RAIL, 1.0, 1);
-		assert(leftRailBurst != null);
-		while (!leftRailBurst.isFinished()) {
-			leftRailBurst.tick(0.01666);
-			
-			System.out.print("LEFT RAIL: ");
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getLeftRailEmitter(i).getIntensity() + "|");
-			}
-			System.out.println();
-		}
-		*/
-		Action rightRailBurst = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY, FireEmitter.Location.RIGHT_RAIL, 1.0, 1, 0.0);
-		assert(rightRailBurst != null);
-		while (!rightRailBurst.isFinished()) {
-			rightRailBurst.tick(0.01666);
-			
-			System.out.print("RIGHT RAIL: ");
-			for (int i = 0; i < 8; i++) {
-				System.out.print("Emitter " + i + ": " + model.getFireEmitterModel().getRightRailEmitter(i).getIntensity() + "|");
-			}
-			System.out.println();
-		}		
-		
-	}
 }
