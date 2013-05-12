@@ -12,7 +12,7 @@ import ca.site3.ssf.gamemodel.FireEmitter.FlameType;
 
 /**
  * Abstract superclass for any move/action taken by participants
- * in the Super Street Fire spectacle.
+ * in Super Street Fire.
  * @author Callum
  *
  */
@@ -28,62 +28,57 @@ public abstract class Action {
 		assert(this.fireEmitterModel != null);
 	}
 	
+	/**
+	 * Merges the given actionToMerge into the collection of activeActions. It does so in an 'intelligent'
+	 * way, ensuring that players can't be attacking and blocking simultaneously and other such
+	 * game rules/stipulations.
+	 * @param activeActions The currently active actions in play.
+	 * @param actionToMerge The action that we want to add to play by merging with the existing, active actions.
+	 */
 	static void mergeAction(Collection<Action> activeActions, Action actionToMerge) {
 		
-		switch (actionToMerge.getActionFlameType()) {
-		
-			case BLOCK_FLAME: {
-				// Block flames need to be specially merged...
-				Iterator<Action> iter = activeActions.iterator();
-				boolean didMerge = false;
-				while (iter.hasNext()) {
-					Action action = iter.next();
-	
-					if (action.getActionFlameType() == FlameType.BLOCK_FLAME &&
-						action.getContributorEntity() == actionToMerge.getContributorEntity()) {
-						((PlayerBlockAction)action).merge((PlayerBlockAction)actionToMerge);
-						didMerge = true;
-					}
-				}
-				
-				if (!didMerge) {
-					activeActions.add(actionToMerge);
-				}
-				
-				break;
-			}
+		// An attack flame made by a player that is currently blocking will stop the block flames from showing,
+		// A block flame made by a player that is currently blocking will just overwrite the previous block...
+		// Regardless, we're going to kill any previous block action made by the player and add the new actionToMerge
+		Iterator<Action> iter = activeActions.iterator();
+		int numBlocksCancelled = 0;
+		while (iter.hasNext()) {
 			
-			case ATTACK_FLAME: {
-				// An attack flame will cancel out any blocks being made by the player
-				// making the attack on the side(s) of the attack
-				Iterator<Action> iter = activeActions.iterator();
-				while (iter.hasNext()) {
-					Action action = iter.next();
-					if (action.getActionFlameType() == FlameType.BLOCK_FLAME &&
-						action.getContributorEntity() == actionToMerge.getContributorEntity()) {
-						
-						if (((PlayerAttackAction)actionToMerge).hasLeftHandedAttack()) {
-							// Remove the left handed part of the block...
-							((PlayerBlockAction)action).removeLeftHandedBlocks();
-						}
-						if (((PlayerAttackAction)actionToMerge).hasRightHandedAttack()) {
-							// Remove the right handed part of the block...
-							((PlayerBlockAction)action).removeRightHandedBlocks();
-						}
-						
-						if (action.isFinished()) {
-							iter.remove();
-						}
-					}
-				}
-				activeActions.add(actionToMerge);
-				break;
+			Action action = iter.next();
+			if (action.getActionFlameType() == FlameType.BLOCK_FLAME &&
+				action.getContributorEntity() == actionToMerge.getContributorEntity()) {
+				
+				// This is to make sure the block executes at least once (probably not necessary since no
+				// one can block and then attack faster than a simulation frame/tick, right?)
+				action.tick(0);
+				
+				// Completely remove the block...
+				action.kill();
+				iter.remove();
+				
+				numBlocksCancelled++;
 			}
-			
-			default:
-				activeActions.add(actionToMerge);
-				break;
 		}
+		
+		// It shouldn't be possible for multiple blocks to ever be active for a single player!!!
+		assert(numBlocksCancelled <= 1);
+		
+		// If we're dealing with merging a block then we need to inform the block of all the relevant,
+		// active attacks that are coming from the other player...
+		if (actionToMerge.getActionFlameType() == FlameType.BLOCK_FLAME) {
+			iter = activeActions.iterator();
+			while (iter.hasNext()) {
+				
+				Action action = iter.next();
+				if (action.getActionFlameType() == FlameType.ATTACK_FLAME &&
+					action.getContributorEntity() != actionToMerge.getContributorEntity()) {
+					// The action is an attack from the opposite player and is relevant to the block...
+					((PlayerBlockAction)actionToMerge).addRelevantIncomingAttackToBlock((PlayerAttackAction)action);
+				}
+			}
+		}
+		
+		activeActions.add(actionToMerge);
 	}
 	
 	boolean addFireEmitterBurst(FireEmitterIterator emitterIter, int width, int numBursts,
@@ -228,10 +223,22 @@ public abstract class Action {
 		return true;
 	}
 	
-	
 	FireEmitterModel getFireEmitterModel() {
 		return this.fireEmitterModel;
 	}	
+	
+	int getTotalNumFlames() {
+		
+		int total = 0;
+		
+		Iterator<ArrayList<FireEmitterSimulator>> arrayIter = this.wavesOfOrderedFireSims.iterator();
+		while (arrayIter.hasNext()) {
+			ArrayList<FireEmitterSimulator> currArray = arrayIter.next();
+			total += currArray.size();
+		}
+		
+		return total;
+	}
 	
 	/**
 	 * Whether this action is completed or not.
@@ -267,7 +274,7 @@ public abstract class Action {
 			this.firstTickDone = true;
 		}
 		
-		// Go through every simulator
+		// Go through every simulator, tick them, check for ones that are finished and clean them up
 		Iterator<ArrayList<FireEmitterSimulator>> arrayIter = this.wavesOfOrderedFireSims.iterator();
 		while (arrayIter.hasNext()) {
 			
@@ -277,8 +284,13 @@ public abstract class Action {
 			while (simIter.hasNext()) {
 				FireEmitterSimulator currSimulator = simIter.next();
 				if (this.tickSimulator(dT, currSimulator)) {
+					
+					// Just to make sure it's dead we kill it -- this will ensure that all flames
+					// associated with the simulator are killed as well
+					currSimulator.kill();
+					
+					// Remove the simulator from this action
 					simIter.remove();
-					currSimulator.kill(); // Just to make sure it's officially and definitely dead
 				}
 			}
 			

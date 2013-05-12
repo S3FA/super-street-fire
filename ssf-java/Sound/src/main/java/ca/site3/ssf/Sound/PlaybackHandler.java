@@ -25,7 +25,14 @@ class PlaybackHandler {// implements LineListener {
 	public boolean isBackgroundPlayer;
 
 	static PlaybackHandler build(SoundPlayerController controller, String source, PlaybackSettings settings) {
-		PlaybackHandler result = new PlaybackHandler(controller, source, settings);
+		
+		// Check to see if the audio file is even readable...
+		File audioFile = new File(source);
+		if (!audioFile.canRead()) {
+			return null;
+		}
+		
+		PlaybackHandler result = new PlaybackHandler(controller, audioFile, settings);
 		boolean isInit = result.init();
 		result.setSettings(settings);
 		
@@ -36,20 +43,20 @@ class PlaybackHandler {// implements LineListener {
 		return result;
 	}
 	
-	private PlaybackHandler(SoundPlayerController controller, String source, PlaybackSettings settings) {
+	private PlaybackHandler(SoundPlayerController controller, File audioFile, PlaybackSettings settings) {
 		assert(controller != null);
 		assert(settings != null);
-		assert(source != null);
+		assert(audioFile != null);
 		assert(settings != null);
 		
 		this.controller = controller;
-		this.audioFilePath = controller.getResourcePath() + source;
-		this.sourceName = source;
+		this.audioFilePath = audioFile.getAbsolutePath();
+		this.sourceName = audioFile.getName();
 		this.settings = settings;
 		
 		try
 		{
-			this.audioFileURL = new File(audioFilePath).toURI().toURL();
+			this.audioFileURL = audioFile.toURI().toURL();
 		}
 		catch(Exception ex)
 		{

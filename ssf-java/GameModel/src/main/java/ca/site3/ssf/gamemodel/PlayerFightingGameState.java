@@ -204,7 +204,6 @@ abstract class PlayerFightingGameState extends GameState {
 			PlayerAttackAction attackAction = ((PlayerAttackAction)action);
 			AttackType attackType = attackAction.getAttackType();
 			
-
 			int playerNum = player.getPlayerNumber();
 			FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 			assert(fireEmitterModel != null);

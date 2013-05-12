@@ -137,8 +137,8 @@ class SerializationHelper {
 			return PlayerAction.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return PlayerAction.DOUBLE_LARIAT_ATTACK;
-		case QUADRUPLE_LARIAT_ATTACK:
-			return PlayerAction.QUADRUPLE_LARIAT_ATTACK;
+		//case QUADRUPLE_LARIAT_ATTACK:
+		//	return PlayerAction.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return PlayerAction.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -149,14 +149,14 @@ class SerializationHelper {
 			return PlayerAction.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return PlayerAction.NYAN_CAT_ATTACK;
-		case DISCO_STU_ATTACK:
-			return PlayerAction.DISCO_STU_ATTACK;
+		//case DISCO_STU_ATTACK:
+		//	return PlayerAction.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return PlayerAction.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return PlayerAction.SUCK_IT_ATTACK;
-		case VAFANAPOLI_ATTACK:
-			return PlayerAction.VAFANAPOLI_ATTACK;
+		//case VAFANAPOLI_ATTACK:
+		//	return PlayerAction.VAFANAPOLI_ATTACK;
 		default:
 			return null;
 		}
@@ -201,8 +201,8 @@ class SerializationHelper {
 			return ActionType.SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return ActionType.DOUBLE_LARIAT_ATTACK;
-		case QUADRUPLE_LARIAT_ATTACK:
-			return ActionType.QUADRUPLE_LARIAT_ATTACK;
+		//case QUADRUPLE_LARIAT_ATTACK:
+		//	return ActionType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return ActionType.SUMO_HEADBUTT_ATTACK;
 		case ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -213,14 +213,14 @@ class SerializationHelper {
 			return ActionType.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return ActionType.NYAN_CAT_ATTACK;
-		case DISCO_STU_ATTACK:
-			return ActionType.DISCO_STU_ATTACK;
+		//case DISCO_STU_ATTACK:
+		//	return ActionType.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return ActionType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return ActionType.SUCK_IT_ATTACK;
-		case VAFANAPOLI_ATTACK:
-			return ActionType.VAFANAPOLI_ATTACK;
+		//case VAFANAPOLI_ATTACK:
+		//	return ActionType.VAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unknown player action: " + action);
 		}
@@ -510,8 +510,8 @@ class SerializationHelper {
 			return AttackType.RIGHT_SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return AttackType.DOUBLE_LARIAT_ATTACK;
-		case QUADRUPLE_LARIAT_ATTACK:
-			return AttackType.QUADRUPLE_LARIAT_ATTACK;
+		//case QUADRUPLE_LARIAT_ATTACK:
+		//	return AttackType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return AttackType.SUMO_HEADBUTT_ATTACK;
 		case LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -526,16 +526,16 @@ class SerializationHelper {
 			return AttackType.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return AttackType.NYAN_CAT_ATTACK;
-		case DISCO_STU_ATTACK:
-			return AttackType.DISCO_STU_ATTACK;
+		//case DISCO_STU_ATTACK:
+		//	return AttackType.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return AttackType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return AttackType.SUCK_IT_ATTACK;
-		case LEFT_VAFANAPOLI_ATTACK:
-			return AttackType.LEFT_VAFANAPOLI_ATTACK;
-		case RIGHT_VAFANAPOLI_ATTACK:
-			return AttackType.RIGHT_VAFANAPOLI_ATTACK;
+		//case LEFT_VAFANAPOLI_ATTACK:
+		//	return AttackType.LEFT_VAFANAPOLI_ATTACK;
+		//case RIGHT_VAFANAPOLI_ATTACK:
+		//	return AttackType.RIGHT_VAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized protobuf attack type: "+t);
 		}
@@ -571,8 +571,8 @@ class SerializationHelper {
 			return GameEvent.AttackType.RIGHT_SHORYUKEN_ATTACK;
 		case DOUBLE_LARIAT_ATTACK:
 			return GameEvent.AttackType.DOUBLE_LARIAT_ATTACK;
-		case QUADRUPLE_LARIAT_ATTACK:
-			return GameEvent.AttackType.QUADRUPLE_LARIAT_ATTACK;
+		//case QUADRUPLE_LARIAT_ATTACK:
+		//	return GameEvent.AttackType.QUADRUPLE_LARIAT_ATTACK;
 		case SUMO_HEADBUTT_ATTACK:
 			return GameEvent.AttackType.SUMO_HEADBUTT_ATTACK;
 		case LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK:
@@ -587,16 +587,16 @@ class SerializationHelper {
 			return GameEvent.AttackType.YMCA_ATTACK;
 		case NYAN_CAT_ATTACK:
 			return GameEvent.AttackType.NYAN_CAT_ATTACK;
-		case DISCO_STU_ATTACK:
-			return GameEvent.AttackType.DISCO_STU_ATTACK;
+		//case DISCO_STU_ATTACK:
+		//	return GameEvent.AttackType.DISCO_STU_ATTACK;
 		case ARM_WINDMILL_ATTACK:
 			return GameEvent.AttackType.ARM_WINDMILL_ATTACK;
 		case SUCK_IT_ATTACK:
 			return GameEvent.AttackType.SUCK_IT_ATTACK;
-		case LEFT_VAFANAPOLI_ATTACK:
-			return GameEvent.AttackType.LEFT_VAFANAPOLI_ATTACK;
-		case RIGHT_VAFANAPOLI_ATTACK:
-			return GameEvent.AttackType.RIGHT_VAFANAPOLI_ATTACK;
+		//case LEFT_VAFANAPOLI_ATTACK:
+		//	return GameEvent.AttackType.LEFT_VAFANAPOLI_ATTACK;
+		//case RIGHT_VAFANAPOLI_ATTACK:
+		//	return GameEvent.AttackType.RIGHT_VAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: " + t);
 		}

@@ -85,8 +85,9 @@ public class SerialDataReader implements Runnable {
 				boolean isFlame = buffer[msgStart+8] == 49; // currently ignores possible '?' status
 				OutputDeviceStatus status = new OutputDeviceStatus(buffer[msgStart+4], true, isArmed, isFlame);
 				messageQueue.offer(status);
-			} catch (IOException ex) {
-				log.warn("IOException reading serial data", ex);
+			}
+			catch (IOException ex) {
+				log.warn("IOException caught while reading serial data", ex);
 			}
 		}
 		log.info("SerialDataReader stopped.");

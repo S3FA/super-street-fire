@@ -371,7 +371,7 @@ public class StreetFireGuiClient {
 					SerializationHelper.protobufToAttackType(e.getAttackType()));
 			
 		case PLAYER_BLOCK_ACTION:
-			return new PlayerBlockActionEvent(playerNumFromPlayer(e.getPlayer()));
+			return new PlayerBlockActionEvent(playerNumFromPlayer(e.getPlayer()), e.getBlockWasEffective());
 			
 		case PLAYER_HEALTH_CHANGED:
 			return new PlayerHealthChangedEvent(playerNumFromPlayer(e.getPlayer()), 

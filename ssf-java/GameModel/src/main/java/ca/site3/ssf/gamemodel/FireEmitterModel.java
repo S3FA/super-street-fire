@@ -143,6 +143,11 @@ class FireEmitterModel {
 		return result;
 	}
 	
+	boolean isDamageEmitter(int damagedPlayerNum, FireEmitter emitter) {
+		Collection<FireEmitter> dmgEmitters = this.getDamageEmitters(damagedPlayerNum);
+		return dmgEmitters.contains(emitter);
+	}
+	
 	ArrayList<FireEmitter> getPlayerLeftEmitters(int playerNum) {
 		switch (playerNum) {
 		case 1:

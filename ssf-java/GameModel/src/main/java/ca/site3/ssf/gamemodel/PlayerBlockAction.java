@@ -7,6 +7,8 @@ class PlayerBlockAction extends Action {
 
 	final private Player blocker;
 	
+	private ArrayList<PlayerAttackAction> relevantIncomingAttacks = new ArrayList<PlayerAttackAction>(5);
+	
 	PlayerBlockAction(FireEmitterModel fireEmitterModel, Player blocker) {
 		super(fireEmitterModel);
 		this.blocker = blocker;
@@ -17,84 +19,29 @@ class PlayerBlockAction extends Action {
 		return this.blocker;
 	}
 	
-	void blockOccurred() {
-		// do nothing currently, the block will stay sustained just like in street fighter.
-	}
-	
-	void merge(PlayerBlockAction actionToMerge) {
-		if (actionToMerge.blocker != this.blocker) {
+	/**
+	 * Add an attack action that might be blocked by this block action, when the block
+	 * is activated, it will be considered as one of the attacks to block against.
+	 * @param attack The attack to add.
+	 */
+	void addRelevantIncomingAttackToBlock(PlayerAttackAction attack) {
+		
+		// The attack isn't relevant if the attacker is the blocker!
+		if (attack.getAttacker() == blocker) {
+			assert(false);
 			return;
 		}
-
-		int minSize = Math.min(actionToMerge.wavesOfOrderedFireSims.size(),
-				this.wavesOfOrderedFireSims.size());
-		ArrayList<FireEmitterSimulator> simsToAdd = new ArrayList<FireEmitterSimulator>(2);
-		for (int i = 0; i < minSize; i++) {
-			ArrayList<FireEmitterSimulator> thisWave  = this.wavesOfOrderedFireSims.get(i);
-			ArrayList<FireEmitterSimulator> mergeWave = actionToMerge.wavesOfOrderedFireSims.get(i);
-			
-			int minWaveSize = Math.min(thisWave.size(), mergeWave.size());
-			for (int j = 0; j < minWaveSize; j++) {
-				FireEmitterSimulator thisSim = thisWave.get(j);
-				FireEmitterSimulator mergeSim = mergeWave.get(j);
-				
-				if (!thisSim.merge(mergeSim)) {
-					simsToAdd.add(mergeSim);
-				}
-			}
-		}
 		
-		this.wavesOfOrderedFireSims.add(simsToAdd);
+		this.relevantIncomingAttacks.add(attack);
 	}
 	
-	void removeLeftHandedBlocks() {
-		ArrayList<FireEmitter> leftEmitters = this.fireEmitterModel.getPlayerLeftEmitters(this.blocker.getPlayerNumber());
-		Iterator<ArrayList<FireEmitterSimulator>> waveIter = this.wavesOfOrderedFireSims.iterator();
-		
-		while (waveIter.hasNext()) {
-			ArrayList<FireEmitterSimulator> currWave = waveIter.next();
-			Iterator<FireEmitterSimulator> simIter   = currWave.iterator();
-			
-			while (simIter.hasNext()) {
-				FireEmitterSimulator currSim = simIter.next();
-				if (leftEmitters.contains(currSim.getEmitter())) {
-					currSim.kill();
-					simIter.remove();
-				}
-			}
-			
-			if (currWave.isEmpty()) {
-				waveIter.remove();
-			}
-		}
-	}
-	
-	void removeRightHandedBlocks() {
-		ArrayList<FireEmitter> rightEmitters = this.fireEmitterModel.getPlayerRightEmitters(this.blocker.getPlayerNumber());
-		Iterator<ArrayList<FireEmitterSimulator>> waveIter = this.wavesOfOrderedFireSims.iterator();
-		
-		while (waveIter.hasNext()) {
-			ArrayList<FireEmitterSimulator> currWave = waveIter.next();
-			Iterator<FireEmitterSimulator> simIter   = currWave.iterator();
-			
-			while (simIter.hasNext()) {
-				FireEmitterSimulator currSim = simIter.next();
-				if (rightEmitters.contains(currSim.getEmitter())) {
-					currSim.kill();
-					simIter.remove();
-				}
-			}
-			
-			if (currWave.isEmpty()) {
-				waveIter.remove();
-			}
-		}
-	}
 	
 	@Override
 	boolean tickSimulator(double dT, FireEmitterSimulator simulator) {
+		
 		simulator.tick(this, dT);
 		return simulator.isFinished();
+		
 	}
 	
 	@Override
@@ -109,9 +56,29 @@ class PlayerBlockAction extends Action {
 	
 	@Override
 	void onFirstTick() {
+		
+		// Check to see whether the block is going to do anything at all 
+		// (i.e., is it effective against any of the attacks that were happening when it was initiated?)...
+		float effectiveness = 0.0f;
+		boolean wasBlockingEffective = false;
+		
+		Iterator<PlayerAttackAction> iter = this.relevantIncomingAttacks.iterator();
+		while (iter.hasNext()) {
+			PlayerAttackAction attack = iter.next();
+			effectiveness = attack.block();
+			if (effectiveness > 0.0) {
+				wasBlockingEffective = true;
+			}
+		}
+		
 		// Raise an event for the action...
 		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
 		assert(actionSignaller != null);
-		actionSignaller.fireOnPlayerBlockAction(this.getBlocker().getPlayerNumber());
+		actionSignaller.fireOnPlayerBlockAction(this.getBlocker().getPlayerNumber(), wasBlockingEffective);
+		
+		// If the block wasn't at all effective then we just kill any effects associated with it
+		if (!wasBlockingEffective) {
+			this.kill();
+		}
 	}	
 }

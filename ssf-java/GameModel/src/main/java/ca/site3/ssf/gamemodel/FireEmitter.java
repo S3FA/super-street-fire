@@ -14,7 +14,15 @@ import java.util.Map;
  */
 public class FireEmitter {
 	
-	public enum Location  { LEFT_RAIL, RIGHT_RAIL, OUTER_RING };
+	public enum Location  { 
+		LEFT_RAIL, RIGHT_RAIL, OUTER_RING;
+		
+		static boolean CanDamageHappenOnLocation(Location loc) {
+			return loc == Location.LEFT_RAIL || loc == RIGHT_RAIL;
+		}
+	};
+
+	
 	public enum FlameType { ATTACK_FLAME, BLOCK_FLAME, NON_GAME_FLAME };
 	
 	final public static float MAX_INTENSITY = 1.0f;

@@ -50,7 +50,7 @@ public class CommandLineArgs {
 	public String gloveInterfaceIP = "192.168.100.2";
 	
 	@Parameter(names={"-gestureEngine", "-ge"}, description="File path to the gesture recognition engine used for recongnizing game gestures")
-	public String gestureEngineFilepath = new File(System.getProperty("user.dir"), "../GestureRecorderGUI/Data/gesture_recognizer_engine.eng").toString();
+	public String gestureEngineFilepath = new File(System.getProperty("user.dir"), "../../data/gesture/gesture_recognizer_engine.eng").toString();
 	
 	@Parameter(names={"-encrypt", "-e"}, description="Use SSL to encrypt wifi communications")
 	public Boolean useSSL = false;

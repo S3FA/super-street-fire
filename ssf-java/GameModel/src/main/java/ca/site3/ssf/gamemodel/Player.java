@@ -16,19 +16,16 @@ class Player {
 	private boolean isInvincible;     // Whether 'god-mode'/invincibility is enabled or not
 	private boolean hasInfiniteMoves; // Whether or not the player has the ability to do any type of move as much as they want
 	private float lastDmgAmount;      // The amount of damage that this player suffered last
-	
-	private GameConfig gameConfig = null;
+
 	private GameModelActionSignaller actionSignaller = null;
 	
-	Player(int playerNum, GameModelActionSignaller actionSignaller, GameConfig gameConfig) {
+	Player(int playerNum, GameModelActionSignaller actionSignaller) {
 		assert(playerNum == 1 || playerNum == 2);
 		
 		// Set the signaller before doing anything else!
 		this.actionSignaller = actionSignaller;
 		assert(this.actionSignaller != null);
 	
-		this.gameConfig = gameConfig;
-		assert(this.gameConfig != null);
 		
 		this.matchReset();
 		this.resetHealth();
@@ -63,14 +60,6 @@ class Player {
 	void clearHealth() {
 		this.setHealth(Player.KO_HEALTH);
 		this.lastDmgAmount = 0;
-	}
-	
-	/**
-	 * Do chip damage to a player with the given full damage amount.
-	 * @param beforeChipDmgAmt The total damage of an attack before it is reduced to a chip damage amount.
-	 */
-	void doChipDamage(float beforeChipDmgAmt) {
-		this.doDamage(Math.max(1.0f, beforeChipDmgAmt * this.gameConfig.getChipDamagePercentage()));
 	}
 	
 	/**

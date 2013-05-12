@@ -2,6 +2,8 @@ package ca.site3.ssf.gamemodel;
 
 import java.util.ArrayList;
 
+import ca.site3.ssf.gamemodel.FireEmitter.Location;
+
 public class PlayerAttackAction extends Action {
 	
 	public enum AttackType {
@@ -23,7 +25,6 @@ public class PlayerAttackAction extends Action {
 		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3, 3),
 		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 5, 5),
 		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 2, 2),
-		QUADRUPLE_LARIAT_ATTACK(Integer.MAX_VALUE, 1, 1),
 		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 2, 2),
 		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
 		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
@@ -33,11 +34,8 @@ public class PlayerAttackAction extends Action {
 		// Easter Egg Attacks
 		YMCA_ATTACK(1, 1, 1),
 		NYAN_CAT_ATTACK(1, 1, 1),
-		DISCO_STU_ATTACK(1, 1),
 		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1, 1),
-		SUCK_IT_ATTACK(1, 1, 1),
-		LEFT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1, 1),
-		RIGHT_VAFANAPOLI_ATTACK(Integer.MAX_VALUE, 1, 1);
+		SUCK_IT_ATTACK(1, 1, 1);
 		
 		private final int maxUsesPerRound;         // Maximum of this attack type that are allowed per-round
 		private final int numAllowedActiveAtATime; // Maximum of this attack type that are allowed to be active at any given time in a round
@@ -82,8 +80,14 @@ public class PlayerAttackAction extends Action {
 	final private Player attacker;
 	final private Player attackee;
 	
-	final private float damagePerFlame; // Amount of damage dealt to the attackee per flame delivered
-		
+	// Amount of damage dealt to the attackee per flame delivered
+	final private float damagePerFlame;
+	
+	private double countdownToBlockSignalInSecs;
+	private boolean blockWindowSignaled;
+	
+	private BlockTimingModel blockTimingModel;
+	
 	PlayerAttackAction(FireEmitterModel fireEmitterModel, AttackType type,
 					   Player attacker, Player attackee, float dmgPerFlame) {
 		
@@ -100,46 +104,48 @@ public class PlayerAttackAction extends Action {
 		
 		this.damagePerFlame = dmgPerFlame;
 		assert(dmgPerFlame > 0.0f);
+		
+		this.countdownToBlockSignalInSecs = BlockTimingModel.getBlockWindowTimeBeforeAtkFirstHurt();
+		this.blockWindowSignaled = false;
+		this.blockTimingModel = new BlockTimingModel(this, fireEmitterModel.getActionSignaller());
 	}
 	
 	/**
-	 * Inform this action that a block (i.e., an attack from the attacker was carried out on the same
-	 * emitter where a block was simultaneously occurring from the attackee) has occurred on one of 
-	 * its simulators. This function will ensure that the block cancels at least one of the
-	 * attack flames in this attack action.
+	 * Inform this action that a block has occurred from the opposing player. The block may or may
+	 * not be effective based on the current state of the blockTimingModel of this attack.
+	 * @return The effectiveness of the block [0,1] -- 0 is completely not effective, 1 is completely effective.
 	 */
-	void blockOccurred(int waveIndex, int simulatorIndex) {
-		assert(waveIndex >= 0);
-		
-		// If the waveIndex is out of bounds then just exit, this attack has already
-		// been blocked/finished/cleared
-		if (waveIndex >= this.wavesOfOrderedFireSims.size()) {
-			return;
+	float block() {
+
+		if (this.isFinished()) {
+			return 0.0f;
 		}
 		
-		// TODO: Block the attack based on how well-timed the block was...
-		// ...
-		
-		
-		// The attack will still do chip damage...
-		this.attackee.doChipDamage(this.damagePerFlame);
-		
-		
-		// When a block occurs on a particular simulator we need to propagate the effects
-		// of that block to each of the simulators that are after it - this will cancel out
-		// one of the flames on each of the successive simulators
-		ArrayList<FireEmitterSimulator> simulatorWave = this.wavesOfOrderedFireSims.get(waveIndex);
-		
-		// If the simulatorIndex is out of bounds then we just exit, this attack has
-		// already finished
-		assert(simulatorIndex >= 0);
-		if (simulatorIndex >= simulatorWave.size()) {
-			return;
+		float effectivenessOfBlock = this.blockTimingModel.block();
+		assert(effectivenessOfBlock >= 0.0);
+		if (effectivenessOfBlock == 0.0) {
+			return 0.0f;
 		}
 		
-		for (int i = simulatorIndex+1; i < simulatorWave.size(); i++) {
-			simulatorWave.get(i).flameBlocked();
+		// Do damage to the attackee/blocker based on the effectiveness...
+		float attackDamageBaseAmt = this.damagePerFlame * this.getTotalNumFlames();
+		float damageAfterBlock    = attackDamageBaseAmt - attackDamageBaseAmt * effectivenessOfBlock;
+		
+		// If chip damage is enabled then it's impossible for a block to be COMPLETELY AND UTTERLY effective
+		// (i.e., reduce damage to zero). So we apply chip damage...
+		if (GameModel.getGameConfig().getChipDamageOn()) {
+			damageAfterBlock = Math.max(1, Math.max(damageAfterBlock, attackDamageBaseAmt * GameModel.getGameConfig().getChipDamagePercentage()));
 		}
+		
+		assert(damageAfterBlock <= attackDamageBaseAmt);
+		attackee.doDamage(damageAfterBlock);
+		
+		// Completely cancel out this attack
+		// IMPORTANT: Make sure to do this AFTER we calculate the damage
+		// since the getTotalNumFlames() will be effected by the call to kill()
+		this.kill();
+		
+		return effectivenessOfBlock;
 	}
 	
 	/**
@@ -185,6 +191,47 @@ public class PlayerAttackAction extends Action {
 		return false;
 	}
 	
+	double getMinimumTimeUntilAttackHurtsAttackee() {
+		// We need to figure out what the smallest amount of time before the attackee is hurt will be...
+		double minTimeToHurt = Double.MAX_VALUE;
+		for (ArrayList<FireEmitterSimulator> simWave : this.wavesOfOrderedFireSims) {
+			
+			// Make sure the wave is on a damage-able location of the arena
+			assert(!simWave.isEmpty());
+			if (!Location.CanDamageHappenOnLocation(simWave.get(0).getEmitter().getLocation())) {
+				continue;
+			}
+			
+			for (FireEmitterSimulator sim : simWave) {
+				FireEmitter emitter = sim.getEmitter();
+				if (this.fireEmitterModel.isDamageEmitter(this.attackee.getPlayerNumber(), emitter)) {
+					minTimeToHurt = Math.min(minTimeToHurt, sim.getInitialDelayInSecs());
+				}
+			}
+		}
+		return minTimeToHurt;
+	}
+	
+	@Override
+	void tick(double dT) {
+		super.tick(dT);
+		
+		// Figure out when to raise the block window for this attack
+		this.countdownToBlockSignalInSecs = Math.max(0.0, this.countdownToBlockSignalInSecs - dT);
+		if (this.countdownToBlockSignalInSecs <= 0.0) {
+			
+			if (this.blockWindowSignaled) {
+				this.blockTimingModel.tick(dT);
+			}
+			else {
+				// The one and only chance for the attackee to block the attack is being signalled...
+				this.blockTimingModel.startBlockWindow();
+				this.blockWindowSignaled = true;
+			}
+		}
+		
+	}
+	
 	@Override
 	boolean tickSimulator(double dT, FireEmitterSimulator simulator) {
 		simulator.tick(this, dT);
@@ -203,6 +250,15 @@ public class PlayerAttackAction extends Action {
 	
 	@Override
 	void onFirstTick() {
+		
+		// Calculate the amount of time in seconds before a block signal is raised for this attack...
+		// NOTE: The attack must be long enough for a block window to actually happen
+		double timeToFirstHurtInSecs = this.getMinimumTimeUntilAttackHurtsAttackee();
+		assert(timeToFirstHurtInSecs >= BlockTimingModel.getBlockWindowTimeBeforeAtkFirstHurt());
+		this.countdownToBlockSignalInSecs = Math.max(BlockTimingModel.getBlockWindowTimeBeforeAtkFirstHurt(), 
+				timeToFirstHurtInSecs - BlockTimingModel.getBlockWindowTimeBeforeAtkFirstHurt());
+		this.blockWindowSignaled = false;
+		
 		// Raise an event for the action...
 		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
 		assert(actionSignaller != null);

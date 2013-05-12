@@ -20,7 +20,7 @@ import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
  */
 public class GameModel implements IGameModel {
 
-	private GameConfig config;
+	private static GameConfig config = new GameConfig(true, 0.75, 60, 3, 0.1f);
 	
 	private GameState currState = null;
 	private GameState nextState = null;
@@ -36,21 +36,26 @@ public class GameModel implements IGameModel {
 	
 	private List<RoundResult> roundResults = new ArrayList<RoundResult>(4);
 	
-	public GameModel(GameConfig config) {
+	public GameModel() {
 		this.logger = LoggerFactory.getLogger(getClass());
 		
-		this.config = config;
-		assert(this.config != null);
 		
 		this.actionSignaller = new GameModelActionSignaller();
 		
-		this.player1 = new Player(PLAYER_1_NUM, this.actionSignaller, this.config);
-		this.player2 = new Player(PLAYER_2_NUM, this.actionSignaller, this.config);
+		this.player1 = new Player(PLAYER_1_NUM, this.actionSignaller);
+		this.player2 = new Player(PLAYER_2_NUM, this.actionSignaller);
 		
 		this.fireEmitterModel = new FireEmitterModel(new FireEmitterConfig(true, 16, 8), this.actionSignaller);
 		
 		// Make sure the rest of the model is setup before the state
 		this.nextState = new IdleGameState(this);
+	}
+	
+	public static void setGameConfig(GameConfig config) {
+		GameModel.config = config;
+	}
+	public static GameConfig getGameConfig() {
+		return GameModel.config;
 	}
 	
 	GameState getCurrentState() {
