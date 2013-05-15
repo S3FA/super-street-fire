@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "-[ArenaView drawRect:]:ArenaView.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[Emitter colour]:Emitter.h">
+         <PersistentStrings>
+            <PersistentString
+               value = "*self.colour">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[Emitter init]:Emitter.m">
+      </ContextState>
+      <ContextState
+         contextName = "-[ArenaView setupEmitters]:ArenaView.m">
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
