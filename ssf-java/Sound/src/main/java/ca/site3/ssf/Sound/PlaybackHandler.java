@@ -93,12 +93,17 @@ class PlaybackHandler {// implements LineListener {
 				String bgFile = controller.getBackgroundFileName();
 				URL queuedFile = new File(bgFile).toURI().toURL();
 				
-				controller.mySoundSystem.cull(controller.getBackgroundSource());
+				controller.mySoundSystem.stop(bgSource);
+				controller.mySoundSystem.removeSource(bgSource);
+				controller.mySoundSystem.dequeueSound(bgSource, bgFile);
+				
+				// Note that when you queue up a sound, it actually plays in the source you are queuing it up to play AFTER.
 				controller.mySoundSystem.play(sourceName);
 				controller.mySoundSystem.queueSound(sourceName, queuedFile, bgSource);
 				
-				controller.setBackgroundFileName(bgFile);
-				controller.setBackgroundSource(bgSource);
+				// See above - that's why we need to set the background source to be the source we want to queue bg music to play after
+				controller.setBackgroundFileName(this.audioFilePath);
+				controller.setBackgroundSource(sourceName);
 			}
 			else
 			{

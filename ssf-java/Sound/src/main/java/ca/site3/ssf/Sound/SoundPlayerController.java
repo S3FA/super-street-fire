@@ -53,6 +53,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	// Initialize the sound player
 	void init()
 	{
+		// Add the libraries and codecs
 		try
 		{
 			SoundSystemConfig.addLibrary( LibraryLWJGLOpenAL.class );
@@ -63,7 +64,8 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
             System.out.println("error linking with the plugins" );
         }
 		
-		 try
+		// Create the soundsystem
+		try
         {
             mySoundSystem = new SoundSystem( LibraryLWJGLOpenAL.class );
         }
@@ -75,20 +77,24 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
         }
 	}
 	
+	// Gets the resource path
 	String getResourcePath() {
 		return this.resourcePath;
 	}
 	
+	// Gets the config properties
 	Properties getConfigProperties() {
 		return this.configProperties;
 	}
 	
+	// Sets the audio settings
 	public void setAudioSettings(AudioSettings settings) {
 		synchronized(this.settings) {
 			this.settings = settings;
 		}
 	}
 	
+	// Gets the audio settings
 	public AudioSettings getAudioSettings() {
 		AudioSettings result = null;
 		synchronized(this.settings) {
@@ -97,26 +103,31 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		return result;
 	}
 
+	// Gets the current source of background music
 	public String getBackgroundSource()
 	{
 		return backgroundSource;
 	}
 	
+	// Gets the current source of background music's file name
 	public String getBackgroundFileName()
 	{
 		return backgroundFileName;
 	}
 	
+	// Sets the background source
 	public void setBackgroundSource(String source)
 	{
 		backgroundSource = source;
 	}
 	
+	// Sets the background source's file name
 	public void setBackgroundFileName(String fileName)
 	{
 		backgroundFileName = fileName;
 	}
 	
+	// Stops the thread
 	public void stop() {
 		this.stop = true;
 	}
@@ -129,13 +140,24 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		this.incomingEvents.add(gameModelEvent);
 	}
 	
+	// Stops the background music and removes all references to it
 	void stopAllSounds() 
 	{
-		mySoundSystem.cull(this.getBackgroundSource());
+		try{
+			mySoundSystem.stop(this.getBackgroundSource());
+			mySoundSystem.removeSource(this.getBackgroundSource());
+			mySoundSystem.dequeueSound(this.getBackgroundSource(), this.getBackgroundFileName());
+		}
+		catch(Exception ex){
+			// An error occurred while trying to clean up the background music sources
+			ex.printStackTrace();
+		}
+		
 		this.setBackgroundSource("");
 		this.setBackgroundFileName("");
 	}
 	
+	// Pauses the background music
 	void pauseBackgroundMusic()
 	{
 		try{
@@ -148,6 +170,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		}
 	}
 	
+	// Unpauses the background music
 	void unpauseBackgroundMusic()
 	{
 		try{
@@ -162,6 +185,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		}
 	}
 	
+	// Sets the config file referenced throughout the library
 	private void setConfigFile(String configPath) {
 		this.configProperties = new Properties();
 		
@@ -175,20 +199,25 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 			this.resourcePath = "";
 		}
 	}
-
+	
+	// Stops a specific sound source from playing
 	void stopSound(String source) {
 		mySoundSystem.stop(source);
 	}
 
+	// The main logic of the sound thread
 	public void run() {
 		while (!this.stop) {
 			IGameModelEvent gameModelEvent;
+			
+			// Take game events from the queue
 			try {
 				gameModelEvent = this.incomingEvents.take();
 			} catch (InterruptedException e) {
 				continue;
 			}
 			
+			// Decide whether to stop/pause/play sounds
 			if (gameModelEvent.getType() == Type.GAME_STATE_CHANGED) {
 				GameStateChangedEvent ce = (GameStateChangedEvent) gameModelEvent;
 				GameStateType oldGameState = ce.getOldState();
@@ -206,6 +235,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 				}
 			}
 			
+			// Create a new instance of the sound player and execute the sound
 			SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
 			if (soundPlayer != null) {
 				soundPlayer.execute(gameModelEvent);
