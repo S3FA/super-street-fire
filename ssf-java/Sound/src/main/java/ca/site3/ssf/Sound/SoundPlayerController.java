@@ -8,6 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
@@ -130,7 +131,35 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	
 	void stopAllSounds() 
 	{
-		mySoundSystem.cleanup();
+		mySoundSystem.cull(this.getBackgroundSource());
+		this.setBackgroundSource("");
+		this.setBackgroundFileName("");
+	}
+	
+	void pauseBackgroundMusic()
+	{
+		try{
+			mySoundSystem.pause(this.getBackgroundSource());
+		}
+		catch(Exception ex)
+		{
+			// There was an exception trying to pause the background music
+			ex.printStackTrace();
+		}
+	}
+	
+	void unpauseBackgroundMusic()
+	{
+		try{
+			if(this.getBackgroundSource() != null)
+			{
+				mySoundSystem.play(this.getBackgroundSource());
+			}
+		}
+		catch(Exception ex){
+			// There was an exception trying to unpause the background music.
+			ex.printStackTrace();
+		}
 	}
 	
 	private void setConfigFile(String configPath) {
@@ -162,12 +191,17 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 			
 			if (gameModelEvent.getType() == Type.GAME_STATE_CHANGED) {
 				GameStateChangedEvent ce = (GameStateChangedEvent) gameModelEvent;
-				switch (ce.getNewState()) {
+				GameStateType oldGameState = ce.getOldState();
+				switch (ce.getNewState()) { 
 				case IDLE_STATE:
+					this.stopAllSounds();
 				case PAUSED_STATE:
-					stopAllSounds();
+					pauseBackgroundMusic();
 					break;
 				default:
+					if (oldGameState == GameStateType.PAUSED_STATE){
+						unpauseBackgroundMusic();
+					}
 					break;
 				}
 			}

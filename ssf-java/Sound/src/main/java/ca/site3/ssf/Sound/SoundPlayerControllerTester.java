@@ -24,7 +24,6 @@ public class SoundPlayerControllerTester{
 	{
 		System.out.println("Started the SoundPlayerControllerTester.");
 		
-		
 		init();
 	}
 	

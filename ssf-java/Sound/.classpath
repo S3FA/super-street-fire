@@ -22,7 +22,7 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Sound/lib/lwjgl-native"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="../lib/junit-4.8.1.jar"/>
-	<classpathentry kind="lib" path="../lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/superstreetfire/ssf-java/lib/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/meverson/Documents/eclipse/superstreetfire/ssf-java/lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

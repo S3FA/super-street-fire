@@ -25,22 +25,29 @@ class PlaybackHandler {// implements LineListener {
 	public boolean isBackgroundPlayer;
 
 	static PlaybackHandler build(SoundPlayerController controller, String source, PlaybackSettings settings) {
-		
-		// Check to see if the audio file is even readable...
-		File audioFile = new File(source);
-		if (!audioFile.canRead()) {
-			return null;
+		try{
+			// Check to see if the audio file is even readable...
+			File audioFile = new File(controller.getResourcePath() + source);
+			if (!audioFile.canRead()) {
+				return null;
+			}
+			
+			PlaybackHandler result = new PlaybackHandler(controller, audioFile, settings);
+			boolean isInit = result.init();
+			result.setSettings(settings);
+			
+			if (!isInit) {
+				return null;
+			}
+			
+			return result;
 		}
-		
-		PlaybackHandler result = new PlaybackHandler(controller, audioFile, settings);
-		boolean isInit = result.init();
-		result.setSettings(settings);
-		
-		if (!isInit) {
-			return null;
+		catch(Exception ex)
+		{
+			logger.warn("Exception while attempting to set up the playbackHandler.", ex);
+			throw ex;
+			//return null;
 		}
-		
-		return result;
 	}
 	
 	private PlaybackHandler(SoundPlayerController controller, File audioFile, PlaybackSettings settings) {
@@ -82,11 +89,16 @@ class PlaybackHandler {// implements LineListener {
 			// Pause the background music if necessary, and queue it up to restart immediately after playback
 			if(this.settings.getIsQuietBackground())
 			{
-				URL queuedFile = new File(controller.getBackgroundFileName()).toURI().toURL();
+				String bgSource = controller.getBackgroundSource();
+				String bgFile = controller.getBackgroundFileName();
+				URL queuedFile = new File(bgFile).toURI().toURL();
 				
-				controller.mySoundSystem.stop(controller.getBackgroundSource());
+				controller.mySoundSystem.cull(controller.getBackgroundSource());
 				controller.mySoundSystem.play(sourceName);
-				controller.mySoundSystem.queueSound(sourceName, queuedFile, controller.getBackgroundSource());
+				controller.mySoundSystem.queueSound(sourceName, queuedFile, bgSource);
+				
+				controller.setBackgroundFileName(bgFile);
+				controller.setBackgroundSource(bgSource);
 			}
 			else
 			{
@@ -114,8 +126,14 @@ class PlaybackHandler {// implements LineListener {
 	}
 	
 	private void updateSettings() {
-		// Adjust the volume on the audio clip
-		this.controller.mySoundSystem.setVolume(sourceName, this.settings.getVolume());
+		try{
+			// Adjust the volume on the audio clip
+			//this.controller.mySoundSystem.setVolume(sourceName, this.settings.getVolume());
+		}
+		catch (Exception ex){
+			logger.warn("Exception while attempting to set the volume.", ex);
+			throw ex;
+		}
 	}
 	
 	public void setIsBackground(boolean background)
