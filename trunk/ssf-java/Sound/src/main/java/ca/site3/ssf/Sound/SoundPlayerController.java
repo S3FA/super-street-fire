@@ -44,8 +44,13 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	
 	public SoundPlayerController(AudioSettings settings) {
 		assert(settings != null);
+		
+		this.backgroundFileName = "";
+		this.backgroundSource   = "";
+		
 		this.settings = settings;
 		this.setConfigFile(DEFAULT_CONFIG_FILEPATH);
+		
 		
 		init();
 	}

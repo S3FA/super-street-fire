@@ -115,6 +115,32 @@ class GameInfoPanel extends JPanel {
 		}
 	}
 
+	void tick(double dT) {
+		this.player1Panel.tick(dT);
+		this.player2Panel.tick(dT);
+	}
+	
+	void addBlockWindow(int blockWindowID, int playerNum, double timeLengthInSecs) {
+		if (playerNum == 1) {
+			this.player1Panel.addBlockWindow(blockWindowID, timeLengthInSecs);
+		}
+		else {
+			this.player2Panel.addBlockWindow(blockWindowID, timeLengthInSecs);
+		}
+	}
+	void removeBlockWindow(int blockWindowID, int playerNum) {
+		if (playerNum == 1) {
+			this.player1Panel.removeBlockWindow(blockWindowID);
+		}
+		else {
+			this.player2Panel.removeBlockWindow(blockWindowID);
+		}
+	}
+	void removeAllBlockWindows() {
+		this.player1Panel.removeAllBlockWindows();
+		this.player2Panel.removeAllBlockWindows();
+	}
+	
 	PlayerInfoPanel getPlayer1Panel() {
 		return this.player1Panel;
 	}

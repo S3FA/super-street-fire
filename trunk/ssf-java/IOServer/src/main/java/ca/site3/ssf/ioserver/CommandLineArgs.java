@@ -24,6 +24,9 @@ public class CommandLineArgs {
 	@Parameter(names = "-actionGap", description = "Minimum time (in seconds) between player actions")
 	public Double minTimeBetweenPlayerActionsInSecs = 0.75;
 	
+	@Parameter(names = "-actionPtRegenRate", description = "Regeneration rate of player action points (in action points per second)")
+	public Float actionPointRegenRate = 8.0f;
+	
 	@Parameter(names="-roundLength", description="Length of rounds (in seconds)")
 	public Integer roundTimeInSecs = 45;
 	

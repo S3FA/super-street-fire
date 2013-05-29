@@ -31,6 +31,7 @@ class TestRoundGameState extends PlayerFightingGameState {
 
 	@Override
 	void tick(double dT) {
+		super.tick(dT);
 		
 		// Simulate all of the queued actions...
 		Iterator<Action> iter = this.activeActions.iterator();

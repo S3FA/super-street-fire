@@ -158,7 +158,7 @@ public class TestSerialStuff {
 			ex.printStackTrace();
 		}
 		
-		SerialCommunicator sc = new SerialCommunicator(in, out, null);
+		SerialCommunicator sc = new SerialCommunicator(new CommandLineArgs(), in, out, null);
 		
 		Thread commThread = new Thread(sc);
 		commThread.start();
@@ -210,7 +210,7 @@ public class TestSerialStuff {
 			ex.printStackTrace();
 		}
 		
-		SerialCommunicator sc = new SerialCommunicator(in, out, null);
+		SerialCommunicator sc = new SerialCommunicator(new CommandLineArgs(), in, out, null);
 		
 		Thread commThread = new Thread(sc);
 		commThread.start();
@@ -265,7 +265,7 @@ public class TestSerialStuff {
 			ex.printStackTrace();
 		}
 		
-		SerialCommunicator sc = new SerialCommunicator(in, out, null);
+		SerialCommunicator sc = new SerialCommunicator(new CommandLineArgs(), in, out, null);
 		
 		Thread commThread = new Thread(sc);
 		commThread.start();

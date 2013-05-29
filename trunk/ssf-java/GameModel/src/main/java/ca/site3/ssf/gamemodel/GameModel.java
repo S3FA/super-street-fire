@@ -20,7 +20,7 @@ import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
  */
 public class GameModel implements IGameModel {
 
-	private static GameConfig config = new GameConfig(true, 0.75, 60, 3, 0.1f);
+	private static GameConfig config = new GameConfig(true, 0.75, 60, 3, 0.1f, 8.0f);
 	
 	private GameState currState = null;
 	private GameState nextState = null;
@@ -223,7 +223,7 @@ public class GameModel implements IGameModel {
 	/**
 	 * Completely resets the game data and turns all emitters off.
 	 */
-	void resetGame(boolean clearPlayerHealth) {
+	void resetGame(boolean clearPlayerHealthAndActionPoints) {
 		// Make sure the game is completely reset:
 		// - All emitters must be turned off
 		// - All players must have full health restored and all record of wins/losses wiped
@@ -234,12 +234,14 @@ public class GameModel implements IGameModel {
 		p1.matchReset();
 		p2.matchReset();
 		
-		if (clearPlayerHealth) {
+		if (clearPlayerHealthAndActionPoints) {
 			p1.clearHealth();
+			p1.clearActionPoints();
 			p2.clearHealth();
+			p2.clearActionPoints();
 		}
 		
-		assert(this.roundResults.size() <= this.getConfig().getMaxNumRoundsPerMatch());
+		assert(this.roundResults.size() <= GameModel.getGameConfig().getMaxNumRoundsPerMatch());
 		this.roundResults.clear();
 	}
 	
@@ -250,7 +252,7 @@ public class GameModel implements IGameModel {
 	void addRoundResult(RoundResult result) {
 		this.roundResults.add(result);
 		// It should never be the case that we add more results than there are maximum number of rounds
-		assert(this.roundResults.size() <= this.getConfig().getMaxNumRoundsPerMatch());
+		assert(this.roundResults.size() <= GameModel.getGameConfig().getMaxNumRoundsPerMatch());
 	}
 	
 	/**
@@ -318,10 +320,6 @@ public class GameModel implements IGameModel {
 	}
 	Player getPlayer2() {
 		return this.player2;
-	}
-	
-	GameConfig getConfig() {
-		return this.config;
 	}
 	
 	GameModelActionSignaller getActionSignaller() {

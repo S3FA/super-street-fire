@@ -25,6 +25,8 @@ class TieBreakerGameState extends PlayerFightingGameState {
 
 	@Override
 	void tick(double dT) {
+		super.tick(dT);
+		
 		// Check to see if a player has won/lost the match...
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();

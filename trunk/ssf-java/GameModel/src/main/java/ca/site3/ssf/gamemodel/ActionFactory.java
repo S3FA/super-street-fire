@@ -90,7 +90,7 @@ final public class ActionFactory {
 			assert(false);
 			return null;
 		}
-		
+
 		Action action = null;
 		
 		FireEmitterModel fireEmitterModel    = this.gameModel.getFireEmitterModel();
@@ -100,7 +100,7 @@ final public class ActionFactory {
 		Player attackee = this.gameModel.getPlayer(Player.getOpposingPlayerNum(playerNum));
 		
 		boolean success = true;
-		
+
 		switch (playerActionType) {
 			case BLOCK:
 				action = new PlayerBlockAction(fireEmitterModel, blockerOrAttacker);
@@ -109,7 +109,7 @@ final public class ActionFactory {
 				// attacks coming in on both rails...
 				final int BLOCK_WIDTH = 1;
 				final int BLOCK_NUM_BURSTS = 1;
-				final double BLOCK_DURATION_IN_SECS = 2.0;
+				final double BLOCK_DURATION_IN_SECS = 1.25;
 				final double BLOCK_PERCENT_ON = 0.99;
 				final double BLOCK_PERCENT_OFF = 1.0 - BLOCK_PERCENT_ON;
 				final double BLOCK_DELAY = 0.0;
@@ -134,7 +134,7 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double JAB_BASE_ACCELERATION   = 0.0;
-				final double JAB_TIME_LENGTH_IN_SECS = 1.5;
+				final double JAB_TIME_LENGTH_IN_SECS = 1.75;
 				final float JAB_DAMAGE_PER_FLAME     = 3.5f;
 				final int JAB_NUM_FLAMES             = 1;
 				
@@ -178,7 +178,7 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double CHOP_BASE_ACCELERATION   = 0.25;
-				final double CHOP_TIME_LENGTH_IN_SECS = 1.8;
+				final double CHOP_TIME_LENGTH_IN_SECS = 2.0;
 				final float CHOP_DAMAGE_PER_FLAME     = 4.0f;
 				final int CHOP_NUM_FLAMES             = 1;
 				

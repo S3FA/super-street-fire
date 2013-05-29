@@ -46,7 +46,9 @@ abstract class PlayerFightingGameState extends GameState {
 		assert(p1 != null && p2 != null);
 		
 		p1.resetHealth();
+		p1.resetActionPoints();
 		p2.resetHealth();
+		p2.resetActionPoints();
 		
 		// Initialize the maps for tracking player attacks
 		for (AttackType atkType : AttackType.values()) {
@@ -102,6 +104,17 @@ abstract class PlayerFightingGameState extends GameState {
 			break;
 		}
 		
+	}
+	
+	@Override
+	void tick(double dT) {
+		
+		// Tick each player (this will regenerate their action points)
+		Player p1 = this.gameModel.getPlayer1();
+		Player p2 = this.gameModel.getPlayer2();
+		
+		p1.tick(dT);
+		p2.tick(dT);
 	}
 	
 	@Override
@@ -217,12 +230,12 @@ abstract class PlayerFightingGameState extends GameState {
 
 			if (isLeftHandedAttack) {
 				if (playerNum == 1) {
-					if (this.secsSinceLastP1LeftAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+					if (this.secsSinceLastP1LeftAction < GameModel.getGameConfig().getMinTimeBetweenPlayerActionsInSecs()) {
 						return false;
 					}
 				}
 				else {
-					if (this.secsSinceLastP2LeftAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+					if (this.secsSinceLastP2LeftAction < GameModel.getGameConfig().getMinTimeBetweenPlayerActionsInSecs()) {
 						return false;
 					}
 				}
@@ -236,12 +249,12 @@ abstract class PlayerFightingGameState extends GameState {
 			
 			if (isRightHandedAttack) {
 				if (playerNum == 1) {
-					if (this.secsSinceLastP1RightAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+					if (this.secsSinceLastP1RightAction < GameModel.getGameConfig().getMinTimeBetweenPlayerActionsInSecs()) {
 						return false;
 					}
 				}
 				else {
-					if (this.secsSinceLastP2RightAction < this.gameModel.getConfig().getMinTimeBetweenPlayerActionsInSecs()) {
+					if (this.secsSinceLastP2RightAction < GameModel.getGameConfig().getMinTimeBetweenPlayerActionsInSecs()) {
 						return false;
 					}
 				}

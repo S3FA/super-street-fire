@@ -20,6 +20,9 @@ final public class GameConfig {
 	// another performed action is executed).
 	final private double  minTimeBetweenPlayerActionsInSecs;
 	
+	// The number of action points that players will automatically regenerate per second of gameplay
+	final private float actionPointRegenRate;
+	
 	// Amount of time per-round in seconds
 	final private int roundTimeInSecs;
 	
@@ -27,18 +30,21 @@ final public class GameConfig {
 	final private int numRoundsPerMatch;
 	
 	public GameConfig(boolean chipDamageOn, double minTimeBetweenPlayerActionsInSecs,
-				      int roundTimeInSecs, int numRoundsPerMatch, float chipDamagePercentage) {
+				      int roundTimeInSecs, int numRoundsPerMatch, float chipDamagePercentage,
+				      float actionPointRegenRate) {
 		
 		this.chipDamageOn = chipDamageOn;
 		this.minTimeBetweenPlayerActionsInSecs = minTimeBetweenPlayerActionsInSecs;
 		this.roundTimeInSecs = roundTimeInSecs;
 		this.numRoundsPerMatch = numRoundsPerMatch;
 		this.chipDamagePercentage = chipDamagePercentage;
+		this.actionPointRegenRate = actionPointRegenRate;
 		
 		assert(roundTimeInSecs > 0);
 		assert(minTimeBetweenPlayerActionsInSecs >= 0);
 		assert(numRoundsPerMatch > 0 && numRoundsPerMatch % 2 == 1);
 		assert(chipDamagePercentage >= 0.0f && chipDamagePercentage <= 1.0f);
+		assert(actionPointRegenRate > 0.0f);
 	}
 	
 
@@ -63,5 +69,7 @@ final public class GameConfig {
 	public int getNumRequiredVictoryRoundsForMatchVictory() {
 		return (int)(this.numRoundsPerMatch/2) + 1;
 	}
-	
+	public float getActionPointRegenRate() {
+		return this.actionPointRegenRate;
+	}
 }

@@ -13,11 +13,13 @@ class RoundInPlayState extends PlayerFightingGameState {
 		super(gameModel, true);
 
 		// Initialize the count down timer
-		this.setCountdownTimer(this.gameModel.getConfig().getRoundTimeInSecs());
+		this.setCountdownTimer(GameModel.getGameConfig().getRoundTimeInSecs());
 	}
 
 	@Override
 	void tick(double dT) {
+		super.tick(dT);
+		
 		// Check to see if a player has won/lost the match...
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
@@ -138,7 +140,7 @@ class RoundInPlayState extends PlayerFightingGameState {
 		boolean roundTimedOut = this.roundHasTimedOut();
 		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, roundTimedOut);
 		
-		GameConfig gameConfig = this.gameModel.getConfig();
+		GameConfig gameConfig = GameModel.getGameConfig();
 		assert(gameConfig != null);
 		
 		final int NUM_WINS_FOR_VICTORY = gameConfig.getNumRequiredVictoryRoundsForMatchVictory();
@@ -179,7 +181,7 @@ class RoundInPlayState extends PlayerFightingGameState {
 		boolean roundTimedOut = this.roundHasTimedOut();
 		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), RoundResult.TIE, roundTimedOut);
 		
-		GameConfig gameConfig = this.gameModel.getConfig();
+		GameConfig gameConfig = GameModel.getGameConfig();
 		assert(gameConfig != null);
 		
 		// Check for the special case of a player match victory on a tie:
