@@ -9,19 +9,22 @@ message GameEvent {
 
   // corresponds to IGameModelEvent classes
   enum EventType {
-    GAME_INFO_REFRESH         = 0;
-    FIRE_EMITTER_CHANGED      = 1;
-    GAME_STATE_CHANGED        = 2;
-    PLAYER_HEALTH_CHANGED     = 3;
-    ROUND_PLAY_TIMER_CHANGED  = 4;
-    ROUND_BEGIN_TIMER_CHANGED = 5;
-    ROUND_ENDED               = 6;
-    MATCH_ENDED               = 7;
-    PLAYER_ATTACK_ACTION      = 8;
-    PLAYER_BLOCK_ACTION       = 9;
-    RINGMASTER_ACTION         = 10;
-    SYSTEM_INFO_REFRESH       = 11;
-    UNRECOGNIZED_GESTURE      = 12;
+    GAME_INFO_REFRESH            = 0;
+    FIRE_EMITTER_CHANGED         = 1;
+    GAME_STATE_CHANGED           = 2;
+    PLAYER_HEALTH_CHANGED        = 3;
+    ROUND_PLAY_TIMER_CHANGED     = 4;
+    ROUND_BEGIN_TIMER_CHANGED    = 5;
+    ROUND_ENDED                  = 6;
+    MATCH_ENDED                  = 7;
+    PLAYER_ATTACK_ACTION         = 8;
+    PLAYER_BLOCK_ACTION          = 9;
+    RINGMASTER_ACTION            = 10;
+    SYSTEM_INFO_REFRESH          = 11;
+    UNRECOGNIZED_GESTURE         = 12;
+    BLOCK_WINDOW                 = 13;
+    PLAYER_ACTION_POINTS_CHANGED = 14;
+    PLAYER_ATTACK_ACTION_FAILED  = 15;
   }
   
   enum RoundResult {
@@ -34,8 +37,7 @@ message GameEvent {
     PLAYER_1_MATCH_WIN = 0;
     PLAYER_2_MATCH_WIN = 1;
   }
-  
-  // for TOUCH_EMITTER
+
   enum FireEmitterType {
     LEFT_RAIL  = 0;
     RIGHT_RAIL = 1;
@@ -75,11 +77,11 @@ message GameEvent {
     PSYCHO_CRUSHER_ATTACK                   = 19;
     
     // Easter Egg Attacks
-    YMCA_ATTACK         = 20;
-    NYAN_CAT_ATTACK     = 21;
-    DISCO_STU_ATTACK    = 22;
-    ARM_WINDMILL_ATTACK = 23;
-    SUCK_IT_ATTACK      = 24;
+    YMCA_ATTACK             = 20;
+    NYAN_CAT_ATTACK         = 21;
+    DISCO_STU_ATTACK        = 22;
+    ARM_WINDMILL_ATTACK     = 23;
+    SUCK_IT_ATTACK          = 24;
     LEFT_VAFANAPOLI_ATTACK  = 25;
     RIGHT_VAFANAPOLI_ATTACK = 26;
     
@@ -102,6 +104,10 @@ message GameEvent {
     TWO   = 1;
     ONE   = 2;
     FIGHT = 3;
+  }
+  
+  enum AttackFailureReason {
+    NOT_ENOUGH_ACTION_POINTS = 0;
   }
   
   // needed to reconstruct a FireEmitter (or at impersonate a FireEmitterChangedEvent)
@@ -179,4 +185,21 @@ message GameEvent {
   // PlayerBlockActionEvent
   // reuse player
   optional bool blockWasEffective = 25;
+  
+  // BlockWindowEvent
+  optional int32 blockWindowID          = 26;
+  optional bool blockWindowHasExpired   = 27;
+  optional double blockWindowTimeInSecs = 28;
+  optional int32 blockingPlayerNumber   = 29;
+  
+  // PlayerActionPointsChangedEvent
+  // reuse player
+  optional float oldActionPoints = 30;
+  optional float newActionPoints = 31;
+  
+  // PlayerAttackActionFailedEvent
+  // reuse player
+  // reuse attackType
+  optional AttackFailureReason attackFailureReason = 32;
+  
 }
