@@ -114,6 +114,34 @@ public final class Event {
     // optional bool blockWasEffective = 25;
     boolean hasBlockWasEffective();
     boolean getBlockWasEffective();
+    
+    // optional int32 blockWindowID = 26;
+    boolean hasBlockWindowID();
+    int getBlockWindowID();
+    
+    // optional bool blockWindowHasExpired = 27;
+    boolean hasBlockWindowHasExpired();
+    boolean getBlockWindowHasExpired();
+    
+    // optional double blockWindowTimeInSecs = 28;
+    boolean hasBlockWindowTimeInSecs();
+    double getBlockWindowTimeInSecs();
+    
+    // optional int32 blockingPlayerNumber = 29;
+    boolean hasBlockingPlayerNumber();
+    int getBlockingPlayerNumber();
+    
+    // optional float oldActionPoints = 30;
+    boolean hasOldActionPoints();
+    float getOldActionPoints();
+    
+    // optional float newActionPoints = 31;
+    boolean hasNewActionPoints();
+    float getNewActionPoints();
+    
+    // optional .guiprotocol.GameEvent.AttackFailureReason attackFailureReason = 32;
+    boolean hasAttackFailureReason();
+    ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason getAttackFailureReason();
   }
   public static final class GameEvent extends
       com.google.protobuf.GeneratedMessage
@@ -158,6 +186,9 @@ public final class Event {
       RINGMASTER_ACTION(10, 10),
       SYSTEM_INFO_REFRESH(11, 11),
       UNRECOGNIZED_GESTURE(12, 12),
+      BLOCK_WINDOW(13, 13),
+      PLAYER_ACTION_POINTS_CHANGED(14, 14),
+      PLAYER_ATTACK_ACTION_FAILED(15, 15),
       ;
       
       public static final int GAME_INFO_REFRESH_VALUE = 0;
@@ -173,6 +204,9 @@ public final class Event {
       public static final int RINGMASTER_ACTION_VALUE = 10;
       public static final int SYSTEM_INFO_REFRESH_VALUE = 11;
       public static final int UNRECOGNIZED_GESTURE_VALUE = 12;
+      public static final int BLOCK_WINDOW_VALUE = 13;
+      public static final int PLAYER_ACTION_POINTS_CHANGED_VALUE = 14;
+      public static final int PLAYER_ATTACK_ACTION_FAILED_VALUE = 15;
       
       
       public final int getNumber() { return value; }
@@ -192,6 +226,9 @@ public final class Event {
           case 10: return RINGMASTER_ACTION;
           case 11: return SYSTEM_INFO_REFRESH;
           case 12: return UNRECOGNIZED_GESTURE;
+          case 13: return BLOCK_WINDOW;
+          case 14: return PLAYER_ACTION_POINTS_CHANGED;
+          case 15: return PLAYER_ATTACK_ACTION_FAILED;
           default: return null;
         }
       }
@@ -222,7 +259,7 @@ public final class Event {
       }
       
       private static final EventType[] VALUES = {
-        GAME_INFO_REFRESH, FIRE_EMITTER_CHANGED, GAME_STATE_CHANGED, PLAYER_HEALTH_CHANGED, ROUND_PLAY_TIMER_CHANGED, ROUND_BEGIN_TIMER_CHANGED, ROUND_ENDED, MATCH_ENDED, PLAYER_ATTACK_ACTION, PLAYER_BLOCK_ACTION, RINGMASTER_ACTION, SYSTEM_INFO_REFRESH, UNRECOGNIZED_GESTURE, 
+        GAME_INFO_REFRESH, FIRE_EMITTER_CHANGED, GAME_STATE_CHANGED, PLAYER_HEALTH_CHANGED, ROUND_PLAY_TIMER_CHANGED, ROUND_BEGIN_TIMER_CHANGED, ROUND_ENDED, MATCH_ENDED, PLAYER_ATTACK_ACTION, PLAYER_BLOCK_ACTION, RINGMASTER_ACTION, SYSTEM_INFO_REFRESH, UNRECOGNIZED_GESTURE, BLOCK_WINDOW, PLAYER_ACTION_POINTS_CHANGED, PLAYER_ATTACK_ACTION_FAILED, 
       };
       
       public static EventType valueOf(
@@ -837,6 +874,72 @@ public final class Event {
       }
       
       // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.RoundBeginCountdownTime)
+    }
+    
+    public enum AttackFailureReason
+        implements com.google.protobuf.ProtocolMessageEnum {
+      NOT_ENOUGH_ACTION_POINTS(0, 0),
+      ;
+      
+      public static final int NOT_ENOUGH_ACTION_POINTS_VALUE = 0;
+      
+      
+      public final int getNumber() { return value; }
+      
+      public static AttackFailureReason valueOf(int value) {
+        switch (value) {
+          case 0: return NOT_ENOUGH_ACTION_POINTS;
+          default: return null;
+        }
+      }
+      
+      public static com.google.protobuf.Internal.EnumLiteMap<AttackFailureReason>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static com.google.protobuf.Internal.EnumLiteMap<AttackFailureReason>
+          internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<AttackFailureReason>() {
+              public AttackFailureReason findValueByNumber(int number) {
+                return AttackFailureReason.valueOf(number);
+              }
+            };
+      
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(index);
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return ca.site3.ssf.guiprotocol.Event.GameEvent.getDescriptor().getEnumTypes().get(8);
+      }
+      
+      private static final AttackFailureReason[] VALUES = {
+        NOT_ENOUGH_ACTION_POINTS, 
+      };
+      
+      public static AttackFailureReason valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        return VALUES[desc.getIndex()];
+      }
+      
+      private final int index;
+      private final int value;
+      
+      private AttackFailureReason(int index, int value) {
+        this.index = index;
+        this.value = value;
+      }
+      
+      // @@protoc_insertion_point(enum_scope:guiprotocol.GameEvent.AttackFailureReason)
     }
     
     public interface FireEmitterOrBuilder
@@ -2253,6 +2356,76 @@ public final class Event {
       return blockWasEffective_;
     }
     
+    // optional int32 blockWindowID = 26;
+    public static final int BLOCKWINDOWID_FIELD_NUMBER = 26;
+    private int blockWindowID_;
+    public boolean hasBlockWindowID() {
+      return ((bitField0_ & 0x00400000) == 0x00400000);
+    }
+    public int getBlockWindowID() {
+      return blockWindowID_;
+    }
+    
+    // optional bool blockWindowHasExpired = 27;
+    public static final int BLOCKWINDOWHASEXPIRED_FIELD_NUMBER = 27;
+    private boolean blockWindowHasExpired_;
+    public boolean hasBlockWindowHasExpired() {
+      return ((bitField0_ & 0x00800000) == 0x00800000);
+    }
+    public boolean getBlockWindowHasExpired() {
+      return blockWindowHasExpired_;
+    }
+    
+    // optional double blockWindowTimeInSecs = 28;
+    public static final int BLOCKWINDOWTIMEINSECS_FIELD_NUMBER = 28;
+    private double blockWindowTimeInSecs_;
+    public boolean hasBlockWindowTimeInSecs() {
+      return ((bitField0_ & 0x01000000) == 0x01000000);
+    }
+    public double getBlockWindowTimeInSecs() {
+      return blockWindowTimeInSecs_;
+    }
+    
+    // optional int32 blockingPlayerNumber = 29;
+    public static final int BLOCKINGPLAYERNUMBER_FIELD_NUMBER = 29;
+    private int blockingPlayerNumber_;
+    public boolean hasBlockingPlayerNumber() {
+      return ((bitField0_ & 0x02000000) == 0x02000000);
+    }
+    public int getBlockingPlayerNumber() {
+      return blockingPlayerNumber_;
+    }
+    
+    // optional float oldActionPoints = 30;
+    public static final int OLDACTIONPOINTS_FIELD_NUMBER = 30;
+    private float oldActionPoints_;
+    public boolean hasOldActionPoints() {
+      return ((bitField0_ & 0x04000000) == 0x04000000);
+    }
+    public float getOldActionPoints() {
+      return oldActionPoints_;
+    }
+    
+    // optional float newActionPoints = 31;
+    public static final int NEWACTIONPOINTS_FIELD_NUMBER = 31;
+    private float newActionPoints_;
+    public boolean hasNewActionPoints() {
+      return ((bitField0_ & 0x08000000) == 0x08000000);
+    }
+    public float getNewActionPoints() {
+      return newActionPoints_;
+    }
+    
+    // optional .guiprotocol.GameEvent.AttackFailureReason attackFailureReason = 32;
+    public static final int ATTACKFAILUREREASON_FIELD_NUMBER = 32;
+    private ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason attackFailureReason_;
+    public boolean hasAttackFailureReason() {
+      return ((bitField0_ & 0x10000000) == 0x10000000);
+    }
+    public ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason getAttackFailureReason() {
+      return attackFailureReason_;
+    }
+    
     private void initFields() {
       type_ = ca.site3.ssf.guiprotocol.Event.GameEvent.EventType.GAME_INFO_REFRESH;
       emitter_ = ca.site3.ssf.guiprotocol.Event.GameEvent.FireEmitter.getDefaultInstance();
@@ -2278,6 +2451,13 @@ public final class Event {
       player2UnlimitedMovesOn_ = false;
       ringmasterActionType_ = ca.site3.ssf.guiprotocol.Event.GameEvent.RingmasterActionType.LEFT_HALF_RING_ACTION;
       blockWasEffective_ = false;
+      blockWindowID_ = 0;
+      blockWindowHasExpired_ = false;
+      blockWindowTimeInSecs_ = 0D;
+      blockingPlayerNumber_ = 0;
+      oldActionPoints_ = 0F;
+      newActionPoints_ = 0F;
+      attackFailureReason_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason.NOT_ENOUGH_ACTION_POINTS;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -2378,6 +2558,27 @@ public final class Event {
       }
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
         output.writeBool(25, blockWasEffective_);
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        output.writeInt32(26, blockWindowID_);
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        output.writeBool(27, blockWindowHasExpired_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        output.writeDouble(28, blockWindowTimeInSecs_);
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        output.writeInt32(29, blockingPlayerNumber_);
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        output.writeFloat(30, oldActionPoints_);
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        output.writeFloat(31, newActionPoints_);
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        output.writeEnum(32, attackFailureReason_.getNumber());
       }
       getUnknownFields().writeTo(output);
     }
@@ -2488,6 +2689,34 @@ public final class Event {
       if (((bitField0_ & 0x00200000) == 0x00200000)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(25, blockWasEffective_);
+      }
+      if (((bitField0_ & 0x00400000) == 0x00400000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(26, blockWindowID_);
+      }
+      if (((bitField0_ & 0x00800000) == 0x00800000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(27, blockWindowHasExpired_);
+      }
+      if (((bitField0_ & 0x01000000) == 0x01000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeDoubleSize(28, blockWindowTimeInSecs_);
+      }
+      if (((bitField0_ & 0x02000000) == 0x02000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(29, blockingPlayerNumber_);
+      }
+      if (((bitField0_ & 0x04000000) == 0x04000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(30, oldActionPoints_);
+      }
+      if (((bitField0_ & 0x08000000) == 0x08000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(31, newActionPoints_);
+      }
+      if (((bitField0_ & 0x10000000) == 0x10000000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(32, attackFailureReason_.getNumber());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -2671,6 +2900,20 @@ public final class Event {
         bitField0_ = (bitField0_ & ~0x00400000);
         blockWasEffective_ = false;
         bitField0_ = (bitField0_ & ~0x00800000);
+        blockWindowID_ = 0;
+        bitField0_ = (bitField0_ & ~0x01000000);
+        blockWindowHasExpired_ = false;
+        bitField0_ = (bitField0_ & ~0x02000000);
+        blockWindowTimeInSecs_ = 0D;
+        bitField0_ = (bitField0_ & ~0x04000000);
+        blockingPlayerNumber_ = 0;
+        bitField0_ = (bitField0_ & ~0x08000000);
+        oldActionPoints_ = 0F;
+        bitField0_ = (bitField0_ & ~0x10000000);
+        newActionPoints_ = 0F;
+        bitField0_ = (bitField0_ & ~0x20000000);
+        attackFailureReason_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason.NOT_ENOUGH_ACTION_POINTS;
+        bitField0_ = (bitField0_ & ~0x40000000);
         return this;
       }
       
@@ -2815,6 +3058,34 @@ public final class Event {
           to_bitField0_ |= 0x00200000;
         }
         result.blockWasEffective_ = blockWasEffective_;
+        if (((from_bitField0_ & 0x01000000) == 0x01000000)) {
+          to_bitField0_ |= 0x00400000;
+        }
+        result.blockWindowID_ = blockWindowID_;
+        if (((from_bitField0_ & 0x02000000) == 0x02000000)) {
+          to_bitField0_ |= 0x00800000;
+        }
+        result.blockWindowHasExpired_ = blockWindowHasExpired_;
+        if (((from_bitField0_ & 0x04000000) == 0x04000000)) {
+          to_bitField0_ |= 0x01000000;
+        }
+        result.blockWindowTimeInSecs_ = blockWindowTimeInSecs_;
+        if (((from_bitField0_ & 0x08000000) == 0x08000000)) {
+          to_bitField0_ |= 0x02000000;
+        }
+        result.blockingPlayerNumber_ = blockingPlayerNumber_;
+        if (((from_bitField0_ & 0x10000000) == 0x10000000)) {
+          to_bitField0_ |= 0x04000000;
+        }
+        result.oldActionPoints_ = oldActionPoints_;
+        if (((from_bitField0_ & 0x20000000) == 0x20000000)) {
+          to_bitField0_ |= 0x08000000;
+        }
+        result.newActionPoints_ = newActionPoints_;
+        if (((from_bitField0_ & 0x40000000) == 0x40000000)) {
+          to_bitField0_ |= 0x10000000;
+        }
+        result.attackFailureReason_ = attackFailureReason_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2932,6 +3203,27 @@ public final class Event {
         }
         if (other.hasBlockWasEffective()) {
           setBlockWasEffective(other.getBlockWasEffective());
+        }
+        if (other.hasBlockWindowID()) {
+          setBlockWindowID(other.getBlockWindowID());
+        }
+        if (other.hasBlockWindowHasExpired()) {
+          setBlockWindowHasExpired(other.getBlockWindowHasExpired());
+        }
+        if (other.hasBlockWindowTimeInSecs()) {
+          setBlockWindowTimeInSecs(other.getBlockWindowTimeInSecs());
+        }
+        if (other.hasBlockingPlayerNumber()) {
+          setBlockingPlayerNumber(other.getBlockingPlayerNumber());
+        }
+        if (other.hasOldActionPoints()) {
+          setOldActionPoints(other.getOldActionPoints());
+        }
+        if (other.hasNewActionPoints()) {
+          setNewActionPoints(other.getNewActionPoints());
+        }
+        if (other.hasAttackFailureReason()) {
+          setAttackFailureReason(other.getAttackFailureReason());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -3183,6 +3475,47 @@ public final class Event {
             case 200: {
               bitField0_ |= 0x00800000;
               blockWasEffective_ = input.readBool();
+              break;
+            }
+            case 208: {
+              bitField0_ |= 0x01000000;
+              blockWindowID_ = input.readInt32();
+              break;
+            }
+            case 216: {
+              bitField0_ |= 0x02000000;
+              blockWindowHasExpired_ = input.readBool();
+              break;
+            }
+            case 225: {
+              bitField0_ |= 0x04000000;
+              blockWindowTimeInSecs_ = input.readDouble();
+              break;
+            }
+            case 232: {
+              bitField0_ |= 0x08000000;
+              blockingPlayerNumber_ = input.readInt32();
+              break;
+            }
+            case 245: {
+              bitField0_ |= 0x10000000;
+              oldActionPoints_ = input.readFloat();
+              break;
+            }
+            case 253: {
+              bitField0_ |= 0x20000000;
+              newActionPoints_ = input.readFloat();
+              break;
+            }
+            case 256: {
+              int rawValue = input.readEnum();
+              ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason value = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(32, rawValue);
+              } else {
+                bitField0_ |= 0x40000000;
+                attackFailureReason_ = value;
+              }
               break;
             }
           }
@@ -3989,6 +4322,156 @@ public final class Event {
         return this;
       }
       
+      // optional int32 blockWindowID = 26;
+      private int blockWindowID_ ;
+      public boolean hasBlockWindowID() {
+        return ((bitField0_ & 0x01000000) == 0x01000000);
+      }
+      public int getBlockWindowID() {
+        return blockWindowID_;
+      }
+      public Builder setBlockWindowID(int value) {
+        bitField0_ |= 0x01000000;
+        blockWindowID_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearBlockWindowID() {
+        bitField0_ = (bitField0_ & ~0x01000000);
+        blockWindowID_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // optional bool blockWindowHasExpired = 27;
+      private boolean blockWindowHasExpired_ ;
+      public boolean hasBlockWindowHasExpired() {
+        return ((bitField0_ & 0x02000000) == 0x02000000);
+      }
+      public boolean getBlockWindowHasExpired() {
+        return blockWindowHasExpired_;
+      }
+      public Builder setBlockWindowHasExpired(boolean value) {
+        bitField0_ |= 0x02000000;
+        blockWindowHasExpired_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearBlockWindowHasExpired() {
+        bitField0_ = (bitField0_ & ~0x02000000);
+        blockWindowHasExpired_ = false;
+        onChanged();
+        return this;
+      }
+      
+      // optional double blockWindowTimeInSecs = 28;
+      private double blockWindowTimeInSecs_ ;
+      public boolean hasBlockWindowTimeInSecs() {
+        return ((bitField0_ & 0x04000000) == 0x04000000);
+      }
+      public double getBlockWindowTimeInSecs() {
+        return blockWindowTimeInSecs_;
+      }
+      public Builder setBlockWindowTimeInSecs(double value) {
+        bitField0_ |= 0x04000000;
+        blockWindowTimeInSecs_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearBlockWindowTimeInSecs() {
+        bitField0_ = (bitField0_ & ~0x04000000);
+        blockWindowTimeInSecs_ = 0D;
+        onChanged();
+        return this;
+      }
+      
+      // optional int32 blockingPlayerNumber = 29;
+      private int blockingPlayerNumber_ ;
+      public boolean hasBlockingPlayerNumber() {
+        return ((bitField0_ & 0x08000000) == 0x08000000);
+      }
+      public int getBlockingPlayerNumber() {
+        return blockingPlayerNumber_;
+      }
+      public Builder setBlockingPlayerNumber(int value) {
+        bitField0_ |= 0x08000000;
+        blockingPlayerNumber_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearBlockingPlayerNumber() {
+        bitField0_ = (bitField0_ & ~0x08000000);
+        blockingPlayerNumber_ = 0;
+        onChanged();
+        return this;
+      }
+      
+      // optional float oldActionPoints = 30;
+      private float oldActionPoints_ ;
+      public boolean hasOldActionPoints() {
+        return ((bitField0_ & 0x10000000) == 0x10000000);
+      }
+      public float getOldActionPoints() {
+        return oldActionPoints_;
+      }
+      public Builder setOldActionPoints(float value) {
+        bitField0_ |= 0x10000000;
+        oldActionPoints_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearOldActionPoints() {
+        bitField0_ = (bitField0_ & ~0x10000000);
+        oldActionPoints_ = 0F;
+        onChanged();
+        return this;
+      }
+      
+      // optional float newActionPoints = 31;
+      private float newActionPoints_ ;
+      public boolean hasNewActionPoints() {
+        return ((bitField0_ & 0x20000000) == 0x20000000);
+      }
+      public float getNewActionPoints() {
+        return newActionPoints_;
+      }
+      public Builder setNewActionPoints(float value) {
+        bitField0_ |= 0x20000000;
+        newActionPoints_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearNewActionPoints() {
+        bitField0_ = (bitField0_ & ~0x20000000);
+        newActionPoints_ = 0F;
+        onChanged();
+        return this;
+      }
+      
+      // optional .guiprotocol.GameEvent.AttackFailureReason attackFailureReason = 32;
+      private ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason attackFailureReason_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason.NOT_ENOUGH_ACTION_POINTS;
+      public boolean hasAttackFailureReason() {
+        return ((bitField0_ & 0x40000000) == 0x40000000);
+      }
+      public ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason getAttackFailureReason() {
+        return attackFailureReason_;
+      }
+      public Builder setAttackFailureReason(ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x40000000;
+        attackFailureReason_ = value;
+        onChanged();
+        return this;
+      }
+      public Builder clearAttackFailureReason() {
+        bitField0_ = (bitField0_ & ~0x40000000);
+        attackFailureReason_ = ca.site3.ssf.guiprotocol.Event.GameEvent.AttackFailureReason.NOT_ENOUGH_ACTION_POINTS;
+        onChanged();
+        return this;
+      }
+      
       // @@protoc_insertion_point(builder_scope:guiprotocol.GameEvent)
     }
     
@@ -4025,7 +4508,7 @@ public final class Event {
   static {
     java.lang.String[] descriptorData = {
       "\n\013event.proto\022\013guiprotocol\032\014common.proto" +
-      "\"\361\025\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
+      "\"\351\030\n\tGameEvent\022.\n\004type\030\001 \002(\0162 .guiprotoc" +
       "ol.GameEvent.EventType\0223\n\007emitter\030\002 \001(\0132" +
       "\".guiprotocol.GameEvent.FireEmitter\022,\n\014o" +
       "ldGameState\030\003 \001(\0162\026.guiprotocol.GameStat" +
@@ -4049,53 +4532,63 @@ public final class Event {
       "\030\026 \001(\010\022\037\n\027player2UnlimitedMovesOn\030\027 \001(\010\022" +
       "I\n\024ringmasterActionType\030\030 \001(\0162+.guiproto" +
       "col.GameEvent.RingmasterActionType\022\031\n\021bl" +
-      "ockWasEffective\030\031 \001(\010\032\261\001\n\013FireEmitter\022\024\n" +
-      "\014emitterIndex\030\001 \002(\005\022;\n\013emitterType\030\002 \002(\016" +
-      "2&.guiprotocol.GameEvent.FireEmitterType" +
-      "\022\033\n\023intensityRingmaster\030\003 \002(\002\022\030\n\020intensi" +
-      "tyPlayer1\030\004 \002(\002\022\030\n\020intensityPlayer2\030\005 \002(",
-      "\002\032Q\n\013BoardStatus\022\020\n\010deviceId\030\001 \002(\005\022\022\n\nre" +
-      "sponding\030\002 \002(\010\022\r\n\005armed\030\003 \002(\010\022\r\n\005flame\030\004" +
-      " \002(\010\"\313\002\n\tEventType\022\025\n\021GAME_INFO_REFRESH\020" +
-      "\000\022\030\n\024FIRE_EMITTER_CHANGED\020\001\022\026\n\022GAME_STAT" +
-      "E_CHANGED\020\002\022\031\n\025PLAYER_HEALTH_CHANGED\020\003\022\034" +
-      "\n\030ROUND_PLAY_TIMER_CHANGED\020\004\022\035\n\031ROUND_BE" +
-      "GIN_TIMER_CHANGED\020\005\022\017\n\013ROUND_ENDED\020\006\022\017\n\013" +
-      "MATCH_ENDED\020\007\022\030\n\024PLAYER_ATTACK_ACTION\020\010\022" +
-      "\027\n\023PLAYER_BLOCK_ACTION\020\t\022\025\n\021RINGMASTER_A" +
-      "CTION\020\n\022\027\n\023SYSTEM_INFO_REFRESH\020\013\022\030\n\024UNRE",
-      "COGNIZED_GESTURE\020\014\"L\n\013RoundResult\022\r\n\tROU" +
-      "ND_TIE\020\000\022\026\n\022PLAYER_1_ROUND_WIN\020\001\022\026\n\022PLAY" +
-      "ER_2_ROUND_WIN\020\002\"=\n\013MatchResult\022\026\n\022PLAYE" +
-      "R_1_MATCH_WIN\020\000\022\026\n\022PLAYER_2_MATCH_WIN\020\001\"" +
-      "@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\nRIG" +
-      "HT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I\n\020FlameEmitte" +
-      "rType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013BLOCK_FLAME\020\001" +
-      "\022\022\n\016NON_GAME_FLAME\020\002\"\203\005\n\nAttackType\022\024\n\020C" +
-      "USTOM_UNDEFINED\020\000\022\014\n\010LEFT_JAB\020\001\022\r\n\tRIGHT" +
-      "_JAB\020\002\022\r\n\tLEFT_HOOK\020\003\022\016\n\nRIGHT_HOOK\020\004\022\021\n",
-      "\rLEFT_UPPERCUT\020\005\022\022\n\016RIGHT_UPPERCUT\020\006\022\r\n\t" +
-      "LEFT_CHOP\020\007\022\016\n\nRIGHT_CHOP\020\010\022\014\n\010HADOUKEN\020" +
-      "\t\022\016\n\nSONIC_BOOM\020\n\022\031\n\025LEFT_SHORYUKEN_ATTA" +
-      "CK\020\013\022\032\n\026RIGHT_SHORYUKEN_ATTACK\020\014\022\030\n\024DOUB" +
-      "LE_LARIAT_ATTACK\020\r\022\033\n\027QUADRUPLE_LARIAT_A" +
-      "TTACK\020\016\022\030\n\024SUMO_HEADBUTT_ATTACK\020\017\022%\n!LEF" +
-      "T_ONE_HUNDRED_HAND_SLAP_ATTACK\020\020\022&\n\"RIGH" +
-      "T_ONE_HUNDRED_HAND_SLAP_ATTACK\020\021\022+\n\'TWO_" +
-      "HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK\020\022\022\031\n" +
-      "\025PSYCHO_CRUSHER_ATTACK\020\023\022\017\n\013YMCA_ATTACK\020",
-      "\024\022\023\n\017NYAN_CAT_ATTACK\020\025\022\024\n\020DISCO_STU_ATTA" +
-      "CK\020\026\022\027\n\023ARM_WINDMILL_ATTACK\020\027\022\022\n\016SUCK_IT" +
-      "_ATTACK\020\030\022\032\n\026LEFT_VAFANAPOLI_ATTACK\020\031\022\033\n" +
-      "\027RIGHT_VAFANAPOLI_ATTACK\020\032\"\344\001\n\024Ringmaste" +
-      "rActionType\022\031\n\025LEFT_HALF_RING_ACTION\020\000\022\032" +
-      "\n\026RIGHT_HALF_RING_ACTION\020\001\022\023\n\017LEFT_JAB_A" +
-      "CTION\020\002\022\024\n\020RIGHT_JAB_ACTION\020\003\022\023\n\017ERUPTIO" +
-      "N_ACTION\020\004\022\026\n\022LEFT_CIRCLE_ACTION\020\005\022\027\n\023RI" +
-      "GHT_CIRCLE_ACTION\020\006\022\023\n\017HADOUKEN_ACTION\020\007" +
-      "\022\017\n\013DRUM_ACTION\020\010\"A\n\027RoundBeginCountdown",
-      "Time\022\t\n\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005FIG" +
-      "HT\020\003B\032\n\030ca.site3.ssf.guiprotocol"
+      "ockWasEffective\030\031 \001(\010\022\025\n\rblockWindowID\030\032" +
+      " \001(\005\022\035\n\025blockWindowHasExpired\030\033 \001(\010\022\035\n\025b" +
+      "lockWindowTimeInSecs\030\034 \001(\001\022\034\n\024blockingPl" +
+      "ayerNumber\030\035 \001(\005\022\027\n\017oldActionPoints\030\036 \001(" +
+      "\002\022\027\n\017newActionPoints\030\037 \001(\002\022G\n\023attackFail",
+      "ureReason\030  \001(\0162*.guiprotocol.GameEvent." +
+      "AttackFailureReason\032\261\001\n\013FireEmitter\022\024\n\014e" +
+      "mitterIndex\030\001 \002(\005\022;\n\013emitterType\030\002 \002(\0162&" +
+      ".guiprotocol.GameEvent.FireEmitterType\022\033" +
+      "\n\023intensityRingmaster\030\003 \002(\002\022\030\n\020intensity" +
+      "Player1\030\004 \002(\002\022\030\n\020intensityPlayer2\030\005 \002(\002\032" +
+      "Q\n\013BoardStatus\022\020\n\010deviceId\030\001 \002(\005\022\022\n\nresp" +
+      "onding\030\002 \002(\010\022\r\n\005armed\030\003 \002(\010\022\r\n\005flame\030\004 \002" +
+      "(\010\"\240\003\n\tEventType\022\025\n\021GAME_INFO_REFRESH\020\000\022" +
+      "\030\n\024FIRE_EMITTER_CHANGED\020\001\022\026\n\022GAME_STATE_",
+      "CHANGED\020\002\022\031\n\025PLAYER_HEALTH_CHANGED\020\003\022\034\n\030" +
+      "ROUND_PLAY_TIMER_CHANGED\020\004\022\035\n\031ROUND_BEGI" +
+      "N_TIMER_CHANGED\020\005\022\017\n\013ROUND_ENDED\020\006\022\017\n\013MA" +
+      "TCH_ENDED\020\007\022\030\n\024PLAYER_ATTACK_ACTION\020\010\022\027\n" +
+      "\023PLAYER_BLOCK_ACTION\020\t\022\025\n\021RINGMASTER_ACT" +
+      "ION\020\n\022\027\n\023SYSTEM_INFO_REFRESH\020\013\022\030\n\024UNRECO" +
+      "GNIZED_GESTURE\020\014\022\020\n\014BLOCK_WINDOW\020\r\022 \n\034PL" +
+      "AYER_ACTION_POINTS_CHANGED\020\016\022\037\n\033PLAYER_A" +
+      "TTACK_ACTION_FAILED\020\017\"L\n\013RoundResult\022\r\n\t" +
+      "ROUND_TIE\020\000\022\026\n\022PLAYER_1_ROUND_WIN\020\001\022\026\n\022P",
+      "LAYER_2_ROUND_WIN\020\002\"=\n\013MatchResult\022\026\n\022PL" +
+      "AYER_1_MATCH_WIN\020\000\022\026\n\022PLAYER_2_MATCH_WIN" +
+      "\020\001\"@\n\017FireEmitterType\022\r\n\tLEFT_RAIL\020\000\022\016\n\n" +
+      "RIGHT_RAIL\020\001\022\016\n\nOUTER_RING\020\002\"I\n\020FlameEmi" +
+      "tterType\022\020\n\014ATTACK_FLAME\020\000\022\017\n\013BLOCK_FLAM" +
+      "E\020\001\022\022\n\016NON_GAME_FLAME\020\002\"\203\005\n\nAttackType\022\024" +
+      "\n\020CUSTOM_UNDEFINED\020\000\022\014\n\010LEFT_JAB\020\001\022\r\n\tRI" +
+      "GHT_JAB\020\002\022\r\n\tLEFT_HOOK\020\003\022\016\n\nRIGHT_HOOK\020\004" +
+      "\022\021\n\rLEFT_UPPERCUT\020\005\022\022\n\016RIGHT_UPPERCUT\020\006\022" +
+      "\r\n\tLEFT_CHOP\020\007\022\016\n\nRIGHT_CHOP\020\010\022\014\n\010HADOUK",
+      "EN\020\t\022\016\n\nSONIC_BOOM\020\n\022\031\n\025LEFT_SHORYUKEN_A" +
+      "TTACK\020\013\022\032\n\026RIGHT_SHORYUKEN_ATTACK\020\014\022\030\n\024D" +
+      "OUBLE_LARIAT_ATTACK\020\r\022\033\n\027QUADRUPLE_LARIA" +
+      "T_ATTACK\020\016\022\030\n\024SUMO_HEADBUTT_ATTACK\020\017\022%\n!" +
+      "LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK\020\020\022&\n\"R" +
+      "IGHT_ONE_HUNDRED_HAND_SLAP_ATTACK\020\021\022+\n\'T" +
+      "WO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK\020\022" +
+      "\022\031\n\025PSYCHO_CRUSHER_ATTACK\020\023\022\017\n\013YMCA_ATTA" +
+      "CK\020\024\022\023\n\017NYAN_CAT_ATTACK\020\025\022\024\n\020DISCO_STU_A" +
+      "TTACK\020\026\022\027\n\023ARM_WINDMILL_ATTACK\020\027\022\022\n\016SUCK",
+      "_IT_ATTACK\020\030\022\032\n\026LEFT_VAFANAPOLI_ATTACK\020\031" +
+      "\022\033\n\027RIGHT_VAFANAPOLI_ATTACK\020\032\"\344\001\n\024Ringma" +
+      "sterActionType\022\031\n\025LEFT_HALF_RING_ACTION\020" +
+      "\000\022\032\n\026RIGHT_HALF_RING_ACTION\020\001\022\023\n\017LEFT_JA" +
+      "B_ACTION\020\002\022\024\n\020RIGHT_JAB_ACTION\020\003\022\023\n\017ERUP" +
+      "TION_ACTION\020\004\022\026\n\022LEFT_CIRCLE_ACTION\020\005\022\027\n" +
+      "\023RIGHT_CIRCLE_ACTION\020\006\022\023\n\017HADOUKEN_ACTIO" +
+      "N\020\007\022\017\n\013DRUM_ACTION\020\010\"A\n\027RoundBeginCountd" +
+      "ownTime\022\t\n\005THREE\020\000\022\007\n\003TWO\020\001\022\007\n\003ONE\020\002\022\t\n\005" +
+      "FIGHT\020\003\"3\n\023AttackFailureReason\022\034\n\030NOT_EN",
+      "OUGH_ACTION_POINTS\020\000B\032\n\030ca.site3.ssf.gui" +
+      "protocol"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -4107,7 +4600,7 @@ public final class Event {
           internal_static_guiprotocol_GameEvent_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_guiprotocol_GameEvent_descriptor,
-              new java.lang.String[] { "Type", "Emitter", "OldGameState", "NewGameState", "MatchResult", "Player", "AttackType", "OldHealth", "NewHealth", "RoundNumber", "RoundBeginTimer", "RoundResult", "TimedOut", "TimeInSecs", "GameState", "RoundResults", "Player1Health", "Player2Health", "RoundInPlayTimer", "BoardStatus", "Player1UnlimitedMovesOn", "Player2UnlimitedMovesOn", "RingmasterActionType", "BlockWasEffective", },
+              new java.lang.String[] { "Type", "Emitter", "OldGameState", "NewGameState", "MatchResult", "Player", "AttackType", "OldHealth", "NewHealth", "RoundNumber", "RoundBeginTimer", "RoundResult", "TimedOut", "TimeInSecs", "GameState", "RoundResults", "Player1Health", "Player2Health", "RoundInPlayTimer", "BoardStatus", "Player1UnlimitedMovesOn", "Player2UnlimitedMovesOn", "RingmasterActionType", "BlockWasEffective", "BlockWindowID", "BlockWindowHasExpired", "BlockWindowTimeInSecs", "BlockingPlayerNumber", "OldActionPoints", "NewActionPoints", "AttackFailureReason", },
               ca.site3.ssf.guiprotocol.Event.GameEvent.class,
               ca.site3.ssf.guiprotocol.Event.GameEvent.Builder.class);
           internal_static_guiprotocol_GameEvent_FireEmitter_descriptor =

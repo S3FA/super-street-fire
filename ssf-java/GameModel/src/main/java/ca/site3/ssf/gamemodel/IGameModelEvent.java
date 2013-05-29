@@ -20,7 +20,13 @@ public interface IGameModelEvent extends Serializable {
 		PLAYER_BLOCK_ACTION,
 		RINGMASTER_ACTION,
 		UNRECOGNIZED_GESTURE,
-		SYSTEM_INFO_REFRESH // this doens't strictly belong here... Callum: I don't think we need this in the game model, couldn't we just keep this stuff in the IOServer?
+		BLOCK_WINDOW,
+		PLAYER_ACTION_POINTS_CHANGED,
+		PLAYER_ATTACK_ACTION_FAILED,
+		
+		SYSTEM_INFO_REFRESH // TODO: this doesn't strictly belong here... 
+							// Callum: I don't think we need this in the game model, 
+		                    // couldn't we just keep this stuff in the IOServer?
 	};
 		
 	public Type getType();

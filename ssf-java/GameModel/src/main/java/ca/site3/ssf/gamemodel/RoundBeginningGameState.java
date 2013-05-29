@@ -3,7 +3,7 @@ package ca.site3.ssf.gamemodel;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
 
 /**
- * Round Beginning State, think "3, 2, 1, FIGHT!" - Happens 
+ * Round Beginning State (think "3, 2, 1, FIGHT!") - Happens 
  * at the beginning of every new round of play. This state has its own mini, internal
  * statemachine that ensures that the countdown triggers the proper
  * countdown events for all gamemodel listeners.
@@ -18,6 +18,8 @@ import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownTyp
 class RoundBeginningGameState extends GameState {
 	
 	final static private double FIGHT_COUNT_TOTAL = 3.0; // 3, 2, 1, FIGHT!
+	final static private double SLIGHT_DELAY = 0.25;     // The VERY slight delay before going into the in-play state, right after "FIGHT!" is shown
+	
 	private double fightCounter;
 	
 	private enum CountState { BEFORE_THREE, THREE, TWO, ONE, FIGHT };
@@ -40,26 +42,38 @@ class RoundBeginningGameState extends GameState {
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
 		assert(p1 != null && p2 != null);
+		
+		// Clear the health and action points to zero so we can animate/fill them up while the round is starting
 		p1.clearHealth();
+		p1.clearActionPoints();
 		p2.clearHealth();
+		p2.clearActionPoints();
 	}
 
 	@Override
 	void tick(double dT) {
 		this.updateCountState();
 		
-		// Charge the player's health back up to full over the time of the count down to fight...
+		double fightCounterMaxZero = Math.max(0.0, this.fightCounter);
+		
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
 		assert(p1 != null && p2 != null);
-		double playerHealthLerp = (Math.max(0.0, this.fightCounter) - RoundBeginningGameState.FIGHT_COUNT_TOTAL) * 
+		
+		// Charge the player's health back up to full over the time of the countdown to the fight...
+		double playerHealthLerp = (fightCounterMaxZero - RoundBeginningGameState.FIGHT_COUNT_TOTAL) * 
 				((Player.FULL_HEALTH) / (-RoundBeginningGameState.FIGHT_COUNT_TOTAL));
 		p1.setHealth((float)playerHealthLerp);
 		p2.setHealth((float)playerHealthLerp);
 		
-		// NOTE: We use a number slightly less than zero because there's the 'FIGHT' portion
-		// of the count down.
-		if (this.fightCounter <= -0.25) {
+		// Charge the player's action points back up to full over the time of the countdown to the fight...
+		double playerActionPointLerp = (fightCounterMaxZero - RoundBeginningGameState.FIGHT_COUNT_TOTAL) * 
+				((Player.FULL_ACTION_POINTS) / (-RoundBeginningGameState.FIGHT_COUNT_TOTAL));
+		p1.setActionPoints((float)playerActionPointLerp);
+		p2.setActionPoints((float)playerActionPointLerp);
+		
+		// NOTE: We use a number slightly less than zero because there's the 'FIGHT' portion of the countdown
+		if (this.fightCounter <= -SLIGHT_DELAY) {
 			// Change to the next state...
 			this.goToNextState();
 			return;
@@ -172,8 +186,6 @@ class RoundBeginningGameState extends GameState {
 	}
 	
 	private boolean isRoundATieBreaker() {
-		GameConfig gameConfig = this.gameModel.getConfig();
-		assert(gameConfig != null);
 		
 		Player p1 = this.gameModel.getPlayer1();
 		Player p2 = this.gameModel.getPlayer2();
@@ -182,7 +194,7 @@ class RoundBeginningGameState extends GameState {
 		// Check for a complete match tie: Each player has the same number of wins and the
 		// number of rounds per match has been reached
 		return (p1.getNumRoundWins() == p2.getNumRoundWins() &&
-				this.gameModel.getNumRoundsPlayed() == gameConfig.getNumRoundsPerMatch());
+				this.gameModel.getNumRoundsPlayed() == GameModel.getGameConfig().getNumRoundsPerMatch());
 	}
 	
 }

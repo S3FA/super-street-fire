@@ -84,32 +84,37 @@ class PlaybackHandler {// implements LineListener {
 	}
 	
 	void play() {
-		try 
-		{
+		try {
 			// Pause the background music if necessary, and queue it up to restart immediately after playback
-			if(this.settings.getIsQuietBackground())
-			{
+			if(this.settings.getIsQuietBackground()) {
 				String bgSource = controller.getBackgroundSource();
 				String bgFile = controller.getBackgroundFileName();
-				URL queuedFile = new File(bgFile).toURI().toURL();
 				
-				controller.mySoundSystem.stop(bgSource);
-				controller.mySoundSystem.removeSource(bgSource);
-				controller.mySoundSystem.dequeueSound(bgSource, bgFile);
+				assert(bgSource != null);
+				assert(bgFile != null);
 				
-				// Note that when you queue up a sound, it actually plays in the source you are queuing it up to play AFTER.
-				controller.mySoundSystem.play(sourceName);
-				controller.mySoundSystem.queueSound(sourceName, queuedFile, bgSource);
+				File queuedFile = new File(bgFile);
+				if (queuedFile.canRead()) {
 				
-				// See above - that's why we need to set the background source to be the source we want to queue bg music to play after
-				controller.setBackgroundFileName(this.audioFilePath);
-				controller.setBackgroundSource(sourceName);
+					URL queuedFileURL = queuedFile.toURI().toURL();
+				
+					controller.mySoundSystem.stop(bgSource);
+					controller.mySoundSystem.removeSource(bgSource);
+					controller.mySoundSystem.dequeueSound(bgSource, bgFile);
+					
+					// Note that when you queue up a sound, it actually plays in the source you are queuing it up to play AFTER.
+					controller.mySoundSystem.play(sourceName);
+					controller.mySoundSystem.queueSound(sourceName, queuedFileURL, bgSource);
+					
+					// See above - that's why we need to set the background source to be the source we want to queue bg music to play after
+					controller.setBackgroundFileName(this.audioFilePath);
+					controller.setBackgroundSource(sourceName);
+				}
 			}
-			else
-			{
+			else {
 				controller.mySoundSystem.play(this.sourceName);
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			logger.warn("Exception while attempting to play the ogg in playbackHandler.", e);
 			return;
 		}

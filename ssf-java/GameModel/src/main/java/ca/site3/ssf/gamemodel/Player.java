@@ -9,13 +9,16 @@ class Player {
 	
 	public static final float KO_HEALTH   = 0.0f;
 	public static final float FULL_HEALTH = 100.0f;
+	public static final float NO_ACTION_POINTS = 0.0f;
+	public static final float FULL_ACTION_POINTS = 100.0f;
 	
-	private int playerNum;
-	private float health;
-	private int numRoundWins;
-	private boolean isInvincible;     // Whether 'god-mode'/invincibility is enabled or not
-	private boolean hasInfiniteMoves; // Whether or not the player has the ability to do any type of move as much as they want
-	private float lastDmgAmount;      // The amount of damage that this player suffered last
+	private int playerNum;              // The player number (1 or 2)
+	private float health;               // Current life/health of this player
+	private float actionPoints;         // Current number of action points that can be spent by this player on attacks
+	private int numRoundWins;           // Number of round wins that this player currently has
+	private boolean isInvincible;       // Whether 'god-mode'/invincibility is enabled or not
+	private boolean hasInfiniteMoves;   // Whether or not the player has the ability to do any type of move as much as they want
+	private float lastDmgAmount;        // The amount of damage that this player suffered last
 
 	private GameModelActionSignaller actionSignaller = null;
 	
@@ -26,9 +29,10 @@ class Player {
 		this.actionSignaller = actionSignaller;
 		assert(this.actionSignaller != null);
 	
-		
 		this.matchReset();
 		this.resetHealth();
+		this.resetActionPoints();
+		
 		this.isInvincible = false;
 		this.hasInfiniteMoves = false;
 		this.playerNum = playerNum;
@@ -62,6 +66,13 @@ class Player {
 		this.lastDmgAmount = 0;
 	}
 	
+	void tick(double dT) {
+		
+		// Players will constantly regenerate action points while the game is being played...
+		this.setActionPoints((float)Math.min(Player.FULL_ACTION_POINTS, 
+				this.actionPoints + dT * GameModel.getGameConfig().getActionPointRegenRate()));
+	}
+	
 	/**
 	 * Do damage to this player of the following amount.
 	 * @param damageAmt The amount of damage to do.
@@ -89,6 +100,41 @@ class Player {
 			this.actionSignaller.fireOnPlayerHealthChanged(this.playerNum, healthBefore, this.health);
 		}
 	}
+	
+	void resetActionPoints() {
+		this.setActionPoints(Player.FULL_ACTION_POINTS);
+	}
+	void clearActionPoints() {
+		this.setActionPoints(Player.NO_ACTION_POINTS);
+	}
+	
+	void removeActionPoints(float actionPts) {
+		if (actionPts > this.actionPoints) {
+			assert(false);
+			this.setActionPoints(0);
+			return;
+		}
+		
+		this.setActionPoints(this.actionPoints - actionPts);
+	}
+	
+	/**
+	 * Sets the action points of this player to the given amount, this will also cause
+	 * an event to occur within the game model signaling a action point change.
+	 * @param actionPts The amount to set for this player's action points.
+	 */
+	void setActionPoints(float actionPts) {
+		assert(actionPts >= Player.NO_ACTION_POINTS && actionPts <= Player.FULL_ACTION_POINTS);
+		
+		float actionPtsBefore = this.actionPoints;
+		this.actionPoints = actionPts;
+		
+		// If the action points actually changed then trigger an event to indicate the change to all gamemodel listeners
+		if (Math.floor(this.actionPoints) != Math.floor(actionPtsBefore)) {
+			this.actionSignaller.fireOnPlayerActionPointsChanged(this.playerNum, actionPtsBefore, this.actionPoints);
+		}
+	}
+	
 	
 	/**
 	 * Set this player as invincible.
@@ -122,6 +168,14 @@ class Player {
 	 */
 	float getHealth() {
 		return Math.max(this.health, Player.KO_HEALTH);
+	}
+	
+	/**
+	 * Gets the number of action points for this player.
+	 * @return The action point amount, in the interval [NO_ACTION_POINTS, FULL_ACTION_POINTS].
+	 */
+	float getActionPoints() {
+		return this.actionPoints;
 	}
 	
 	/**

@@ -137,8 +137,7 @@ public class GestureRecognizer {
 			return null;
 		}
 		
-		// We have a gesture! Tell the gamemodel about it in order to execute that gesture within
-		// the context of the current game
+		// We have a gesture! Build the appropriate gesture and return it
 		return actionFactory.buildPlayerAction(playerNum, result.getActionFactoryType(),
 				result.getUsesLeftHand(), result.getUsesRightHand());
 	}

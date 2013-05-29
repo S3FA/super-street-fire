@@ -36,6 +36,8 @@ public class SerialCommunicator implements Runnable {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
+	private final CommandLineArgs args;
+	
 	private static final byte[] STOP_SENTINEL = new byte[] { (byte)0 };
 	private static final byte[] QUERY_SYSTEM_SENTINEL = new byte[] { (byte)'?' };
 	
@@ -82,7 +84,8 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	
-	public SerialCommunicator(InputStream serialIn, OutputStream serialOut, StreetFireServer guiOut) {
+	public SerialCommunicator(CommandLineArgs args, InputStream serialIn, OutputStream serialOut, StreetFireServer guiOut) {
+		this.args = args;
 		this.reader = new SerialDataReader(serialIn);
 		this.out = new BufferedOutputStream(serialOut);
 		this.server = guiOut;
@@ -197,7 +200,7 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	void setGlowfliesOn(boolean makeSurfaceHot, boolean broadcast) {
-		log.info("Setting glowflies on: "+makeSurfaceHot);
+		log.info(makeSurfaceHot ? "Turning glowflies on." : "Turning glowfiles off.");
 		this.glowfliesOn = makeSurfaceHot;
 		
 		if (broadcast) {
@@ -261,10 +264,11 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	void notifyTimerAndLifeBars(RoundPlayTimerChangedEvent e) {
-		if (e.getTimeInSecs() < 0 || e.getTimeInSecs() > 99) {
+		if (e.getTimeInSecs() < 0 || e.getTimeInSecs() > this.args.roundTimeInSecs) {
 			log.warn("Unsupported timer value {}", e.getTimeInSecs());
 			return;
 		}
+		
 		lastTimerVal = e.getTimeInSecs();
 		notifyTimerAndLifeBars();
 	}

@@ -11,6 +11,7 @@ import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
+import ca.site3.ssf.gamemodel.PlayerAttackActionFailedEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
@@ -599,6 +600,24 @@ class SerializationHelper {
 		//	return GameEvent.AttackType.RIGHT_VAFANAPOLI_ATTACK;
 		default:
 			throw new IllegalArgumentException("Unrecognized AttackType: " + t);
+		}
+	}
+	
+	static GameEvent.AttackFailureReason attackFailureReasonToProtobuf(PlayerAttackActionFailedEvent.Reason reason) {
+		switch (reason) {
+			case NOT_ENOUGH_ACTION_POINTS:
+				return GameEvent.AttackFailureReason.NOT_ENOUGH_ACTION_POINTS;
+			default:
+				throw new IllegalArgumentException("Unrecognized Player Attack Failure Reason: " + reason);
+		}
+	}
+	
+	static ca.site3.ssf.gamemodel.PlayerAttackActionFailedEvent.Reason protobufToAttackFailureReason(GameEvent.AttackFailureReason reason) {
+		switch (reason) {
+			case NOT_ENOUGH_ACTION_POINTS:
+				return ca.site3.ssf.gamemodel.PlayerAttackActionFailedEvent.Reason.NOT_ENOUGH_ACTION_POINTS;
+			default:
+				throw new IllegalArgumentException("Unrecognized protobuf Player Attack Failure Reason: " + reason);
 		}
 	}
 	

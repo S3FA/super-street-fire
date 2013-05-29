@@ -13,6 +13,9 @@ import ca.site3.ssf.common.Algebra;
  */
 class BlockTimingModel {
 
+	// Keeps track of block window ids for events
+	private static int BLOCK_WINDOW_ID_COUNTER = 0;
+	
 	// We need to set this based on the average time it takes for a blocking
 	// event to travel from the GameModel to the hardware that tells the player to block
 	private static final long EVENT_TO_HARDWARE_TRAVEL_TIME_IN_MS = 100; // TODO: Change this based on testing...
@@ -45,22 +48,29 @@ class BlockTimingModel {
 		return TOTAL_BLOCK_WINDOW_TIME_IN_SECS * FRACTION_OF_BLOCK_WINDOW_BEFORE_FIRST_ATK_HURT;
 	}
 	
+	// The unique id for this block timing model instance (for event purposes)
+	private final int id;
+	
+	// The number of the player who this BlockTimingModel applies to
+	private final int blockingPlayerNum;
 	
 	// The countdown time in seconds for when a block is allowed/accepted, when
 	// this expires (after TOTAL_BLOCK_WINDOW_TIME_IN_MS milliseconds) it should be assigned a value of 0
 	private double allowedBlockCountdownInSecs;
 	
-	private PlayerAttackAction associatedAtk;          // The attack that this block model will allow blocking of
-	private GameModelActionSignaller actionSignaller;  // Signaller so that this can communicate block events
+	private GameModelActionSignaller actionSignaller;  // Signal object so that this can communicate block window events
+	private boolean isFinished; // Whether the window has happened and is complete
 	
-	BlockTimingModel(PlayerAttackAction associatedAtk, GameModelActionSignaller actionSignaller) {
-		assert(associatedAtk != null);
+	BlockTimingModel(int blockingPlayerNum, GameModelActionSignaller actionSignaller) {
 		assert(actionSignaller != null);
 		
-		this.associatedAtk   = associatedAtk;
+		this.id = BLOCK_WINDOW_ID_COUNTER;
+		BLOCK_WINDOW_ID_COUNTER++;
+
+		this.blockingPlayerNum = blockingPlayerNum;
 		this.actionSignaller = actionSignaller;
-		
-		this.stopBlockWindow();
+		this.allowedBlockCountdownInSecs = 0.0;
+		this.isFinished = false;
 	}
 	
 	/**
@@ -69,10 +79,14 @@ class BlockTimingModel {
 	 * for the relevant player.
 	 */
 	void startBlockWindow() {
+		if (this.isFinished) {
+			return;
+		}
+		
 		this.allowedBlockCountdownInSecs = (double)TOTAL_BLOCK_WINDOW_TIME_IN_MS / 1000.0;
 		
-		// Raise an event for the beginning of the block window
-		//actionSignaller.fireOnBlockWindowStartAction(this.associatedAtk, this.allowedBlockCountdownInSecs);
+		// Signal an event for the beginning of the block window
+		actionSignaller.fireOnBlockWindowEvent(this.id, false, this.allowedBlockCountdownInSecs, this.blockingPlayerNum);
 	}
 	
 	/**
@@ -80,9 +94,11 @@ class BlockTimingModel {
 	 * current state.
 	 */
 	void stopBlockWindow() {
-		//if (this.allowedBlockCountdownInSecs > 0.0) {
-			//actionSignaller.fireOnBlockWindowStopAction(this.associatedAtk);
-		//}
+		if (this.allowedBlockCountdownInSecs > 0.0 && !this.isFinished) {
+			// Signal an event for the expiration of this block window
+			actionSignaller.fireOnBlockWindowEvent(this.id, true, this.allowedBlockCountdownInSecs, this.blockingPlayerNum);
+			this.isFinished = true;
+		}
 		
 		this.allowedBlockCountdownInSecs = 0.0;
 	}
@@ -92,19 +108,23 @@ class BlockTimingModel {
 	 * @return true if the block window is active, false if not.
 	 */
 	boolean isBlockWindowActive() {
-		return this.allowedBlockCountdownInSecs > 0.0;
+		return this.allowedBlockCountdownInSecs > 0.0 && !this.isFinished;
 	}
 	
 	/**
 	 * Calling this will indicate that a block occurred, this will change
 	 * the state of this object to stop tracking the current block window and
 	 * it will also indicate the effectiveness of the block.
-	 * @return The effectiveness of the block as a percentage in the interval [0,1].
-	 * Where 0 is not effective at all, and 1 as completely effective.
+	 * @return The effectiveness of the block as a fractional percentage in the interval [0, 1].
+	 * Where 0 is not effective at all, and 1 is completely effective.
 	 */
 	float block() {
+		if (this.isFinished) {
+			return 0.0f;
+		}
+		
 		double countdownTime = this.allowedBlockCountdownInSecs;
-		this.allowedBlockCountdownInSecs = 0.0;
+		this.stopBlockWindow();
 		
 		float effectiveness = 0.0f;
 		
@@ -120,10 +140,18 @@ class BlockTimingModel {
 				effectiveness = Algebra.LerpF(TOTAL_MINUS_FULLY_EFFECTIVE_TIME_IN_SECS, 0.0, 1.0f, 0.0f, countdownTime);
 			}
 			assert(effectiveness > 0.0);
-			
-			// Raise an event to signify that the block was successful with some amount of effectiveness
-			//actionSignaller.fireOnBlockSuccessAction(this.associatedAtk, effectiveness);
 		}
+		
+		/*
+		if (effectiveness > 0.0) {
+			// Raise an event to signify that the block was successful with some amount of effectiveness
+			//actionSignaller.fireOnBlockAction(this.associatedAtk, effectiveness);
+		}
+		else {
+			// Raise an event to signify that the block was a failure
+			//actionSignaller.fireOnBlockAction(null, 0.0);
+		}
+		*/
 		
 		return effectiveness;
 	}
@@ -135,7 +163,7 @@ class BlockTimingModel {
 	 */
 	void tick(double dT) {
 		// Just exit if there's no block currently allowed
-		if (this.allowedBlockCountdownInSecs <= 0.0) {
+		if (this.allowedBlockCountdownInSecs <= 0.0 || this.isFinished) {
 			return;
 		}
 		

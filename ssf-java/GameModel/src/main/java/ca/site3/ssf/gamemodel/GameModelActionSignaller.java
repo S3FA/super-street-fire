@@ -87,6 +87,17 @@ class GameModelActionSignaller {
 	}
 	
 	/**
+	 * Triggers each of the listener's callbacks for a player action point change.
+	 * @param playerNum The player number of the player whose action points changed.
+	 * @param prevActionPointAmt The player's previous action point amount, before the change.
+	 * @param newActionPointAmt The player's new action point amount after the change.
+	 */
+	void fireOnPlayerActionPointsChanged(int playerNum, float prevActionPointAmt, float newActionPointAmt) {
+		PlayerActionPointsChangedEvent event = new PlayerActionPointsChangedEvent(playerNum, prevActionPointAmt, newActionPointAmt);
+		this.fireGameModelEvent(event);
+	}
+	
+	/**
 	 * Triggers each of the listener's callbacks for when the round-in-play timer changes.
 	 * @param newTimeInSecs The latest time on the round-in-play timer.
 	 */
@@ -135,6 +146,17 @@ class GameModelActionSignaller {
 	}
 	
 	/**
+	 * Triggers each of the listener's callbacks for a player attack failure event.
+	 * @param playerNum Attacker player number.
+	 * @param attackType The type of attack.
+	 * @param reason The reason for the failure.
+	 */
+	void fireOnAttackFailedAction(int playerNum, PlayerAttackAction.AttackType attackType, PlayerAttackActionFailedEvent.Reason reason) {
+		PlayerAttackActionFailedEvent event = new PlayerAttackActionFailedEvent(playerNum, attackType, reason);
+		this.fireGameModelEvent(event);
+	}
+	
+	/**
 	 * Triggers each of the listener's callbacks for a player block event.
 	 * @param playerNum Blocker player number.
 	 * @param blockWasEffective Whether the block was effective or not (i.e., it actually blocked something).
@@ -168,6 +190,18 @@ class GameModelActionSignaller {
 	 */
 	void fireOnUnrecognizedGestureEvent(IGameModel.Entity entity) {
 		UnrecognizedGestureEvent event = new UnrecognizedGestureEvent(entity);
+		this.fireGameModelEvent(event);
+	}
+
+	/**
+	 * Triggers each of the listener's callbacks for a blocking window event.
+	 * @param blockWindowID The ID of the blocking window signalling the event.
+	 * @param blockWindowExpired Whether the blocking window just expired or not.
+	 * @param blockWindowTimeLengthInSecs The length of the block window when first started, only valid if the window hasn't yet expired.
+	 * @param blockingPlayerNum The player who the block window applies to (i.e., the player who must block).
+	 */
+	void fireOnBlockWindowEvent(int blockWindowID, boolean blockWindowExpired, double blockWindowTimeLengthInSecs, int blockingPlayerNum) {
+		BlockWindowEvent event = new BlockWindowEvent(blockWindowID, blockWindowExpired, blockWindowTimeLengthInSecs, blockingPlayerNum);
 		this.fireGameModelEvent(event);
 	}
 }

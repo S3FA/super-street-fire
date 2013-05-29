@@ -39,9 +39,12 @@ import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
+import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
+import ca.site3.ssf.gamemodel.PlayerAttackActionFailedEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RingmasterActionEvent;
@@ -105,10 +108,13 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
     private final CommandLineArgs args;
     private StreetFireGuiClient client = null;
 
-    static final int PREF_WINDOW_WIDTH = 1250;
+    static final int PREF_WINDOW_WIDTH  = 1250;
+    static final int PREF_WINDOW_HEIGHT = 770;
     
-    /** thread that monitors the queue for game model events */
+    // Thread that monitors the queue for game model events
     private Thread gameEventThread;
+    // Thread that allows for animation / ticking of GUI elements
+    private Thread tickThread;
     
 	public DevGUIMainWindow(IOServer ioserver, CommandLineArgs args) {
 		
@@ -149,7 +155,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		
 		// Setup the frame's basic characteristics...
 		this.setTitle("Super Street Fire (Developer GUI) - " + args.serialDevice);
-		this.setPreferredSize(new Dimension(PREF_WINDOW_WIDTH, 725));
+		this.setPreferredSize(new Dimension(PREF_WINDOW_WIDTH, PREF_WINDOW_HEIGHT));
 		this.setMinimumSize(new Dimension(PREF_WINDOW_WIDTH, 720));
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
@@ -208,7 +214,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 			}
 		});
 		
-		gameEventThread = new Thread("DevGUI game event listener thread") {
+		this.gameEventThread = new Thread("DevGUI game event listener thread") {
 			public @Override void run() {
 				while (true) {
 					try {
@@ -220,7 +226,39 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 				}
 			}
 		};
-		gameEventThread.start();
+		this.gameEventThread.start();
+		
+		this.tickThread = new Thread("DevGUI tick thread") {
+			public @Override void run() {
+				
+				final int MAX_FRAME_RATE_HZ  = 60;
+				final long MAX_FRAME_TIME_MS = (long)(1000 * (1.0 / (double)MAX_FRAME_RATE_HZ));
+				
+				long prevTimeInMs = System.currentTimeMillis();
+				long currTimeInMs = prevTimeInMs;
+				while (true) {
+					
+					currTimeInMs = System.currentTimeMillis();
+					
+					long deltaTimeInMs = currTimeInMs - prevTimeInMs;
+					prevTimeInMs = currTimeInMs;
+					
+					double deltaTimeInSecs = (double)deltaTimeInMs / 1000.0;
+					assert(deltaTimeInSecs >= 0);
+					
+					tickGUI(deltaTimeInSecs);
+					
+					try {
+						Thread.sleep(Math.max(0, MAX_FRAME_TIME_MS - deltaTimeInMs));
+					} 
+					catch (InterruptedException e) {
+					}
+				}
+				
+			}
+		};
+		this.tickThread.start();
+		
 		
 		this.ioserver.getDeviceStatus().addListener(this);
 	}
@@ -263,12 +301,32 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 				case ROUND_PLAY_TIMER_CHANGED:
 					DevGUIMainWindow.this.onRoundPlayTimerChanged((RoundPlayTimerChangedEvent)event);
 					break;
+				case UNRECOGNIZED_GESTURE:
+					break;
+				case BLOCK_WINDOW:
+					DevGUIMainWindow.this.onBlockWindowEvent((BlockWindowEvent)event);
+					break;
+				case PLAYER_ACTION_POINTS_CHANGED:
+					DevGUIMainWindow.this.onPlayerActionPointsChanged((PlayerActionPointsChangedEvent)event);
+					break;
+				case PLAYER_ATTACK_ACTION_FAILED:
+					DevGUIMainWindow.this.onPlayerAttackFailed((PlayerAttackActionFailedEvent)event);
+					break;
 				case SYSTEM_INFO_REFRESH:
 					DevGUIMainWindow.this.onSystemInfoRefresh((SystemInfoRefreshEvent)event);
+					break;
 				default:
 					assert(false);
 					break;
 				}				
+			}
+		});
+	}
+	
+	private void tickGUI(final double dT) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				DevGUIMainWindow.this.infoPanel.tick(dT);
 			}
 		});
 	}
@@ -353,6 +411,13 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		default:
 			break;
 		}
+		
+		// If the game is not in-play then we remove all the block windows/signals in the GUI
+		if (currentState != GameState.GameStateType.ROUND_IN_PLAY_STATE && 
+			currentState != GameState.GameStateType.TEST_ROUND_STATE) {
+			this.infoPanel.removeAllBlockWindows();
+		}
+		
 		this.controlPanel.gameStateChanged(currentState);
 	}
 
@@ -364,7 +429,26 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	private void onRoundPlayTimerChanged(RoundPlayTimerChangedEvent event) {
 		this.infoPanel.setRoundTimer(event.getTimeInSecs());
 	}
+	
+	private void onBlockWindowEvent(BlockWindowEvent event) {
+		if (event.getHasBlockWindowExpired()) {
+			this.infoPanel.removeBlockWindow(event.getBlockWindowID(), event.getBlockingPlayerNumber());
+		}
+		else {
+			this.infoPanel.addBlockWindow(event.getBlockWindowID(), event.getBlockingPlayerNumber(), event.getBlockWindowTimeLengthInSeconds());
+		}
+	}
+	
+	private void onPlayerActionPointsChanged(PlayerActionPointsChangedEvent event) {
+		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(event.getPlayerNum());
+		playerPanel.setActionPoints(event.getNewActionPointAmt());
+	}
 
+	private void onPlayerAttackFailed(PlayerAttackActionFailedEvent event) {
+		PlayerInfoPanel playerPanel = this.infoPanel.getPlayerPanel(event.getPlayerNum());
+		playerPanel.attackFailed(event.getAttackType(), event.getReason(), this.infoPanel.getRoundTime());
+	}
+	
 	private void onRoundBeginFightTimerChanged(RoundBeginTimerChangedEvent event) {
 		// Clear the old arena display results on the beginning of a new match...
 		if (event.getRoundNumber() == 1) {
@@ -384,12 +468,14 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		infoText += event.getRoundResult().toString();
 		
 		this.arenaDisplay.setInfoText(infoText);
+		this.infoPanel.removeAllBlockWindows();
 	}
 
 	private void onMatchEnded(MatchEndedEvent event) {
 		String infoText = "Match Over\n";
 		infoText += event.getMatchResult().toString();
 		this.arenaDisplay.setInfoText(infoText);
+		this.infoPanel.removeAllBlockWindows();
 	}
 
 	private void onPlayerAttackAction(PlayerAttackActionEvent event) {

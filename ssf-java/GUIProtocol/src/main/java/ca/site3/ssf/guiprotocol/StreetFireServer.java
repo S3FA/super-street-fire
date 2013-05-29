@@ -33,11 +33,14 @@ import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.InitiateNextStateCommand;
 import ca.site3.ssf.gamemodel.KillGameCommand;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
+import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
+import ca.site3.ssf.gamemodel.PlayerAttackActionFailedEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerStatusUpdateCommand;
@@ -324,6 +327,34 @@ public class StreetFireServer implements Runnable {
 			UnrecognizedGestureEvent e = (UnrecognizedGestureEvent)evt;
 			b.setType(EventType.UNRECOGNIZED_GESTURE)
 				.setPlayer(SerializationHelper.entityToProtobuf(e.getEntity()));
+			break;
+		}
+		
+		case BLOCK_WINDOW: {
+			BlockWindowEvent e = (BlockWindowEvent)evt;
+			b.setType(EventType.BLOCK_WINDOW)
+				.setBlockWindowID(e.getBlockWindowID())
+				.setBlockWindowHasExpired(e.getHasBlockWindowExpired())
+				.setBlockWindowTimeInSecs(e.getBlockWindowTimeLengthInSeconds())
+				.setBlockingPlayerNumber(e.getBlockingPlayerNumber());
+			break;
+		}
+		
+		case PLAYER_ACTION_POINTS_CHANGED: {
+			PlayerActionPointsChangedEvent e = (PlayerActionPointsChangedEvent)evt;
+			b.setType(EventType.PLAYER_ACTION_POINTS_CHANGED)
+				.setPlayer(e.getPlayerNum() == 1 ? Common.Player.P1 : Common.Player.P2)
+				.setOldActionPoints(e.getPrevActionPointAmt())
+				.setNewActionPoints(e.getNewActionPointAmt());
+			break;
+		}
+		
+		case PLAYER_ATTACK_ACTION_FAILED: {
+			PlayerAttackActionFailedEvent e = (PlayerAttackActionFailedEvent)evt;
+			b.setType(EventType.PLAYER_ATTACK_ACTION_FAILED)
+				.setPlayer(e.getPlayerNum() == 1 ? Common.Player.P1 : Common.Player.P2)
+				.setAttackType(SerializationHelper.attackTypeToProtobuf(e.getAttackType()))
+				.setAttackFailureReason(SerializationHelper.attackFailureReasonToProtobuf(e.getReason()));
 			break;
 		}
 		

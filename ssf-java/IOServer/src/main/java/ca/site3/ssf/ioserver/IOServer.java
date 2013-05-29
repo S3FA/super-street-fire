@@ -81,7 +81,8 @@ public class IOServer {
 		this.args = args;
 
 		GameModel.setGameConfig(new GameConfig(args.isChipDamage, args.minTimeBetweenPlayerActionsInSecs, 
-											   args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage));
+											   args.roundTimeInSecs, args.numRoundsPerMatch, args.chipDamagePercentage,
+											   args.actionPointRegenRate));
 		game = new GameModel();
 	}
 	
@@ -126,7 +127,7 @@ public class IOServer {
 			serialIn = new InputStream() { public @Override int read() throws IOException { return 0; } }; // /dev/null
 		}
 		
-		serialComm = new SerialCommunicator(serialIn, serialOut, guiServer);
+		serialComm = new SerialCommunicator(args, serialIn, serialOut, guiServer);
 		Thread serialCommThread = new Thread(serialComm, "Serial communications thread");
 		serialCommThread.start();
 		

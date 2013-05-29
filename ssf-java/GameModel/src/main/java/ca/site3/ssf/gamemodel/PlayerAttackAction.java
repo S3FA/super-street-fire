@@ -7,43 +7,44 @@ import ca.site3.ssf.gamemodel.FireEmitter.Location;
 public class PlayerAttackAction extends Action {
 	
 	public enum AttackType {
-		CUSTOM_UNDEFINED_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		CUSTOM_UNDEFINED_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 0),
 		
 		// Basic Attacks
-		LEFT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
-		RIGHT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE), 
-		LEFT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
-		RIGHT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
-		LEFT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
-		RIGHT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
-		LEFT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
-		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE),
+		LEFT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
+		RIGHT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f), 
+		LEFT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
+		RIGHT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
+		LEFT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
+		RIGHT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
+		LEFT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
+		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
 		
 		// Special Attacks
-		HADOUKEN_ATTACK(Integer.MAX_VALUE, 2, 2),
-		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3, 3),
-		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 3, 3),
-		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 5, 5),
-		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 2, 2),
-		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 2, 2),
-		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
-		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
-		TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1),
-		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE, 1, 1),
+		HADOUKEN_ATTACK(Integer.MAX_VALUE, 2, 2, 34.0f),
+		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 2, 2, 34.0f),
+		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 2, 2, 34.0f),
+		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 2, 2, 25.0f),
+		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 2, 2, 50.0f),
+		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 2, 2, 50.0f),
+		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 50.0f),
+		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 50.0f),
+		TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 75.0f),
+		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE, 1, 1, 75.0f),
 		
 		// Easter Egg Attacks
-		YMCA_ATTACK(1, 1, 1),
-		NYAN_CAT_ATTACK(1, 1, 1),
-		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1, 1),
-		SUCK_IT_ATTACK(1, 1, 1);
+		YMCA_ATTACK(1, 1, 1, 95.0f),
+		NYAN_CAT_ATTACK(1, 1, 1, 95.0f),
+		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1, 1, 95.0f),
+		SUCK_IT_ATTACK(1, 1, 1, 95.0f);
 		
 		private final int maxUsesPerRound;         // Maximum of this attack type that are allowed per-round
 		private final int numAllowedActiveAtATime; // Maximum of this attack type that are allowed to be active at any given time in a round
+		private final float actionPointCost;       // Cost, in action points [0,100], required to perform the attack
 		
 		private final boolean isActivationGroupLimited;  // Whether this attack type is limited by the global number of active group attacks for a given player
 		private final int numActivationsInGroupAtATime;  // If this attack type is activation group limited, then this is the limit
 		
-		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime, int numActivationsInGroupAtATime) {
+		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime, int numActivationsInGroupAtATime, float actionPointCost) {
 			
 			assert(maxUsesPerRound >= 0);
 			assert(numAllowedActiveAtATime >= 0);
@@ -51,8 +52,9 @@ public class PlayerAttackAction extends Action {
 			this.numAllowedActiveAtATime = numAllowedActiveAtATime;
 			this.isActivationGroupLimited = true;
 			this.numActivationsInGroupAtATime = numActivationsInGroupAtATime;
+			this.actionPointCost = actionPointCost;
 		} 
-		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime) {
+		AttackType(int maxUsesPerRound, int numAllowedActiveAtATime, float actionPointCost) {
 			
 			assert(maxUsesPerRound >= 0);
 			assert(numAllowedActiveAtATime >= 0);
@@ -60,6 +62,7 @@ public class PlayerAttackAction extends Action {
 			this.numAllowedActiveAtATime = numAllowedActiveAtATime;
 			this.isActivationGroupLimited = false;
 			this.numActivationsInGroupAtATime = Integer.MAX_VALUE;
+			this.actionPointCost = actionPointCost;
 		}
 		
 		int getMaxUsesPerRound() {
@@ -73,6 +76,9 @@ public class PlayerAttackAction extends Action {
 		}
 		int getNumActivationsInGroupAtATime() {
 			return this.numActivationsInGroupAtATime;
+		}
+		float getActionPointCost() {
+			return this.actionPointCost;
 		}
 	};
 
@@ -107,7 +113,7 @@ public class PlayerAttackAction extends Action {
 		
 		this.countdownToBlockSignalInSecs = BlockTimingModel.getBlockWindowTimeBeforeAtkFirstHurt();
 		this.blockWindowSignaled = false;
-		this.blockTimingModel = new BlockTimingModel(this, fireEmitterModel.getActionSignaller());
+		this.blockTimingModel = new BlockTimingModel(this.attackee.getPlayerNumber(), fireEmitterModel.getActionSignaller());
 	}
 	
 	/**
@@ -138,7 +144,7 @@ public class PlayerAttackAction extends Action {
 		}
 		
 		assert(damageAfterBlock <= attackDamageBaseAmt);
-		attackee.doDamage(damageAfterBlock);
+		this.attackee.doDamage(damageAfterBlock);
 		
 		// Completely cancel out this attack
 		// IMPORTANT: Make sure to do this AFTER we calculate the damage
@@ -213,6 +219,12 @@ public class PlayerAttackAction extends Action {
 	}
 	
 	@Override
+	void kill() {
+		super.kill();
+		this.blockTimingModel.stopBlockWindow();
+	}
+	
+	@Override
 	void tick(double dT) {
 		super.tick(dT);
 		
@@ -251,6 +263,22 @@ public class PlayerAttackAction extends Action {
 	@Override
 	void onFirstTick() {
 		
+		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
+		assert(actionSignaller != null);
+		
+		// Check to see if the attacker has enough action points to pull off the attack
+		if (this.attacker.getActionPoints() >= this.type.getActionPointCost()) {
+			// Attacker has enough action points; remove the action point cost of this attack from the player that executed it
+			this.attacker.removeActionPoints(this.type.getActionPointCost());
+		}
+		else {
+			// Attacker doesn't have requisite action points -- kill this attack
+			this.kill();
+			// Signal that this attack failed due to lack of action points
+			actionSignaller.fireOnAttackFailedAction(this.attacker.getPlayerNumber(), this.type, PlayerAttackActionFailedEvent.Reason.NOT_ENOUGH_ACTION_POINTS);
+			return;
+		}
+		
 		// Calculate the amount of time in seconds before a block signal is raised for this attack...
 		// NOTE: The attack must be long enough for a block window to actually happen
 		double timeToFirstHurtInSecs = this.getMinimumTimeUntilAttackHurtsAttackee();
@@ -260,8 +288,6 @@ public class PlayerAttackAction extends Action {
 		this.blockWindowSignaled = false;
 		
 		// Raise an event for the action...
-		GameModelActionSignaller actionSignaller = this.fireEmitterModel.getActionSignaller();
-		assert(actionSignaller != null);
 		actionSignaller.fireOnPlayerAttackAction(this.getAttacker().getPlayerNumber(), this.type);
 	}
 }
