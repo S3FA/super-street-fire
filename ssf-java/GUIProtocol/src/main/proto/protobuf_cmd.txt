@@ -1,0 +1,8 @@
+
+Callum: This drives me nuts everytime... I always forget what the correct way to execute the protobuf command is, so here it is:
+
+
+
+cd C:\projects\superstreetfire\ssf-java\GUIProtocol\src\main\proto
+
+C:\protobuf-2.4.1\protoc --java_out=../java *.proto
