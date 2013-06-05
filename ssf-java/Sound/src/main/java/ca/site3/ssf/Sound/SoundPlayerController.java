@@ -14,6 +14,7 @@ import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 
+import paulscode.sound.IStreamListener;
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig;
 import paulscode.sound.SoundSystemException;
@@ -24,7 +25,7 @@ import paulscode.sound.libraries.LibraryLWJGLOpenAL;
  * Listens for game events and plays sound effects and music as appropriate.
  * @author Mike, Callum
  */
-public class SoundPlayerController implements IGameModelListener, Runnable {
+public class SoundPlayerController implements IGameModelListener, Runnable, IStreamListener {
 	
 	private static final String DEFAULT_CONFIG_FILEPATH = "SoundProperties.properties";
 	
@@ -35,7 +36,9 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	private AudioSettings settings;
 	private String backgroundSource;
 	private String backgroundFileName;
+	private String backgroundOverrideSource;
 	
+	private GameStateType currentGameState; 
 	private BlockingQueue<IGameModelEvent> incomingEvents = new LinkedBlockingQueue<IGameModelEvent>();
 	
 	SoundSystem mySoundSystem;
@@ -63,6 +66,7 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 		{
 			SoundSystemConfig.addLibrary( LibraryLWJGLOpenAL.class );
             SoundSystemConfig.setCodec( "ogg", CodecJOrbis.class );
+            SoundSystemConfig.addStreamListener(this);
 		}
 		catch( SoundSystemException e )
         {
@@ -80,61 +84,6 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
             e.printStackTrace();
             return;
         }
-	}
-	
-	// Gets the resource path
-	String getResourcePath() {
-		return this.resourcePath;
-	}
-	
-	// Gets the config properties
-	Properties getConfigProperties() {
-		return this.configProperties;
-	}
-	
-	// Sets the audio settings
-	public void setAudioSettings(AudioSettings settings) {
-		synchronized(this.settings) {
-			this.settings = settings;
-		}
-	}
-	
-	// Gets the audio settings
-	public AudioSettings getAudioSettings() {
-		AudioSettings result = null;
-		synchronized(this.settings) {
-			result = this.settings;
-		}
-		return result;
-	}
-
-	// Gets the current source of background music
-	public String getBackgroundSource()
-	{
-		return backgroundSource;
-	}
-	
-	// Gets the current source of background music's file name
-	public String getBackgroundFileName()
-	{
-		return backgroundFileName;
-	}
-	
-	// Sets the background source
-	public void setBackgroundSource(String source)
-	{
-		backgroundSource = source;
-	}
-	
-	// Sets the background source's file name
-	public void setBackgroundFileName(String fileName)
-	{
-		backgroundFileName = fileName;
-	}
-	
-	// Stops the thread
-	public void stop() {
-		this.stop = true;
 	}
 	
     /**
@@ -166,7 +115,10 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 	void pauseBackgroundMusic()
 	{
 		try{
-			mySoundSystem.pause(this.getBackgroundSource());
+			if(this.getBackgroundSource() != null)
+			{
+				mySoundSystem.pause(this.getBackgroundSource());
+			}
 		}
 		catch(Exception ex)
 		{
@@ -189,26 +141,6 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 			ex.printStackTrace();
 		}
 	}
-	
-	// Sets the config file referenced throughout the library
-	private void setConfigFile(String configPath) {
-		this.configProperties = new Properties();
-		
-		try {
-			this.configProperties.load(this.getClass().getResourceAsStream(configPath));
-			this.resourcePath = configProperties.getProperty("ResourcePath");
-		}
-		catch (IOException ex) {
-			logger.warn("Setting config file failed.", ex);
-			this.configProperties = null;
-			this.resourcePath = "";
-		}
-	}
-	
-	// Stops a specific sound source from playing
-	void stopSound(String source) {
-		mySoundSystem.stop(source);
-	}
 
 	// The main logic of the sound thread
 	public void run() {
@@ -226,6 +158,9 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 			if (gameModelEvent.getType() == Type.GAME_STATE_CHANGED) {
 				GameStateChangedEvent ce = (GameStateChangedEvent) gameModelEvent;
 				GameStateType oldGameState = ce.getOldState();
+				
+				this.currentGameState = ce.getNewState();
+				
 				switch (ce.getNewState()) { 
 				case IDLE_STATE:
 					this.stopAllSounds();
@@ -247,5 +182,105 @@ public class SoundPlayerController implements IGameModelListener, Runnable {
 			}
 		}
 	}
+	
+	// Stops a specific sound source from playing
+	void stopSound(String source) {
+		mySoundSystem.stop(source);
+	}
+	
+	// Detect when a stream has finished playing - if it's a bg music overriding sound, unpause the background music
+	public void endOfStream(String sourcename, int queueSize)
+	{
+	    if( this.backgroundOverrideSource != null && this.backgroundOverrideSource.equals(sourcename))
+	    {
+	    	if (this.currentGameState != GameStateType.PAUSED_STATE)
+	    	{
+	    		mySoundSystem.play(this.backgroundSource);
+	    	}
+	        
+	        setBackgroundOverrideSource("");
+	    }
+	}
+	
+	// Sets the config file referenced throughout the library
+	private void setConfigFile(String configPath) {
+		this.configProperties = new Properties();
+		
+		try {
+			this.configProperties.load(this.getClass().getResourceAsStream(configPath));
+			this.resourcePath = configProperties.getProperty("ResourcePath");
+		}
+		catch (IOException ex) {
+			logger.warn("Setting config file failed.", ex);
+			this.configProperties = null;
+			this.resourcePath = "";
+		}
+	}
+	
+	// Gets the resource path
+	String getResourcePath() {
+		return this.resourcePath;
+	}
+	
+	// Gets the config properties
+	Properties getConfigProperties() {
+		return this.configProperties;
+	}
+	
+	// Sets the audio settings
+	public void setAudioSettings(AudioSettings settings) {
+		synchronized(this.settings) {
+			this.settings = settings;
+		}
+	}
+	
+	// Gets the audio settings
+	public AudioSettings getAudioSettings() {
+		AudioSettings result = null;
+		synchronized(this.settings) {
+			result = this.settings;
+		}
+		return result;
+	}
 
+	// Gets the current source of background overriding sounds
+	public String getBackgroundOverrideSource()
+	{
+		return backgroundOverrideSource;
+	}
+	
+	// Sets the current source of background overriding sounds
+	public void setBackgroundOverrideSource(String source)
+	{
+		this.backgroundOverrideSource = source;
+	}
+	
+	// Gets the current source of background music
+	public String getBackgroundSource()
+	{
+		return backgroundSource;
+	}
+	
+	// Gets the current source of background music's file name
+	public String getBackgroundFileName()
+	{
+		return backgroundFileName;
+	}
+	
+	// Sets the background source
+	public void setBackgroundSource(String source)
+	{
+		backgroundSource = source;
+	}
+	
+	// Sets the background source's file name
+	public void setBackgroundFileName(String fileName)
+	{
+		backgroundFileName = fileName;
+	}
+	
+	// Stops the thread
+	public void stop() {
+		this.stop = true;
+	}
 }

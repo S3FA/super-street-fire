@@ -39,8 +39,7 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		//attackAudioMap.put(AttackType.DISCO_STU_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.DiscoStuAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.SUCK_IT_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.SuckItAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.PSYCHO_CRUSHER_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.PsychoCrusherAttack"), playbackSettings));
-		attackAudioMap.put(AttackType.YMCA_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.YmcaAttack"), playbackSettings));
-		
+
 		PlaybackHandler shoryukenPlayback = PlaybackHandler.build(controller, configProperties.getProperty("AttackType.ShoryukenAttack"), playbackSettings);
 		attackAudioMap.put(AttackType.LEFT_SHORYUKEN_ATTACK, shoryukenPlayback);
 		attackAudioMap.put(AttackType.RIGHT_SHORYUKEN_ATTACK, shoryukenPlayback);
@@ -52,6 +51,9 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		//PlaybackHandler vafanapoliHandler = PlaybackHandler.build(controller, configProperties.getProperty("AttackType.VafanapoliAttack"), playbackSettings);
 		//attackAudioMap.put(AttackType.LEFT_VAFANAPOLI_ATTACK, vafanapoliHandler);
 		//attackAudioMap.put(AttackType.RIGHT_VAFANAPOLI_ATTACK, vafanapoliHandler);
+
+		attackAudioMap.put(AttackType.YMCA_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.YmcaAttack"), 
+				new PlaybackSettings(globalSettings.getVolume(), false, true)));
 		
 		attackAudioMap.put(AttackType.NYAN_CAT_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.NyanCatAttack"), 
 				new PlaybackSettings(globalSettings.getVolume(), false, true)));
