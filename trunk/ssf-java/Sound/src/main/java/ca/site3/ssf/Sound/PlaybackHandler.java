@@ -12,12 +12,12 @@ import java.net.URL;
  * Plays a .ogg file by file name.
  * @author Mike, Callum
  */
-class PlaybackHandler {// implements LineListener {
+class PlaybackHandler {
 	
 	private static Logger logger = LoggerFactory.getLogger(PlaybackHandler.class);
 
 	private final SoundPlayerController controller;
-	private final String sourceName;
+	private String sourceName;
 	private String audioFilePath;
 	private URL audioFileURL;
 	private PlaybackSettings settings;
@@ -73,7 +73,10 @@ class PlaybackHandler {// implements LineListener {
 	
 	private boolean init() {
 		try{
-			this.controller.mySoundSystem.newStreamingSource(this.isBackgroundPlayer, sourceName, this.audioFileURL, this.audioFilePath, this.settings.getIsLooping(), 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
+			if(!this.settings.getIsQuietBackground())
+			{
+				this.controller.mySoundSystem.newStreamingSource(this.isBackgroundPlayer, sourceName, this.audioFileURL, this.audioFilePath, this.settings.getIsLooping(), 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
+			}
 		}
 		catch(Exception ex){
 			logger.warn("Failed to read audio file " + audioFilePath);
@@ -84,42 +87,25 @@ class PlaybackHandler {// implements LineListener {
 	}
 	
 	void play() {
-		try {
+		try 
+		{
 			// Pause the background music if necessary, and queue it up to restart immediately after playback
-			if(this.settings.getIsQuietBackground()) {
-				String bgSource = controller.getBackgroundSource();
-				String bgFile = controller.getBackgroundFileName();
-				
-				assert(bgSource != null);
-				assert(bgFile != null);
-				
-				File queuedFile = new File(bgFile);
-				if (queuedFile.canRead()) {
-				
-					URL queuedFileURL = queuedFile.toURI().toURL();
-				
-					controller.mySoundSystem.stop(bgSource);
-					controller.mySoundSystem.removeSource(bgSource);
-					controller.mySoundSystem.dequeueSound(bgSource, bgFile);
-					
-					// Note that when you queue up a sound, it actually plays in the source you are queuing it up to play AFTER.
-					controller.mySoundSystem.play(sourceName);
-					controller.mySoundSystem.queueSound(sourceName, queuedFileURL, bgSource);
-					
-					// See above - that's why we need to set the background source to be the source we want to queue bg music to play after
-					controller.setBackgroundFileName(this.audioFilePath);
-					controller.setBackgroundSource(sourceName);
-				}
+			if(this.settings.getIsQuietBackground())
+			{
+				controller.pauseBackgroundMusic();
+				this.sourceName = controller.mySoundSystem.quickStream(this.isBackgroundPlayer, this.audioFileURL, this.sourceName, this.settings.getIsLooping(), 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
+				controller.setBackgroundOverrideSource(this.sourceName);
 			}
-			else {
+			else
+			{
 				controller.mySoundSystem.play(this.sourceName);
 			}
-		} catch (Exception e) {
+		}catch (Exception e) {
 			logger.warn("Exception while attempting to play the ogg in playbackHandler.", e);
 			return;
 		}
 	}
-
+	
 	void stop() {
 		this.controller.mySoundSystem.stop(sourceName);
 	}
@@ -136,14 +122,7 @@ class PlaybackHandler {// implements LineListener {
 	}
 	
 	private void updateSettings() {
-		try{
-			// Adjust the volume on the audio clip
-			//this.controller.mySoundSystem.setVolume(sourceName, this.settings.getVolume());
-		}
-		catch (Exception ex){
-			logger.warn("Exception while attempting to set the volume.", ex);
-			throw ex;
-		}
+
 	}
 	
 	public void setIsBackground(boolean background)
