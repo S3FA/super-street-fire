@@ -108,8 +108,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
     private final CommandLineArgs args;
     private StreetFireGuiClient client = null;
 
-    static final int PREF_WINDOW_WIDTH  = 1250;
-    static final int PREF_WINDOW_HEIGHT = 770;
+    static final int PREF_WINDOW_WIDTH  = 1360;
+    static final int PREF_WINDOW_HEIGHT = 760;
     
     // Thread that monitors the queue for game model events
     private Thread gameEventThread;

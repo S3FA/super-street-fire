@@ -45,8 +45,8 @@ class PlaybackHandler {
 		catch(Exception ex)
 		{
 			logger.warn("Exception while attempting to set up the playbackHandler.", ex);
-			throw ex;
-			//return null;
+//			throw ex;
+			return null;
 		}
 	}
 	

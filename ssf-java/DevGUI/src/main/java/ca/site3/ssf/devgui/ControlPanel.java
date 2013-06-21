@@ -1,5 +1,6 @@
 package ca.site3.ssf.devgui;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -41,19 +43,15 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JButton executeP2ActionButton 			= null;
 	private JButton executeRingmasterActionButton	= null;
 	
-	@SuppressWarnings("rawtypes")
 	private JComboBox player1ActionComboBox    = null;
-	@SuppressWarnings("rawtypes")
 	private JComboBox player2ActionComboBox    = null;
-	@SuppressWarnings("rawtypes")
 	private JComboBox ringmasterActionComboBox = null;
 	
 	List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	ControlPanel(ActionFactory actionFactory, StreetFireGuiClient client) {
 		
-		//setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
 		this.actionFactory = actionFactory;
 		this.client = client;
@@ -102,15 +100,18 @@ class ControlPanel extends JPanel implements ActionListener {
 		this.player1ActionComboBox    = new JComboBox(playerActionStrs.toArray());
 		this.player2ActionComboBox    = new JComboBox(playerActionStrs.toArray());
 		this.ringmasterActionComboBox = new JComboBox(ringmasterActionStrs.toArray());
-		this.executeP1ActionButton = new JButton("Execute for Player 1");
+		this.executeP1ActionButton = new JButton("Execute P1");
 		this.executeP1ActionButton.addActionListener(this);
-		this.executeP2ActionButton = new JButton("Execute for Player 2");
+		this.executeP2ActionButton = new JButton("Execute P2");
 		this.executeP2ActionButton.addActionListener(this);
 		this.executeRingmasterActionButton = new JButton("Execute for Ringmaster");
 		this.executeRingmasterActionButton.addActionListener(this);
 		
+		player1ActionComboBox.setMaximumSize(new Dimension(160, Integer.MAX_VALUE));
+		player2ActionComboBox.setMaximumSize(new Dimension(160, Integer.MAX_VALUE));
 		
 		JPanel actionPanel = new JPanel();
+		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
 		actionPanel.add(this.player1ActionComboBox);
 		actionPanel.add(this.executeP1ActionButton);
 		actionPanel.add(this.player2ActionComboBox);
