@@ -266,12 +266,12 @@ final public class ActionFactory {
 					success &= this.addConstantVelocityWaveToAction(action,
 							fireEmitterModel.getOuterRingStartEmitterIter(
 									fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, false, 0), true),
-							fireEmitterConfig.getNumOuterRingEmitters()/2, SHORYUKEN_NUM_FLAMES_PUNCH_HAND, SHORYUKEN_TIME_LENGTH_IN_SECS,
+							fireEmitterConfig.getNumOuterRingEmitters()/2, SHORYUKEN_NUM_FLAMES_OFFHAND, SHORYUKEN_TIME_LENGTH_IN_SECS,
 							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 					success &= this.addConstantVelocityWaveToAction(action,
 							fireEmitterModel.getOuterRingStartEmitterIter(
 									fireEmitterModel.getSemanticOuterRingEmitterIndex(playerNum, true, 0), false),
-							fireEmitterConfig.getNumOuterRingEmitters()/2, SHORYUKEN_NUM_FLAMES_OFFHAND, SHORYUKEN_TIME_LENGTH_IN_SECS,
+							fireEmitterConfig.getNumOuterRingEmitters()/2, SHORYUKEN_NUM_FLAMES_PUNCH_HAND, SHORYUKEN_TIME_LENGTH_IN_SECS,
 							DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				
