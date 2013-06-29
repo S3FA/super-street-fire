@@ -18,6 +18,9 @@ class MatchEndedSoundPlayer extends SoundPlayer {
 
 		this.p1VictoryPlayback = PlaybackHandler.build(controller, configProperties.getProperty("MatchResult.PlayerOneVictory"), playbackSettings);
 		this.p2VictoryPlayback = PlaybackHandler.build(controller, configProperties.getProperty("MatchResult.PlayerTwoVictory"), playbackSettings);
+	
+		// Stop all other controller sounds...
+		controller.stopAllSounds();
 	}
 	
 	// Get the default playback settings for this sound player

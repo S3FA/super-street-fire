@@ -46,8 +46,7 @@ class GameStateChangedSoundPlayer extends SoundPlayer {
 	}
 	
 	// Get the default playback settings for this sound player
-	private PlaybackSettings getDefaultPlaybackSettings()
-	{
+	private PlaybackSettings getDefaultPlaybackSettings() {
 		return new PlaybackSettings(controller.getAudioSettings().getVolume(), true, false);
 	}
 	

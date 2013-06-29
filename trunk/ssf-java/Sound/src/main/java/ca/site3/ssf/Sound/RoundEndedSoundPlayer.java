@@ -44,16 +44,17 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		
 		RoundEndedEvent event = (RoundEndedEvent)gameModelEvent;
 		switch (event.getRoundResult()) {
-		case PLAYER1_VICTORY:
-			return this.p1VictoryAudioHandler;
-		case PLAYER2_VICTORY:
-			return this.p2VictoryAudioHandler;
-		case TIE:
-			return this.tieAudioHandler;
 		
-		default:
-			assert(false);
-			break;
+			case PLAYER1_VICTORY:
+				return this.p1VictoryAudioHandler;
+			case PLAYER2_VICTORY:
+				return this.p2VictoryAudioHandler;
+			case TIE:
+				return this.tieAudioHandler;
+			
+			default:
+				assert(false);
+				break;
 		}
 		
 		return null;

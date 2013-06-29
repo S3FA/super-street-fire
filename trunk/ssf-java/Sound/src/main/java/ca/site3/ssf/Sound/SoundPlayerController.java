@@ -2,8 +2,6 @@ package ca.site3.ssf.Sound;
 
 import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 
 import paulscode.sound.IStreamListener;
@@ -25,7 +22,7 @@ import paulscode.sound.libraries.LibraryLWJGLOpenAL;
  * Listens for game events and plays sound effects and music as appropriate.
  * @author Mike, Callum
  */
-public class SoundPlayerController implements IGameModelListener, Runnable, IStreamListener {
+public class SoundPlayerController implements IGameModelListener, IStreamListener {
 	
 	private static final String DEFAULT_CONFIG_FILEPATH = "SoundProperties.properties";
 	
@@ -39,11 +36,8 @@ public class SoundPlayerController implements IGameModelListener, Runnable, IStr
 	private String backgroundOverrideSource;
 	
 	private GameStateType currentGameState; 
-	private BlockingQueue<IGameModelEvent> incomingEvents = new LinkedBlockingQueue<IGameModelEvent>();
-	
+
 	SoundSystem mySoundSystem;
-	
-	private volatile boolean stop = false;
 	
 	public SoundPlayerController(AudioSettings settings) {
 		assert(settings != null);
@@ -54,33 +48,27 @@ public class SoundPlayerController implements IGameModelListener, Runnable, IStr
 		this.settings = settings;
 		this.setConfigFile(DEFAULT_CONFIG_FILEPATH);
 		
-		
 		init();
 	}
 	
 	// Initialize the sound player
-	void init()
-	{
+	void init() {
 		// Add the libraries and codecs
-		try
-		{
+		try {
 			SoundSystemConfig.addLibrary( LibraryLWJGLOpenAL.class );
             SoundSystemConfig.setCodec( "ogg", CodecJOrbis.class );
             SoundSystemConfig.addStreamListener(this);
 		}
-		catch( SoundSystemException e )
-        {
-            System.out.println("error linking with the plugins" );
+		catch( SoundSystemException e ) {
+            System.out.println("Error linking with the plugins" );
         }
 		
 		// Create the soundsystem
-		try
-        {
+		try {
             mySoundSystem = new SoundSystem( LibraryLWJGLOpenAL.class );
         }
-        catch( SoundSystemException e )
-        {
-        	System.out.println( "LWJGL OpenAL library is not compatible on this computer" );
+        catch( SoundSystemException e ) {
+        	System.out.println("LWJGL OpenAL library is not compatible on this computer");
             e.printStackTrace();
             return;
         }
@@ -91,18 +79,50 @@ public class SoundPlayerController implements IGameModelListener, Runnable, IStr
 	 * @param event The object holding the event information.
 	 */
 	public void onGameModelEvent(IGameModelEvent gameModelEvent) {		
-		this.incomingEvents.add(gameModelEvent);
+		
+		switch (gameModelEvent.getType()) {
+		
+			case GAME_STATE_CHANGED: {
+				// Decide whether to stop/pause/play sounds
+				GameStateChangedEvent ce = (GameStateChangedEvent) gameModelEvent;
+				GameStateType oldGameState = ce.getOldState();
+	
+				this.currentGameState = ce.getNewState();
+	
+				switch (ce.getNewState()) {
+					case IDLE_STATE:
+						this.stopAllSounds();
+					case PAUSED_STATE:
+						this.pauseBackgroundMusic();
+						break;
+					default:
+						if (oldGameState == GameStateType.PAUSED_STATE) {
+							this.unpauseBackgroundMusic();
+						}
+						break;
+				}
+				break;
+			}
+			
+			default:
+				break;
+		}
+		
+		// Create a new instance of the sound player and execute the sound
+		SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
+		if (soundPlayer != null) {
+			soundPlayer.execute(gameModelEvent);
+		}
 	}
 	
 	// Stops the background music and removes all references to it
-	void stopAllSounds() 
-	{
-		try{
+	void stopAllSounds() {
+		try {
 			mySoundSystem.stop(this.getBackgroundSource());
 			mySoundSystem.removeSource(this.getBackgroundSource());
 			mySoundSystem.dequeueSound(this.getBackgroundSource(), this.getBackgroundFileName());
 		}
-		catch(Exception ex){
+		catch(Exception ex) {
 			// An error occurred while trying to clean up the background music sources
 			ex.printStackTrace();
 		}
@@ -112,74 +132,28 @@ public class SoundPlayerController implements IGameModelListener, Runnable, IStr
 	}
 	
 	// Pauses the background music
-	void pauseBackgroundMusic()
-	{
-		try{
-			if(this.getBackgroundSource() != null)
-			{
+	void pauseBackgroundMusic() {
+		try {
+			if (this.getBackgroundSource() != null) {
 				mySoundSystem.pause(this.getBackgroundSource());
 			}
 		}
-		catch(Exception ex)
-		{
+		catch(Exception ex) {
 			// There was an exception trying to pause the background music
 			ex.printStackTrace();
 		}
 	}
 	
 	// Unpauses the background music
-	void unpauseBackgroundMusic()
-	{
-		try{
-			if(this.getBackgroundSource() != null)
-			{
+	void unpauseBackgroundMusic() {
+		try {
+			if (this.getBackgroundSource() != null) {
 				mySoundSystem.play(this.getBackgroundSource());
 			}
 		}
-		catch(Exception ex){
+		catch(Exception ex) {
 			// There was an exception trying to unpause the background music.
 			ex.printStackTrace();
-		}
-	}
-
-	// The main logic of the sound thread
-	public void run() {
-		while (!this.stop) {
-			IGameModelEvent gameModelEvent;
-			
-			// Take game events from the queue
-			try {
-				gameModelEvent = this.incomingEvents.take();
-			} catch (InterruptedException e) {
-				continue;
-			}
-			
-			// Decide whether to stop/pause/play sounds
-			if (gameModelEvent.getType() == Type.GAME_STATE_CHANGED) {
-				GameStateChangedEvent ce = (GameStateChangedEvent) gameModelEvent;
-				GameStateType oldGameState = ce.getOldState();
-				
-				this.currentGameState = ce.getNewState();
-				
-				switch (ce.getNewState()) { 
-				case IDLE_STATE:
-					this.stopAllSounds();
-				case PAUSED_STATE:
-					pauseBackgroundMusic();
-					break;
-				default:
-					if (oldGameState == GameStateType.PAUSED_STATE){
-						unpauseBackgroundMusic();
-					}
-					break;
-				}
-			}
-			
-			// Create a new instance of the sound player and execute the sound
-			SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
-			if (soundPlayer != null) {
-				soundPlayer.execute(gameModelEvent);
-			}
 		}
 	}
 	
@@ -189,16 +163,13 @@ public class SoundPlayerController implements IGameModelListener, Runnable, IStr
 	}
 	
 	// Detect when a stream has finished playing - if it's a bg music overriding sound, unpause the background music
-	public void endOfStream(String sourcename, int queueSize)
-	{
-	    if( this.backgroundOverrideSource != null && this.backgroundOverrideSource.equals(sourcename))
-	    {
-	    	if (this.currentGameState != GameStateType.PAUSED_STATE)
-	    	{
-	    		mySoundSystem.play(this.backgroundSource);
+	public void endOfStream(String sourcename, int queueSize) {
+	    if (this.backgroundOverrideSource != null && this.backgroundOverrideSource.equals(sourcename)) {
+	    	if (this.currentGameState != GameStateType.PAUSED_STATE) {
+	    		this.unpauseBackgroundMusic();
 	    	}
 	        
-	        setBackgroundOverrideSource("");
+	        this.setBackgroundOverrideSource("");
 	    }
 	}
 	
@@ -244,43 +215,32 @@ public class SoundPlayerController implements IGameModelListener, Runnable, IStr
 	}
 
 	// Gets the current source of background overriding sounds
-	public String getBackgroundOverrideSource()
-	{
+	public String getBackgroundOverrideSource() {
 		return backgroundOverrideSource;
 	}
 	
 	// Sets the current source of background overriding sounds
-	public void setBackgroundOverrideSource(String source)
-	{
+	public void setBackgroundOverrideSource(String source) {
 		this.backgroundOverrideSource = source;
 	}
 	
 	// Gets the current source of background music
-	public String getBackgroundSource()
-	{
+	public String getBackgroundSource() {
 		return backgroundSource;
 	}
 	
 	// Gets the current source of background music's file name
-	public String getBackgroundFileName()
-	{
+	public String getBackgroundFileName() {
 		return backgroundFileName;
 	}
 	
 	// Sets the background source
-	public void setBackgroundSource(String source)
-	{
+	public void setBackgroundSource(String source) {
 		backgroundSource = source;
 	}
 	
 	// Sets the background source's file name
-	public void setBackgroundFileName(String fileName)
-	{
+	public void setBackgroundFileName(String fileName) {
 		backgroundFileName = fileName;
-	}
-	
-	// Stops the thread
-	public void stop() {
-		this.stop = true;
 	}
 }

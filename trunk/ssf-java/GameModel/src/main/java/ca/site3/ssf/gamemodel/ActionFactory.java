@@ -946,7 +946,6 @@ final public class ActionFactory {
 	
 	/**
 	 * Create an end-of-round burst of flames at the given location of fire emitters in the arena.
-	 * ya know.. cause we gotta wow the crowd.
 	 * @param colourEntity The entity that will drive the colour of the flames.
 	 * @param location The emitters location in the game arena.
 	 * @param totalDurationInSecs Length of the whole burst action in seconds.
@@ -954,26 +953,22 @@ final public class ActionFactory {
 	 * @return The resulting action, null on failure.
 	 */
 	final Action buildCrowdPleaserBurstAction(GameModel.Entity colourEntity, FireEmitter.Location location,
-								              double totalDurationInSecs, int numBursts, double delayInSecs) {
+								              double totalDurationInSecs, int numBursts, double delayInSecs,
+								              int numEmitters) {
 		
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
 		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
-		
-		int numEmitters = 0;
-		
+
 		FireEmitterIterator emitterIter = null;
 		switch (location) {
 			case LEFT_RAIL:
 				emitterIter = fireEmitterModel.getLeftRailStartEmitterIter(0);
-				numEmitters = fireEmitterConfig.getNumEmittersPerRail();
 				break;
 			case RIGHT_RAIL:
 				emitterIter = fireEmitterModel.getRightRailStartEmitterIter(0);
-				numEmitters = fireEmitterConfig.getNumEmittersPerRail();
 				break;
 			case OUTER_RING:
 				emitterIter = fireEmitterModel.getOuterRingStartEmitterIter(0, false);
-				numEmitters = fireEmitterConfig.getNumOuterRingEmitters();
 				break;
 			default:
 				assert(false);

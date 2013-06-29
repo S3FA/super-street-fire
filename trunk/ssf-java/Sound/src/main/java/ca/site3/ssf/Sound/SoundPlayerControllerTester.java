@@ -40,6 +40,6 @@ public class SoundPlayerControllerTester{
 		soundPlayerController.onGameModelEvent(player1AttackActionEvent);
 		soundPlayerController.onGameModelEvent(player2AttackActionEvent);
 		
-		new Thread(soundPlayerController, "Sound Player Controller").start();
+		//new Thread(soundPlayerController, "Sound Player Controller").start();
 	}
 }
