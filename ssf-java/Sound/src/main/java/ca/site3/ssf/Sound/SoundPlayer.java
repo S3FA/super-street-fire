@@ -33,39 +33,41 @@ abstract class SoundPlayer implements ISoundPlayer {
 		
 		SoundPlayer result = null;
 		switch (gameModelEvent.getType()) {
-		
-		case GAME_STATE_CHANGED: {
-			result = new GameStateChangedSoundPlayer(controller);
-			break;
+			
+			case GAME_STATE_CHANGED: {
+				result = new GameStateChangedSoundPlayer(controller);
+				break;
+			}
+			case PLAYER_ATTACK_ACTION: {
+				result = new PlayerAttackActionSoundPlayer(controller);
+				break;
+			}
+			case ROUND_ENDED: {
+				result = new RoundEndedSoundPlayer(controller);
+				break;
+			}
+			case MATCH_ENDED: {
+				result = new MatchEndedSoundPlayer(controller);
+				break;
+			}
+			case RINGMASTER_ACTION: {
+				result = new RingmasterActionSoundPlayer(controller);
+				break;
+			}
+			case ROUND_BEGIN_TIMER_CHANGED: {
+				result = new RoundBeginTimerChangedSoundPlayer(controller);
+				break;
+			}
+			case UNRECOGNIZED_GESTURE: {
+				result = new UnrecognizedGestureSoundPlayer(controller);
+				break;
+			}
+			//case 
+			
+			default:
+				break;
 		}
-		case PLAYER_ATTACK_ACTION: {
-			result = new PlayerAttackActionSoundPlayer(controller);
-			break;
-		}
-		case ROUND_ENDED: {
-			result = new RoundEndedSoundPlayer(controller);
-			break;
-		}
-		case MATCH_ENDED: {
-			result = new MatchEndedSoundPlayer(controller);
-			break;
-		}
-		case RINGMASTER_ACTION: {
-			result = new RingmasterActionSoundPlayer(controller);
-			break;
-		}
-		case ROUND_BEGIN_TIMER_CHANGED: {
-			result = new RoundBeginTimerChangedSoundPlayer(controller);
-			break;
-		}
-		case UNRECOGNIZED_GESTURE: {
-			result = new UnrecognizedGestureSoundPlayer(controller);
-			break;
-		}
-		default:
-			break;
-		}
-		
+			
 		return result;
 	}
 	

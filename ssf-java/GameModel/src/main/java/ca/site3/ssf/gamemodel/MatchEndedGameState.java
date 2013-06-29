@@ -40,11 +40,16 @@ class MatchEndedGameState extends GameState {
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction  = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 2.75, 4, 0.0);
+		FireEmitterConfig fireConfig = gameModel.getFireEmitterModel().getFireEmitterConfig();
+		int victoryRailFlameWidth = fireConfig.getNumEmittersPerRail()/2;
+		
+		tempAction  = actionFactory.buildCrowdPleaserBurstAction(
+				victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 2.75, 4, 0.0);
+		tempAction = actionFactory.buildCrowdPleaserBurstAction(
+				victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		

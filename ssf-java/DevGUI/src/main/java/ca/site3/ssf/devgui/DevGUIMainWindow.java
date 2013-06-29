@@ -150,7 +150,6 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		// member of it, so that we don't make the mistake of touching it with any of the GUI threads.
 		// GW: how about we just be careful. Need a reference to this to cleanly stop sound on quit.
 		soundPlayerController = new SoundPlayerController(new AudioSettings(5.0f, 0.33f));
-		new Thread(soundPlayerController, "Sound Player Controller").start();
 		this.ioserver.getGameModel().addGameModelListener(soundPlayerController);
 		
 		// Setup the frame's basic characteristics...
@@ -639,7 +638,6 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 			app.setDockIconImage(ssfImage);
 			app.setQuitHandler(new QuitHandler() {
 				public @Override void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
-					soundPlayerController.stop();
 					DevGUIMainWindow.this.ioserver.stop();
 					response.performQuit();
 				}

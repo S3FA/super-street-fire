@@ -304,4 +304,7 @@ class FireEmitterModel {
 		}
 	}
 
+	FireEmitterConfig getFireEmitterConfig() {
+		return this.config;
+	}
 }
