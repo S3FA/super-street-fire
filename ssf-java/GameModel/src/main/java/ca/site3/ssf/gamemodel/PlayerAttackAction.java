@@ -267,16 +267,18 @@ public class PlayerAttackAction extends Action {
 		assert(actionSignaller != null);
 		
 		// Check to see if the attacker has enough action points to pull off the attack
-		if (this.attacker.getActionPoints() >= this.type.getActionPointCost()) {
-			// Attacker has enough action points; remove the action point cost of this attack from the player that executed it
-			this.attacker.removeActionPoints(this.type.getActionPointCost());
-		}
-		else {
-			// Attacker doesn't have requisite action points -- kill this attack
-			this.kill();
-			// Signal that this attack failed due to lack of action points
-			actionSignaller.fireOnAttackFailedAction(this.attacker.getPlayerNumber(), this.type, PlayerAttackActionFailedEvent.Reason.NOT_ENOUGH_ACTION_POINTS);
-			return;
+		if (!this.attacker.getHasInfiniteMoves()) {
+			if (this.attacker.getActionPoints() >= this.type.getActionPointCost()) {
+				// Attacker has enough action points; remove the action point cost of this attack from the player that executed it
+				this.attacker.removeActionPoints(this.type.getActionPointCost());
+			}
+			else {
+				// Attacker doesn't have requisite action points -- kill this attack
+				this.kill();
+				// Signal that this attack failed due to lack of action points
+				actionSignaller.fireOnAttackFailedAction(this.attacker.getPlayerNumber(), this.type, PlayerAttackActionFailedEvent.Reason.NOT_ENOUGH_ACTION_POINTS);
+				return;
+			}
 		}
 		
 		// Calculate the amount of time in seconds before a block signal is raised for this attack...
