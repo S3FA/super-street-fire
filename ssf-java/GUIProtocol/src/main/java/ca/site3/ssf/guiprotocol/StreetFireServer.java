@@ -191,7 +191,8 @@ public class StreetFireServer implements Runnable {
 							guiHandler.sendGameEvent(event);
 						}
 						catch (IOException ex) {
-							log.error("Exception sending GameEvent to GUI client", ex);
+							log.error("Exception sending GameEvent to GUI client. Removing handler", ex);
+							iter.remove();
 						}
 						
 						if (!serverSocket.isBound() || serverSocket.isClosed()) {
