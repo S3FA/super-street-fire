@@ -167,6 +167,7 @@ public class GameModel implements IGameModel {
 		GameInfoRefreshEvent event = new GameInfoRefreshEvent(
 				this.currState.getStateType(), this.roundResults, matchResult, 
 				this.player1.getHealth(), this.player2.getHealth(),
+				this.player1.getActionPoints(), this.player2.getActionPoints(),
 				this.player1.getHasInfiniteMoves(), this.player2.getHasInfiniteMoves(),
 				roundBeginCountdown, roundInPlayTimer, roundTimedOut);
 		this.actionSignaller.fireOnQueryGameInfoRefresh(event);

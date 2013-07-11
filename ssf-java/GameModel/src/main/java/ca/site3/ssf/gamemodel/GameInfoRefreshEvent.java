@@ -17,12 +17,15 @@ public final class GameInfoRefreshEvent implements IGameModelEvent {
 	private final float player2Health;
 	private final boolean player1UnlimitedMovesOn;
 	private final boolean player2UnlimitedMovesOn;
+	private final float player1ActionPoints;
+	private final float player2ActionPoints;
 	private final RoundBeginCountdownType roundBeginCountdown;
 	private final int roundInPlayTimerSecs;
 	private final boolean roundTimedOut;
 	
 	public GameInfoRefreshEvent(GameState.GameStateType currGameState, List<RoundResult> currRoundResults, MatchResult matchResult,
 			                    float player1Health, float player2Health,
+			                    float player1ActionPoints, float player2ActionPoints,
 			                	boolean player1UnlimitedMovesOn,
 			                	boolean player2UnlimitedMovesOn,
 			                	RoundBeginCountdownType roundBeginCountdown,
@@ -38,6 +41,8 @@ public final class GameInfoRefreshEvent implements IGameModelEvent {
 		this.matchResult      = matchResult;
 		this.player1Health    = player1Health;
 		this.player2Health    = player2Health;
+		this.player1ActionPoints = player1ActionPoints;
+		this.player2ActionPoints = player2ActionPoints;
 		this.player1UnlimitedMovesOn = player1UnlimitedMovesOn;
 		this.player2UnlimitedMovesOn = player2UnlimitedMovesOn;
 		this.roundBeginCountdown  = roundBeginCountdown;
@@ -63,6 +68,12 @@ public final class GameInfoRefreshEvent implements IGameModelEvent {
 	}
 	public float getPlayer2Health() {
 		return this.player2Health;
+	}
+	public float getPlayer1ActionPoints() {
+		return this.player1ActionPoints;
+	}
+	public float getPlayer2ActionPoints() {
+		return this.player2ActionPoints;
 	}
 	public boolean getPlayer1UnlimitedMoves() {
 		return this.player1UnlimitedMovesOn;

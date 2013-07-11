@@ -359,6 +359,7 @@ public class StreetFireGuiClient {
 				SerializationHelper.protobufToRoundResults(e.getRoundResultsList()),
 				SerializationHelper.protobufToMatchResult(e.getMatchResult()),
 				e.getPlayer1Health(), e.getPlayer2Health(),
+				e.getPlayer1ActionPoints(), e.getPlayer2ActionPoints(),
 				e.getPlayer1UnlimitedMovesOn(), e.getPlayer2UnlimitedMovesOn(),
 				SerializationHelper.protobufToRoundBeginCountdownTimer(e.getRoundBeginTimer()),
 				e.getRoundInPlayTimer(), e.getTimedOut());
