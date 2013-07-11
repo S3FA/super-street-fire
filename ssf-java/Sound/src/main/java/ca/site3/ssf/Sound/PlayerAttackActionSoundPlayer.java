@@ -32,11 +32,9 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		attackAudioMap.put(AttackType.SONIC_BOOM_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.SonicBoomAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.HADOUKEN_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.HadoukenAttack"),	playbackSettings));
 		attackAudioMap.put(AttackType.DOUBLE_LARIAT_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.DoubleLariatAttack"), playbackSettings));
-		//attackAudioMap.put(AttackType.QUADRUPLE_LARIAT_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.QuadrupleLariatAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.SUMO_HEADBUTT_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.SumoHeadbuttAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.TwoHandedOneHundredHandSlapAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.ARM_WINDMILL_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.ArmWindmillAttack"), playbackSettings));
-		//attackAudioMap.put(AttackType.DISCO_STU_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.DiscoStuAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.SUCK_IT_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.SuckItAttack"), playbackSettings));
 		attackAudioMap.put(AttackType.PSYCHO_CRUSHER_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.PsychoCrusherAttack"), playbackSettings));
 
@@ -47,10 +45,6 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		PlaybackHandler oneHandedOneHundredHandSlap = PlaybackHandler.build(controller, configProperties.getProperty("AttackType.OneHandedOneHundredHandSlapAttack"), playbackSettings);
 		attackAudioMap.put(AttackType.LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK, oneHandedOneHundredHandSlap);
 		attackAudioMap.put(AttackType.RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK, oneHandedOneHundredHandSlap);
-		
-		//PlaybackHandler vafanapoliHandler = PlaybackHandler.build(controller, configProperties.getProperty("AttackType.VafanapoliAttack"), playbackSettings);
-		//attackAudioMap.put(AttackType.LEFT_VAFANAPOLI_ATTACK, vafanapoliHandler);
-		//attackAudioMap.put(AttackType.RIGHT_VAFANAPOLI_ATTACK, vafanapoliHandler);
 
 		attackAudioMap.put(AttackType.YMCA_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.YmcaAttack"), 
 				new PlaybackSettings(globalSettings.getVolume(), false, true)));
