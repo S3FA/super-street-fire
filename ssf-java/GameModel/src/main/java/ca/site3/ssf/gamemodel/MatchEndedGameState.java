@@ -34,22 +34,24 @@ class MatchEndedGameState extends GameState {
 		ActionFactory actionFactory = this.gameModel.getActionFactory();
 		assert(actionFactory != null);
 		
-		Action tempAction = null;
-		
-		tempAction = actionFactory.buildPlayerWinAction(victoryPlayer.getPlayerNumber(), 2.75, 1, 0.0);
-		assert(tempAction != null);
-		this.matchEndActions.add(tempAction);
-		
 		FireEmitterConfig fireConfig = gameModel.getFireEmitterModel().getFireEmitterConfig();
 		int victoryRailFlameWidth = fireConfig.getNumEmittersPerRail()/2;
+		int victoryRingFlameWidth = fireConfig.getNumOuterRingEmitters()/2;
 		
-		tempAction  = actionFactory.buildCrowdPleaserBurstAction(
-				victoryPlayer.getEntity(), FireEmitter.Location.LEFT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
+		Action tempAction = null;
+		
+		tempAction = actionFactory.buildPlayerWinAction(victoryPlayer.getPlayerNumber(), 
+				FireEmitter.Location.OUTER_RING, 2.75, 1, 0.0, victoryRingFlameWidth);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
-		tempAction = actionFactory.buildCrowdPleaserBurstAction(
-				victoryPlayer.getEntity(), FireEmitter.Location.RIGHT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
+		tempAction  = actionFactory.buildPlayerWinAction(
+				victoryPlayer.getPlayerNumber(), FireEmitter.Location.LEFT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
+		assert(tempAction != null);
+		this.matchEndActions.add(tempAction);
+		
+		tempAction = actionFactory.buildPlayerWinAction(
+				victoryPlayer.getPlayerNumber(), FireEmitter.Location.RIGHT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		

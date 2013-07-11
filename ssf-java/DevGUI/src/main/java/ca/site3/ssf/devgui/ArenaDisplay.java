@@ -175,6 +175,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		super.paint(g);
 		
 		Graphics2D g2 = (Graphics2D)g;
+
 		
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_GASP);
@@ -189,7 +190,9 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final float CENTER_X = size.width/2.0f;
 		final float CENTER_Y = size.height/2.0f;
 		
-		size.setSize(Math.min(750, size.width), Math.min(750, size.height));
+		float sizeX = Math.min(750, size.width);
+		float sizeY = Math.min(750, size.height);
+		size.setSize(sizeX, sizeY);
 
 		final float WIDTH_BETWEEN_RAILS       = size.width * 0.2f;
 		final float HALF_WIDTH_BETWEEN_RAILS  = WIDTH_BETWEEN_RAILS / 2.0f;
@@ -201,25 +204,25 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final float EMITTER_RADIUS                       = EMITTER_DIAMETER / 2.0f;
 		final float DISTANCE_BETWEEN_RAIL_EMITTERS       = LENGTH_PER_EMITTER_AND_SPACE_ON_RAIL - EMITTER_DIAMETER;
 		
-		final float RAIL_TOP_Y    = CENTER_Y - HALF_RAIL_LENGTH;
-		final float RAIL_BOTTOM_Y = CENTER_Y + HALF_RAIL_LENGTH;
+		final float RAIL_TOP   = CENTER_X - HALF_RAIL_LENGTH;
+		final float RAIL_BOTTOM = CENTER_X + HALF_RAIL_LENGTH;
 		
 		// Start by drawing the two central rails between the player podiums
-		final float LEFT_RAIL_CENTER_X = CENTER_X - HALF_WIDTH_BETWEEN_RAILS - EMITTER_RADIUS;
-		final float RIGHT_RAIL_CENTER_X = CENTER_X + HALF_WIDTH_BETWEEN_RAILS + EMITTER_RADIUS;
+		final float LEFT_RAIL_CENTER  = CENTER_Y + HALF_WIDTH_BETWEEN_RAILS + EMITTER_RADIUS;
+		final float RIGHT_RAIL_CENTER = CENTER_Y - HALF_WIDTH_BETWEEN_RAILS - EMITTER_RADIUS;
 		
 		g2.setPaint(Color.black);
 		g2.setStroke(ArenaDisplay.RAIL_STROKE);
-		g2.draw(new Line2D.Float(LEFT_RAIL_CENTER_X, RAIL_TOP_Y, LEFT_RAIL_CENTER_X, RAIL_BOTTOM_Y));
-		g2.draw(new Line2D.Float(RIGHT_RAIL_CENTER_X, RAIL_TOP_Y, RIGHT_RAIL_CENTER_X, RAIL_BOTTOM_Y));		
+		g2.draw(new Line2D.Float(RAIL_TOP, LEFT_RAIL_CENTER, RAIL_BOTTOM, LEFT_RAIL_CENTER));
+		g2.draw(new Line2D.Float(RAIL_TOP, RIGHT_RAIL_CENTER, RAIL_BOTTOM, RIGHT_RAIL_CENTER));		
 		
 		// Now draw all of the rail emitters as filled-in shapes
 		g2.setStroke(ArenaDisplay.EMITTER_OUTLINE_STROKE);
 		g2.setFont(ArenaDisplay.INTENSITY_FONT);
-		float currPosition = RAIL_BOTTOM_Y;
+		float currPosition = RAIL_BOTTOM;
 		for (int i = 0; i < this.fireEmitterConfig.getNumEmittersPerRail(); i++) {
-			Point2D.Float leftRailEmitterPos = new Point2D.Float(LEFT_RAIL_CENTER_X - EMITTER_RADIUS, currPosition - EMITTER_RADIUS);
-			Point2D.Float rightRailEmitterPos = new Point2D.Float(RIGHT_RAIL_CENTER_X - EMITTER_RADIUS, currPosition - EMITTER_RADIUS);
+			Point2D.Float leftRailEmitterPos = new Point2D.Float(currPosition - EMITTER_RADIUS, LEFT_RAIL_CENTER - EMITTER_RADIUS);
+			Point2D.Float rightRailEmitterPos = new Point2D.Float(currPosition - EMITTER_RADIUS, RIGHT_RAIL_CENTER - EMITTER_RADIUS);
 			
 			Ellipse2D.Float leftRailEmitterShape  = new Ellipse2D.Float(leftRailEmitterPos.x,
 					leftRailEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
@@ -240,24 +243,24 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 			
 			String leftEmitterPercentStr = "" + (int)(this.leftRailEmitterData[i].maxIntensity * 100) + "%";
 			String rightEmitterPercentStr = "" + (int)(this.rightRailEmitterData[i].maxIntensity * 100) + "%";
-			g2.drawString(leftEmitterPercentStr, leftRailEmitterPos.x - 2 - INTENSITY_FONT_METRICS.stringWidth(leftEmitterPercentStr),
-					leftRailEmitterPos.y + EMITTER_RADIUS);
-			g2.drawString(rightEmitterPercentStr, rightRailEmitterPos.x + EMITTER_DIAMETER + 2, rightRailEmitterPos.y + EMITTER_RADIUS);
+			g2.drawString(leftEmitterPercentStr, leftRailEmitterPos.x + INTENSITY_FONT_METRICS.stringWidth(leftEmitterPercentStr) / 2.0f,
+					leftRailEmitterPos.y + 3*EMITTER_RADIUS);
+			g2.drawString(rightEmitterPercentStr, rightRailEmitterPos.x + INTENSITY_FONT_METRICS.stringWidth(rightEmitterPercentStr) / 2.0f, 
+					rightRailEmitterPos.y - 5);
 			
 			g2.drawImage(getIconForEmitter(Location.LEFT_RAIL, i), 
-					(int)leftRailEmitterPos.x - 2 - DEVICE_FLAME_IMAGE.getWidth(), 
-					(int)leftRailEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
-					
+					(int)(leftRailEmitterPos.x + 3 + DEVICE_FLAME_IMAGE.getWidth()/2.0f), 
+					(int)(leftRailEmitterPos.y - DEVICE_FLAME_IMAGE.getHeight()),
 					null);
 			g2.drawImage(getIconForEmitter(Location.RIGHT_RAIL, i), 
-					(int)(rightRailEmitterPos.x + EMITTER_DIAMETER) + 2, 
-					(int)rightRailEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
+					(int)(rightRailEmitterPos.x + 3 + DEVICE_FLAME_IMAGE.getWidth()/2.0f ), 
+					(int)(rightRailEmitterPos.y + EMITTER_RADIUS + DEVICE_FLAME_IMAGE.getHeight()), 
 					null);
 			
 			
 			g2.setPaint(Color.black);
 			currPosition -= (EMITTER_DIAMETER + DISTANCE_BETWEEN_RAIL_EMITTERS);
-		}
+		}		
 		
 		// Draw the outer ring of emitters
 		final float OUTER_RING_RADIUS   = WIDTH_BETWEEN_RAILS * 1.642857f; // This number comes from the schematic (23' / 14')
@@ -266,6 +269,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final int HALF_NUM_OUTER_RING_EMITTERS = this.fireEmitterConfig.getNumOuterRingEmitters() / 2;
 		final float INCREMENT_ANGLE = (float)Math.PI / (float)(HALF_NUM_OUTER_RING_EMITTERS+1);
 		final float HALF_PI = (float)Math.PI/2.0f;
+		final float QUARTER_PI = (float)Math.PI/4.0f;
 		
 		final float OUTER_RING_X = CENTER_X - OUTER_RING_RADIUS;
 		final float OUTER_RING_Y = CENTER_Y - OUTER_RING_RADIUS;
@@ -278,12 +282,12 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		// Start by drawing the right-hand side of the outer ring, staring with the bottom-right emitter and moving
 		// up and around the outer ring to the top-right emitter...
 		g2.setStroke(ArenaDisplay.EMITTER_OUTLINE_STROKE);
-		float currAngle = -HALF_PI + INCREMENT_ANGLE;
+		float currAngle = -(float)Math.PI - HALF_PI - INCREMENT_ANGLE;
 
 		for (int i = 0; i < HALF_NUM_OUTER_RING_EMITTERS; i++) {
 			Point2D.Float outerRingEmitterPos =
-					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
-					CENTER_Y - OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);
+					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS,
+					CENTER_Y - OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS);
 			
 			Ellipse2D.Float outerRingEmitterShape  = 
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
@@ -303,15 +307,15 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 					(int)outerRingEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
 					null);
 			
-			currAngle += INCREMENT_ANGLE;
+			currAngle -= INCREMENT_ANGLE;
 		}
 
 		// Now draw the left-hand side of the outer ring...
-		currAngle = HALF_PI + INCREMENT_ANGLE;
+		currAngle = -(float)Math.PI + HALF_PI - INCREMENT_ANGLE;
 		for (int i = HALF_NUM_OUTER_RING_EMITTERS; i < this.fireEmitterConfig.getNumOuterRingEmitters(); i++) {
 			Point2D.Float outerRingEmitterPos =
-					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS,
-					CENTER_Y - OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS);			
+					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS,
+					CENTER_Y - OUTER_RING_RADIUS * (float)Math.cos(currAngle) - EMITTER_RADIUS);			
 			
 			Ellipse2D.Float outerRingEmitterShape  =
 					new Ellipse2D.Float(outerRingEmitterPos.x, outerRingEmitterPos.y, EMITTER_DIAMETER, EMITTER_DIAMETER);
@@ -332,40 +336,54 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 					(int)outerRingEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
 					null);
 			
-			currAngle += INCREMENT_ANGLE;
+			currAngle -= INCREMENT_ANGLE;
 		}
 		
 		// Draw the player podiums
 		final float PODIUM_WIDTH      = WIDTH_BETWEEN_RAILS * 0.5f;
 		final float HALF_PODIUM_WIDTH = PODIUM_WIDTH / 2.0f;
 				
-		final float PLAYER_LEFT_X  = CENTER_X - PODIUM_WIDTH / 2.0f;
-		final float PLAYER_1_TOP_Y = RAIL_BOTTOM_Y;
-		final float PLAYER_2_TOP_Y = RAIL_TOP_Y - PODIUM_WIDTH;
+		/*
+		final float PLAYER_TOP_Y  = CENTER_Y - PODIUM_WIDTH / 2.0f;
+		final float PLAYER_1_TOP_Y = RAIL_BOTTOM;
+		final float PLAYER_2_TOP_Y = RAIL_TOP - PODIUM_WIDTH;
 		final float RINGMASTER_PODIUM_WIDTH = PODIUM_WIDTH/1.5f;
 		final float RINGMASTER_LEFT_X = CENTER_X - WIDTH_BETWEEN_RAILS - RINGMASTER_PODIUM_WIDTH;
 		final float RINGMASTER_TOP_Y  = CENTER_Y - (PODIUM_WIDTH/2.0f);
+		*/
 		
-		RoundRectangle2D.Float player1PodiumShape = new RoundRectangle2D.Float(PLAYER_LEFT_X, PLAYER_1_TOP_Y, PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
+		final float RINGMASTER_PODIUM_HEIGHT = PODIUM_WIDTH/1.5f;
+		final float RINGMASTER_LEFT_X  = CENTER_X - PODIUM_WIDTH / 2.0f;
+		final float RINGMASTER_TOP_Y   = CENTER_Y + HALF_WIDTH_BETWEEN_RAILS + 1.5f*RINGMASTER_PODIUM_HEIGHT;
+		final float PLAYER_TOP_Y  = CENTER_Y - PODIUM_WIDTH / 2.0f;
+		final float PLAYER_1_LEFT_X = CENTER_X + HALF_RAIL_LENGTH;
+		final float PLAYER_2_LEFT_X = CENTER_X - HALF_RAIL_LENGTH - PODIUM_WIDTH;
+		
+		RoundRectangle2D.Float player1PodiumShape = 
+				new RoundRectangle2D.Float(PLAYER_1_LEFT_X, PLAYER_TOP_Y, PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
 		g2.setStroke(ArenaDisplay.PODIUM_OUTLINE_STROKE);
 		g2.setPaint(ArenaDisplay.PLAYER_1_COLOUR);
 		g2.fill(player1PodiumShape);
 		g2.setPaint(Color.black);
 		g2.draw(player1PodiumShape);
 		
-		RoundRectangle2D.Float player2PodiumShape = new RoundRectangle2D.Float(PLAYER_LEFT_X, PLAYER_2_TOP_Y, PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
+		RoundRectangle2D.Float player2PodiumShape = 
+				new RoundRectangle2D.Float(PLAYER_2_LEFT_X, PLAYER_TOP_Y, PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
 		g2.setStroke(ArenaDisplay.PODIUM_OUTLINE_STROKE);
 		g2.setPaint(ArenaDisplay.PLAYER_2_COLOUR);
 		g2.fill(player2PodiumShape);
 		g2.setPaint(Color.black);
 		g2.draw(player2PodiumShape);
 		
-		RoundRectangle2D.Float ringmasterPodiumShape = new RoundRectangle2D.Float(RINGMASTER_LEFT_X, RINGMASTER_TOP_Y, RINGMASTER_PODIUM_WIDTH, PODIUM_WIDTH, 10, 10);
+		RoundRectangle2D.Float ringmasterPodiumShape = 
+				new RoundRectangle2D.Float(RINGMASTER_LEFT_X, RINGMASTER_TOP_Y, PODIUM_WIDTH, RINGMASTER_PODIUM_HEIGHT, 10, 10);
 		g2.setStroke(ArenaDisplay.PODIUM_OUTLINE_STROKE);
 		g2.setPaint(ArenaDisplay.RINGMASTER_COLOUR);
 		g2.fill(ringmasterPodiumShape);
 		g2.setPaint(Color.black);
 		g2.draw(ringmasterPodiumShape);
+		
+		
 		
 		String player1Str = "Player 1";
 		String player2Str = "Player 2";
@@ -374,8 +392,8 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		g2.drawString(player1Str, player1PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player1Str)) / 2.0f, player1PodiumShape.y + HALF_PODIUM_WIDTH);
 		g2.drawString(player2Str, player2PodiumShape.x + (PODIUM_WIDTH - PLAYER_FONT_METRICS.stringWidth(player2Str)) / 2.0f, player2PodiumShape.y + HALF_PODIUM_WIDTH);
 		g2.setFont(RINGMASTER_FONT);
-		g2.drawString(ringmasterStr, ringmasterPodiumShape.x + (RINGMASTER_PODIUM_WIDTH - RINGMASTER_FONT_METRICS.stringWidth(ringmasterStr)) / 2.0f,
-				ringmasterPodiumShape.y + PODIUM_WIDTH/2.0f);
+		g2.drawString(ringmasterStr, ringmasterPodiumShape.x + (PODIUM_WIDTH - RINGMASTER_FONT_METRICS.stringWidth(ringmasterStr)) / 2.0f,
+				ringmasterPodiumShape.y + RINGMASTER_PODIUM_HEIGHT/2.0f + RINGMASTER_FONT_METRICS.getHeight()/2.0f);
 		
 		// Draw the countdown text...
 		FontMetrics COUNTDOWN_FONT_METRICS = g2.getFontMetrics(ArenaDisplay.COUNTDOWN_FONT);
@@ -447,9 +465,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 				this.getHeight() - SCALE_AMT * this.ssfImage.getHeight(null) - 10);		
 		imgTransform.scale(SCALE_AMT, SCALE_AMT);
 
-		
 		g2.drawImage(this.ssfImage, imgTransform, null);
-		
 	}
 
 	public void mouseClicked(MouseEvent event) {
