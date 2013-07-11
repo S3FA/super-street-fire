@@ -121,6 +121,8 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 			mySoundSystem.stop(this.getBackgroundSource());
 			mySoundSystem.removeSource(this.getBackgroundSource());
 			mySoundSystem.dequeueSound(this.getBackgroundSource(), this.getBackgroundFileName());
+			mySoundSystem.stop(this.getBackgroundOverrideSource());
+			mySoundSystem.removeSource(this.getBackgroundOverrideSource());
 		}
 		catch(Exception ex) {
 			// An error occurred while trying to clean up the background music sources
