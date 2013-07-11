@@ -45,38 +45,40 @@ class RoundEndedGameState extends GameState {
 		
 		FireEmitterConfig fireConfig = gameModel.getFireEmitterModel().getFireEmitterConfig();
 		int victoryRailFlameWidth = fireConfig.getNumEmittersPerRail()/2;
+		int victoryRingFlameWidth = fireConfig.getNumOuterRingEmitters()/2;
 		
 		// Action for the various of fire emitter areas in the game arena...
 		if (roundVictor != null) {
-			tempAction = actionFactory.buildPlayerWinAction(roundVictor.getPlayerNumber(), RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 1, 0.0);
+			tempAction = actionFactory.buildPlayerWinAction(roundVictor.getPlayerNumber(),
+					FireEmitter.Location.OUTER_RING, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 1, 0.0, victoryRingFlameWidth);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 			
-			tempAction  = actionFactory.buildCrowdPleaserBurstAction(roundVictor.getEntity(),
+			tempAction  = actionFactory.buildPlayerWinAction(roundVictor.getPlayerNumber(),
 					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
-			tempAction = actionFactory.buildCrowdPleaserBurstAction(roundVictor.getEntity(),
+			tempAction = actionFactory.buildPlayerWinAction(roundVictor.getPlayerNumber(),
 					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 		}
 		else {
-			tempAction  = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY,
-					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
+			tempAction  = actionFactory.buildPlayerWinAction(1, FireEmitter.Location.LEFT_RAIL,
+					RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
-			tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER1_ENTITY,
-					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
+			tempAction = actionFactory.buildPlayerWinAction(1, FireEmitter.Location.RIGHT_RAIL, 
+					RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 			
-			tempAction  = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER2_ENTITY,
-					FireEmitter.Location.LEFT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
+			tempAction  = actionFactory.buildPlayerWinAction(2, FireEmitter.Location.LEFT_RAIL, 
+					RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
-			tempAction = actionFactory.buildCrowdPleaserBurstAction(GameModel.Entity.PLAYER2_ENTITY,
-					FireEmitter.Location.RIGHT_RAIL, RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
+			tempAction = actionFactory.buildPlayerWinAction(2, FireEmitter.Location.RIGHT_RAIL, 
+					RoundEndedGameState.ROUND_ENDED_LENGTH_IN_SECS, 3, 0.0, victoryRailFlameWidth);
 			assert(tempAction != null);
 			this.roundEndActions.add(tempAction);
 		}

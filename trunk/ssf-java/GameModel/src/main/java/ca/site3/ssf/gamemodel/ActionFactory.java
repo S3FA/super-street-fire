@@ -952,60 +952,39 @@ final public class ActionFactory {
 	 * @param numBursts The number of bursts.
 	 * @return The resulting action, null on failure.
 	 */
-	final Action buildCrowdPleaserBurstAction(GameModel.Entity colourEntity, FireEmitter.Location location,
-								              double totalDurationInSecs, int numBursts, double delayInSecs,
-								              int numEmitters) {
+	final Action buildPlayerWinAction(int victoryPlayerNum, FireEmitter.Location location,
+								          double totalDurationInSecs, int numBursts, double delayInSecs, int numEmitters) {
 		
 		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
-		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
+		Player victoryPlayer = this.gameModel.getPlayer(victoryPlayerNum);
 
 		FireEmitterIterator emitterIter = null;
 		switch (location) {
 			case LEFT_RAIL:
-				emitterIter = fireEmitterModel.getLeftRailStartEmitterIter(0);
+				emitterIter = fireEmitterModel.getPlayerLeftHandStartEmitterIter(victoryPlayerNum);
 				break;
 			case RIGHT_RAIL:
-				emitterIter = fireEmitterModel.getRightRailStartEmitterIter(0);
+				emitterIter = fireEmitterModel.getPlayerRightHandStartEmitterIter(victoryPlayerNum);
 				break;
 			case OUTER_RING:
-				emitterIter = fireEmitterModel.getOuterRingStartEmitterIter(0, false);
+				if (victoryPlayerNum == 1) {
+					emitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_12OCLOCK_OUTER_RING_RIGHT_EMITTER, true);
+				}
+				else {
+					assert(victoryPlayerNum == 2);
+					emitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER, true);
+				}
+
 				break;
 			default:
 				assert(false);
 				return null;
 		}
 
-		Action action = new CrowdPleaserAction(fireEmitterModel, colourEntity);
+		Action action = new CrowdPleaserAction(fireEmitterModel, victoryPlayer.getEntity());
 		this.addBurstToAction(action, emitterIter, numEmitters, numBursts, totalDurationInSecs, 0.8f, 0.05f, delayInSecs);
 		return action;
 	}
-	
-	final Action buildPlayerWinAction(int victoryPlayerNum, double totalDurationInSecs, int numBursts, double delayInSecs) {
-		
-		FireEmitterModel fireEmitterModel = this.gameModel.getFireEmitterModel();
-		FireEmitterConfig fireEmitterConfig = fireEmitterModel.getConfig();
-		
-		FireEmitterIterator fireEmitterIter = null;
-		
-		Player victoryPlayer = this.gameModel.getPlayer(victoryPlayerNum);
-		assert(victoryPlayer != null);
-		
-		Action result = new CrowdPleaserAction(fireEmitterModel, victoryPlayer.getEntity());
-		if (victoryPlayerNum == 1) {
-			fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_12OCLOCK_OUTER_RING_RIGHT_EMITTER, true);
-		}
-		else {
-			assert(victoryPlayerNum == 2);
-			fireEmitterIter = fireEmitterModel.getOuterRingStartEmitterIter(FireEmitterModel.RINGMASTER_6OCLOCK_OUTER_RING_LEFT_EMITTER, true);
-		}
-
-		assert(fireEmitterIter != null);
-		this.addBurstToAction(result, fireEmitterIter, fireEmitterConfig.getNumOuterRingEmitters()/2, numBursts,
-				totalDurationInSecs, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, delayInSecs);
-		
-		return result;
-	}
-
 	
 	final Action buildCrowdPleaserTouchAction(GameModel.Entity colourEntity, FireEmitter.Location location,
 											  int index, double totalDurationInSecs, int numBursts) {

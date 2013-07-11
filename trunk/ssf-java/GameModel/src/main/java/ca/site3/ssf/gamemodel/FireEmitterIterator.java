@@ -20,7 +20,9 @@ class FireEmitterIterator {
 	final private boolean wrapAround;
 	private ListIterator<FireEmitter> iterator;
 	
-	FireEmitterIterator(List<FireEmitter> fireEmitterList, int startIdx, boolean reverseDirection, boolean wrapAround) {
+	FireEmitterIterator(List<FireEmitter> fireEmitterList, int startIdx, 
+				        boolean reverseDirection, boolean wrapAround) {
+		
 		assert(startIdx >= 0 && startIdx <= fireEmitterList.size());
 		assert(fireEmitterList != null);
 		
@@ -29,7 +31,7 @@ class FireEmitterIterator {
 		this.reverseDirection = reverseDirection;
 		this.wrapAround = wrapAround;
 		
-		// Need to accomodate the call to previous for a reversed iterator...
+		// Need to accommodate the call to previous for a reversed iterator...
 		if (this.reverseDirection) {
 			try {
 				this.iterator.next();
