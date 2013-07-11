@@ -407,10 +407,10 @@ public class SerialCommunicator implements Runnable {
 		 * IGameModelListeners
 		 */
 		SystemInfoRefreshEvent refreshEvent = new SystemInfoRefreshEvent(leftRailStatus, rightRailStatus, outerRingStatus);
-		log.debug("Notifying GUI of system status");
 		if (server != null) {
 			server.notifyGUI(refreshEvent);
 		}
+		log.info("...done querying boards and notifying GUI(s)");
 	}
 	
 	
