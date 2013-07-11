@@ -1,16 +1,18 @@
 package ca.site3.ssf.Sound;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.RingmasterActionEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
+import ca.site3.ssf.gamemodel.RingmasterAction.ActionType;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
 class RoundEndedSoundPlayer extends SoundPlayer {
-	
-	private PlaybackHandler p1VictoryAudioHandler;
-	private PlaybackHandler p2VictoryAudioHandler;
-	private PlaybackHandler tieAudioHandler;
+
+	private Map<RoundResult, PlaybackHandler> actionAudioMap = new HashMap<RoundResult, PlaybackHandler>(RoundResult.values().length);
 	
 	RoundEndedSoundPlayer(SoundPlayerController controller, RoundResult roundResult) {
 		super(controller);
@@ -18,12 +20,9 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		Properties configProperties = controller.getConfigProperties();
 		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
 
-		this.p1VictoryAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.PlayerOneVictory"), playbackSettings);
-		this.p2VictoryAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.PlayerTwoVictory"), playbackSettings);
-		this.tieAudioHandler = PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.Tie"), playbackSettings);
-		
-		// Stop all other controller sounds...
-		controller.stopAllSounds();
+		actionAudioMap.put(RoundResult.PLAYER1_VICTORY, PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.PlayerOneVictory"), playbackSettings));
+		actionAudioMap.put(RoundResult.PLAYER2_VICTORY, PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.PlayerTwoVictory"), playbackSettings));
+		actionAudioMap.put(RoundResult.TIE, PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.Tie"), playbackSettings));
 	}
 	
 	// Get the default playback settings for this sound player
@@ -43,22 +42,10 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 			return null;
 		}
 		
+		this.controller.stopAllSounds();
+		
 		RoundEndedEvent event = (RoundEndedEvent)gameModelEvent;
-		switch (event.getRoundResult()) {
-		
-			case PLAYER1_VICTORY:
-				return this.p1VictoryAudioHandler;
-			case PLAYER2_VICTORY:
-				return this.p2VictoryAudioHandler;
-			case TIE:
-				return this.tieAudioHandler;
-			
-			default:
-				assert(false);
-				break;
-		}
-		
-		return null;
+		return this.actionAudioMap.get(event.getRoundResult());
 	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
