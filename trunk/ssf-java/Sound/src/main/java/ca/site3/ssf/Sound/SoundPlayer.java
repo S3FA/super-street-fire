@@ -34,7 +34,7 @@ abstract class SoundPlayer implements ISoundPlayer {
 		
 		SoundPlayer result = null;
 		switch (gameModelEvent.getType()) {
-			
+			// based on this, get the specific action audio map entry with the appropriate casted game event type. everything can be mapped together
 			case GAME_STATE_CHANGED: {
 				result = new GameStateChangedSoundPlayer(controller);
 				break;
