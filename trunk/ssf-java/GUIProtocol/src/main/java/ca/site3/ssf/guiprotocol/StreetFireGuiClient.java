@@ -293,11 +293,13 @@ public class StreetFireGuiClient {
 				} catch (InterruptedException ex) {
 					log.warn("Interrupted waiting for a command",ex);
 				} catch (IOException ex) {
-					/* probably want some kind of callback to client here.
-					   hacky but could put a special 'error message' 
-					   IGameModelEvent on the event queue. 
-					   Otherwise dedicated error handler callback */
-					log.error("Exception sending data to server",ex);
+					log.error("Exception sending data to server, marking as not connected",ex);
+					try {
+						socket.close();
+					} catch (IOException ex2) {
+						log.error("Exception trying to close socket!", ex);
+					}
+					socket = null;
 				}
 				
 				if ( ! isConnected() ) {
@@ -333,7 +335,13 @@ public class StreetFireGuiClient {
 						}
 					}
 				} catch (IOException ex) {
-					log.warn("IOException listening on GUI input stream",ex);
+					log.warn("IOException listening on GUI input stream, marking as not connected", ex);
+					try {
+						socket.close();
+					} catch (IOException ex2) {
+						log.error("IOException trying to close socket");
+					}
+					socket = null;
 				} catch (Exception ex) {
 					log.error("Exception listening on GUI input stream",ex);
 				}
