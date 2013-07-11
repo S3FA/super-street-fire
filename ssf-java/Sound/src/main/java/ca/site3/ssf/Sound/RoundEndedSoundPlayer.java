@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
+import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
 class RoundEndedSoundPlayer extends SoundPlayer {
 	
@@ -11,7 +12,7 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 	private PlaybackHandler p2VictoryAudioHandler;
 	private PlaybackHandler tieAudioHandler;
 	
-	RoundEndedSoundPlayer(SoundPlayerController controller) {
+	RoundEndedSoundPlayer(SoundPlayerController controller, RoundResult roundResult) {
 		super(controller);
 		
 		Properties configProperties = controller.getConfigProperties();
