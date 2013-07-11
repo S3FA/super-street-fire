@@ -1,6 +1,7 @@
 package ca.site3.ssf.Sound;
 
 import ca.site3.ssf.gamemodel.IGameModelEvent;
+import ca.site3.ssf.gamemodel.RoundEndedEvent;
 
 /**
  * Super class for all sound players - implements the ISoundPlayer. Classes
@@ -43,7 +44,8 @@ abstract class SoundPlayer implements ISoundPlayer {
 				break;
 			}
 			case ROUND_ENDED: {
-				result = new RoundEndedSoundPlayer(controller);
+				RoundEndedEvent ree = (RoundEndedEvent)gameModelEvent;
+				result = new RoundEndedSoundPlayer(controller, ree.getRoundResult());
 				break;
 			}
 			case MATCH_ENDED: {
