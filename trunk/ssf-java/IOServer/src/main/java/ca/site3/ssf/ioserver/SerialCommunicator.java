@@ -200,7 +200,7 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	void setGlowfliesOn(boolean makeSurfaceHot, boolean broadcast) {
-		log.info(makeSurfaceHot ? "Turning glowflies on." : "Turning glowfiles off.");
+		log.info(makeSurfaceHot ? "Turning glowflies on." : "Turning glowflies off.");
 		this.glowfliesOn = makeSurfaceHot;
 		
 		if (broadcast) {

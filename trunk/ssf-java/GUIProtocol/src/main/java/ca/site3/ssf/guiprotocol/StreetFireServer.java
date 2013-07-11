@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
@@ -178,7 +179,7 @@ public class StreetFireServer implements Runnable {
 					isDone = true;
 					continue;
 				}
-				
+				Set<GuiHandler> droppedConnections = new HashSet<StreetFireServer.GuiHandler>();
 				try {
 					// Get the next event that occurred in the gamemodel on the server
 					GameEvent event = eventQueue.take();
@@ -191,8 +192,8 @@ public class StreetFireServer implements Runnable {
 							guiHandler.sendGameEvent(event);
 						}
 						catch (IOException ex) {
-							log.error("Exception sending GameEvent to GUI client. Removing handler", ex);
-							iter.remove();
+							log.warn("Exception sending GameEvent to GUI client. Removing handler", ex);
+							droppedConnections.add(guiHandler);
 						}
 						
 						if (!serverSocket.isBound() || serverSocket.isClosed()) {
@@ -204,6 +205,7 @@ public class StreetFireServer implements Runnable {
 				} catch (InterruptedException ex) {
 					log.warn("Interrupted waiting for an event", ex);
 				}
+				activeHandlers.removeAll(droppedConnections);
 			}
 			
 			// Make sure we tell the server that it's no longer viable, stop its socket accepting thread.
