@@ -365,7 +365,7 @@ public class SerialCommunicator implements Runnable {
 				this.out.write(messageTemplate);
 				this.out.flush();
 				try {
-					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(1, TimeUnit.MILLISECONDS);
+					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(40, TimeUnit.MILLISECONDS);
 					if (status != null) {
 						systemStatus[status.deviceId - 1] = status;
 					}
