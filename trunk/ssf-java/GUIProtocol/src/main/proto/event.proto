@@ -202,4 +202,7 @@ message GameEvent {
   // reuse attackType
   optional AttackFailureReason attackFailureReason = 32;
   
+  // Also for GameInfoRefreshEvent:
+  optional float player1ActionPoints = 33;
+  optional float player2ActionPoints = 34;
 }
