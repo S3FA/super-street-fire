@@ -139,7 +139,7 @@ public class IOServer {
 		gameEventRouter = new GameEventRouter(guiServer, serialComm);
 		game.addGameModelListener(gameEventRouter);
 		
-		eventAggregator = new GloveEventCoalescer(startTime, 0.5, commManager.getCommInQueue(), commManager.getGestureQueue());
+		eventAggregator = new GloveEventCoalescer(startTime, commManager.getCommInQueue(), commManager.getGestureQueue());
 
 		Thread eventAggregatorThread = new Thread(eventAggregator, "Event aggregator thread");
 		eventAggregatorThread.start();
