@@ -222,10 +222,9 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 			int iteration = getNextFileIteration(GESTURE_INSTANCE_FILE_EXT);
 	       
 	        // Save the data to a file readable by the GestureRecognizer
+			filename = this.getFileSaveDirectory() + "/" + gestureName.getSelectedItem().toString() + 
+				Integer.toString(iteration) + "." + GESTURE_INSTANCE_FILE_EXT;
 			
-			filename = this.saveDirTextBox.getText() +
-	        		"/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + 
-	        		"." + GESTURE_INSTANCE_FILE_EXT;
 			File recognizerFile = new File(filename);
 			filename = recognizerFile.toString();
 			
@@ -272,12 +271,32 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		int iteration = 0;
 		
         // If the file exists, check if the next iteration of the file exists until we can make a new one
-        while (new File(this.saveDirTextBox.getText() + 
+        while (new File(this.getFileSaveDirectory() + 
         		"/" + gestureName.getSelectedItem().toString() + Integer.toString(iteration) + "." + suffix).exists()) {
         	iteration++;
         }
         
         return iteration;
+	}
+	
+	public String getFileSaveDirectory() {
+		// Special magic: check to see if the directory that we're saving to has the same lower-case
+		// name as the gesture we're saving, if not then look in that directory for a directory
+		// that does and save it in there...
+		String gestureStringName = this.gestureName.getSelectedItem().toString();
+		String gestureStringNameLC = gestureStringName.toLowerCase();
+		String expectedGestureDirNameLC = gestureStringNameLC + "s";
+		File saveDir = new File(this.saveDirTextBox.getText());
+		String dirName = saveDir.getName();
+		
+		String dir;
+		if (!dirName.equals(expectedGestureDirNameLC)) {
+			dir = this.saveDirTextBox.getText() + "/" + expectedGestureDirNameLC;
+		}
+		else {
+			dir = this.saveDirTextBox.getText();
+		}
+		return dir;
 	}
 	
 	// Gets the state of the csv export checkbox

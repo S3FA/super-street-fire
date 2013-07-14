@@ -91,8 +91,7 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 		Thread producerThread = new Thread(gloveListener, "Glove listener Thread");
 		producerThread.start();
 		
-		final double TWO_HANDED_BUTTON_DOWN_THRESHOLD_IN_SECS = 0.5;
-		this.eventAggregator = new GloveEventCoalescer(System.currentTimeMillis(), TWO_HANDED_BUTTON_DOWN_THRESHOLD_IN_SECS, eventQueue, gestureQueue);
+		this.eventAggregator = new GloveEventCoalescer(System.currentTimeMillis(), eventQueue, gestureQueue);
 		Thread eventAggregatorThread = new Thread(this.eventAggregator, "Event aggregator thread");
 		eventAggregatorThread.start();
 		

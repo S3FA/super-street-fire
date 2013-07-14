@@ -25,9 +25,13 @@ public class DeviceDataParser implements IDeviceDataParser {
 	
 	private DeviceStatus deviceStatus;
 	
-	// gX:69.68,gY:-77.45,gZ:-20.77,aX:-265.64,aY:239.84,aZ:4228.79,RLL:0.69,PCH:-2.46|
-	private final Pattern pattern = Pattern.compile("^gX:([^,]+),gY:([^,]+),gZ:([^,]+),aX:([^,]+),aY:([^,]+),aZ:([^,]+),RLL:([^,]+),PCH:([^|]+)\\|$");
 	
+	private final Pattern pattern =
+			// gX:69.68,gY:-77.45,gZ:-20.77,aX:-265.64,aY:239.84,aZ:4228.79,RLL:0.69,PCH:-2.46|
+			//Pattern.compile("^gX:([^,]+),gY:([^,]+),gZ:([^,]+),aX:([^,]+),aY:([^,]+),aZ:([^,]+),RLL:([^,]+),PCH:([^|]+)\\|$");
+			// aX:-265.64,aY:239.84,aZ:4228.79,YAW:21.9,PCH:-2.46,RLL:0.69|
+			Pattern.compile("^aX:([^,]+),aY:([^,]+),aZ:([^,]+),YAW:([^,]+),PCH:([^,]+),RLL:([^|]+)\\|$");
+			
 	public DeviceDataParser(DeviceStatus deviceStatus) {
 		this.deviceStatus = deviceStatus;
 	}
@@ -84,7 +88,7 @@ public class DeviceDataParser implements IDeviceDataParser {
 			return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), GloveEvent.EventType.BUTTON_UP_EVENT, gyro, accel, heading);
 		}
 		else {
-			if (dataStr.startsWith("gX") == false) {
+			if (dataStr.startsWith("aX") == false) {
 				log.warn("Ignoring data: '{}'",dataStr);
 				return null;
 			}
@@ -99,21 +103,23 @@ public class DeviceDataParser implements IDeviceDataParser {
 				return null;
 			}
 			
-			double[] gyro = new double[3];
-			double[] accel = new double[3];
+			double[] gyro = new double[] { 0, 0, 0 };
+			double[] accel = new double[] { 0, 0, 0 };
 			double[] heading = new double[] { 0, 0, 0 };
 			
 			for (int i=0; i<3; i++) {
 				try {
-					gyro[i] = Double.parseDouble(m.group(i+1));
-					accel[i] = Double.parseDouble(m.group(i+4));
+					gyro[i]    = 0.0; // Not currently recording Gyro
+					accel[i]   = Double.parseDouble(m.group(i+1));
+					heading[i] = Double.parseDouble(m.group(i+4));
 				} catch (NumberFormatException ex) {
 					log.error("Failed parsing glove data",ex);
 					return null;
 				}
 			}
 	
-			return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), GloveEvent.EventType.DATA_EVENT, gyro, accel, heading);
+			return new GloveEvent(d.entity, d.type, System.currentTimeMillis(), GloveEvent.EventType.DATA_EVENT, 
+					gyro, accel, heading);
 		}
 	}
 }

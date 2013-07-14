@@ -61,7 +61,12 @@ public class GloveEventCoalescer implements Runnable {
 	 * glove forgets to send a Button up event. This value represents the maximum wait time
 	 * between any series of glove events before those events are coalesced.
 	 */
-	private static final long MAX_TIME_TO_WAIT_FOR_BUTTON_UP_EVENT_MS = 800;
+	private static final long MAX_TIME_TO_WAIT_FOR_BUTTON_UP_EVENT_MS = 600;
+	
+	/**
+	 * The maximum wait time between button's down/up on both gloves to combine them into a single gesture.
+	 */
+	private static final double MAX_TIME_BETWEEN_TWO_HANDED_GESTURE_BUTTON_RELEASE_IN_SECS = 0.55;
 	
 	// These queues hold the accumulated data that will make up a distinct gesture once coalesced
 	protected Queue<GloveEvent> p1LeftQueue  = new LinkedList<GloveEvent>();
@@ -101,7 +106,7 @@ public class GloveEventCoalescer implements Runnable {
 	 * @param deviceEventQueue objects will be consumed from this queue
 	 * @param gestureInstanceQueue this queue will be populated
 	 */
-	public GloveEventCoalescer(long startTime, double bothButtonsDownThresholdInSecs,
+	public GloveEventCoalescer(long startTime,
 							   BlockingQueue<DeviceEvent> deviceEventQueue,
 							   BlockingQueue<EntityGestureInstance> gestureInstanceQueue) {
 		
@@ -109,7 +114,7 @@ public class GloveEventCoalescer implements Runnable {
 		this.gestureInstanceQueue = gestureInstanceQueue;
 		
 		this.startTime = startTime;
-		this.bothButtonsDownThreshold = bothButtonsDownThresholdInSecs * 1000.0;
+		this.bothButtonsDownThreshold = MAX_TIME_BETWEEN_TWO_HANDED_GESTURE_BUTTON_RELEASE_IN_SECS * 1000.0;
 	}
 	
 	

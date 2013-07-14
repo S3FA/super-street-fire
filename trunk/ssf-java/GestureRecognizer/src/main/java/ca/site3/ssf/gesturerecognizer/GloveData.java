@@ -10,7 +10,7 @@ import ca.site3.ssf.common.Algebra;
 /**
  * A class for representing a single point of a single glove's data for Super Street Fire.
  * A glove's data consists of three 3-vectors of information:
- * - Gyroscopic data on x,y,z
+ * - Gyroscope data on x,y,z
  * - Accelerometer data on x,y,z
  * - Magnetometer data on x,y,z
  * 
