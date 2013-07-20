@@ -205,7 +205,16 @@ public class StreetFireServer implements Runnable {
 				} catch (InterruptedException ex) {
 					log.warn("Interrupted waiting for an event", ex);
 				}
+				
 				activeHandlers.removeAll(droppedConnections);
+				
+				// Kill all the dropped connections
+				Iterator<GuiHandler> droppedIter = droppedConnections.iterator();
+				while (droppedIter.hasNext()) {
+					GuiHandler droppedHandler = droppedIter.next();
+					droppedHandler.stop();
+				}
+				
 			}
 			
 			// Make sure we tell the server that it's no longer viable, stop its socket accepting thread.
@@ -236,6 +245,8 @@ public class StreetFireServer implements Runnable {
 				.setMatchResult(SerializationHelper.matchResultToProtobuf(e.getMatchResult()))
 				.setPlayer1Health(e.getPlayer1Health())
 				.setPlayer2Health(e.getPlayer2Health())
+				.setPlayer1ActionPoints(e.getPlayer1ActionPoints())
+				.setPlayer2ActionPoints(e.getPlayer2ActionPoints())
 				.setRoundBeginTimer(SerializationHelper.roundBeginCountdownTimerToProtobuf(e.getRoundBeginCountdown()))
 				.setRoundInPlayTimer(e.getRoundInPlayTimer())
 				.setTimedOut(e.getRoundTimedOut());

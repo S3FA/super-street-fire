@@ -47,7 +47,7 @@ public class GloveEventCoalescer implements Runnable {
 	 * How many {@link GloveEvent}s to cache before aggregating into
 	 * a {@link GestureInstance}.
 	 */
-	private static final int GLOVE_DATA_CACHE_SIZE   = 150;
+	private static final int GLOVE_DATA_CACHE_SIZE   = 200;
 	/**
 	 * How many {@link HeadsetEvent}s to cache before aggregating into
 	 * a {@link GestureInstance}.
