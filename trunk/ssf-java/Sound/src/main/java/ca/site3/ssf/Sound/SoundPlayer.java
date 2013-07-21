@@ -43,6 +43,10 @@ abstract class SoundPlayer implements ISoundPlayer {
 				result = new PlayerAttackActionSoundPlayer(controller);
 				break;
 			}
+			case PLAYER_BLOCK_ACTION: {
+				result = new PlayerBlockActionSoundPlayer(controller);
+				break;
+			}
 			case ROUND_ENDED: {
 				RoundEndedEvent ree = (RoundEndedEvent)gameModelEvent;
 				result = new RoundEndedSoundPlayer(controller, ree.getRoundResult());
