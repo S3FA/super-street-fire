@@ -13,6 +13,9 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 	private Map<AttackType, PlaybackHandler> attackAudioMap =
 			new HashMap<AttackType, PlaybackHandler>(AttackType.values().length);
 	
+	// A special playback handler that occurs one in ten times for nyan cat
+	private PlaybackHandler nyanWaits = null;
+	
 	PlayerAttackActionSoundPlayer(SoundPlayerController controller) {
 		super(controller);
 		
@@ -51,6 +54,8 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		
 		attackAudioMap.put(AttackType.NYAN_CAT_ATTACK, PlaybackHandler.build(controller, configProperties.getProperty("AttackType.NyanCatAttack"), 
 				new PlaybackSettings(globalSettings.getVolume(), false, true)));
+		
+		nyanWaits = PlaybackHandler.build(controller, configProperties.getProperty("AttackType.NyanWaitsAttack"), new PlaybackSettings(globalSettings.getVolume(), false, true));
 	}
 	
 	// Get the default playback settings for this sound player
@@ -60,6 +65,13 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 		}
 		
 		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
+
+		// 10% of the time nyan cat is triggered, play Nyan Waits instead
+		if(event.getAttackType() == AttackType.NYAN_CAT_ATTACK && Math.random() > 0.9)
+		{
+			return nyanWaits;
+		}
+		
 		return this.attackAudioMap.get(event.getAttackType());
 	}
 	
