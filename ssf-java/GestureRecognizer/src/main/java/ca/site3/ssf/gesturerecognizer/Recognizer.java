@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
+import org.apache.commons.math.stat.ranking.NaNStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +77,8 @@ class Recognizer {
 		
 		// Clean up the data set based on the gesture type...
 		dataSet.cleanUpForGestureType(this.gestureType);
-		
-		if (this.recognizer != null) {
+
+		if (this.recognizer != null && this.recognizer.getPi(0) != Double.NaN) {
 			this.trainMore(dataSet);
 		}
 		else {

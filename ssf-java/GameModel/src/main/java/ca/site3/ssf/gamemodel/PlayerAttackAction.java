@@ -10,32 +10,32 @@ public class PlayerAttackAction extends Action {
 		CUSTOM_UNDEFINED_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 0),
 		
 		// Basic Attacks
-		LEFT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
-		RIGHT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f), 
-		LEFT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
-		RIGHT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
-		LEFT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
-		RIGHT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
-		LEFT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
-		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 10.0f),
+		LEFT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f),
+		RIGHT_JAB_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f), 
+		LEFT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f),
+		RIGHT_HOOK_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f),
+		LEFT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f),
+		RIGHT_UPPERCUT_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f),
+		LEFT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f),
+		RIGHT_CHOP_ATTACK(Integer.MAX_VALUE, Integer.MAX_VALUE, 20.0f),
 		
 		// Special Attacks
-		HADOUKEN_ATTACK(Integer.MAX_VALUE, 2, 2, 34.0f),
-		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 2, 2, 34.0f),
-		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 2, 2, 34.0f),
-		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 2, 2, 25.0f),
-		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 2, 2, 50.0f),
-		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 2, 2, 50.0f),
-		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 50.0f),
-		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 50.0f),
+		HADOUKEN_ATTACK(Integer.MAX_VALUE, 2, 2, 40.0f),
+		LEFT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 1, 2, 50.0f),
+		RIGHT_SHORYUKEN_ATTACK(Integer.MAX_VALUE, 1, 2, 50.0f),
+		SONIC_BOOM_ATTACK(Integer.MAX_VALUE, 2, 2, 40.0f),
+		DOUBLE_LARIAT_ATTACK(Integer.MAX_VALUE, 1, 2, 55.0f),
+		SUMO_HEADBUTT_ATTACK(Integer.MAX_VALUE, 2, 2, 40.0f),
+		LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 55.0f),
+		RIGHT_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 55.0f),
 		TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK(Integer.MAX_VALUE, 1, 1, 75.0f),
 		PSYCHO_CRUSHER_ATTACK(Integer.MAX_VALUE, 1, 1, 75.0f),
 		
 		// Easter Egg Attacks
 		YMCA_ATTACK(1, 1, 1, 95.0f),
 		NYAN_CAT_ATTACK(1, 1, 1, 95.0f),
-		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1, 1, 95.0f),
-		SUCK_IT_ATTACK(1, 1, 1, 95.0f);
+		ARM_WINDMILL_ATTACK(Integer.MAX_VALUE, 1, 1, 80.0f),
+		SUCK_IT_ATTACK(1, 1, 1, 60.0f);
 		
 		private final int maxUsesPerRound;         // Maximum of this attack type that are allowed per-round
 		private final int numAllowedActiveAtATime; // Maximum of this attack type that are allowed to be active at any given time in a round

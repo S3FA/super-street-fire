@@ -24,8 +24,8 @@ import be.ac.ulg.montefiore.run.jahmm.io.FileFormatException;
  */
 class RecognizerManager {
 	
-	static final int NUM_ONE_HANDED_PLAYER_GESTURE_NODES = 6;
-	static final int NUM_TWO_HANDED_PLAYER_GESTURE_NODES = 9;
+	static final int NUM_ONE_HANDED_PLAYER_GESTURE_NODES = 5;
+	static final int NUM_TWO_HANDED_PLAYER_GESTURE_NODES = 7;
 	
 	static final int NUM_ONE_HANDED_RINGMASTER_GESTURE_NODES = 5;
 	static final int NUM_TWO_HANDED_RINGMASTER_GESTURE_NODES = 7;
@@ -290,7 +290,7 @@ class RecognizerManager {
 			return null;
 		}
 		
-		logger.info("Best found matching gesture: " + bestGesture.toString());
+		logger.info("Best matching gesture: " + bestGesture.toString());
 		return bestGesture;
 	}
 	
