@@ -24,10 +24,10 @@ class MatchEndedGameState extends GameState {
 		GameModelActionSignaller actionSignaller = this.gameModel.getActionSignaller();
 		assert(actionSignaller != null);
 		if (victoryPlayer.getPlayerNumber() == 1) {
-			actionSignaller.fireOnMatchEnded(MatchResult.PLAYER1_VICTORY);
+			actionSignaller.fireOnMatchEnded(MatchResult.PLAYER1_VICTORY, this.gameModel.getPlayer1().getHealth(), this.gameModel.getPlayer2().getHealth());
 		}
 		else {
-			actionSignaller.fireOnMatchEnded(MatchResult.PLAYER2_VICTORY);
+			actionSignaller.fireOnMatchEnded(MatchResult.PLAYER2_VICTORY, this.gameModel.getPlayer1().getHealth(), this.gameModel.getPlayer2().getHealth());
 		}
 		
 		// Add match end actions to show the victory player's flames in all their glory...
