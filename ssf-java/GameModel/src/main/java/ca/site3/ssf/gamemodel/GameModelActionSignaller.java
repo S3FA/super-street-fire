@@ -121,8 +121,8 @@ class GameModelActionSignaller {
 	 * @param roundResult The round result.
 	 * @param roundTimedOut Whether the round timed out or not.
 	 */
-	void fireOnRoundEnded(int roundNumber, RoundResult roundResult, boolean roundTimedOut) {
-		RoundEndedEvent event = new RoundEndedEvent(roundNumber, roundResult, roundTimedOut);
+	void fireOnRoundEnded(int roundNumber, RoundResult roundResult, boolean roundTimedOut, double p1Health, double p2Health) {
+		RoundEndedEvent event = new RoundEndedEvent(roundNumber, roundResult, roundTimedOut, p1Health, p2Health);
 		this.fireGameModelEvent(event);
 	}
 	

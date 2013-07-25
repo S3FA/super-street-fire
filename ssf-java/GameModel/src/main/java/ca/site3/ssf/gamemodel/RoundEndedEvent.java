@@ -13,11 +13,20 @@ public final class RoundEndedEvent implements IGameModelEvent {
 	final private RoundResult roundResult;   // The result of the round
 	final private boolean roundTimedOut;	// Whether the round timed out or not, in the case of a tie breaker round, this will always be true
 	
-	public RoundEndedEvent(int roundNumber, RoundResult roundResult, boolean roundTimedOut) {
+	final private double p1Health;
+	final private double p2Health;
+	
+	static final public double TOASTY_THRESHOLD = 0.5;
+	
+	
+	public RoundEndedEvent(int roundNumber, RoundResult roundResult, boolean roundTimedOut, double p1Health, double p2Health) {
 		super();
 		this.roundNumber   = roundNumber;
 		this.roundResult   = roundResult;
 		this.roundTimedOut = roundTimedOut;
+		
+		this.p1Health = p1Health;
+		this.p2Health = p2Health;
 	}
 	
 	public int getRoundNumber() {
@@ -35,5 +44,25 @@ public final class RoundEndedEvent implements IGameModelEvent {
 	public Type getType() {
 		return Type.ROUND_ENDED;
 	}
-
+	
+	
+	public boolean isToasty() {
+		return getWinnerHealth() > Player.FULL_HEALTH * TOASTY_THRESHOLD;
+	}
+	
+	public boolean isPerfect() {
+		return getWinnerHealth() == Player.FULL_HEALTH;
+	}
+	
+	
+	private double getWinnerHealth() {
+		switch (roundResult) {
+		case PLAYER1_VICTORY:
+			return p1Health;
+		case PLAYER2_VICTORY:
+			return p2Health;
+		default:
+			return 0;
+		}
+	}
 }

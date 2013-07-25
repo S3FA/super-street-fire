@@ -118,7 +118,7 @@ class TieBreakerGameState extends PlayerFightingGameState {
 		
 		victoryPlayer.incrementNumRoundWins();
 		this.gameModel.addRoundResult(result);
-		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, false);
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, false, gameModel.getPlayer1().getHealth(), gameModel.getPlayer2().getHealth());
 		this.gameModel.setNextGameState(new MatchEndedGameState(this.gameModel, victoryPlayer));
 	}
 	

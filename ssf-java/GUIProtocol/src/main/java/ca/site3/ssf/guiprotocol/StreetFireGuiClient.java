@@ -396,7 +396,7 @@ public class StreetFireGuiClient {
 			return new RoundBeginTimerChangedEvent(SerializationHelper.protobufToRoundBeginCountdownTimer(e.getRoundBeginTimer()), e.getRoundNumber());
 			
 		case ROUND_ENDED:
-			return new RoundEndedEvent(e.getRoundNumber(), SerializationHelper.protobufToRoundResult(e.getRoundResult()), e.getTimedOut());
+			return new RoundEndedEvent(e.getRoundNumber(), SerializationHelper.protobufToRoundResult(e.getRoundResult()), e.getTimedOut(), e.getPlayer1Health(), e.getPlayer2Health());
 			
 		case ROUND_PLAY_TIMER_CHANGED:
 			return new RoundPlayTimerChangedEvent(e.getTimeInSecs());

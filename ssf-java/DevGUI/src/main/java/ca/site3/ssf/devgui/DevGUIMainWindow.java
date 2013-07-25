@@ -368,7 +368,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 			int roundNumber = roundResults.size();
 			int roundIndex  = roundNumber - 1;
 			
-			this.onRoundEnded(new RoundEndedEvent(roundNumber, roundResults.get(roundIndex), event.getRoundTimedOut()));
+			this.onRoundEnded(new RoundEndedEvent(roundNumber, roundResults.get(roundIndex), event.getRoundTimedOut(), event.getPlayer1Health(), event.getPlayer2Health()));
 			break;
 		}
 		
