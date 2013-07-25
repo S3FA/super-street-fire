@@ -36,7 +36,7 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 	private String backgroundOverrideSource;
 	
 	private GameStateType currentGameState; 
-
+	
 	SoundSystem mySoundSystem;
 	
 	public SoundPlayerController(AudioSettings settings) {

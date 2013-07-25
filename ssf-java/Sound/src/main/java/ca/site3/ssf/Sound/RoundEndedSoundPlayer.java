@@ -11,11 +11,12 @@ import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 class RoundEndedSoundPlayer extends SoundPlayer {
 
 	private Map<RoundResult, PlaybackHandler> actionAudioMap = new HashMap<RoundResult, PlaybackHandler>(RoundResult.values().length);
+	private Properties configProperties;
 	
 	RoundEndedSoundPlayer(SoundPlayerController controller, RoundResult roundResult) {
 		super(controller);
 		
-		Properties configProperties = controller.getConfigProperties();
+		configProperties = controller.getConfigProperties();
 		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
 
 		actionAudioMap.put(RoundResult.PLAYER1_VICTORY, PlaybackHandler.build(controller, configProperties.getProperty("RoundResult.PlayerOneVictory"), playbackSettings));
@@ -43,7 +44,20 @@ class RoundEndedSoundPlayer extends SoundPlayer {
 		this.controller.stopAllSounds();
 		
 		RoundEndedEvent event = (RoundEndedEvent)gameModelEvent;
-		return this.actionAudioMap.get(event.getRoundResult());
+		PlaybackHandler playbackHandler = this.actionAudioMap.get(event.getRoundResult());
+		
+		if (event.isPerfect())
+		{
+			playbackHandler.hasFollowupSound = true;
+			playbackHandler.followupSoundSource = configProperties.getProperty("RoundResult.Perfect");
+		}
+		else if(event.isToasty())
+		{
+			playbackHandler.hasFollowupSound = true;
+			playbackHandler.followupSoundSource = configProperties.getProperty("RoundResult.Toasty");
+		}
+		
+		return playbackHandler;
 	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
