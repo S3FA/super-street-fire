@@ -22,6 +22,8 @@ class PlaybackHandler {
 	private URL audioFileURL;
 	private PlaybackSettings settings;
 	
+	public boolean hasFollowupSound = false;
+	public String followupSoundSource = null;
 	public boolean isBackgroundPlayer;
 
 	static PlaybackHandler build(SoundPlayerController controller, String source, PlaybackSettings settings) {
@@ -99,6 +101,13 @@ class PlaybackHandler {
 			else
 			{
 				controller.mySoundSystem.play(this.sourceName);
+				
+				if (hasFollowupSound)
+				{
+					File followupFile = new File(controller.getResourcePath() + followupSoundSource);
+					URL followupURL = followupFile.toURI().toURL();
+					controller.mySoundSystem.queueSound(this.sourceName, followupURL, followupSoundSource);
+				}
 			}
 		}catch (Exception e) {
 			logger.warn("Exception while attempting to play the ogg in playbackHandler.", e);
