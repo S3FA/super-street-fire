@@ -44,12 +44,7 @@ class PlayerBlockActionSoundPlayer extends SoundPlayer {
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
 		return false;
 	}
-	
-	private PlaybackSettings getDefaultPlaybackSettings()
-	{
-		return new PlaybackSettings(controller.getAudioSettings().getVolume(), false, false);
-	}
-	
+
 	public PlaybackSettings getPlaybackSettings(AudioSettings globalSettings, IGameModelEvent gameModelEvent) {
 		assert(globalSettings != null);
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.PLAYER_ATTACK_ACTION) {
