@@ -35,7 +35,7 @@ class RecordingPanel extends JPanel {
 		this.loggerPanel = new LoggerPanel("Log");
 		this.loggerPanel.setTextAreaSize(20, 100);
 
-		this.fileInfoPanel = new FileInfoPanel();
+		this.fileInfoPanel = new FileInfoPanel(this.loggerPanel);
 		
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new FlowLayout(FlowLayout.CENTER));

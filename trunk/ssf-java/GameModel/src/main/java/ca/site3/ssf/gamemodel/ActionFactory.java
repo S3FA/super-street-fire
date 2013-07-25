@@ -135,7 +135,7 @@ final public class ActionFactory {
 				
 				final double JAB_BASE_ACCELERATION   = 0.0;
 				final double JAB_TIME_LENGTH_IN_SECS = 1.75;
-				final float JAB_DAMAGE_PER_FLAME     = 3.5f;
+				final float JAB_DAMAGE_PER_FLAME     = 5.0f;
 				final int JAB_NUM_FLAMES             = 1;
 				
 				if (leftHand) {
@@ -158,16 +158,24 @@ final public class ActionFactory {
 				
 				final double BASE_ACCELERATION   = 0.0;
 				final double TIME_LENGTH_IN_SECS = 2.25;
-				final float DAMAGE_PER_FLAME     = 5.0f;
+				final float DAMAGE_PER_FLAME     = 7.0f;
 				final int NUM_FLAMES             = 1;
 				
 				if (leftHand) {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK, blockerOrAttacker, attackee, DAMAGE_PER_FLAME);
+					PlayerAttackAction.AttackType attackType = (playerActionType == ActionType.HOOK_ATTACK) ? 
+							PlayerAttackAction.AttackType.LEFT_HOOK_ATTACK :
+							PlayerAttackAction.AttackType.LEFT_UPPERCUT_ATTACK;
+					
+					action = new PlayerAttackAction(fireEmitterModel, attackType, blockerOrAttacker, attackee, DAMAGE_PER_FLAME);
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerLeftHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
 							NUM_FLAMES, TIME_LENGTH_IN_SECS, BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
 				else {
-					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK, blockerOrAttacker, attackee, DAMAGE_PER_FLAME);
+					PlayerAttackAction.AttackType attackType = (playerActionType == ActionType.HOOK_ATTACK) ? 
+							PlayerAttackAction.AttackType.RIGHT_HOOK_ATTACK :
+							PlayerAttackAction.AttackType.RIGHT_UPPERCUT_ATTACK;
+					
+					action = new PlayerAttackAction(fireEmitterModel, attackType, blockerOrAttacker, attackee, DAMAGE_PER_FLAME);
 					success &= this.addAcceleratingWaveToAction(action, fireEmitterModel.getPlayerRightHandStartEmitterIter(playerNum), fireEmitterConfig.getNumEmittersPerRail(),
 							NUM_FLAMES, TIME_LENGTH_IN_SECS, BASE_ACCELERATION, DEFAULT_FULL_ON_FRACTION, DEFAULT_FULL_OFF_FRACTION, 0.0);
 				}
@@ -178,8 +186,8 @@ final public class ActionFactory {
 				assert(leftHand || rightHand);
 				
 				final double CHOP_BASE_ACCELERATION   = 0.25;
-				final double CHOP_TIME_LENGTH_IN_SECS = 2.0;
-				final float CHOP_DAMAGE_PER_FLAME     = 4.0f;
+				final double CHOP_TIME_LENGTH_IN_SECS = 2.25;
+				final float CHOP_DAMAGE_PER_FLAME     = 9.0f;
 				final int CHOP_NUM_FLAMES             = 1;
 				
 				if (leftHand) {
@@ -197,10 +205,11 @@ final public class ActionFactory {
 			
 			case HADOUKEN_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 14.0f;
 				final double HADOUKEN_BASE_ACCELERATION   = 0.0;
-				final double HADOUKEN_TIME_LENGTH_IN_SECS = 3.0;
-				final float HADOUKEN_DAMAGE_PER_FLAME     = 3.0f;
-				final int HADOUKEN_NUM_FLAMES             = 2;
+				final double HADOUKEN_TIME_LENGTH_IN_SECS = 2.8;
+				final int HADOUKEN_NUM_FLAMES             = 1;
+				final float HADOUKEN_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(HADOUKEN_NUM_FLAMES * 2);
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.HADOUKEN_ATTACK, playerNum,
 						HADOUKEN_TIME_LENGTH_IN_SECS, HADOUKEN_BASE_ACCELERATION, HADOUKEN_NUM_FLAMES, HADOUKEN_DAMAGE_PER_FLAME);
@@ -222,11 +231,13 @@ final public class ActionFactory {
 			
 			case SHORYUKEN_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 24.0f;
 				final double SHORYUKEN_BASE_ACCELERATION   = 0.25;
 				final double SHORYUKEN_TIME_LENGTH_IN_SECS = 3.0;
-				final float SHORYUKEN_DAMAGE_PER_FLAME    = 6.0f;
-				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND = 2;
-				final int SHORYUKEN_NUM_FLAMES_OFFHAND    = 1;
+				final int SHORYUKEN_NUM_FLAMES_PUNCH_HAND  = 2;
+				final int SHORYUKEN_NUM_FLAMES_OFFHAND     = 1;
+				final float SHORYUKEN_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / 
+						(float)(SHORYUKEN_NUM_FLAMES_PUNCH_HAND + SHORYUKEN_NUM_FLAMES_OFFHAND);
 
 				if (leftHand) {
 					action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_SHORYUKEN_ATTACK, blockerOrAttacker, attackee, SHORYUKEN_DAMAGE_PER_FLAME);
@@ -280,10 +291,11 @@ final public class ActionFactory {
 			
 			case SONIC_BOOM_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 11.0f;
 				final double SONIC_BOOM_BASE_ACCELERATION   = 0.0;
 				final double SONIC_BOOM_TIME_LENGTH_IN_SECS = 2.0;
-				final float SONIC_BOOM_DAMAGE_PER_FLAME     = 3.5f;
 				final int SONIC_BOOM_NUM_FLAMES             = 1;
+				final float SONIC_BOOM_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(SONIC_BOOM_NUM_FLAMES * 2);
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SONIC_BOOM_ATTACK, playerNum,
 						SONIC_BOOM_TIME_LENGTH_IN_SECS, SONIC_BOOM_BASE_ACCELERATION,
@@ -307,10 +319,11 @@ final public class ActionFactory {
 			
 			case DOUBLE_LARIAT_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 20.0f;
 				final double DOUBLE_LARIAT_BASE_ACCELERATION   = 0.0;
 				final double DOUBLE_LARIAT_TIME_LENGTH_IN_SECS = 4.0;
-				final float DOUBLE_LARIAT_DAMAGE_PER_FLAME     = 3.5f;
 				final int DOUBLE_LARIAT_NUM_FLAMES             = 2;
+				final float DOUBLE_LARIAT_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(DOUBLE_LARIAT_NUM_FLAMES * 2);
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.DOUBLE_LARIAT_ATTACK, playerNum,
 						DOUBLE_LARIAT_TIME_LENGTH_IN_SECS, DOUBLE_LARIAT_BASE_ACCELERATION,
@@ -362,10 +375,11 @@ final public class ActionFactory {
 			
 			case SUMO_HEADBUTT_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 13.0f;
 				final double SUMO_HEADBUTT_BASE_ACCELERATION   = 0.0;
 				final double SUMO_HEADBUTT_TIME_LENGTH_IN_SECS = 3.0;
-				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME     = 2.0f;
 				final int SUMO_HEADBUTT_NUM_FLAMES             = 1;
+				final float SUMO_HEADBUTT_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(SUMO_HEADBUTT_NUM_FLAMES * 2);
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.SUMO_HEADBUTT_ATTACK, playerNum,
 						SUMO_HEADBUTT_TIME_LENGTH_IN_SECS, SUMO_HEADBUTT_BASE_ACCELERATION,
@@ -391,8 +405,8 @@ final public class ActionFactory {
 				
 				final double ONE_HUND_HAND_SLAP_BASE_ACCELERATION   = 0.0;
 				final double ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS = 3.0;
-				final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME     = 2.0f;
-				final int ONE_HUND_HAND_SLAP_NUM_FLAMES             = 3;
+				
+				final int ONE_HUND_HAND_SLAP_NUM_FLAMES = 3;
 				
 				final int TWO_HANDED_NUM_RANDOM_BURSTS = 12;
 				final int ONE_HANDED_NUM_RANDOM_BURSTS = TWO_HANDED_NUM_RANDOM_BURSTS / 2;
@@ -401,6 +415,8 @@ final public class ActionFactory {
 				double currDelayCount = ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS * 0.1;
 				
 				if (leftHand && rightHand) {
+					final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME = 3.5f;
+					
 					action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.TWO_HANDED_ONE_HUNDRED_HAND_SLAP_ATTACK, playerNum,
 							ONE_HUND_HAND_SLAP_TIME_LENGTH_IN_SECS, ONE_HUND_HAND_SLAP_BASE_ACCELERATION,
 							ONE_HUND_HAND_SLAP_NUM_FLAMES, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
@@ -418,7 +434,8 @@ final public class ActionFactory {
 					
 				}
 				else {
-
+					final float ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME = 5.0f;
+					
 					if (leftHand) {
 						action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.LEFT_ONE_HUNDRED_HAND_SLAP_ATTACK,
 								blockerOrAttacker, attackee, ONE_HUND_HAND_SLAP_DAMAGE_PER_FLAME);
@@ -461,9 +478,11 @@ final public class ActionFactory {
 			
 			case PSYCHO_CRUSHER_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 24.0f;
+				
 				final double PSYCHO_CRUSHER_TIME_LENGTH_IN_SECS = 2.25;
-				final float PSYCHO_CRUSHER_DAMAGE_PER_FLAME     = 2.5f;
 				final int PSYCHO_CRUSHER_NUM_FLAMES             = 3;
+				final float PSYCHO_CRUSHER_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(PSYCHO_CRUSHER_NUM_FLAMES * 2);
 				final double PSYCHO_CRUSHER_BASE_ACCELERATION   = 0.0;
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.PSYCHO_CRUSHER_ATTACK, playerNum,
@@ -488,10 +507,12 @@ final public class ActionFactory {
 			
 			case YMCA_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 28.0f;
+				
 				final double YMCA_BASE_ACCELERATION   = 0.0;
 				final double YMCA_TIME_LENGTH_IN_SECS = 3.5;
-				final float YMCA_DAMAGE_PER_FLAME     = 2.5f;
 				final int YMCA_NUM_FLAMES             = 4;
+				final float YMCA_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(YMCA_NUM_FLAMES * 2);
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(PlayerAttackAction.AttackType.YMCA_ATTACK, playerNum,
 						YMCA_TIME_LENGTH_IN_SECS, YMCA_BASE_ACCELERATION, YMCA_NUM_FLAMES, YMCA_DAMAGE_PER_FLAME);
@@ -514,11 +535,12 @@ final public class ActionFactory {
 			
 			case NYAN_CAT_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 33.3f;
 				final double NYAN_CAT_BASE_ACCELERATION   = 0.0;
 				final double NYAN_CAT_TIME_LENGTH_IN_SECS = 3.33333333333333333333;
-				final float NYAN_CAT_DAMAGE_PER_FLAME     = 1.11111111111111111111f;
 				final int NYAN_CAT_NUM_FLAMES_PER_WAVE    = 2;
 				final int NYAN_CAT_NUM_WAVES              = 3;
+				final float NYAN_CAT_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(NYAN_CAT_NUM_WAVES * NYAN_CAT_NUM_FLAMES_PER_WAVE * 2);
 				
 				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.NYAN_CAT_ATTACK,
 						blockerOrAttacker, attackee, NYAN_CAT_DAMAGE_PER_FLAME);
@@ -596,10 +618,11 @@ final public class ActionFactory {
 			
 			case ARM_WINDMILL_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 27.0f;
 				final double ARM_WINDMILL_BASE_ACCELERATION   = 0.75;
 				final double ARM_WINDMILL_TIME_LENGTH_IN_SECS = 2.5;
-				final float ARM_WINDMILL_DAMAGE_PER_FLAME     = 2.0f;
 				final int ARM_WINDMILL_NUM_FLAMES             = 3;
+				final float ARM_WINDMILL_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(ARM_WINDMILL_NUM_FLAMES);
 				
 				action = new PlayerAttackAction(fireEmitterModel, PlayerAttackAction.AttackType.ARM_WINDMILL_ATTACK,
 						blockerOrAttacker, attackee, ARM_WINDMILL_DAMAGE_PER_FLAME);
@@ -630,10 +653,11 @@ final public class ActionFactory {
 			
 			case SUCK_IT_ATTACK: {
 				
+				final float TOTAL_DAMAGE = 15.0f;
 				final double SUCK_IT_BASE_ACCELERATION   = 0;
 				final double SUCK_IT_TIME_LENGTH_IN_SECS = 1.5f;
-				final float SUCK_IT_DAMAGE_PER_FLAME     = 3.0f;
-				final int SUCK_IT_NUM_FLAMES = 3;
+				final int SUCK_IT_NUM_FLAMES             = 1;
+				final float SUCK_IT_DAMAGE_PER_FLAME     = TOTAL_DAMAGE / (float)(SUCK_IT_NUM_FLAMES * 2);
 				
 				action = this.buildPlayerTwoHandedSymetricalAttack(AttackType.SUCK_IT_ATTACK,
 						playerNum, SUCK_IT_TIME_LENGTH_IN_SECS, SUCK_IT_BASE_ACCELERATION, SUCK_IT_NUM_FLAMES, SUCK_IT_DAMAGE_PER_FLAME);

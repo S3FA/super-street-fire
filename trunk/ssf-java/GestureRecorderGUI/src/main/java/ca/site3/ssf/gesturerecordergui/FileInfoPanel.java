@@ -10,6 +10,8 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.BorderFactory;
@@ -18,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
@@ -46,6 +49,7 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 	
 	private boolean isNewFile = false;
 	private JComboBox gestureName;
+	private JButton deleteLastGestureButton;
 	private Checkbox exportRecognizer;
 	private Checkbox exportCsv;
 	
@@ -53,12 +57,20 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 	private JButton dirButton;
 	private JFileChooser dirChooser;
 	
-	FileInfoPanel() {
+	private List<String> recordedGestureInstFilesBuffer = new LinkedList<String>();
+	
+	private LoggerPanel logPanel;
+	
+	FileInfoPanel(LoggerPanel logPanel) {
 		super();
+		
+		assert(logPanel != null);
+		this.logPanel = logPanel;
 		
 		Color borderColour = Color.black;
 		
-		TitledBorder border = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(borderColour), "Gesture Recording Info");
+		TitledBorder border = BorderFactory.createTitledBorder(
+				BorderFactory.createLineBorder(borderColour), "Gesture Recording Info");
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
 		
@@ -67,9 +79,13 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 
 		FormLayoutHelper formLayoutHelper = new FormLayoutHelper();
 		
-		this.gestureName = formLayoutHelper.constructGestureComboBox();		
+		this.gestureName      = formLayoutHelper.constructGestureComboBox();
 		this.exportRecognizer = new Checkbox();
-		this.exportCsv = new Checkbox();
+		this.exportCsv        = new Checkbox();
+		
+		this.deleteLastGestureButton = new JButton("Delete Last Recorded Gesture");
+		this.deleteLastGestureButton.setEnabled(false);
+		this.deleteLastGestureButton.addActionListener(this);
 		
 		JLabel exportToRecognizerLabel = new JLabel("Export to Gesture Recognizer");
 		exportToRecognizerLabel.setForeground(Color.black);
@@ -84,8 +100,11 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		JLabel gestureNameLabel = new JLabel("Gesture:");
 		gestureNameLabel.setForeground(Color.black);
 		formLayoutHelper.addMiddleField(gestureNameLabel, this);
-		formLayoutHelper.addMiddleField(this.gestureName, this);
-		formLayoutHelper.addLastField(new JLabel(""), this);
+		JPanel gesturePanel = new JPanel();
+		gesturePanel.setLayout(new BoxLayout(gesturePanel, BoxLayout.X_AXIS));
+		gesturePanel.add(this.gestureName);
+		gesturePanel.add(this.deleteLastGestureButton);
+		formLayoutHelper.addLastField(gesturePanel, this);
 		
 		JLabel dirLabel = new JLabel("Save Directory:");
 		dirLabel.setForeground(Color.black);
@@ -238,6 +257,8 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 			ex.printStackTrace();
 			filename = "";
 		}
+		this.recordedGestureInstFilesBuffer.add(filename);
+		this.deleteLastGestureButton.setEnabled(true);
 		return filename;
 	}
 	
@@ -329,6 +350,31 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 	            String selectedDir = this.dirChooser.getSelectedFile().getAbsolutePath();
 	            userPreferences.put(EXPORT_DIR_KEY, selectedDir);
 	            this.saveDirTextBox.setText(selectedDir);
+			}
+		}
+		else if (event.getSource() == this.deleteLastGestureButton) {
+			if (this.recordedGestureInstFilesBuffer.isEmpty()) {
+				this.deleteLastGestureButton.setEnabled(false);
+				return;
+			}
+			String fileToDeletePath = this.recordedGestureInstFilesBuffer.get(this.recordedGestureInstFilesBuffer.size()-1);
+			
+			int dlgResult = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete " + fileToDeletePath + "?", 
+				"Confirm", JOptionPane.INFORMATION_MESSAGE);
+			if (dlgResult == JOptionPane.OK_OPTION) {
+				this.recordedGestureInstFilesBuffer.remove(this.recordedGestureInstFilesBuffer.size()-1);
+				if (this.recordedGestureInstFilesBuffer.isEmpty()) {
+					this.deleteLastGestureButton.setEnabled(false);
+				}
+				
+				File fileToDelete = new File(fileToDeletePath);
+				if (fileToDelete.delete()) {
+					logPanel.setLogText(fileToDeletePath + " successfully deleted.");
+				}
+				else {
+					logPanel.setLogText(fileToDeletePath + " could not be deleted.");
+				}
+				
 			}
 		}
 	}
