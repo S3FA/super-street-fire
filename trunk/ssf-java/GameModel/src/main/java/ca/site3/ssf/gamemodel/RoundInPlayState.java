@@ -138,7 +138,8 @@ class RoundInPlayState extends PlayerFightingGameState {
 		this.gameModel.addRoundResult(result);
 		
 		boolean roundTimedOut = this.roundHasTimedOut();
-		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, roundTimedOut);
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), result, roundTimedOut,
+															 gameModel.getPlayer1().getHealth(), gameModel.getPlayer2().getHealth());
 		
 		GameConfig gameConfig = GameModel.getGameConfig();
 		assert(gameConfig != null);
@@ -179,7 +180,8 @@ class RoundInPlayState extends PlayerFightingGameState {
 		
 		// We don't increment the number of wins for either player on a tie... 
 		boolean roundTimedOut = this.roundHasTimedOut();
-		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), RoundResult.TIE, roundTimedOut);
+		this.gameModel.getActionSignaller().fireOnRoundEnded(this.gameModel.getNumRoundsPlayed(), RoundResult.TIE, roundTimedOut,
+															gameModel.getPlayer1().getHealth(), gameModel.getPlayer2().getHealth());
 		
 		GameConfig gameConfig = GameModel.getGameConfig();
 		assert(gameConfig != null);
