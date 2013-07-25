@@ -376,7 +376,7 @@ public class StreetFireGuiClient {
 				SerializationHelper.protobufToGameState(e.getNewGameState()));
 			
 		case MATCH_ENDED:
-			return new MatchEndedEvent(SerializationHelper.protobufToMatchResult(e.getMatchResult()));
+			return new MatchEndedEvent(SerializationHelper.protobufToMatchResult(e.getMatchResult()), e.getPlayer1Health(), e.getPlayer2Health());
 
 		case PLAYER_ATTACK_ACTION:
 			return new PlayerAttackActionEvent(playerNumFromPlayer(e.getPlayer()), 

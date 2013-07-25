@@ -373,7 +373,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		}
 		
 		case MATCH_ENDED_STATE:
-			this.onMatchEnded(new MatchEndedEvent(event.getMatchResult()));
+			this.onMatchEnded(new MatchEndedEvent(event.getMatchResult(), event.getPlayer1Health(), event.getPlayer2Health()));
 			break;
 		
 		default:

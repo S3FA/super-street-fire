@@ -130,8 +130,8 @@ class GameModelActionSignaller {
 	 * Triggers each of the listener's callbacks for the match ended event.
 	 * @param matchResult The match result.
 	 */
-	void fireOnMatchEnded(MatchResult matchResult) {
-		MatchEndedEvent event = new MatchEndedEvent(matchResult);
+	void fireOnMatchEnded(MatchResult matchResult, double p1Health, double p2Health) {
+		MatchEndedEvent event = new MatchEndedEvent(matchResult, p1Health, p2Health);
 		this.fireGameModelEvent(event);
 	}
 	
