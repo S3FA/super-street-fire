@@ -60,14 +60,16 @@ class PlayerAttackActionSoundPlayer extends SoundPlayer {
 	
 	// Get the default playback settings for this sound player
 	public PlaybackHandler getAudioPlaybackHandler(IGameModelEvent gameModelEvent) {
+		
 		if (gameModelEvent == null || gameModelEvent.getType() != IGameModelEvent.Type.PLAYER_ATTACK_ACTION) {
 			return null;
 		}
 		
 		PlayerAttackActionEvent event = (PlayerAttackActionEvent)gameModelEvent;
-
+		double chanceOfNyanWaits = Math.random();
+		
 		// 10% of the time nyan cat is triggered, play Nyan Waits instead
-		if(event.getAttackType() == AttackType.NYAN_CAT_ATTACK && Math.random() > 0.9)
+		if(event.getAttackType() == AttackType.NYAN_CAT_ATTACK && chanceOfNyanWaits > 0.9)
 		{
 			return nyanWaits;
 		}
