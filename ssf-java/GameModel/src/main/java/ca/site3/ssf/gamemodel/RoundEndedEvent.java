@@ -44,16 +44,14 @@ public final class RoundEndedEvent implements IGameModelEvent {
 	public Type getType() {
 		return Type.ROUND_ENDED;
 	}
-	
-	
+		
 	public boolean isToasty() {
-		return getWinnerHealth() > Player.FULL_HEALTH * TOASTY_THRESHOLD;
+		return getWinnerHealth() >= Player.FULL_HEALTH * TOASTY_THRESHOLD;
 	}
 	
 	public boolean isPerfect() {
-		return getWinnerHealth() == Player.FULL_HEALTH;
+		return getWinnerHealth() == Player.FULL_HEALTH;	
 	}
-	
 	
 	private double getWinnerHealth() {
 		switch (roundResult) {

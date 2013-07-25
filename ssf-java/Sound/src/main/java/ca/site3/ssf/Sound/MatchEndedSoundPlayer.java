@@ -11,11 +11,12 @@ import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 class MatchEndedSoundPlayer extends SoundPlayer {
 
 	private Map<MatchResult, PlaybackHandler> actionAudioMap = new HashMap<MatchResult, PlaybackHandler>(MatchResult.values().length);
-		
+	private Properties configProperties;
+	
 	MatchEndedSoundPlayer(SoundPlayerController controller) {
 		super(controller);
 		
-		Properties configProperties = controller.getConfigProperties();
+		configProperties = controller.getConfigProperties();
 		PlaybackSettings playbackSettings = getDefaultPlaybackSettings();
 
 		actionAudioMap.put(MatchResult.PLAYER1_VICTORY, PlaybackHandler.build(controller, configProperties.getProperty("MatchResult.PlayerOneVictory"), playbackSettings));
@@ -34,7 +35,20 @@ class MatchEndedSoundPlayer extends SoundPlayer {
 		}
 		
 		MatchEndedEvent event = (MatchEndedEvent)gameModelEvent;
-		return this.actionAudioMap.get(event.getMatchResult());
+		PlaybackHandler playbackHandler = this.actionAudioMap.get(event.getMatchResult());
+		
+		if (event.isPerfect())
+		{
+			playbackHandler.hasFollowupSound = true;
+			playbackHandler.followupSoundSource = configProperties.getProperty("MatchResult.Perfect");
+		}
+		else if(event.isToasty())
+		{
+			playbackHandler.hasFollowupSound = true;
+			playbackHandler.followupSoundSource = configProperties.getProperty("MatchResult.Toasty");
+		}
+		
+		return playbackHandler;
 	}
 	
 	public boolean isBackgroundSoundPlayer(IGameModelEvent gameModelEvent) {
