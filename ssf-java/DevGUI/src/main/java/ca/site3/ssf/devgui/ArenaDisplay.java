@@ -269,7 +269,6 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final int HALF_NUM_OUTER_RING_EMITTERS = this.fireEmitterConfig.getNumOuterRingEmitters() / 2;
 		final float INCREMENT_ANGLE = (float)Math.PI / (float)(HALF_NUM_OUTER_RING_EMITTERS+1);
 		final float HALF_PI = (float)Math.PI/2.0f;
-		final float QUARTER_PI = (float)Math.PI/4.0f;
 		
 		final float OUTER_RING_X = CENTER_X - OUTER_RING_RADIUS;
 		final float OUTER_RING_Y = CENTER_Y - OUTER_RING_RADIUS;

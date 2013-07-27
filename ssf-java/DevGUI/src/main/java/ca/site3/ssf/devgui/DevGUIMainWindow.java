@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.Sound.AudioSettings;
 import ca.site3.ssf.Sound.SoundPlayerController;
+import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
@@ -39,7 +40,6 @@ import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
-import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.MatchEndedEvent;
 import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
@@ -61,10 +61,10 @@ import ca.site3.ssf.ioserver.IOServer;
 import ca.site3.ssf.ioserver.SerialTestWindow;
 import ch.qos.logback.classic.Level;
 
+import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
-import com.apple.eawt.AppEvent.QuitEvent;
 import com.beust.jcommander.JCommander;
 
 
