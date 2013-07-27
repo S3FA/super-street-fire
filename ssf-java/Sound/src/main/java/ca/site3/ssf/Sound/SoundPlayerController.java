@@ -20,6 +20,9 @@ import paulscode.sound.libraries.LibraryLWJGLOpenAL;
 
 /**
  * Listens for game events and plays sound effects and music as appropriate.
+ * Uses SoundEventMapper to determine what sounds to play
+ * Uses PlaybackHandlers for each sound
+ * Audio and Playback settings determine specific sound settings
  * @author Mike, Callum
  */
 public class SoundPlayerController implements IGameModelListener, IStreamListener {
@@ -64,7 +67,7 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
             System.out.println("Error linking with the plugins" );
         }
 		
-		// Create the soundsystem
+		// Create the sound system
 		try {
             mySoundSystem = new SoundSystem( LibraryLWJGLOpenAL.class );
         }
@@ -115,9 +118,11 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 				break;
 		}
 		
+		// Play the sound
 		this.playSound(soundEventMapper.getPlaybackHandler(gameModelEvent));
 	}
 	
+	// Tells the playback handler to play the sound
 	public void playSound(PlaybackHandler handler) {
 		if (handler == null) {
 			return;
@@ -128,13 +133,9 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 		{
 			this.setBackgroundFileName(handler.getFilePath());
 			this.setBackgroundSource(handler.getSourceName());
-			handler.setIsBackground(true);
-		}
-		else
-		{
-			handler.setIsBackground(false);
 		}
 		
+		// Tell the playback handler to play the sound
 		handler.play();
 	}
 	
