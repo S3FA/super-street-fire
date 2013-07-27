@@ -38,6 +38,7 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 	private GameStateType currentGameState; 
 	
 	SoundSystem mySoundSystem;
+	SoundEventMapper soundEventMapper;
 	
 	public SoundPlayerController(AudioSettings settings) {
 		assert(settings != null);
@@ -72,6 +73,12 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
             e.printStackTrace();
             return;
         }
+		
+		// Make sure there are audio settings available
+		assert(getAudioSettings() != null);
+		
+		// Build the sound event mappings so we can map game events to sounds
+		this.soundEventMapper = new SoundEventMapper(this);
 	}
 	
     /**
@@ -108,11 +115,27 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 				break;
 		}
 		
-		// Create a new instance of the sound player and execute the sound
-		SoundPlayer soundPlayer = SoundPlayer.build(this, gameModelEvent);
-		if (soundPlayer != null) {
-			soundPlayer.execute(gameModelEvent);
+		this.playSound(soundEventMapper.getPlaybackHandler(gameModelEvent));
+	}
+	
+	public void playSound(PlaybackHandler handler) {
+		if (handler == null) {
+			return;
 		}
+		
+		// Update the current background music source
+		if(handler.isBackgroundPlayer)
+		{
+			this.setBackgroundFileName(handler.getFilePath());
+			this.setBackgroundSource(handler.getSourceName());
+			handler.setIsBackground(true);
+		}
+		else
+		{
+			handler.setIsBackground(false);
+		}
+		
+		handler.play();
 	}
 	
 	// Stops the background music and removes all references to it
@@ -136,8 +159,8 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 	// Pauses the background music
 	void pauseBackgroundMusic() {
 		try {
-			if (this.getBackgroundSource() != null) {
-				mySoundSystem.pause(this.getBackgroundSource());
+			if (this.backgroundSource != null) {
+				mySoundSystem.pause(this.backgroundSource);
 			}
 		}
 		catch(Exception ex) {
@@ -149,8 +172,8 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 	// Unpauses the background music
 	void unpauseBackgroundMusic() {
 		try {
-			if (this.getBackgroundSource() != null) {
-				mySoundSystem.play(this.getBackgroundSource());
+			if (this.backgroundSource != null) {
+				mySoundSystem.play(this.backgroundSource);
 			}
 		}
 		catch(Exception ex) {

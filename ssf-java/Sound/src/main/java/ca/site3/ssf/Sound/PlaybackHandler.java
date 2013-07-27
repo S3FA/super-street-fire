@@ -25,6 +25,7 @@ class PlaybackHandler {
 	public boolean hasFollowupSound = false;
 	public String followupSoundSource = null;
 	public boolean isBackgroundPlayer;
+	public boolean hasQuietBackground;
 
 	static PlaybackHandler build(SoundPlayerController controller, String source, PlaybackSettings settings) {
 		try{
@@ -33,7 +34,7 @@ class PlaybackHandler {
 			if (!audioFile.canRead()) {
 				return null;
 			}
-			
+
 			PlaybackHandler result = new PlaybackHandler(controller, audioFile, settings);
 			boolean isInit = result.init();
 			result.setSettings(settings);
@@ -47,7 +48,6 @@ class PlaybackHandler {
 		catch(Exception ex)
 		{
 			logger.warn("Exception while attempting to set up the playbackHandler.", ex);
-//			throw ex;
 			return null;
 		}
 	}
@@ -56,12 +56,13 @@ class PlaybackHandler {
 		assert(controller != null);
 		assert(settings != null);
 		assert(audioFile != null);
-		assert(settings != null);
 		
 		this.controller = controller;
 		this.audioFilePath = audioFile.getAbsolutePath();
 		this.sourceName = audioFile.getName();
 		this.settings = settings;
+		this.isBackgroundPlayer = settings.getIsLooping();
+		this.hasQuietBackground = settings.getIsQuietBackground();
 		
 		try
 		{
@@ -75,10 +76,7 @@ class PlaybackHandler {
 	
 	private boolean init() {
 		try{
-			if(!this.settings.getIsQuietBackground())
-			{
-				this.controller.mySoundSystem.newStreamingSource(this.isBackgroundPlayer, sourceName, this.audioFileURL, this.audioFilePath, this.settings.getIsLooping(), 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
-			}
+			this.controller.mySoundSystem.newStreamingSource(this.isBackgroundPlayer, sourceName, this.audioFileURL, this.audioFilePath, this.isBackgroundPlayer, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
 		}
 		catch(Exception ex){
 			logger.warn("Failed to read audio file " + audioFilePath);
@@ -92,10 +90,10 @@ class PlaybackHandler {
 		try 
 		{
 			// Pause the background music if necessary, and queue it up to restart immediately after playback
-			if(this.settings.getIsQuietBackground())
+			if(this.hasQuietBackground)
 			{
 				controller.pauseBackgroundMusic();
-				this.sourceName = controller.mySoundSystem.quickStream(this.isBackgroundPlayer, this.audioFileURL, this.sourceName, this.settings.getIsLooping(), 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0 );
+				controller.mySoundSystem.play(this.sourceName);
 				controller.setBackgroundOverrideSource(this.sourceName);
 			}
 			else
@@ -122,18 +120,12 @@ class PlaybackHandler {
 	void setSettings(PlaybackSettings settings) {
 		assert(settings != null);
 		this.settings = settings;
-		this.updateSettings();
-		
 	}
 	
 	void setGlobalAudioSettings(AudioSettings globalSettings) {
 		this.settings.setVolume(globalSettings.getVolume());
 	}
-	
-	private void updateSettings() {
 
-	}
-	
 	public void setIsBackground(boolean background)
 	{
 		this.isBackgroundPlayer = background;
