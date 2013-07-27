@@ -15,7 +15,11 @@ import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
 
+import com.beust.jcommander.JCommander;
+
+import ca.site3.ssf.common.LoggingUtil;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gesturerecognizer.GestureInstance;
 import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
@@ -33,7 +37,7 @@ import ca.site3.ssf.ioserver.EntityGestureInstance;
 
 /**
  * The main GUI class and driver for the gesture recorder
- * @author Mike
+ * @author Mike, Callum
  *
  */
 public class GestureRecorderGUIMainWindow extends JFrame {
@@ -135,7 +139,13 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 	 * The main driver method for the Developer GUI.
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] argv) {
+		
+		final CommandLineArgs args = new CommandLineArgs();
+		// populates args from argv
+		new JCommander(args, argv);
+		
+		LoggingUtil.configureLogging(args.verbosity);
 		
         Runnable doCreateAndShowGUI = new Runnable() {
         	

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.Sound.AudioSettings;
 import ca.site3.ssf.Sound.SoundPlayerController;
+import ca.site3.ssf.common.LoggingUtil;
 import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.FireEmitterConfig;
@@ -654,7 +655,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		// populates args from argv
 		new JCommander(args, argv);
 		
-		configureLogging(args.verbosity);
+		LoggingUtil.configureLogging(args.verbosity);
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -673,28 +674,6 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		DevGUIMainWindow window = new DevGUIMainWindow(ioserver, args);
 		window.getThisPartyStarted();
 		window.setVisible(true);
-	}
-
-	public static void configureLogging(int level) {
-		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
-				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-		
-		switch (level) {
-			case 0:
-				root.setLevel(Level.OFF); break;
-			case 1:
-				root.setLevel(Level.TRACE); break;
-			case 2:
-				root.setLevel(Level.DEBUG); break;
-			case 3:
-				root.setLevel(Level.INFO); break;
-			case 4:
-				root.setLevel(Level.WARN); break;
-			case 5:
-				root.setLevel(Level.ERROR); break;
-			default:
-				root.setLevel(Level.INFO);
-		}
 	}
 
 	@Override
