@@ -39,6 +39,9 @@ public class SoundEventMapper {
 	private PlaybackHandler playerBlockActionHandler_P2BlockSuccess = null;
 	private PlaybackHandler unrecognizedGestureHandler = null;
 	
+	// Introductory sound player
+	public PlaybackHandler introHandler_capcom = null;
+	
 	private AudioSettings globalSettings = null;
 	private PlaybackSettings playbackSettings = null;
 	private Properties configProperties;
@@ -70,6 +73,9 @@ public class SoundEventMapper {
 	// Maps all of the game events with sounds to the appropriate sound and builds sound players for custom sounds
 	private void buildSoundMaps()
 	{	
+		// Intro sounds
+		introHandler_capcom = PlaybackHandler.build(controller, configProperties.getProperty("Intro.Capcom"), playbackSettings);
+		
 		// Game State events
 		gameStateAudioMap.put(GameStateType.IDLE_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.IdleState"), playbackSettings));
 		gameStateAudioMap.put(GameStateType.MATCH_ENDED_STATE, PlaybackHandler.build(controller,configProperties.getProperty("GameState.MatchEndedState"), playbackSettings));
