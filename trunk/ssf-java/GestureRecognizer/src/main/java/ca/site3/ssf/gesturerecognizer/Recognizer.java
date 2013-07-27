@@ -1,12 +1,10 @@
 package ca.site3.ssf.gesturerecognizer;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
 
-import org.apache.commons.math.stat.ranking.NaNStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
