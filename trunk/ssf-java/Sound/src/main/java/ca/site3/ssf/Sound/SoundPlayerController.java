@@ -82,6 +82,7 @@ public class SoundPlayerController implements IGameModelListener, IStreamListene
 		
 		// Build the sound event mappings so we can map game events to sounds
 		this.soundEventMapper = new SoundEventMapper(this);
+		this.playSound(this.soundEventMapper.introHandler_capcom);
 	}
 	
     /**
