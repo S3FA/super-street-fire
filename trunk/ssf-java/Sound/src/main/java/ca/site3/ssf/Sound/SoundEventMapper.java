@@ -21,6 +21,11 @@ import ca.site3.ssf.gamemodel.RingmasterAction.ActionType;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
 import ca.site3.ssf.gamemodel.RoundEndedEvent.RoundResult;
 
+/**
+ * Maps game events to the appropriate sounds, builds playback handlers for each sound and accounts for custom
+ * logic like toasty/perfect.
+ * @author Mike
+ */
 public class SoundEventMapper {
 	
 	private Map<GameStateType, PlaybackHandler> gameStateAudioMap =	new HashMap<GameStateType, PlaybackHandler>(GameStateType.values().length);
@@ -40,6 +45,7 @@ public class SoundEventMapper {
 	
 	protected SoundPlayerController controller;
 	
+	// Any round theme music needs to be included here or else it will never be randomly selected
 	private static final List<String> THEME_SONG_RESOURCES = Arrays.asList(
 		"Theme.Balrog",
 		"Theme.Bison",
@@ -55,15 +61,15 @@ public class SoundEventMapper {
 		assert(controller != null);
 		this.controller = controller;
 		this.configProperties = controller.getConfigProperties();
+		this.globalSettings = controller.getAudioSettings();
+		this.playbackSettings = getDefaultPlaybackSettings();
 		
 		this.buildSoundMaps();
 	}
 	
+	// Maps all of the game events with sounds to the appropriate sound and builds sound players for custom sounds
 	private void buildSoundMaps()
-	{
-		this.globalSettings = controller.getAudioSettings();
-		this.playbackSettings = getDefaultPlaybackSettings();
-		
+	{	
 		// Game State events
 		gameStateAudioMap.put(GameStateType.IDLE_STATE, PlaybackHandler.build(controller, configProperties.getProperty("GameState.IdleState"), playbackSettings));
 		gameStateAudioMap.put(GameStateType.MATCH_ENDED_STATE, PlaybackHandler.build(controller,configProperties.getProperty("GameState.MatchEndedState"), playbackSettings));
@@ -137,6 +143,7 @@ public class SoundEventMapper {
 		unrecognizedGestureHandler = PlaybackHandler.build(controller, configProperties.getProperty("Action.UnrecognizedGesture"), playbackSettings);
 	}
 	
+	// Retrieves the appropriate playback handler for each game event and accounts for custom conditions (like toasty/perfect) as necessary
 	public PlaybackHandler getPlaybackHandler(IGameModelEvent gameModelEvent) {
 		if (controller == null || gameModelEvent == null) {
 			return null;
@@ -241,11 +248,13 @@ public class SoundEventMapper {
 		return null;
 	}
 	
+	// Gets the default playback settings for a given sound
 	private PlaybackSettings getDefaultPlaybackSettings()
 	{
 		return new PlaybackSettings(controller.getAudioSettings().getVolume(), false, false);
 	}
 	
+	// Randomizes the theme song for each new round
 	private String pickARandomThemeSong() {
 		Random random = new Random(System.currentTimeMillis());
 		int songIndex = random.nextInt(THEME_SONG_RESOURCES.size());
