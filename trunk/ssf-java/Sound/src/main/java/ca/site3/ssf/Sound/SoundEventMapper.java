@@ -9,7 +9,6 @@ import java.util.Random;
 
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.MatchEndedEvent;
 import ca.site3.ssf.gamemodel.PlayerAttackActionEvent;
 import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.RingmasterActionEvent;
@@ -17,7 +16,6 @@ import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundEndedEvent;
 import ca.site3.ssf.gamemodel.UnrecognizedGestureEvent;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
-import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 import ca.site3.ssf.gamemodel.PlayerAttackAction.AttackType;
 import ca.site3.ssf.gamemodel.RingmasterAction.ActionType;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent.RoundBeginCountdownType;
@@ -132,8 +130,8 @@ public class SoundEventMapper {
 		roundBeginCountdownTypeAudioMap.put(RoundBeginCountdownType.FIGHT, PlaybackHandler.build(controller, configProperties.getProperty("RoundBeginCountdown.Fight"), playbackSettings));
 
 		// Player block events
-		playerBlockActionHandler_P1BlockSuccess = PlaybackHandler.build(controller, configProperties.getProperty("BlockType.P1Block"), new PlaybackSettings(globalSettings.getVolume(), false, true));
-		playerBlockActionHandler_P2BlockSuccess = PlaybackHandler.build(controller, configProperties.getProperty("BlockType.P2Block"), new PlaybackSettings(globalSettings.getVolume(), false, true));
+		playerBlockActionHandler_P1BlockSuccess = PlaybackHandler.build(controller, configProperties.getProperty("BlockType.P1Block"), playbackSettings);
+		playerBlockActionHandler_P2BlockSuccess = PlaybackHandler.build(controller, configProperties.getProperty("BlockType.P2Block"), playbackSettings);
 		
 		// Unrecognized gesture
 		unrecognizedGestureHandler = PlaybackHandler.build(controller, configProperties.getProperty("Action.UnrecognizedGesture"), playbackSettings);
