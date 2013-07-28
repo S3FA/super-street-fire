@@ -12,6 +12,9 @@ import gesturefileinfo
 def print_usage_and_exit():
     print "Usage:"
     print os.path.basename(sys.argv[0]) + " [-n (#)] [-a (#)] [-s (#)] (base_dir) (dir_name_for_analysis)"
+    print "-n : Number of files to display with the least and most number of recorded points"
+    print "-a : Number of files to display with the lowest and highest accelerometer values"
+    print "-s : Number of files to display with the lowest and highest standard deviation in comparsion to all other gestures of that type"
     exit(1) 
 
 
@@ -44,6 +47,9 @@ if __name__ == "__main__":
         baseDirIdx += 2
     
     # Make sure the directory to analyze is valid
+    if len(sys.argv) <= baseDirIdx+1:
+        print_usage_and_exit()
+
     dirBasePath      = sys.argv[baseDirIdx]
     dirNameToAnalyze = sys.argv[baseDirIdx+1]
     if not os.path.isdir(dirBasePath):
