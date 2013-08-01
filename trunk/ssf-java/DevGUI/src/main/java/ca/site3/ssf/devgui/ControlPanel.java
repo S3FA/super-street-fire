@@ -47,9 +47,14 @@ class ControlPanel extends JPanel implements ActionListener {
 	private JComboBox player2ActionComboBox    = null;
 	private JComboBox ringmasterActionComboBox = null;
 	
-	List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
+	private List<GameStateType> nextStates = new ArrayList<GameStateType>(2);
 	
-	ControlPanel(ActionFactory actionFactory, StreetFireGuiClient client) {
+	private DevGUIMainWindow mainWindow = null;
+	
+	ControlPanel(DevGUIMainWindow mainWindow, ActionFactory actionFactory, StreetFireGuiClient client) {
+		
+		assert(mainWindow != null);
+		this.mainWindow = mainWindow;
 		
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
@@ -125,11 +130,17 @@ class ControlPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		try {
 			if (event.getSource() == this.nextStateButton1) {
-				assert(this.nextStates.size() > 0);
+				if (this.nextStates.size() == 0) {
+					assert(false);
+					return;
+				}
 				client.initiateNextState(this.nextStates.get(0));
 			}
 			else if (event.getSource() == this.nextStateButton2) {
-				assert(this.nextStates.size() > 1);
+				if (this.nextStates.size() <= 1) {
+					assert(false);
+					return;
+				}
 				client.initiateNextState(this.nextStates.get(1));
 			}
 			else if (event.getSource() == this.killButton) {
@@ -150,8 +161,18 @@ class ControlPanel extends JPanel implements ActionListener {
 			else if (event.getSource() == this.testButton) {
 				client.testSystem();
 			}
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			log.warn("Exception communicating with IOServer",ex);
+			this.mainWindow.displayNotConnectedDialog(true);
+			while (!client.isConnected()) {
+				try {
+					client.connect();
+				}
+				catch (IOException e) {
+				}
+			}
+			this.mainWindow.displayNotConnectedDialog(false);
 		}
 	}
 	

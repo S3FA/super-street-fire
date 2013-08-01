@@ -83,14 +83,11 @@ public class StreetFireGuiClient {
 	private ReceiveThread receiveThread;
 	
 	
-	
-	
 	public StreetFireGuiClient(InetAddress ioserver, int port, boolean useSSL) {
-		serverAddress = ioserver;
+		this.serverAddress = ioserver;
 		this.port = port;
 		this.useSSL = useSSL;
 	}
-	
 	
 	/**
 	 * Connect to the IO Server. This must be called before any 
@@ -267,10 +264,6 @@ public class StreetFireGuiClient {
 	 * @throws IOException
 	 */
 	private void submitCommand(Command cmd) throws IOException {
-		if (isConnected() == false) {
-			throw new IllegalStateException("Not connected to server");
-		}
-		
 		commandQueue.offer(cmd);
 	}
 	
@@ -288,22 +281,34 @@ public class StreetFireGuiClient {
 			while (true) {
 				try {
 					Command cmd = commandQueue.take();
-					log.debug("SendThread "+System.identityHashCode(this) + " sending command: "+cmd.getType());
+					log.debug("SendThread " + System.identityHashCode(this) + " sending command: " + cmd.getType());
 					cmd.writeDelimitedTo(socket.getOutputStream());
-				} catch (InterruptedException ex) {
+				}
+				catch (InterruptedException ex) {
 					log.warn("Interrupted waiting for a command",ex);
-				} catch (IOException ex) {
+				}
+				catch (IOException ex) {
 					log.error("Exception sending data to server, marking as not connected",ex);
-					try {
-						socket.close();
-					} catch (IOException ex2) {
-						log.error("Exception trying to close socket!", ex);
+					if (socket != null) {
+						try {
+							socket.close();
+						} catch (IOException ex2) {
+							log.error("Exception trying to close socket!", ex);
+						}
+						socket = null;
 					}
-					socket = null;
 				}
 				
-				if ( ! isConnected() ) {
+				if (!isConnected()) {
 					log.info("No longer connected; Stopped listening for commands");
+					if (socket != null) {
+						try {
+							socket.close();
+						}
+						catch (IOException e) { }
+						socket = null;
+					}
+					
 					break;
 				}
 			}
@@ -334,16 +339,33 @@ public class StreetFireGuiClient {
 							eventQueue.add(gameEvent);
 						}
 					}
-				} catch (IOException ex) {
+				}
+				catch (IOException ex) {
 					log.warn("IOException listening on GUI input stream, marking as not connected", ex);
-					try {
-						socket.close();
-					} catch (IOException ex2) {
-						log.error("IOException trying to close socket");
+					if (socket != null) {
+						try {
+							socket.close();
+						}
+						catch (IOException ex2) {
+							log.error("IOException trying to close socket");
+						}
+						socket = null;
+					}
+				} 
+				catch (Exception ex) {
+					log.error("Exception listening on GUI input stream",ex);
+				}
+				
+				if (!isConnected()) {
+					log.info("No longer connected; Stopped receiving events");
+					if (socket != null) {
+						try {
+							socket.close();
+						}
+						catch (IOException e) { }
 					}
 					socket = null;
-				} catch (Exception ex) {
-					log.error("Exception listening on GUI input stream",ex);
+					break;
 				}
 			}
 		}

@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -106,6 +107,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
     
     private SoundPlayerController soundPlayerController;
     
+    private JDialog connectingDlg = new JDialog(this, "Not connected...", false);
+    
     private final CommandLineArgs args;
     private StreetFireGuiClient client = null;
 
@@ -142,7 +145,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		
 		try {
 			client.connect();
-		} catch (IOException ex) {
+		}
+		catch (IOException ex) {
 			log.error("DevGUI could not connect to IOServer",ex);
 		}
 		
@@ -200,7 +204,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.infoPanel = new GameInfoPanel(client);
 		infoAndControlPanel.add(this.infoPanel, BorderLayout.NORTH);
 		
-		this.controlPanel = new ControlPanel(gameModel.getActionFactory(), client);
+		this.controlPanel = new ControlPanel(this, gameModel.getActionFactory(), client);
 		infoAndControlPanel.add(this.controlPanel, BorderLayout.CENTER);
 		
 		contentPane.add(infoAndControlPanel, BorderLayout.SOUTH);
@@ -217,10 +221,12 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.gameEventThread = new Thread("DevGUI game event listener thread") {
 			public @Override void run() {
 				while (true) {
+					
 					try {
 						IGameModelEvent event = client.getEventQueue().take();
 						handleGameModelEvent(event);
-					} catch (InterruptedException ex) {
+					}
+					catch (InterruptedException ex) {
 						log.warn("DevGUI interrupted while waiting for game model event",ex);
 					}
 				}
@@ -236,8 +242,8 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 				
 				long prevTimeInMs = System.currentTimeMillis();
 				long currTimeInMs = prevTimeInMs;
-				while (true) {
-					
+				
+				while (true) {	
 					currTimeInMs = System.currentTimeMillis();
 					
 					long deltaTimeInMs = currTimeInMs - prevTimeInMs;
@@ -252,18 +258,14 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 						Thread.sleep(Math.max(0, MAX_FRAME_TIME_MS - deltaTimeInMs));
 					} 
 					catch (InterruptedException e) {
-					}
+					}					
 				}
-				
 			}
 		};
 		this.tickThread.start();
-		
-		
 		this.ioserver.getDeviceStatus().addListener(this);
 	}
 
-	 
 	private void handleGameModelEvent(final IGameModelEvent event) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -552,6 +554,10 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.arenaDisplay.setInfoText("Test Round");
 		this.infoPanel.getPlayer1Panel().setUnlimitedMovesCheckBoxEnabled(false);
 		this.infoPanel.getPlayer2Panel().setUnlimitedMovesCheckBoxEnabled(false);
+	}
+	
+	void displayNotConnectedDialog(boolean showDialog) {
+		this.connectingDlg.setVisible(showDialog);
 	}
 	
 	@Override
