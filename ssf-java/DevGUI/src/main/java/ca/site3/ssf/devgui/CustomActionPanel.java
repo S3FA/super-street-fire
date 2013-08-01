@@ -217,6 +217,7 @@ class CustomActionPanel extends JPanel implements ChangeListener, ActionListener
 			}
 			catch (IOException e) {
 				e.printStackTrace();
+				
 			}
 		}
 		else if (event.getSource() == this.playerComboBox) {

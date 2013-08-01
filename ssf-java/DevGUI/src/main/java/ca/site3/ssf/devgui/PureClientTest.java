@@ -18,6 +18,7 @@ import javax.swing.WindowConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.common.LoggingUtil;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
 import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
@@ -171,7 +172,7 @@ class PureClientTest extends JFrame implements ActionListener {
 		final CommandLineArgs args = new CommandLineArgs();
 		new JCommander(args, argv);
 		
-		DevGUIMainWindow.configureLogging(args.verbosity);
+		LoggingUtil.configureLogging(args.verbosity);
 		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

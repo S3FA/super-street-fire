@@ -157,7 +157,7 @@ public class IOServer {
 			}
 		}
 		catch (FileNotFoundException e) {
-			log.warn("Could not load file gesture recognition engine from " + args.gestureEngineFilepath, e);
+			log.warn("Could not load file gesture recognition engine from " + args.gestureEngineFilepath);
 		}
 		
 		isStopped = false;
@@ -336,7 +336,7 @@ public class IOServer {
 		try {
 			commPortId = CommPortIdentifier.getPortIdentifier(args.serialDevice);
 		} catch (NoSuchPortException ex) {
-			log.error("Could not open serial port '"+ args.serialDevice+"'",ex);
+			log.error("Could not open serial port '" + args.serialDevice + "':" + ex.getMessage());
 		} catch (UnsatisfiedLinkError ex) {
 			log.error("Could not load rxtx serial comm native library.\n" + 
 						"If you're on a Mac, copy IOServer/src/main/resources/librxtxSerial.jnilib to ~/Library/Java/Extensions/\n" +

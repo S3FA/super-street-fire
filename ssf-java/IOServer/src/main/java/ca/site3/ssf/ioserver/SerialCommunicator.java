@@ -41,6 +41,8 @@ public class SerialCommunicator implements Runnable {
 	private static final byte[] STOP_SENTINEL = new byte[] { (byte)0 };
 	private static final byte[] QUERY_SYSTEM_SENTINEL = new byte[] { (byte)'?' };
 	
+	private static final long STATUS_WAIT_TIME_MS = 100;
+	
 	/** 0 - 100 */
 	private short lastP1Health = 0;
 	/** 0 - 100 */
@@ -365,10 +367,11 @@ public class SerialCommunicator implements Runnable {
 				this.out.write(messageTemplate);
 				this.out.flush();
 				try {
-					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(40, TimeUnit.MILLISECONDS);
+					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(STATUS_WAIT_TIME_MS, TimeUnit.MILLISECONDS);
 					if (status != null) {
 						systemStatus[status.deviceId - 1] = status;
 					}
+					
 				} catch (InterruptedException ex) {
 					log.warn("Interrupted while waiting for device status",ex);
 				}
