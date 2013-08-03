@@ -188,17 +188,24 @@ public class GestureRecorderGUIMainWindow extends JFrame {
 				// If export to the gesture recognizer is selected, export to the GestureRecognizer
 				if (this.recordingPanel.getRecognizerExportState()) {
 					String filename = this.recordingPanel.exportToRecognizer(instance);
-					filenames.add(filename);
+					if (filename != null) {
+						filenames.add(filename);
+					}
 				}
 				
 				// Show all of the recorded data in the GUI Log...
-				String logStr = "Gesture exported to file(s):\n";
-				for (String filename : filenames) {
-					logStr += filename + "\n";
+				if (filenames.isEmpty()) {
+					this.recordingPanel.setLogString("FAILED TO WRITE GESTURE!! PERHAPS A BAD DIRECTORY IS SELECTED...");
 				}
-				logStr += "\n" + instance.toDataString();
-				this.recordingPanel.setLogString(logStr);
-				
+				else {
+					String logStr = "Gesture exported to file(s):\n";
+					for (String filename : filenames) {
+						logStr += filename + "\n";
+					}
+	
+					logStr += "\n" + instance.toDataString();
+					this.recordingPanel.setLogString(logStr);
+				}
 			}
 
 		}

@@ -255,8 +255,9 @@ class FileInfoPanel extends JPanel implements ActionListener, ItemListener {
 		}
 		catch (IOException ex) {
 			ex.printStackTrace();
-			filename = "";
+			return null;
 		}
+		
 		this.recordedGestureInstFilesBuffer.add(filename);
 		this.deleteLastGestureButton.setEnabled(true);
 		return filename;

@@ -185,15 +185,16 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final FontMetrics PLAYER_FONT_METRICS     = g2.getFontMetrics(PLAYER_FONT);
 		final FontMetrics RINGMASTER_FONT_METRICS = g2.getFontMetrics(RINGMASTER_FONT);
 		
+
 		Dimension size = this.getSize();
 		
 		final float CENTER_X = size.width/2.0f;
 		final float CENTER_Y = size.height/2.0f;
 		
-		float sizeX = Math.min(750, size.width);
-		float sizeY = Math.min(750, size.height);
+		float sizeX = Math.min(680, size.width);
+		float sizeY = Math.min(680, size.height);
 		size.setSize(sizeX, sizeY);
-
+		
 		final float WIDTH_BETWEEN_RAILS       = size.width * 0.2f;
 		final float HALF_WIDTH_BETWEEN_RAILS  = WIDTH_BETWEEN_RAILS / 2.0f;
 		final float FULL_RAIL_LENGTH          = WIDTH_BETWEEN_RAILS * 2.0f; // Number comes from the schematic
@@ -211,6 +212,8 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		final float LEFT_RAIL_CENTER  = CENTER_Y + HALF_WIDTH_BETWEEN_RAILS + EMITTER_RADIUS;
 		final float RIGHT_RAIL_CENTER = CENTER_Y - HALF_WIDTH_BETWEEN_RAILS - EMITTER_RADIUS;
 		
+		Color transparentWhite = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+		
 		g2.setPaint(Color.black);
 		g2.setStroke(ArenaDisplay.RAIL_STROKE);
 		g2.draw(new Line2D.Float(RAIL_TOP, LEFT_RAIL_CENTER, RAIL_BOTTOM, LEFT_RAIL_CENTER));
@@ -220,6 +223,8 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		g2.setStroke(ArenaDisplay.EMITTER_OUTLINE_STROKE);
 		g2.setFont(ArenaDisplay.INTENSITY_FONT);
 		float currPosition = RAIL_BOTTOM;
+		int leftRailCount = 9;
+		int rightRailCount = 1;
 		for (int i = 0; i < this.fireEmitterConfig.getNumEmittersPerRail(); i++) {
 			Point2D.Float leftRailEmitterPos = new Point2D.Float(currPosition - EMITTER_RADIUS, LEFT_RAIL_CENTER - EMITTER_RADIUS);
 			Point2D.Float rightRailEmitterPos = new Point2D.Float(currPosition - EMITTER_RADIUS, RIGHT_RAIL_CENTER - EMITTER_RADIUS);
@@ -257,9 +262,19 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 					(int)(rightRailEmitterPos.y + EMITTER_RADIUS + DEVICE_FLAME_IMAGE.getHeight()), 
 					null);
 			
+			String leftRailNumStr = "" + leftRailCount;
+			String rightRailNumStr = "" + rightRailCount;
+			
+			g2.setPaint(transparentWhite);
+			g2.drawString(leftRailNumStr, leftRailEmitterPos.x + EMITTER_RADIUS - INTENSITY_FONT_METRICS.stringWidth(leftRailNumStr)/2, 
+					leftRailEmitterPos.y + EMITTER_RADIUS + INTENSITY_FONT_METRICS.getHeight()/2);
+			g2.drawString(rightRailNumStr, rightRailEmitterPos.x + EMITTER_RADIUS - INTENSITY_FONT_METRICS.stringWidth(rightRailNumStr)/2, 
+					rightRailEmitterPos.y + EMITTER_RADIUS + INTENSITY_FONT_METRICS.getHeight()/2);
 			
 			g2.setPaint(Color.black);
 			currPosition -= (EMITTER_DIAMETER + DISTANCE_BETWEEN_RAIL_EMITTERS);
+			leftRailCount++;
+			rightRailCount++;
 		}		
 		
 		// Draw the outer ring of emitters
@@ -283,6 +298,7 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 		g2.setStroke(ArenaDisplay.EMITTER_OUTLINE_STROKE);
 		float currAngle = -(float)Math.PI - HALF_PI - INCREMENT_ANGLE;
 
+		int emitterNum = 17;
 		for (int i = 0; i < HALF_NUM_OUTER_RING_EMITTERS; i++) {
 			Point2D.Float outerRingEmitterPos =
 					new Point2D.Float(CENTER_X + OUTER_RING_RADIUS * (float)Math.sin(currAngle) - EMITTER_RADIUS,
@@ -306,10 +322,17 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 					(int)outerRingEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
 					null);
 			
+			String ringEmitterNumStr = "" + emitterNum;
+			g2.setPaint(transparentWhite);
+			g2.drawString(ringEmitterNumStr, outerRingEmitterPos.x + EMITTER_RADIUS - INTENSITY_FONT_METRICS.stringWidth(ringEmitterNumStr)/2, 
+					outerRingEmitterPos.y + EMITTER_RADIUS + INTENSITY_FONT_METRICS.getHeight()/2);
+			
 			currAngle -= INCREMENT_ANGLE;
+			emitterNum++;
 		}
 
 		// Now draw the left-hand side of the outer ring...
+		emitterNum = 32;
 		currAngle = -(float)Math.PI + HALF_PI - INCREMENT_ANGLE;
 		for (int i = HALF_NUM_OUTER_RING_EMITTERS; i < this.fireEmitterConfig.getNumOuterRingEmitters(); i++) {
 			Point2D.Float outerRingEmitterPos =
@@ -335,7 +358,13 @@ class ArenaDisplay extends JPanel implements MouseListener, MouseMotionListener 
 					(int)outerRingEmitterPos.y + 2 + DEVICE_FLAME_IMAGE.getHeight(), 
 					null);
 			
+			String ringEmitterNumStr = "" + emitterNum;
+			g2.setPaint(transparentWhite);
+			g2.drawString(ringEmitterNumStr, outerRingEmitterPos.x + EMITTER_RADIUS - INTENSITY_FONT_METRICS.stringWidth(ringEmitterNumStr)/2, 
+					outerRingEmitterPos.y + EMITTER_RADIUS + INTENSITY_FONT_METRICS.getHeight()/2);
+			
 			currAngle -= INCREMENT_ANGLE;
+			emitterNum--;
 		}
 		
 		// Draw the player podiums
