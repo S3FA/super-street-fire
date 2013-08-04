@@ -31,6 +31,10 @@ public class SystemInfoRefreshEvent implements IGameModelEvent {
 			this.isArmed = isArmed;
 			this.isFlame = isFlame;
 		}
+		
+		public @Override String toString() {
+			return "OutputDeviceStatus: device " + deviceId + " isResponding: " + isResponding + " isArmed: " + isArmed + " isFlame: " + isFlame;
+		}
 	}
 	
 	private OutputDeviceStatus[] leftRail;

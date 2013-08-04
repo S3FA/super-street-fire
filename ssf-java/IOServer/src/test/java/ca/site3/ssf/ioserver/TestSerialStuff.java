@@ -58,6 +58,10 @@ public class TestSerialStuff {
 	}
 
 	
+	private void initSerialStuff() {
+		initSerialStuff("/dev/tty.usbserial-A40081Z7");
+	}
+	
 	/**
 	 * Initialize the serial comm port.
 	 */
@@ -138,8 +142,12 @@ public class TestSerialStuff {
 //		tss.initSerialStuff("/dev/master");
 //		tss.test();
 //		tss.testFireBoard(25);
-		tss.testTimer(35);
-		tss.testTimer(36);
+		
+		tss.testLifeBoard(35);
+		
+		
+//		tss.testTimer(35);
+//		tss.testTimer(36);
 		
 //		tss.testGlowflies();
 	}
@@ -196,6 +204,35 @@ public class TestSerialStuff {
 	}
 	
 	
+	private void testLifeBoard(int boardId) {
+		SerialCommunicator sc = createSerialCommunicator();
+		float life = 100;
+		while (life >= 0) {
+			sc.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, life, life--));
+		}
+		closeSerialStuff();
+	}
+	
+	
+	private SerialCommunicator createSerialCommunicator() {
+		initSerialStuff("/dev/cu.usbserial-A800K75T");
+		assertNotNull(serialPort);
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = serialPort.getInputStream();
+			out = serialPort.getOutputStream();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		
+		SerialCommunicator sc = new SerialCommunicator(new CommandLineArgs(), in, out, null);
+		
+		Thread commThread = new Thread(sc);
+		commThread.start();
+		return sc;
+	}
+	
 	
 	
 	private void testTimer(int boardId) {
@@ -216,7 +253,6 @@ public class TestSerialStuff {
 		commThread.start();
 		
 //		testTimer(sc, 88);
-		testLifeBar(sc);
 		
 		sc.querySystemStatus();
 		
@@ -230,7 +266,7 @@ public class TestSerialStuff {
 	private void testTimer(SerialCommunicator sc, int countDownStart) {
 		for (int timer = countDownStart; timer >= 0; timer--) {
 			RoundPlayTimerChangedEvent roundEvent = new RoundPlayTimerChangedEvent(timer);
-			sc.notifyTimerAndLifeBars(roundEvent);
+//			sc.notifyTimerAndLifeBars(roundEvent);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException ex) {
@@ -239,15 +275,6 @@ public class TestSerialStuff {
 		}
 	}
 	
-	
-	private void testLifeBar(SerialCommunicator sc) {
-		
-		int prevHealth = 100;
-		for (int health = 100; health >=0; health -= Math.round(100/16)) {
-			new PlayerHealthChangedEvent(1, prevHealth, health);
-			prevHealth = health;
-		}
-	}
 	
 	
 	@SuppressWarnings("unused")

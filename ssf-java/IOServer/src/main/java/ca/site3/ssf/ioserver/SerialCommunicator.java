@@ -1,9 +1,12 @@
 package ca.site3.ssf.ioserver;
 
+import java.awt.Color;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -11,9 +14,11 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ca.site3.ssf.common.Algebra;
 import ca.site3.ssf.common.CommUtil;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
@@ -23,10 +28,6 @@ import ca.site3.ssf.guiprotocol.StreetFireServer;
 /**
  * Contains logic for converting game event data to the format expected by the
  * output hardware, and writes it out to the serial device.
- * 
- * It also caches the most recent health values for each player and the last
- * timer value received in order to properly send out the messages to those
- * boards.
  * 
  * Also stuff for sending query commands to the boards and awaiting their responses.
  * 
@@ -43,32 +44,32 @@ public class SerialCommunicator implements Runnable {
 	
 	private static final long STATUS_WAIT_TIME_MS = 100;
 	
-	/** 0 - 100 */
-	private short lastP1Health = 0;
-	/** 0 - 100 */
-	private short lastP2Health = 0;
+	private static final Color fullHealthColor = Color.GREEN;
+	private static final Color noHealthColor = Color.RED;
+	
+	private static final Color timerColor = Color.ORANGE; // new Color(200, 200, 200);
+	private static final Color endRoundTimerColor = new Color(255, 0, 0);
+	
+	
 	private int lastTimerVal = 0;
 	
-	private static final int NUM_LIFE_BARS = 16;
-	private static final float LIFE_PER_BAR = 100f / NUM_LIFE_BARS;
+	/** Number of LEDs on the strips for player health and action points */
+	private static final int NUM_LIFE_BARS = 44;
 	
-	private int[] timerBoardIds = new int[] { 35, 36 };
 	
-	/**
-	 * <pre>
-	 *	   x0x          x8x
-	 *	 x     x      x     x
-	 *	 5     1      d     9
-	 *	 x     x      x     x
-	 *	   x6x          xex
-	 *	 x     x      x     x
-	 *	 4     2      c     a
-	 *	 x     x      x     x
-	 *	   x3x          xbx
-	 *	</pre>     
-	 */
-	private byte[] digitMap = new byte[] { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+	private static byte[] p1LifeBoardIds = new byte[] { 33, 36 };
+	private static byte[] p2LifeBoardIds = new byte[] { 34, 37 };
+	private static byte[] timerBoardIds  = new byte[] { 35, 38 };
 	
+	private static Set<Byte> lifeBoardIds = new HashSet<Byte>();
+	static {
+		for (byte b : p1LifeBoardIds) {
+			lifeBoardIds.add(b);
+		}
+		for (byte b : p2LifeBoardIds) {
+			lifeBoardIds.add(b);
+		}
+	}
 	
 	private static final byte[] MESSAGE_TEMPLATE_BYTES = new byte[] { 
 		(byte) 0xAA, (byte) 0xAA, // framing bytes
@@ -113,6 +114,9 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	public void run() {
+		
+		initializeStaticBoardColours();
+		
 		Thread inThread = new Thread(reader, "Serial input reader");
 		inThread.start();
 		
@@ -141,7 +145,40 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	
+	private void initializeStaticBoardColours() {
+		for (byte boardId : timerBoardIds) {
+			byte[] payload = new byte[] {
+				boardId,
+				(byte) 't',
+				(byte) timerColor.getRed(),
+				(byte) timerColor.getGreen(),
+				(byte) timerColor.getBlue(),
+			};
+			byte[] msg = getMessageForPayload(payload);
+			log.debug("Sending timer message: " + CommUtil.bytesToHexString(msg));
+			enqueueMessage(msg);
+			try {
+				Thread.sleep(30);
+			} catch (InterruptedException ex) {
+				log.warn("wtf", ex);
+			}
+		}
+		
+		
+		for (byte boardId : lifeBoardIds) {
+			byte[] payload = new byte[] {
+				boardId,
+				(byte) 0x63,
+				(byte) Color.BLUE.getRed(),
+				(byte) Color.BLUE.getGreen(),
+				(byte) Color.BLUE.getBlue()
+			};
+			log.debug("Enqueuing action points color message for board {}", boardId);
+			enqueueMessage(getMessageForPayload(payload));
+		}
+	}
 
+	
 	/**
 	 * Send messages to the serial port to trigger the flame effect.
 	 * See https://code.google.com/p/super-street-fire/wiki/FlameEffectControllerProtocol
@@ -167,7 +204,7 @@ public class SerialCommunicator implements Runnable {
 		 * dest node is easily obtainable, see getHardwareIdFromEvent
 		 * command possibilities are n = ascii '1' - '4' corresponding to flame effect output n to [value] %
 		 * 
-		 * i'm not sure my sure this mapping is correct but the way this is currently implemented is:
+		 * i'm not sure this mapping is correct but the way this is currently implemented is:
 		 * 
 		 * effect output 1 -> fire!
 		 * effect output 2 -> player 1 colour
@@ -259,74 +296,111 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	
-	void notifyTimerAndLifeBars(PlayerHealthChangedEvent e) {
+	
+	void onPlayerHealthChanged(PlayerHealthChangedEvent e) {
+		short life;
 		if (e.getPlayerNum() == 1) {
-			lastP1Health = (short)e.getNewLifePercentage();
+			life = (short)e.getNewLifePercentage();
 		} else if (e.getPlayerNum() == 2) {
-			lastP2Health = (short)e.getNewLifePercentage();
+			life = (short)e.getNewLifePercentage();
 		} else {
-			log.warn("Invalid player number: " + e.getPlayerNum());
+			throw new IllegalArgumentException("Invalid player number: " + e.getPlayerNum());
 		}
-		notifyTimerAndLifeBars();
+		Color c = getColorFromLifePercentage(life);
+		// need to send life amount ('L') and colour ('l') for life bars
+		for (int boardId : (e.getPlayerNum() == 1 ? p1LifeBoardIds : p2LifeBoardIds)) {
+			byte[] payload;
+			
+			payload = new byte[] {
+				(byte) boardId,
+				(byte) 0x4c,
+				(byte) Math.round(life / 100.0 * NUM_LIFE_BARS),
+				(byte) 0x6c,
+				(byte) c.getRed(),
+				(byte) c.getGreen(),
+				(byte) c.getBlue(),
+			};
+			byte[] msg = getMessageForPayload(payload);
+			log.debug("Enqueuing player {} life ({}) percentage message for board {}: {}", new Object[] {e.getPlayerNum(), life, boardId, CommUtil.bytesToHexString(msg)});
+			enqueueMessage(msg);
+			
+			
+//			try {
+//				Thread.sleep(20);
+//			} catch (InterruptedException ex) {
+//				log.warn("Sleep between health level and colour messages interrupted", ex);
+//			}
+			
+		}
+	}
+	
+	private Color getColorFromLifePercentage(short lifePercentage) {
+		return Algebra.colorLerp(noHealthColor, fullHealthColor, ((float)lifePercentage) / 100.0f);
 	}
 	
 	
-	void notifyTimerAndLifeBars(RoundPlayTimerChangedEvent e) {
+	void onPlayerActionPointsChanged(PlayerActionPointsChangedEvent e) {
+		short points;
+		if (e.getPlayerNum() == 1) {
+			points = (short)e.getNewActionPointAmt();
+		} else if (e.getPlayerNum() == 2) {
+			points = (short)e.getNewActionPointAmt();
+		} else {
+			throw new IllegalArgumentException("Invalid player number: " + e.getPlayerNum());
+		}
+		// need to send action points amount ('C') and color ('c')
+		for (byte boardId : (e.getPlayerNum() == 1 ? p1LifeBoardIds : p2LifeBoardIds)) {
+			byte[] payload = new byte[] {
+				boardId,
+				(byte) 0x43,
+				(byte) Math.round(points / 100.0 * NUM_LIFE_BARS)
+			};
+			log.debug("Enqueuing action points percentage message for board {}", boardId);
+			enqueueMessage(getMessageForPayload(payload));
+		}
+	}
+	
+
+	void onTimerChanged(RoundPlayTimerChangedEvent e) {
 		if (e.getTimeInSecs() < 0 || e.getTimeInSecs() > this.args.roundTimeInSecs) {
 			log.warn("Unsupported timer value {}", e.getTimeInSecs());
 			return;
 		}
 		
 		lastTimerVal = e.getTimeInSecs();
-		notifyTimerAndLifeBars();
-	}
-	
-	
-	/**
-	 * Sends values of {@link #lastP1Health}, {@link #lastP2Health}
-	 * and {@link #lastTimerVal} to the timer/life boards
-	 * 
-	 * <p>The payload format for the life bars and timer is:</p>
-	 * 		
-	 * <pre>[dest node] [2 bytes P1 life] [2 bytes P2 life] [2 bytes timer]</pre>
-	 */
-	private void notifyTimerAndLifeBars() {
-		for (int id : timerBoardIds) {
-			byte[] payload = new byte[7];
+		Color c = lastTimerVal <= 10 ? timerColor : endRoundTimerColor;
+		
+		for (byte boardId : timerBoardIds) {
 			
-			// target board
-			payload[0] = (byte)id;
+			try {
+				Thread.sleep(20);
+			} catch (InterruptedException ex) {
+				log.warn("Interrupted sleeping before sending timer message", ex);
+			}
 			
-//			payload[0] = digitMap[lastTimerVal / 10];
-//			payload[1] = digitMap[lastTimerVal % 10];
-//			populateLifeData(lastP2Health, payload, 1);
-//			populateLifeData(lastP1Health, payload, 3);
+			byte[] payload = new byte[] {
+				boardId,
+				(byte) 'T',
+				(byte) lastTimerVal
+			};
 			
-			populateLifeData(lastP1Health, payload, 1);
-			populateLifeData(lastP2Health, payload, 3);
+			byte[] msg = getMessageForPayload(payload);
+			log.debug("Sending timer {} message: {}", boardId, CommUtil.bytesToHexString(msg));
+			enqueueMessage(msg);
 			
-			//System.out.println("lastTimerVal = "+lastTimerVal);;
-			//System.out.println("Timer lastTimerVal/10: "+(lastTimerVal/10));
-			//System.out.println("Timer lastTimerVal%10: "+(lastTimerVal%10));
-			payload[6] = digitMap[lastTimerVal / 10]; 
-			payload[5] = digitMap[lastTimerVal % 10];
-			
-			enqueueMessage(getMessageForPayload(payload));
+			payload = new byte[] {
+				boardId,
+				(byte) 't',
+				(byte) c.getRed(),
+				(byte) c.getGreen(),
+				(byte) c.getBlue(),
+			};
+			msg = getMessageForPayload(payload);
+			log.debug("Sending timer message: " + CommUtil.bytesToHexString(msg));
+			enqueueMessage(msg);
 		}
 	}
 	
-	private void populateLifeData(short life, byte[] buffer, int offset) {
-		if (life == 100) {
-			buffer[offset] = buffer[offset+1] = (byte)0xFF;
-		} else if (life == 0) {
-			buffer[offset] = buffer[offset+1] = 0;
-		} else {
-			int bars = (1 << (int)(life / LIFE_PER_BAR) + 1) - 1;
-			//int bars = 1 << (int)Math.ceil(((float)life / LIFE_PER_BAR));
-			buffer[offset] = (byte) ( (bars >> 8) & 0xFF);
-			buffer[offset+1] = (byte) (bars & 0xFF);
-		}
-	}
 	
 	/**
 	 * Sends out a query command to the devices one at a time.
@@ -547,7 +621,7 @@ public class SerialCommunicator implements Runnable {
 		 */
 		byte sum = 0;
 		for (byte b : payload) {
-			sum += b; // seems likely that this will roll over
+			sum += b;
 		}
 		return (byte) ~sum; // tilde operator flips each bit (aka 1's complement) 
 	}
@@ -560,6 +634,13 @@ public class SerialCommunicator implements Runnable {
 	private void enqueueMessage(byte[] message) {
 		if (messageQueue.offer(message) == false) {
 			log.warn("No room on queue for serial message");
+		}
+		if (message.length > 5 && lifeBoardIds.contains(message[4])) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException ex) {
+				log.warn("Interrupted while pausing after sending life board message", ex);
+			}
 		}
 	}
 	

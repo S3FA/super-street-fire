@@ -8,7 +8,9 @@ import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.IGameModelListener;
+import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
+import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
 
@@ -46,19 +48,28 @@ public class GameEventRouter implements IGameModelListener {
 		
 		if (event.getType() == Type.FIRE_EMITTER_CHANGED) {
 			serialComm.notifyFireEmitters((FireEmitterChangedEvent) event);
-		}
-		else if (event.getType() == Type.PLAYER_HEALTH_CHANGED) {
-			serialComm.notifyTimerAndLifeBars((PlayerHealthChangedEvent) event);
+		} else if (event.getType() == Type.PLAYER_HEALTH_CHANGED) {
+			serialComm.onPlayerHealthChanged((PlayerHealthChangedEvent) event);
+		} else if (event.getType() == Type.PLAYER_ACTION_POINTS_CHANGED) {
+			serialComm.onPlayerActionPointsChanged((PlayerActionPointsChangedEvent) event);
 		} else if (event.getType() == Type.ROUND_PLAY_TIMER_CHANGED) {
-			serialComm.notifyTimerAndLifeBars((RoundPlayTimerChangedEvent) event);
+			serialComm.onTimerChanged((RoundPlayTimerChangedEvent) event);
+		} else if (event.getType() == Type.ROUND_BEGIN_TIMER_CHANGED) {
+			try {
+				int timerVal = Integer.parseInt(((RoundBeginTimerChangedEvent) event).getThreeTwoOneFightTime().toString());
+				serialComm.onTimerChanged(new RoundPlayTimerChangedEvent(timerVal));
+			} catch (NumberFormatException ex) {
+				// swallow "Fight"
+			}
 		}
 		
 		else if (event.getType() == Type.GAME_STATE_CHANGED) {
 			GameStateChangedEvent e = (GameStateChangedEvent)event;
 			if (e.getNewState() == GameStateType.IDLE_STATE) {
 				serialComm.setGlowfliesOn(false);
-				serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(1, 0, 0));
-				serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(2, 0, 0));
+				serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
+				serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
+				serialComm.onTimerChanged(new RoundPlayTimerChangedEvent(99));
 			} else {
 				serialComm.setGlowfliesOn(true);
 			}
