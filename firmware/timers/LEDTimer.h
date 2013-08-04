@@ -26,11 +26,17 @@ class LEDTimer
     /* Change the timer colour. Note changes are made on the next call to 'update' */
     void setColour(uint32_t colour);
     /* Change the time displayed. Note changes are made on the next call to 'update' */
-    void showTime(int tm);
+    void showTime(int tm, boolean turnBlinkingOn);
+    
     /* Call this function periodically to have the colour strip be updated. Note this
      * class is smart about doing updates - it only updates the strip when it needs
      * to. so it's safe to call this function a lot. */
     void update();
+    
+  private:
+    boolean blinkingOn;
+    uint32_t lastBlinkTimeInMillis;
+    enum BlinkState { BlinkOffState, BlinkOnState } blinkState;
 };
 
 #endif

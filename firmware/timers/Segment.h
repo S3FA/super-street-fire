@@ -17,8 +17,10 @@ class Segment
     void begin(Adafruit_NeoPixel *strip);
     /* Set all of the pixels of one segment to a given colour */
     void setSegment (int seg, uint32_t colour);
+    void clearAllSegments();
     /* Display a digit between 0 and 9 */
     void displayDigit(char digit, uint32_t colour);
+    
 
 };
 
