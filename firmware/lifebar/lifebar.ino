@@ -230,6 +230,7 @@ void readSerial()
    * data, in which case we process it below. */
   while (Serial1.available()) {
     messageBuf.receiveByte(Serial1.read());
+
   }
   messageBuf.update();
 
