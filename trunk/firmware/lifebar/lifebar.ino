@@ -166,7 +166,7 @@ void processMessage()
 void setup()
 {
   pinMode(HEART_LED, OUTPUT); //heartbeat LED on teensy board
-  Serial1.begin(38400);
+  Serial1.begin(57600);
   Serial.begin(38400);
 
   state = IDLE;

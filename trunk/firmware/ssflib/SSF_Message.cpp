@@ -5,10 +5,10 @@
  *
  * 0xAA        ---+
  * 0xAA           |  Header bytes
- * [length]       |
+ * [length]    ---+
+ * 
  * [dest]      ---+
- *
- * [command]   ---+  Payload
+ * [command]      |  Payload
  * [value]        |
  * ...         ---+
  *
@@ -17,12 +17,12 @@
  */
 
 #define FRAMING_BYTE          0xAA
-#define NUM_HEADER_BYTES      4
+#define NUM_HEADER_BYTES      3
 #define NUM_FRAMING_BYTES     (NUM_HEADER_BYTES+1)
 #define PAYLOAD_START         NUM_HEADER_BYTES
 #define TIMEOUT               1000
 
-#define DEBUG                 0
+#define DEBUG                 1
 
 MessageBuf::MessageBuf()
 {
@@ -105,6 +105,10 @@ void MessageBuf::receiveByte(byte data)
       Serial.println((int)calculateChecksum());
       Serial.print("read == ");
       Serial.println((int)buffer[messageLen-1]);
+      Serial.println("Bytes received:");
+      for (int i = 0; i < messageLen; i++) {
+        Serial.println(buffer[i], HEX);
+      }
 #endif
       clear();
     }
