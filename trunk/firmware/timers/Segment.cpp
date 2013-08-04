@@ -1,5 +1,7 @@
 #include "Segment.h"
 
+#define NUM_SEGMENTS 7
+
 /* The digits that can be displayed by the seven segment */
 const char *DIGITS = "0123456789";
 
@@ -47,6 +49,13 @@ void Segment::setSegment(int seg, uint32_t colour)
   for(int n = 0; n < PIXELS_PER_SEGMENT; n++) {
     strip->setPixelColor(start + n, colour);
   }
+}
+
+void Segment::clearAllSegments() {
+  for (int i = 0; i < NUM_SEGMENTS; i++) {
+    this->setSegment(i, 0x000000); 
+  }
+  strip->show();
 }
 
 void Segment::displayDigit(char digit, uint32_t colour)

@@ -9,6 +9,8 @@
 #define NODE_ADDRESS     35
 #define RECV_ENABLE      8
 
+#define BLINK_TIMER_TIME 10
+
 /***********/
 /* Globals */
 /***********/
@@ -36,10 +38,13 @@ void processMessage()
   {
     switch(buf[pos++])
     {
-      case 'T':
+      case 'T': {
+        int currTime = (int)buf[pos++];
+        boolean blinkingOn = (currTime <= BLINK_TIMER_TIME && currTime > 0);
         /* Set time to display */
-        timer.showTime((int)buf[pos++]);
+        timer.showTime(currTime, blinkingOn);
         break;
+      }
 
       case 't':
         /* Colour to display */
