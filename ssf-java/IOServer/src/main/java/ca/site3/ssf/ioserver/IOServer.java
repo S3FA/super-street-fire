@@ -45,7 +45,6 @@ public class IOServer {
 	
 	private CommandLineArgs args;
 	
-	
 	private IGameModel game;
 	
 	private GestureRecognizer gestureRecognizer = new GestureRecognizer();
@@ -74,7 +73,7 @@ public class IOServer {
 	
 	private HeartbeatListener heartbeatListener;
 	
-	SerialCommunicator serialComm;
+	private SerialCommunicator serialComm;
 	
 	
 	public IOServer(CommandLineArgs args) {
@@ -188,6 +187,10 @@ public class IOServer {
 	
 	public BlockingQueue<DeviceEvent> getDeviceEventQueue() {
 		return commManager.getCommInQueue();
+	}
+	
+	public SerialCommunicator getSerialCommunicator() {
+		return this.serialComm;
 	}
 	
 	/**

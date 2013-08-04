@@ -59,8 +59,9 @@ import ca.site3.ssf.ioserver.CommandLineArgs;
 import ca.site3.ssf.ioserver.DeviceConstants.Device;
 import ca.site3.ssf.ioserver.DeviceStatus;
 import ca.site3.ssf.ioserver.DeviceStatus.IDeviceStatusListener;
+import ca.site3.ssf.ioserver.GlowflyTestWindow;
 import ca.site3.ssf.ioserver.IOServer;
-import ca.site3.ssf.ioserver.SerialTestWindow;
+import ca.site3.ssf.ioserver.BoardQueryTestWindow;
 import ch.qos.logback.classic.Level;
 
 import com.apple.eawt.AppEvent.QuitEvent;
@@ -86,6 +87,7 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	private JMenuItem gloveInfoWindowMenuItem = null;
 	private JMenuItem customActionMenuItem = null;
 	private JMenuItem glowflyTestMenuItem = null;
+	private JMenuItem boardQueryTestMenuItem = null;
 	
 	private JFrame gloveDataWindow = null;
 	private GloveDataInfoPanel p1LeftGloveInfoPanel  = null;
@@ -96,8 +98,9 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 	private GloveDataInfoPanel rmRightGloveInfoPanel = null;
 	
 	private JFrame customActionWindow = null;
-	private CustomActionPanel customActionPanel = null;
-	private SerialTestWindow glowflyTestWindow = null;
+	private CustomActionPanel customActionPanel  = null;
+	private GlowflyTestWindow glowflyTestWindow  = null;
+	private BoardQueryTestWindow boardTestWindow = null;
 	
 	private ArenaDisplay arenaDisplay = null;
 	private GameInfoPanel infoPanel   = null;
@@ -126,9 +129,10 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.ioserver = ioserver;
 		this.gameModel = ioserver.getGameModel();
 		
-		this.glowflyTestWindow = new SerialTestWindow(ioserver);
+		this.glowflyTestWindow = new GlowflyTestWindow(ioserver);
+		this.boardTestWindow   = new BoardQueryTestWindow(ioserver);
 		
-		if (System.getProperty("os.name").startsWith("Mac OS X") == true) {
+		if (System.getProperty("os.name").startsWith("Mac OS X")) {
 			initMacStuff();
 		}
 	}
@@ -172,10 +176,13 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		this.customActionMenuItem.addActionListener(this);
 		this.glowflyTestMenuItem = new JMenuItem("Glowfly Test UI");
 		this.glowflyTestMenuItem.addActionListener(this);
+		this.boardQueryTestMenuItem = new JMenuItem("Board Query Test UI");
+		this.boardQueryTestMenuItem.addActionListener(this);
 		
 		this.windowMenu.add(this.gloveInfoWindowMenuItem);
 		this.windowMenu.add(this.customActionMenuItem);
 		this.windowMenu.add(this.glowflyTestMenuItem);
+		this.windowMenu.add(this.boardQueryTestMenuItem);
 		
 		this.menuBar.add(this.windowMenu);
 		
@@ -570,6 +577,9 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		}
 		else if (event.getSource() == this.glowflyTestMenuItem) {
 			this.glowflyTestWindow.setVisible(true);
+		}
+		else if (event.getSource() == this.boardQueryTestMenuItem) {
+			this.boardTestWindow.setVisible(true);
 		}
 	}
 	

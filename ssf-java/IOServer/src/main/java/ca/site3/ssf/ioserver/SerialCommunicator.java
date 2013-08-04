@@ -70,6 +70,14 @@ public class SerialCommunicator implements Runnable {
 	private byte[] digitMap = new byte[] { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 	
 	
+	private static final byte[] MESSAGE_TEMPLATE_BYTES = new byte[] { 
+		(byte) 0xAA, (byte) 0xAA, // framing bytes
+		(byte) 2, // payload length (node ID and command)
+		0, // destination node to be replaced within the loop
+		(byte)63, // '?' command in ASCII
+		0 // checksum to be replaced within the loop
+	};
+	
 	private OutputDeviceStatus[] systemStatus = null;
 	
 	private BufferedOutputStream out;
@@ -80,12 +88,10 @@ public class SerialCommunicator implements Runnable {
 	
 	/** not ideal that this is here. used to fire system info refresh event to GUIs */
 	private StreetFireServer server;
-	
-	
+		
 	private volatile boolean glowfliesOn = false;
 	
-	
-	
+
 	public SerialCommunicator(CommandLineArgs args, InputStream serialIn, OutputStream serialOut, StreetFireServer guiOut) {
 		this.args = args;
 		this.reader = new SerialDataReader(serialIn);
@@ -201,7 +207,7 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	
-	void setGlowfliesOn(boolean makeSurfaceHot, boolean broadcast) {
+	public void setGlowfliesOn(boolean makeSurfaceHot, boolean broadcast) {
 		log.info(makeSurfaceHot ? "Turning glowflies on." : "Turning glowflies off.");
 		this.glowfliesOn = makeSurfaceHot;
 		
@@ -223,7 +229,7 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	
-	void toggleGlowfly(boolean on, int id) {
+	public void toggleGlowfly(boolean on, int id) {
 		byte[] payload = new byte[3];
 		payload[0] = (byte)id;
 		payload[1] = (byte) 0x41; // 'A' for A/C
@@ -236,7 +242,7 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	
-	void setGlowfliesOn(boolean makeSurfaceHot) {
+	public void setGlowfliesOn(boolean makeSurfaceHot) {
 		setGlowfliesOn(makeSurfaceHot, true);
 	}
 	
@@ -331,6 +337,73 @@ public class SerialCommunicator implements Runnable {
 		enqueueMessage( QUERY_SYSTEM_SENTINEL ); // sentinel value to trigger system query
 	}
 	
+	/**
+	 * Queries the board with the given number and returns its status.
+	 * @param boardNumber The board to query.
+	 * @return The resulting status of the board.
+	 */
+	public OutputDeviceStatus queryBoard(int boardNumber) {
+		byte[] messageTemplate = MESSAGE_TEMPLATE_BYTES.clone();
+		return this.queryBoard(boardNumber, messageTemplate);
+	}
+	
+	public OutputDeviceStatus[] queryAllBoards() {
+		OutputDeviceStatus[] result = new OutputDeviceStatus[32]; // indexes are off-by-one compared to device IDs
+		for (int i = 0; i < 32; i++) {
+			result[i] = null;
+		}
+		
+		// sent out to each emitter in turn
+		byte[] messageTemplate = MESSAGE_TEMPLATE_BYTES.clone();
+		
+		this.reader.clear();
+		for (int i = 1; i <= 32; i++) {
+			OutputDeviceStatus status = this.queryBoard(i, messageTemplate);
+			assert(status != null);
+			if (status != null) {
+				result[status.deviceId - 1] = status;
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Helper function that queries the board with the given number,
+	 * also has a cached message template for efficiency when querying all boards at once.
+	 * @param boardNumber The board to query.
+	 * @param messageTemplate The message template bytes, must conform to MESSAGE_TEMPLATE.
+	 * @return The resulting status of the board.
+	 */
+	private OutputDeviceStatus queryBoard(int boardNumber, byte[] messageTemplate) {
+		
+		OutputDeviceStatus systemStatus = new OutputDeviceStatus(boardNumber, false, false, false);
+		
+		this.reader.clear();
+		messageTemplate[3] = (byte)boardNumber;
+		messageTemplate[5] = (byte)~(boardNumber + 63);
+		
+		try {
+			this.out.write(messageTemplate);
+			this.out.flush();
+			
+			try {
+				OutputDeviceStatus result = reader.getStatusUpdateQueue().poll(STATUS_WAIT_TIME_MS, TimeUnit.MILLISECONDS);
+				if (result != null) {
+					systemStatus = result;
+				}
+			}
+			catch (InterruptedException ex) {
+				log.warn("Interrupted while waiting for device status",ex);
+			}
+		
+		}
+		catch (IOException ex) {
+			log.error("Error reading or writing status query for node", ex);
+		}
+		
+		return systemStatus;
+	}
 	
 	
 	/**
@@ -343,62 +416,25 @@ public class SerialCommunicator implements Runnable {
 	private void doSystemQuery() {
 		
 		log.info("Querying boards...");
-		
-		systemStatus = new OutputDeviceStatus[32]; // indexes are off-by-one compared to device IDs
-		for (int i=0; i<32; i++) {
-			systemStatus[i] = new OutputDeviceStatus(i, false, false, false);
-		}
-		
-		// sent out to each emitter in turn
-		byte[] messageTemplate = new byte[] { 
-			(byte) 0xAA, (byte) 0xAA, // framing bytes
-			(byte) 2, // payload length (node ID and command)
-			0, // destination node to be replaced within the loop
-			(byte)63, // '?' command in ASCII
-			0 // checksum to be replaced within the loop
-		};
-		
-		
-		reader.clear();
-		for (int i=1; i<=32; i++) {
-			messageTemplate[3] = (byte)i;
-			messageTemplate[5] = (byte) ~(i + 63);
-			try {
-				this.out.write(messageTemplate);
-				this.out.flush();
-				try {
-					OutputDeviceStatus status = reader.getStatusUpdateQueue().poll(STATUS_WAIT_TIME_MS, TimeUnit.MILLISECONDS);
-					if (status != null) {
-						systemStatus[status.deviceId - 1] = status;
-					}
-					
-				} catch (InterruptedException ex) {
-					log.warn("Interrupted while waiting for device status",ex);
-				}
-				
-			} catch (IOException ex) {
-				log.error("Error reading or writing status query for node", ex);
-			}
-		}
-		
+		this.systemStatus = this.queryAllBoards();
 		
 		/*
 		 * Convert from device ID to GameModel. Inverse of getHardwareIdFromEvent
 		 */
 		OutputDeviceStatus[] leftRailStatus = new OutputDeviceStatus[8];
 		for (int i=0; i<8; i++) {
-			leftRailStatus[i] = systemStatus[8+i];
+			leftRailStatus[i] = this.systemStatus[8+i];
 		}
 		OutputDeviceStatus[] rightRailStatus = new OutputDeviceStatus[8];
 		for (int i=0; i<8; i++) {
-			rightRailStatus[i] = systemStatus[i];
+			rightRailStatus[i] = this.systemStatus[i];
 		}
 		OutputDeviceStatus[] outerRingStatus = new OutputDeviceStatus[16];
 		for (int i=0; i<8; i++) {
-			outerRingStatus[i] = systemStatus[16+i];
+			outerRingStatus[i] = this.systemStatus[16+i];
 		}
 		for (int i=8; i<16; i++) {
-			outerRingStatus[i] = systemStatus[31-(i-8)];
+			outerRingStatus[i] = this.systemStatus[31-(i-8)];
 		}
 		
 		/*
@@ -409,7 +445,8 @@ public class SerialCommunicator implements Runnable {
 		 * somewhere. Only the GUIs get notified of this, not any other
 		 * IGameModelListeners
 		 */
-		SystemInfoRefreshEvent refreshEvent = new SystemInfoRefreshEvent(leftRailStatus, rightRailStatus, outerRingStatus);
+		SystemInfoRefreshEvent refreshEvent = 
+				new SystemInfoRefreshEvent(leftRailStatus, rightRailStatus, outerRingStatus);
 		if (server != null) {
 			server.notifyGUI(refreshEvent);
 		}

@@ -12,7 +12,7 @@ import javax.swing.WindowConstants;
 
 
 @SuppressWarnings("serial")
-public class SerialTestWindow extends JFrame implements ActionListener {
+public class GlowflyTestWindow extends JFrame implements ActionListener {
 	private static final int NUM_BOARDS = 32;
 	
 	private IOServer ioserver;
@@ -23,8 +23,8 @@ public class SerialTestWindow extends JFrame implements ActionListener {
 	private JButton broadcastOff;
 	
 	
-	public SerialTestWindow(IOServer server)  {
-		super("glowfly testing");
+	public GlowflyTestWindow(IOServer server)  {
+		super("Glowfly Testing");
 		setLocationRelativeTo(null);
 		
 		ioserver = server;
@@ -53,24 +53,29 @@ public class SerialTestWindow extends JFrame implements ActionListener {
 	
 	
 	public void actionPerformed(ActionEvent e) {
+		
 		JButton btn = (JButton)e.getSource();
+		SerialCommunicator serialComm = ioserver.getSerialCommunicator();
+		assert(serialComm != null);
 		
 		if (btn == broadcastOn) {
-			ioserver.serialComm.setGlowfliesOn(true, true);
-		} else if (btn == broadcastOff) {
-			ioserver.serialComm.setGlowfliesOn(false, true);
-		} else {
+			serialComm.setGlowfliesOn(true, true);
+		}
+		else if (btn == broadcastOff) {
+			serialComm.setGlowfliesOn(false, true);
+		}
+		else {
 			int boardId = (Integer)btn.getClientProperty("id");
 			boolean isOn = (Boolean)btn.getClientProperty("fire");
 			btn.setText("Turn board " + boardId + " " + (isOn? "off": "on"));
 			btn.putClientProperty("fire", ! isOn);
-			ioserver.serialComm.toggleGlowfly(!isOn, boardId);
+			serialComm.toggleGlowfly(!isOn, boardId);
 		}
 	}
 	
 	
 	public static void main(String... args) {
-		SerialTestWindow w = new SerialTestWindow(null);
+		GlowflyTestWindow w = new GlowflyTestWindow(null);
 		w.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		w.setLocationRelativeTo(null);
 		w.pack();
