@@ -257,8 +257,8 @@ void showLife(byte lifeValue, uint32_t lifeColour) { //display the current life 
       col = 0;
     }
     leds.setPixel(LIFEBAR1 + i, col);
-    leds.setPixel(LIFEBAR2 + i, lifeColour);
-    leds.setPixel(LIFEBAR3 + i, lifeColour);
+    leds.setPixel(LIFEBAR2 + i, col);
+    leds.setPixel(LIFEBAR3 + i, col);
   }
   leds.show();
 }
