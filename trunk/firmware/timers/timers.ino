@@ -71,7 +71,7 @@ void readSerial()
 
 void setup()
 {
-  Serial.begin(38400);
+  Serial.begin(57600);
   pinMode(RECV_ENABLE, OUTPUT);
   digitalWrite(RECV_ENABLE, LOW);
 

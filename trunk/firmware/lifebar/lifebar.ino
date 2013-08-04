@@ -228,7 +228,7 @@ void readSerial()
 {
   /* Consume as much serial data as available. The buffer will fill up until there is an entire package of 
    * data, in which case we process it below. */
-  while(Serial1.available()) {
+  while (Serial1.available()) {
     messageBuf.receiveByte(Serial1.read());
   }
   messageBuf.update();
@@ -251,7 +251,7 @@ void showLife(byte lifeValue, uint32_t lifeColour) { //display the current life 
 
   uint32_t col;
   for(int i = 0; i < BAR_LENGTH; i++) {
-    if (i < lifeValue) {
+    if (i <= lifeValue) {
       col = lifeColour;
     } else {
       col = 0;
@@ -273,7 +273,7 @@ void showCharge(byte chargeValue, long chargeColour) {
 
   uint32_t col;
   for(int i=0; i < BAR_LENGTH; i++) {
-    if (i < chargeValue) {
+    if (i <= chargeValue) {
       col = chargeColour;
     } else {
       col = 0;
