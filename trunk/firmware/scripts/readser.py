@@ -2,7 +2,7 @@
 
 import serial
 
-dev = "/dev/ttyUSB0"
+dev = "/dev/ttyACM0"
 
 ser = serial.Serial(dev, 38400)
 print "Reading...", dev
