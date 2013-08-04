@@ -1,5 +1,7 @@
 package ca.site3.ssf.common;
 
+import java.awt.Color;
+
 import org.apache.commons.math.geometry.Vector3D;
 
 public class Algebra {
@@ -15,8 +17,17 @@ public class Algebra {
 			   Math.abs(v1.getZ() - v2.getZ()) < epsilon;
 	}
 	
+	
 	public static float LerpF(double x0, double x1, float y0, float y1, double x) {
 		return (float)(y0 + (y1 - y0) * (x - x0) / (x1 - x0));
 	}
+
 	
+	public static Color colorLerp(Color start, Color dest, float ratio) {
+		return new Color(
+				Math.round(start.getRed()   + ratio * (dest.getRed()   - start.getRed())),
+				Math.round(start.getGreen() + ratio * (dest.getGreen() - start.getGreen())),
+				Math.round(start.getBlue()  + ratio * (dest.getBlue()  - start.getBlue()))
+		);
+	}
 }

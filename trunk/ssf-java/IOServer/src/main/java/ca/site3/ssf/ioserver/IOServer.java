@@ -29,7 +29,6 @@ import ca.site3.ssf.gesturerecognizer.GestureRecognizer;
 import ca.site3.ssf.guiprotocol.StreetFireServer;
 import ca.site3.ssf.guiprotocol.SystemCommand;
 import ca.site3.ssf.guiprotocol.SystemCommand.SystemCommandType;
-import ch.qos.logback.classic.Level;
 
 import com.beust.jcommander.JCommander;
 
@@ -131,8 +130,8 @@ public class IOServer {
 		serialCommThread.start();
 		
 		// launch with lifebars at 0. not the best place for this code but it'll do for now.
-		serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(1, 0, 0));
-		serialComm.notifyTimerAndLifeBars(new PlayerHealthChangedEvent(2, 0, 0));
+		serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
+		serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
 		
 		
 		gameEventRouter = new GameEventRouter(guiServer, serialComm);
@@ -307,25 +306,25 @@ public class IOServer {
 	}
 	
 
-	private static void configureLogging(int level) {
+	private static void configureLogging(int logLevel) {
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
 				LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
 		
-		switch (level) {
+		switch (logLevel) {
 			case 0:
-				root.setLevel(Level.OFF); break;
+				root.setLevel(ch.qos.logback.classic.Level.OFF); break;
 			case 1:
-				root.setLevel(Level.TRACE); break;
+				root.setLevel(ch.qos.logback.classic.Level.TRACE); break;
 			case 2:
-				root.setLevel(Level.DEBUG); break;
+				root.setLevel(ch.qos.logback.classic.Level.DEBUG); break;
 			case 3:
-				root.setLevel(Level.INFO); break;
+				root.setLevel(ch.qos.logback.classic.Level.INFO); break;
 			case 4:
-				root.setLevel(Level.WARN); break;
+				root.setLevel(ch.qos.logback.classic.Level.WARN); break;
 			case 5:
-				root.setLevel(Level.ERROR); break;
+				root.setLevel(ch.qos.logback.classic.Level.ERROR); break;
 			default:
-				root.setLevel(Level.INFO);
+				root.setLevel(ch.qos.logback.classic.Level.INFO);
 		}
 	}
 	

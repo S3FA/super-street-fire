@@ -62,7 +62,6 @@ import ca.site3.ssf.ioserver.DeviceStatus.IDeviceStatusListener;
 import ca.site3.ssf.ioserver.GlowflyTestWindow;
 import ca.site3.ssf.ioserver.IOServer;
 import ca.site3.ssf.ioserver.BoardQueryTestWindow;
-import ch.qos.logback.classic.Level;
 
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;

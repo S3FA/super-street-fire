@@ -31,7 +31,7 @@ public class TestLegacyGloveParser {
 		
 		Queue<DeviceEvent> q = new LinkedList<DeviceEvent>();
 		int port = 31337;
-		DeviceNetworkListener listener = new DeviceNetworkListener("192.168.100.2", port, new LegacyGloveDataParser(), q);
+		DeviceNetworkListener listener = new DeviceNetworkListener("127.0.0.1", port, new LegacyGloveDataParser(), q);
 		Thread listenerThread = new Thread(listener, "DeviceNetworkListener Thread");
 		listenerThread.start();
 		
