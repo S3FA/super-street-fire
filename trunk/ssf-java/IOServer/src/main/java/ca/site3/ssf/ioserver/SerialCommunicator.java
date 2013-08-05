@@ -56,10 +56,11 @@ public class SerialCommunicator implements Runnable {
 	/** Number of LEDs on the strips for player health and action points */
 	private static final int NUM_LIFE_BARS = 44;
 	
-	
-	private static byte[] p1LifeBoardIds = new byte[] { 33, 36 };
-	private static byte[] p2LifeBoardIds = new byte[] { 34, 37 };
-	private static byte[] timerBoardIds  = new byte[] { 35, 38 };
+	// p1/p2 life boards and timers given same IDs
+	// (they don't have query response implemented anyway, and this reduces messages on the bus) 
+	private static byte[] p1LifeBoardIds = new byte[] { 33 /*, 36 */};
+	private static byte[] p2LifeBoardIds = new byte[] { 34 /*, 37 */ };
+	private static byte[] timerBoardIds  = new byte[] { 35 /*, 38 */ };
 	
 	private static Set<Byte> lifeBoardIds = new HashSet<Byte>();
 	static {
@@ -132,6 +133,7 @@ public class SerialCommunicator implements Runnable {
 				} else {
 					this.out.write(message);
 					this.out.flush();
+					try { Thread.sleep(5); } catch (InterruptedException ex) { log.warn("toasty!", ex); }
 					log.debug("wrote message: {}", CommUtil.bytesToHexString(message));
 				}
 			} catch (IOException ex) {
@@ -164,7 +166,6 @@ public class SerialCommunicator implements Runnable {
 			}
 		}
 		
-		
 		for (byte boardId : lifeBoardIds) {
 			byte[] payload = new byte[] {
 				boardId,
@@ -195,7 +196,7 @@ public class SerialCommunicator implements Runnable {
 	 * @param event
 	 */
 	void notifyFireEmitters(FireEmitterChangedEvent event) {
-		
+//if (true) return;
 		/*
 		 * Message format: 0xAA 0xAA [payload_length] [ ... payload ... ] [payload_checksum]
 		 * Payload for purposes of fire emitters is:
@@ -298,6 +299,7 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	void onPlayerHealthChanged(PlayerHealthChangedEvent e) {
+//if (true) return;
 		short life;
 		if (e.getPlayerNum() == 1) {
 			life = (short)e.getNewLifePercentage();
@@ -323,14 +325,6 @@ public class SerialCommunicator implements Runnable {
 			byte[] msg = getMessageForPayload(payload);
 			log.debug("Enqueuing player {} life ({}) percentage message for board {}: {}", new Object[] {e.getPlayerNum(), life, boardId, CommUtil.bytesToHexString(msg)});
 			enqueueMessage(msg);
-			
-			
-//			try {
-//				Thread.sleep(20);
-//			} catch (InterruptedException ex) {
-//				log.warn("Sleep between health level and colour messages interrupted", ex);
-//			}
-			
 		}
 	}
 	
@@ -340,6 +334,7 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	void onPlayerActionPointsChanged(PlayerActionPointsChangedEvent e) {
+//if (true) return;
 		short points;
 		if (e.getPlayerNum() == 1) {
 			points = (short)e.getNewActionPointAmt();
@@ -386,17 +381,6 @@ public class SerialCommunicator implements Runnable {
 			
 			byte[] msg = getMessageForPayload(payload);
 			log.debug("Sending timer {} message: {}", boardId, CommUtil.bytesToHexString(msg));
-			enqueueMessage(msg);
-			
-			payload = new byte[] {
-				boardId,
-				(byte) 't',
-				(byte) c.getRed(),
-				(byte) c.getGreen(),
-				(byte) c.getBlue(),
-			};
-			msg = getMessageForPayload(payload);
-			log.debug("Sending timer message: " + CommUtil.bytesToHexString(msg));
 			enqueueMessage(msg);
 		}
 	}
@@ -634,13 +618,6 @@ public class SerialCommunicator implements Runnable {
 	private void enqueueMessage(byte[] message) {
 		if (messageQueue.offer(message) == false) {
 			log.warn("No room on queue for serial message");
-		}
-		if (message.length > 5 && lifeBoardIds.contains(message[4])) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException ex) {
-				log.warn("Interrupted while pausing after sending life board message", ex);
-			}
 		}
 	}
 	
