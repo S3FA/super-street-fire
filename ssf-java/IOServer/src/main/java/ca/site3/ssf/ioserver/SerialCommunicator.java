@@ -50,17 +50,14 @@ public class SerialCommunicator implements Runnable {
 	private static final Color timerColor = Color.ORANGE; // new Color(200, 200, 200);
 	private static final Color endRoundTimerColor = new Color(255, 0, 0);
 	
-	
 	private int lastTimerVal = 0;
 	
 	/** Number of LEDs on the strips for player health and action points */
 	private static final int NUM_LIFE_BARS = 44;
 	
-	// p1/p2 life boards and timers given same IDs
-	// (they don't have query response implemented anyway, and this reduces messages on the bus) 
-	private static byte[] p1LifeBoardIds = new byte[] { 33 /*, 36 */};
-	private static byte[] p2LifeBoardIds = new byte[] { 34 /*, 37 */ };
-	private static byte[] timerBoardIds  = new byte[] { 35 /*, 38 */ };
+	private static byte[] p1LifeBoardIds = new byte[] { 33, 36 };
+	private static byte[] p2LifeBoardIds = new byte[] { 34, 37 };
+	private static byte[] timerBoardIds  = new byte[] { 35, 38 };
 	
 	private static Set<Byte> lifeBoardIds = new HashSet<Byte>();
 	static {
@@ -82,7 +79,7 @@ public class SerialCommunicator implements Runnable {
 	
 	private OutputDeviceStatus[] systemStatus = null;
 	
-	private BufferedOutputStream out;
+	private OutputStream out;
 	
 	private BlockingQueue<byte[]> messageQueue = new LinkedBlockingQueue<byte[]>();
 	
@@ -97,7 +94,7 @@ public class SerialCommunicator implements Runnable {
 	public SerialCommunicator(CommandLineArgs args, InputStream serialIn, OutputStream serialOut, StreetFireServer guiOut) {
 		this.args = args;
 		this.reader = new SerialDataReader(serialIn);
-		this.out = new BufferedOutputStream(serialOut);
+		this.out    = serialOut;
 		this.server = guiOut;
 	}
 	
@@ -121,24 +118,28 @@ public class SerialCommunicator implements Runnable {
 		Thread inThread = new Thread(reader, "Serial input reader");
 		inThread.start();
 		
-		while ( true ) {
+		while (true) {
 			try {
 				byte[] message = messageQueue.take();
+				
 				if (message.equals(STOP_SENTINEL)) {
 					log.info("SerialCommunicator stopping");
 					break;
 				}
-				if (message.equals(QUERY_SYSTEM_SENTINEL)) {
+				else if (message.equals(QUERY_SYSTEM_SENTINEL)) {
 					doSystemQuery();
-				} else {
+				} 
+				else {
 					this.out.write(message);
-					this.out.flush();
-					try { Thread.sleep(5); } catch (InterruptedException ex) { log.warn("toasty!", ex); }
+					this.out.flush();					
 					log.debug("wrote message: {}", CommUtil.bytesToHexString(message));
 				}
-			} catch (IOException ex) {
+				
+			}
+			catch (IOException ex) {
 				log.error("Error writing to serial device",ex);
-			} catch (InterruptedException ex) {
+			}
+			catch (InterruptedException ex) {
 				log.warn("Interrupted trying to get message from queue",ex);
 			}
 		}
@@ -149,6 +150,7 @@ public class SerialCommunicator implements Runnable {
 	
 	private void initializeStaticBoardColours() {
 		for (byte boardId : timerBoardIds) {
+			
 			byte[] payload = new byte[] {
 				boardId,
 				(byte) 't',
@@ -156,14 +158,17 @@ public class SerialCommunicator implements Runnable {
 				(byte) timerColor.getGreen(),
 				(byte) timerColor.getBlue(),
 			};
+			
 			byte[] msg = getMessageForPayload(payload);
 			log.debug("Sending timer message: " + CommUtil.bytesToHexString(msg));
 			enqueueMessage(msg);
+			
 			try {
 				Thread.sleep(30);
 			} catch (InterruptedException ex) {
 				log.warn("wtf", ex);
 			}
+			
 		}
 		
 		for (byte boardId : lifeBoardIds) {
@@ -196,7 +201,7 @@ public class SerialCommunicator implements Runnable {
 	 * @param event
 	 */
 	void notifyFireEmitters(FireEmitterChangedEvent event) {
-//if (true) return;
+		
 		/*
 		 * Message format: 0xAA 0xAA [payload_length] [ ... payload ... ] [payload_checksum]
 		 * Payload for purposes of fire emitters is:
@@ -296,10 +301,7 @@ public class SerialCommunicator implements Runnable {
 		return message;
 	}
 	
-	
-	
 	void onPlayerHealthChanged(PlayerHealthChangedEvent e) {
-//if (true) return;
 		short life;
 		if (e.getPlayerNum() == 1) {
 			life = (short)e.getNewLifePercentage();
@@ -325,6 +327,14 @@ public class SerialCommunicator implements Runnable {
 			byte[] msg = getMessageForPayload(payload);
 			log.debug("Enqueuing player {} life ({}) percentage message for board {}: {}", new Object[] {e.getPlayerNum(), life, boardId, CommUtil.bytesToHexString(msg)});
 			enqueueMessage(msg);
+			
+			
+//			try {
+//				Thread.sleep(20);
+//			} catch (InterruptedException ex) {
+//				log.warn("Sleep between health level and colour messages interrupted", ex);
+//			}
+			
 		}
 	}
 	
@@ -334,7 +344,6 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	void onPlayerActionPointsChanged(PlayerActionPointsChangedEvent e) {
-//if (true) return;
 		short points;
 		if (e.getPlayerNum() == 1) {
 			points = (short)e.getNewActionPointAmt();
@@ -361,18 +370,17 @@ public class SerialCommunicator implements Runnable {
 			log.warn("Unsupported timer value {}", e.getTimeInSecs());
 			return;
 		}
+
+		this.onTimerChanged(e.getTimeInSecs());
+	}
+	
+	void onTimerChanged(int timerVal) {
 		
-		lastTimerVal = e.getTimeInSecs();
-		Color c = lastTimerVal <= 10 ? timerColor : endRoundTimerColor;
+		this.lastTimerVal = timerVal;
+		Color c = this.lastTimerVal <= 10 ? timerColor : endRoundTimerColor;
 		
 		for (byte boardId : timerBoardIds) {
-			
-			try {
-				Thread.sleep(20);
-			} catch (InterruptedException ex) {
-				log.warn("Interrupted sleeping before sending timer message", ex);
-			}
-			
+						
 			byte[] payload = new byte[] {
 				boardId,
 				(byte) 'T',
@@ -381,6 +389,17 @@ public class SerialCommunicator implements Runnable {
 			
 			byte[] msg = getMessageForPayload(payload);
 			log.debug("Sending timer {} message: {}", boardId, CommUtil.bytesToHexString(msg));
+			enqueueMessage(msg);
+			
+			payload = new byte[] {
+				boardId,
+				(byte) 't',
+				(byte) c.getRed(),
+				(byte) c.getGreen(),
+				(byte) c.getBlue(),
+			};
+			msg = getMessageForPayload(payload);
+			log.debug("Sending timer message: " + CommUtil.bytesToHexString(msg));
 			enqueueMessage(msg);
 		}
 	}
@@ -616,9 +635,20 @@ public class SerialCommunicator implements Runnable {
 	 * @param message
 	 */
 	private void enqueueMessage(byte[] message) {
-		if (messageQueue.offer(message) == false) {
+		if (this.messageQueue.offer(message) == false) {
 			log.warn("No room on queue for serial message");
 		}
+		
+		/*
+		if (message.length > 5 && lifeBoardIds.contains(message[4])) {
+			try {
+				Thread.sleep(10);
+			} 
+			catch (InterruptedException ex) {
+				log.warn("Interrupted while pausing after sending life board message", ex);
+			}
+		}
+		*/
 	}
 	
 }

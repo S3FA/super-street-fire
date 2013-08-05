@@ -41,6 +41,7 @@ public class TestGloveDataParser {
 				DatagramPacket p = new DatagramPacket(line.getBytes("ASCII"), line.length(), localhost, port);
 				socket.send(p);
 			}
+			reader.close();
 			
 			// some time to catch up with stuff
 			try {
