@@ -46,42 +46,69 @@ public class GameEventRouter implements IGameModelListener {
 		// just blast all events out to GUI for now.
 		server.notifyGUI(event);
 		
-		if (event.getType() == Type.FIRE_EMITTER_CHANGED) {
-			serialComm.notifyFireEmitters((FireEmitterChangedEvent) event);
-		} else if (event.getType() == Type.PLAYER_HEALTH_CHANGED) {
-			serialComm.onPlayerHealthChanged((PlayerHealthChangedEvent) event);
-		} else if (event.getType() == Type.PLAYER_ACTION_POINTS_CHANGED) {
-			serialComm.onPlayerActionPointsChanged((PlayerActionPointsChangedEvent) event);
-		} else if (event.getType() == Type.ROUND_PLAY_TIMER_CHANGED) {
-			serialComm.onTimerChanged((RoundPlayTimerChangedEvent) event);
-		} else if (event.getType() == Type.ROUND_BEGIN_TIMER_CHANGED) {
-			try {
-				int timerVal = Integer.parseInt(((RoundBeginTimerChangedEvent) event).getThreeTwoOneFightTime().toString());
-				serialComm.onTimerChanged(new RoundPlayTimerChangedEvent(timerVal));
-			} catch (NumberFormatException ex) {
-				// swallow "Fight"
-			}
-		}
+		switch (event.getType()) {
 		
-		else if (event.getType() == Type.GAME_STATE_CHANGED) {
-			GameStateChangedEvent e = (GameStateChangedEvent)event;
-			if (e.getNewState() == GameStateType.IDLE_STATE) {
-				serialComm.setGlowfliesOn(false);
-				serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
-				serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
-				serialComm.onTimerChanged(new RoundPlayTimerChangedEvent(99));
-			} else {
-				serialComm.setGlowfliesOn(true);
+			case FIRE_EMITTER_CHANGED:
+				serialComm.notifyFireEmitters((FireEmitterChangedEvent) event);
+				break;
+				
+			case PLAYER_HEALTH_CHANGED:
+				serialComm.onPlayerHealthChanged((PlayerHealthChangedEvent) event);
+				break;
+				
+			case PLAYER_ACTION_POINTS_CHANGED:
+				serialComm.onPlayerActionPointsChanged((PlayerActionPointsChangedEvent) event);
+				break;
+				
+			case ROUND_PLAY_TIMER_CHANGED:
+				serialComm.onTimerChanged((RoundPlayTimerChangedEvent) event);
+				break;
+				
+			case ROUND_BEGIN_TIMER_CHANGED: {
+				RoundBeginTimerChangedEvent e = (RoundBeginTimerChangedEvent) event;
+				switch (e.getThreeTwoOneFightTime()) {
+				case THREE:
+					serialComm.onTimerChanged(3);
+					break;
+				case TWO:
+					serialComm.onTimerChanged(2);
+					break;
+				case ONE:
+					serialComm.onTimerChanged(1);
+					break;
+				case FIGHT:
+					serialComm.onTimerChanged(0);
+					break;
+				default:
+					break;
+				}
+				break;
 			}
-		}
-		else if (event.getType() == Type.GAME_INFO_REFRESH) {
-			GameInfoRefreshEvent e = (GameInfoRefreshEvent)event;
-			if (e.getCurrentGameState() == GameStateType.IDLE_STATE) {
-				serialComm.setGlowfliesOn(false);
-			} else {
-				serialComm.setGlowfliesOn(true);
+			
+			case GAME_STATE_CHANGED: {
+				GameStateChangedEvent e = (GameStateChangedEvent)event;
+				if (e.getNewState() == GameStateType.IDLE_STATE) {
+					serialComm.setGlowfliesOn(false);
+					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
+					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
+					serialComm.onTimerChanged(new RoundPlayTimerChangedEvent(99));
+				} else {
+					serialComm.setGlowfliesOn(true);
+				}
+				break;
 			}
+			case GAME_INFO_REFRESH: {
+				GameInfoRefreshEvent e = (GameInfoRefreshEvent)event;
+				if (e.getCurrentGameState() == GameStateType.IDLE_STATE) {
+					serialComm.setGlowfliesOn(false);
+				} else {
+					serialComm.setGlowfliesOn(true);
+				}
+				break;
+			}
+			
+			default:
+				break;
 		}
-		
 	}
 }

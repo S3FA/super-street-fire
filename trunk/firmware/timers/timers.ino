@@ -62,7 +62,7 @@ void processMessage()
 void readSerial()
 {
   /* Consume as much serial data as available */
-  while(Serial.available()) {
+  while (Serial.available()) {
     messageBuf.receiveByte(Serial.read());
   }
   messageBuf.update();
@@ -76,7 +76,7 @@ void readSerial()
 
 void setup()
 {
-  Serial.begin(57600);
+  Serial.begin(57600, SERIAL_8N1);
   pinMode(RECV_ENABLE, OUTPUT);
   digitalWrite(RECV_ENABLE, LOW);
 

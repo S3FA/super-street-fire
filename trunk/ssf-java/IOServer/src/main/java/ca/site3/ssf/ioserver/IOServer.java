@@ -105,14 +105,13 @@ public class IOServer {
 		Thread guiServerThread = new Thread(guiServer, "GUI Server Thread");
 		guiServerThread.start();
 		
-		
 		initSerialDevice();
 		
 		InputStream serialIn = null;
 		OutputStream serialOut = null;
 		if (serialPort != null) {
 			try {
-				serialIn = serialPort.getInputStream();
+				serialIn  = serialPort.getInputStream();
 				serialOut = serialPort.getOutputStream();
 			} catch (IOException ex) {
 				log.error("Exception accessing serial stream",ex);
@@ -369,12 +368,13 @@ public class IOServer {
 		int baudRate = 57600;
 		int databits = SerialPort.DATABITS_8;
 		int stopbits = SerialPort.STOPBITS_1;
-		int parity = SerialPort.PARITY_NONE;
+		int parity   = SerialPort.PARITY_NONE;
 		
 		try {
 			serialPort.setSerialPortParams(baudRate, databits, stopbits, parity);
 			serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
-		} catch (UnsupportedCommOperationException ex) {
+		}
+		catch (UnsupportedCommOperationException ex) {
 			log.error("Could not configure serial port", ex);
 		}
 	}

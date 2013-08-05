@@ -34,7 +34,7 @@ public class SerialDataReader implements Runnable {
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
 	
-	private BufferedInputStream inStream;
+	private InputStream inStream;
 	
 	private LinkedBlockingQueue<OutputDeviceStatus> messageQueue = new LinkedBlockingQueue<OutputDeviceStatus>();
 	
@@ -42,7 +42,7 @@ public class SerialDataReader implements Runnable {
 	
 	
 	public SerialDataReader(InputStream is) {
-		inStream = new BufferedInputStream(is);
+		inStream = is;
 	}
 	
 	public BlockingQueue<OutputDeviceStatus> getStatusUpdateQueue() {

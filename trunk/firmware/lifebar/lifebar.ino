@@ -44,6 +44,7 @@
 #define GREEN          0x00FF00
 #define BLUE           0x0000FF
 #define YELLOW         0xFFFF00
+#define MAGENTA        0xFF00FF
 #define PINK           0xFF1088
 #define ORANGE         0xE05800
 #define WHITE          0xFFFFFF
@@ -65,11 +66,14 @@
 #define LIFEBAR3         (2*BAR_LENGTH)
 #define CHARGEBAR        (3*BAR_LENGTH)
 
+#define BLOCK_FLASH_BLINK_TIME_IN_MS 200
+
 enum STATE //overall state
 {
   IDLE,
   SHOW_LIFE,
   SHOW_CHARGE,
+  SHOW_BLOCK,
   IDLE_ANIM,
 } state;
 
@@ -83,6 +87,11 @@ enum ANIMATION //animation state
   AN_MATRIX,
   AN_RAINBOW,
 } animation;
+
+enum BLOCK_FLASH {
+  BLOCK_FLASH_OFF,
+  BLOCK_FLASH_ON
+} blockFlashState;
 
 /***********/
 /* Globals */
@@ -102,13 +111,18 @@ int animPos = 0; //can these all be one iterator used to store the position in
 byte animDir = 0; //a place to save the state of the anim direction
 
 byte lifeValue = 0;
-long lifeColour = 0xFF0000; //default life colour is red
+long lifeColour = RED;
 byte chargeValue = 0;
-long chargeColour= 0x0000FF; //default charge colour is blue
+long chargeColour= BLUE;
 
 byte animPeriod = 0;
 long animColour1 = 0;
 long animColour2 = 0;
+
+unsigned long blockLengthInMillis = 0;
+unsigned long blockStartTimeInMillis = 0;
+unsigned long lastBlockFlashTimeInMillis = 0;
+long blockColour = MAGENTA;
 
 /*************/
 /* Functions */
@@ -131,24 +145,40 @@ void processMessage()
     {
       case 'L': //life value
         lifeValue = incomingMsg[parsePos++];
-        state = SHOW_LIFE;
+        if (state != SHOW_BLOCK) {
+          state = SHOW_LIFE;
+        }
         break;
 
       case 'l': //life colour
         lifeColour = (incomingMsg[parsePos] << 16) | (incomingMsg[parsePos + 1] << 8) | (incomingMsg[parsePos + 2]);
-        state = SHOW_LIFE;
+        if (state != SHOW_BLOCK) {
+          state = SHOW_LIFE;
+        }
         parsePos += 3; //skip the index over the data to the next potential command
         break;
 
       case 'C': //charge value
         chargeValue = incomingMsg[parsePos++];
-        state = SHOW_LIFE;
+        if (state != SHOW_BLOCK) {
+          state = SHOW_LIFE;
+        }
         break;
 
       case 'c': //charge colour
         chargeColour = (incomingMsg[parsePos] << 16) | (incomingMsg[parsePos + 1] << 8) | (incomingMsg[parsePos + 2]);
-        state = SHOW_LIFE;
+        if (state != SHOW_BLOCK) {
+          state = SHOW_LIFE;
+        }
         parsePos += 3; //skip the index over the data to the next potential command
+        break;
+
+      case 'b': // Tells the board that there's a block window available to the player... overlay it on the lifebar/chargebar
+        state = SHOW_BLOCK;
+        blockLengthInMillis = (incomingMsg[parsePos] << 16) | (incomingMsg[parsePos + 1] << 8) | (incomingMsg[parsePos + 2]);
+        blockStartTimeInMillis = millis();
+        lastBlockFlashTimeInMillis = blockStartTimeInMillis;
+        blockFlashState = BLOCK_FLASH_OFF;
         break;
 
       case 'A': //idle animation pattern
@@ -159,7 +189,11 @@ void processMessage()
       case 'a': //idle animation period
         animPeriod = incomingMsg[parsePos++];
         break;
+        
+      default:
+        break;
     }
+
   }
 }
 
@@ -170,6 +204,7 @@ void setup()
   Serial.begin(38400);
 
   state = IDLE;
+  blockFlashState = BLOCK_FLASH_OFF;
     
   leds.begin();
   leds.show();
@@ -196,6 +231,57 @@ void loop()
       showCharge(chargeValue, chargeColour);
       state = IDLE;
       break;
+
+    case SHOW_BLOCK: {
+      
+      // Check to see if we should still be flashing "BLOCK" for the player...
+      unsigned long currTimeInMillis = millis();
+      unsigned long diffTimeInMillis = currTimeInMillis - blockStartTimeInMillis;
+      if (diffTimeInMillis <= blockLengthInMillis) {
+        
+        // Draw the life and charge, because we're about to draw "BLOCK" over them... 
+        // TODO: Optimize so we don't overdraw/redraw these each time?
+        showLife(lifeValue, lifeColour);
+        showCharge(chargeValue, chargeColour);
+        showBlockWindowBar(diffTimeInMillis);
+        
+        switch (blockFlashState) {
+          
+          case BLOCK_FLASH_OFF:
+            if (currTimeInMillis - lastBlockFlashTimeInMillis >= BLOCK_FLASH_BLINK_TIME_IN_MS) {
+              blockFlashState = BLOCK_FLASH_ON;
+              lastBlockFlashTimeInMillis = currTimeInMillis;
+              // Draw block as a word...
+              showBlockWord();
+            }
+            break;
+            
+          case BLOCK_FLASH_ON:
+            if (currTimeInMillis - lastBlockFlashTimeInMillis >= BLOCK_FLASH_BLINK_TIME_IN_MS) {
+              blockFlashState = BLOCK_FLASH_OFF;
+              lastBlockFlashTimeInMillis = currTimeInMillis;
+              // Don't draw block as a word
+            }
+            else {
+              // Draw block as a word...
+              showBlockWord();
+            }
+            break;
+            
+           default:
+             break; 
+        }
+      }
+      else {
+        // The block window time has expired, don't show the block window any more, overwrite
+        // it with the life and charge bars and go back to the typical 'IDLE' state
+        state = IDLE;
+        showLife(lifeValue, lifeColour);
+        showCharge(chargeValue, chargeColour);
+      }
+      
+      break;
+    }
 
     case IDLE_ANIM:
       switch(animation)
@@ -227,8 +313,9 @@ void loop()
 void readSerial()
 {
   /* Consume as much serial data as available. The buffer will fill up until there is an entire package of 
-   * data, in which case we process it below. */
-  while (Serial1.available()) {
+   * data, in which case we process it below.
+   */
+  while (Serial1.available() || messageBuf.complete) {
     messageBuf.receiveByte(Serial1.read());
 
   }
@@ -277,11 +364,86 @@ void showCharge(byte chargeValue, long chargeColour) {
     if (i <= chargeValue) {
       col = chargeColour;
     } else {
-      col = 0;
+      col = BLACK;
     }
     leds.setPixel(CHARGEBAR + i, col);
   }
   leds.show();  
+}
+
+/**
+ * Prints the word "block" in lower-case over and across the charge and life bars.
+ * Used when the player is being told to block an incoming attack.
+ */
+void showBlockWord() {
+  
+  // 0 o o x o o o x o o o o o o o o o x o x o o o 
+  // 1 o o x x x o x o x x x o x x x o x x o o o o
+  // 2 o o x o x o x o x o x o x o o o x o x o o o
+  // 3 o o x x x o x o x x x o x x x o x o x o o o
+  
+  uint32_t blockWordColour = WHITE;
+  
+  leds.setPixel(LIFEBAR1 + 2,  blockWordColour);
+  leds.setPixel(LIFEBAR1 + 6,  blockWordColour);
+  leds.setPixel(LIFEBAR1 + 16, blockWordColour);
+  leds.setPixel(LIFEBAR1 + 18, blockWordColour);
+  
+  leds.setPixel(LIFEBAR2 + 2,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 3,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 4,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 6,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 8,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 9,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 10, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 12, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 13, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 14, blockWordColour);  
+  leds.setPixel(LIFEBAR2 + 16, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 17, blockWordColour); 
+  
+  leds.setPixel(LIFEBAR3 + 2,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 4,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 6,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 8,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 10, blockWordColour);
+  leds.setPixel(LIFEBAR3 + 12, blockWordColour);
+  leds.setPixel(LIFEBAR3 + 16, blockWordColour);
+  leds.setPixel(LIFEBAR3 + 18, blockWordColour);
+  
+  leds.setPixel(CHARGEBAR + 2,  blockWordColour);  
+  leds.setPixel(CHARGEBAR + 3,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 4,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 6,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 8,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 9,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 10, blockWordColour);
+  leds.setPixel(CHARGEBAR + 12, blockWordColour);
+  leds.setPixel(CHARGEBAR + 13, blockWordColour);
+  leds.setPixel(CHARGEBAR + 14, blockWordColour);
+  leds.setPixel(CHARGEBAR + 16, blockWordColour);
+  leds.setPixel(CHARGEBAR + 18, blockWordColour);
+  
+  leds.show();
+}
+
+/**
+ * Prints/shows a block "window" over one of the life rows, this indicates the length
+ * of time available to the player for them to block an incoming attack.
+ */
+void showBlockWindowBar(unsigned long timeSinceBlockStart) {
+  int blockBarValue = map(timeSinceBlockStart, 0, blockLengthInMillis, BAR_LENGTH, 0);
+  uint32_t col;
+  for (int i = 0; i < BAR_LENGTH; i++) {
+    if (i <= blockBarValue) {
+      col = blockColour;
+    }
+    else {
+      col = BLACK;
+    }
+    leds.setPixel(LIFEBAR1 + i, col);
+  }
+  leds.show();
 }
 
 //flying state monster something something - the FSM saves the value of period and calls larson
