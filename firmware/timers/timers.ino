@@ -80,7 +80,7 @@ void processMessage() {
 
       case 't':
         // Colour to display
-        timer.setColour((payloadBuffer[i] << 16) | (payloadBuffer[i + 1] << 8) | payloadBuffer[i + 2]);
+        timer.setColour((((uint32_t)(payloadBuffer[i])) << 16) | (((uint32_t)payloadBuffer[i + 1]) << 8) | ((uint32_t)payloadBuffer[i + 2]));
         i += 3;
         break;
 
