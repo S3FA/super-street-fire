@@ -22,12 +22,13 @@
 #define PAYLOAD_START         NUM_HEADER_BYTES
 #define TIMEOUT               1000
 
-#define DEBUG                 1
+#define DEBUG                 0
 
 MessageBuf::MessageBuf()
 {
   payload = buffer + PAYLOAD_START;
   clear();
+  dosomething();
 }
 
 void MessageBuf::clear()
@@ -54,21 +55,28 @@ void MessageBuf::receiveByte(byte data)
     /* We're full! Can't accept more data until this buffer is cleared. */
     return;
   }
-  lastReceivedTime = millis();
 
-  //  Serial.print("BYTE ");
-  //  Serial.println((int)data);
-
-  if (pos <= 1 && data != FRAMING_BYTE) 
-  {
+  if (checkForTimeout()) {
+    clear();
+    lastReceivedTime = millis();
+    return;
+  }
+  else {
+    lastReceivedTime = millis();
+  }
+  
+  if (pos <= 1 && data != FRAMING_BYTE) {
     /* We were expecting two framing bytes, but we didn't get them so reset 
      * the buffer */
     clear();
+
 #if DEBUG
     Serial.println("framing bytes not found");
 #endif
+
     return;
-  } else if (pos == 2) {
+  } 
+  else if (pos == 2) {
     /* We now have the length of the package (assuming it's correct!) */
     payloadLen = (int)data;
     messageLen = payloadLen + NUM_FRAMING_BYTES;
@@ -77,13 +85,15 @@ void MessageBuf::receiveByte(byte data)
       clear();
       return;
     }
-  } else if (pos == 3) {
+  } 
+  else if (pos == 3) {
     /* Record the destination address */
     destination = (int)data;
   }
   
   buffer[pos++] = data;
   if (messageLen != 0 && pos >= messageLen) {
+
 #if DEBUG
     Serial.print("Complete message: ");
     Serial.print(messageLen);
@@ -97,8 +107,10 @@ void MessageBuf::receiveByte(byte data)
     if (calculateChecksum() == buffer[messageLen-1]) {
       /* Checksum success! */
       complete = true;
-    } else {
+    }
+    else {
       /* Ignore the error and clear the buffer for the next packet */
+
 #if DEBUG
       Serial.println("checksum failure!");
       Serial.print("calculated == ");
@@ -110,15 +122,8 @@ void MessageBuf::receiveByte(byte data)
         Serial.println(buffer[i], HEX);
       }
 #endif
+
       clear();
     }
-  }
-}
-
-void MessageBuf::update()
-{
-  if (lastReceivedTime != 0 && millis()-lastReceivedTime > TIMEOUT) {
-    /* Timeout while waiting for data */
-    clear();
   }
 }

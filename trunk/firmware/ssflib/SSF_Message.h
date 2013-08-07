@@ -38,9 +38,13 @@ class MessageBuf {
     /* Call this function whenever you'd like to have the buffer receive 
      * a byte of data */
     void receiveByte(byte b);
-    void update();
+    bool checkForTimeout() const;
     /* Calculates and returns the checksum of a completed message */
     byte calculateChecksum();
 };
+
+inline bool MessageBuf::checkForTimeout() const {
+  return lastReceivedTime != 0 && millis()-lastReceivedTime > TIMEOUT;
+}
 
 #endif

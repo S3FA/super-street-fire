@@ -20,8 +20,6 @@ class Segment
     void clearAllSegments();
     /* Display a digit between 0 and 9 */
     void displayDigit(char digit, uint32_t colour);
-    
-
 };
 
 #endif

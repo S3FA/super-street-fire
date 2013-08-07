@@ -17,7 +17,9 @@ import org.slf4j.LoggerFactory;
 import ca.site3.ssf.common.Algebra;
 import ca.site3.ssf.common.CommUtil;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
@@ -44,16 +46,22 @@ public class SerialCommunicator implements Runnable {
 	
 	private static final long STATUS_WAIT_TIME_MS = 100;
 	
-	private static final Color fullHealthColor = Color.GREEN;
-	private static final Color noHealthColor = Color.RED;
+	private static final int MAX_END_ROUND_TIMER_VAL = 10;
 	
-	private static final Color timerColor = Color.ORANGE; // new Color(200, 200, 200);
-	private static final Color endRoundTimerColor = new Color(255, 0, 0);
+	private static final Color FULL_HEALTH_COLOUR = Color.GREEN;
+	private static final Color NO_HEALTH_COLOUR   = Color.RED;
+	
+	private static final Color FULL_ACTION_COLOUR = Color.CYAN;
+	private static final Color NO_ACTION_COLOUR   = Color.BLUE;
+	
+	private static final Color DEFAULT_TIMER_COLOUR   = Color.YELLOW;
+	private static final Color END_ROUND_TIMER_COLOUR = Color.RED;
 	
 	private int lastTimerVal = 0;
+	private Color lastTimerColourVal = Color.BLACK;
 	
 	/** Number of LEDs on the strips for player health and action points */
-	private static final int NUM_LIFE_BARS = 44;
+	private static final int NUM_LEDS_PER_BAR = 44;
 	
 	private static byte[] p1LifeBoardIds = new byte[] { 33, 36 };
 	private static byte[] p2LifeBoardIds = new byte[] { 34, 37 };
@@ -104,32 +112,48 @@ public class SerialCommunicator implements Runnable {
 	 * broadcast out.
 	 */
 	public void stop() {
-		messageQueue.add(STOP_SENTINEL);
+		this.messageQueue.add(STOP_SENTINEL);
 	}
 	
 	public void ESTOP() {
-		setGlowfliesOn(false);
+		this.setGlowfliesOn(false);
 	}
 	
 	public void run() {
 		
-		initializeStaticBoardColours();
+		this.initializeStaticBoardColours();
 		
 		Thread inThread = new Thread(reader, "Serial input reader");
 		inThread.start();
 		
+		final long MIN_FRAME_TIME_IN_MS = 6;
+		long prevTimeInMs = System.currentTimeMillis();
+		long currTimeInMs = prevTimeInMs;
+		
 		while (true) {
 			try {
-				byte[] message = messageQueue.take();
+				byte[] message = this.messageQueue.take();
+				
+				currTimeInMs = System.currentTimeMillis();
+				long deltaTimeInMs = currTimeInMs - prevTimeInMs;
+				assert(deltaTimeInMs >= 0);
+				prevTimeInMs = currTimeInMs;
 				
 				if (message.equals(STOP_SENTINEL)) {
 					log.info("SerialCommunicator stopping");
 					break;
 				}
 				else if (message.equals(QUERY_SYSTEM_SENTINEL)) {
-					doSystemQuery();
+					this.doSystemQuery();
 				} 
 				else {
+					
+					// To make sure we don't send serial messages too fast!
+					try {
+						Thread.sleep(Math.max(0, MIN_FRAME_TIME_IN_MS - deltaTimeInMs));
+					} 
+					catch (InterruptedException e) {}	
+					
 					this.out.write(message);
 					this.out.flush();					
 					log.debug("wrote message: {}", CommUtil.bytesToHexString(message));
@@ -149,39 +173,25 @@ public class SerialCommunicator implements Runnable {
 	
 	
 	private void initializeStaticBoardColours() {
+		
+		byte[] payload;
+		byte[] msg;
+		
 		for (byte boardId : timerBoardIds) {
 			
-			byte[] payload = new byte[] {
+			payload = new byte[] {
 				boardId,
-				(byte) 't',
-				(byte) timerColor.getRed(),
-				(byte) timerColor.getGreen(),
-				(byte) timerColor.getBlue(),
+				(byte) 0x74,
+				(byte) DEFAULT_TIMER_COLOUR.getRed(),
+				(byte) DEFAULT_TIMER_COLOUR.getGreen(),
+				(byte) DEFAULT_TIMER_COLOUR.getBlue(),
 			};
 			
-			byte[] msg = getMessageForPayload(payload);
+			msg = getMessageForPayload(payload);
 			log.debug("Sending timer message: " + CommUtil.bytesToHexString(msg));
 			enqueueMessage(msg);
-			
-			try {
-				Thread.sleep(30);
-			} catch (InterruptedException ex) {
-				log.warn("wtf", ex);
-			}
-			
 		}
-		
-		for (byte boardId : lifeBoardIds) {
-			byte[] payload = new byte[] {
-				boardId,
-				(byte) 0x63,
-				(byte) Color.BLUE.getRed(),
-				(byte) Color.BLUE.getGreen(),
-				(byte) Color.BLUE.getBlue()
-			};
-			log.debug("Enqueuing action points color message for board {}", boardId);
-			enqueueMessage(getMessageForPayload(payload));
-		}
+
 	}
 
 	
@@ -302,105 +312,135 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	void onPlayerHealthChanged(PlayerHealthChangedEvent e) {
-		short life;
-		if (e.getPlayerNum() == 1) {
-			life = (short)e.getNewLifePercentage();
-		} else if (e.getPlayerNum() == 2) {
-			life = (short)e.getNewLifePercentage();
-		} else {
-			throw new IllegalArgumentException("Invalid player number: " + e.getPlayerNum());
-		}
-		Color c = getColorFromLifePercentage(life);
+
+		Color c = getColorFromLifePercentage(e.getNewLifePercentage());
+		
 		// need to send life amount ('L') and colour ('l') for life bars
+		byte[] payload;
+		byte[] msg;
 		for (int boardId : (e.getPlayerNum() == 1 ? p1LifeBoardIds : p2LifeBoardIds)) {
-			byte[] payload;
 			
 			payload = new byte[] {
 				(byte) boardId,
 				(byte) 0x4c,
-				(byte) Math.round(life / 100.0 * NUM_LIFE_BARS),
+				(byte) Math.ceil((e.getNewLifePercentage() / 100.0f) * NUM_LEDS_PER_BAR),
 				(byte) 0x6c,
 				(byte) c.getRed(),
 				(byte) c.getGreen(),
-				(byte) c.getBlue(),
+				(byte) c.getBlue()
 			};
-			byte[] msg = getMessageForPayload(payload);
-			log.debug("Enqueuing player {} life ({}) percentage message for board {}: {}", new Object[] {e.getPlayerNum(), life, boardId, CommUtil.bytesToHexString(msg)});
-			enqueueMessage(msg);
 			
-			
-//			try {
-//				Thread.sleep(20);
-//			} catch (InterruptedException ex) {
-//				log.warn("Sleep between health level and colour messages interrupted", ex);
-//			}
-			
+			msg = getMessageForPayload(payload);
+			log.debug("Enqueuing player {} life ({}) percentage message for board {}: {}", 
+					new Object[] {e.getPlayerNum(), e.getNewLifePercentage(), boardId, CommUtil.bytesToHexString(msg)});
+			enqueueMessage(msg);	
 		}
 	}
 	
-	private Color getColorFromLifePercentage(short lifePercentage) {
-		return Algebra.colorLerp(noHealthColor, fullHealthColor, ((float)lifePercentage) / 100.0f);
+	private Color getColorFromLifePercentage(float lifePercentage) {
+		return Algebra.colorLerp(NO_HEALTH_COLOUR, FULL_HEALTH_COLOUR, lifePercentage / 100.0f);
 	}
-	
 	
 	void onPlayerActionPointsChanged(PlayerActionPointsChangedEvent e) {
-		short points;
-		if (e.getPlayerNum() == 1) {
-			points = (short)e.getNewActionPointAmt();
-		} else if (e.getPlayerNum() == 2) {
-			points = (short)e.getNewActionPointAmt();
-		} else {
-			throw new IllegalArgumentException("Invalid player number: " + e.getPlayerNum());
-		}
+
+		Color c = getColorFromActionBarPercentage(e.getNewActionPointAmt());
+		
 		// need to send action points amount ('C') and color ('c')
+		byte[] payload;
 		for (byte boardId : (e.getPlayerNum() == 1 ? p1LifeBoardIds : p2LifeBoardIds)) {
-			byte[] payload = new byte[] {
+			payload = new byte[] {
 				boardId,
 				(byte) 0x43,
-				(byte) Math.round(points / 100.0 * NUM_LIFE_BARS)
+				(byte) Math.ceil((e.getNewActionPointAmt() / 100.0f) * NUM_LEDS_PER_BAR),
+				(byte) 0x63,
+				(byte) c.getRed(),
+				(byte) c.getGreen(),
+				(byte) c.getBlue()				
 			};
 			log.debug("Enqueuing action points percentage message for board {}", boardId);
 			enqueueMessage(getMessageForPayload(payload));
 		}
 	}
 	
+	private Color getColorFromActionBarPercentage(float actionBarPercentage) {
+		return Algebra.colorLerp(FULL_ACTION_COLOUR, NO_ACTION_COLOUR, actionBarPercentage / 100.0f);
+	}
 
-	void onTimerChanged(RoundPlayTimerChangedEvent e) {
-		if (e.getTimeInSecs() < 0 || e.getTimeInSecs() > this.args.roundTimeInSecs) {
-			log.warn("Unsupported timer value {}", e.getTimeInSecs());
-			return;
-		}
-
-		this.onTimerChanged(e.getTimeInSecs());
+	void onTimerChanged(RoundPlayTimerChangedEvent e, GameState.GameStateType currGameState) {
+		
+		this.onTimerChanged(e.getTimeInSecs(), currGameState, null);
 	}
 	
-	void onTimerChanged(int timerVal) {
+	void onTimerChanged(int timerVal, GameState.GameStateType currGameState, Color overrideColour) {
+		
+		if (timerVal < 0 || timerVal > 99) {
+			log.warn("Unsupported timer value {}", timerVal);
+			return;
+		}
+		
+		// Check to see if the timer colour has changed since last time
+		// (we only update the colour when it has changed to avoid serial message pollution)
+		boolean timerColourHasChanged = false;
+		if ((this.lastTimerVal <= MAX_END_ROUND_TIMER_VAL && timerVal > MAX_END_ROUND_TIMER_VAL) ||
+			(this.lastTimerVal > MAX_END_ROUND_TIMER_VAL && timerVal <= MAX_END_ROUND_TIMER_VAL) ||
+			(overrideColour != null && this.lastTimerColourVal != overrideColour)) {
+			
+			timerColourHasChanged = true;
+		}
 		
 		this.lastTimerVal = timerVal;
-		Color c = this.lastTimerVal <= 10 ? timerColor : endRoundTimerColor;
+
+		byte[] payload;
+		byte[] msg;
 		
-		for (byte boardId : timerBoardIds) {
-						
-			byte[] payload = new byte[] {
-				boardId,
-				(byte) 'T',
-				(byte) lastTimerVal
-			};
+		if (timerColourHasChanged) {
 			
-			byte[] msg = getMessageForPayload(payload);
-			log.debug("Sending timer {} message: {}", boardId, CommUtil.bytesToHexString(msg));
-			enqueueMessage(msg);
-			
-			payload = new byte[] {
-				boardId,
-				(byte) 't',
-				(byte) c.getRed(),
-				(byte) c.getGreen(),
-				(byte) c.getBlue(),
-			};
-			msg = getMessageForPayload(payload);
-			log.debug("Sending timer message: " + CommUtil.bytesToHexString(msg));
-			enqueueMessage(msg);
+			Color c = null;
+			if (overrideColour != null) {
+				c = overrideColour;
+			}
+			else {
+				switch (currGameState) {
+					case TEST_ROUND_STATE:
+					case IDLE_STATE:
+						c = DEFAULT_TIMER_COLOUR;
+						break;
+					default:
+						c = this.lastTimerVal <= MAX_END_ROUND_TIMER_VAL ? 
+								END_ROUND_TIMER_COLOUR : DEFAULT_TIMER_COLOUR;
+						break;
+				}
+			}
+
+			for (byte boardId : timerBoardIds) {
+				payload = new byte[] {
+						boardId,
+						(byte) 0x54,
+						(byte) lastTimerVal,
+						(byte) 0x74,
+						(byte) c.getRed(),
+						(byte) c.getGreen(),
+						(byte) c.getBlue()
+					};
+					
+				msg = this.getMessageForPayload(payload);
+				log.debug("Sending timer {} message: {}", boardId, CommUtil.bytesToHexString(msg));
+				this.enqueueMessage(msg);
+			}
+		}
+		else {
+			for (byte boardId : timerBoardIds) {
+				
+				payload = new byte[] {
+					boardId,
+					(byte) 0x54,
+					(byte) lastTimerVal
+				};
+				
+				msg = this.getMessageForPayload(payload);
+				log.debug("Sending timer {} message: {}", boardId, CommUtil.bytesToHexString(msg));
+				this.enqueueMessage(msg);
+			}
 		}
 	}
 	
@@ -411,7 +451,7 @@ public class SerialCommunicator implements Runnable {
 	 * done while a game is actually going on.
 	 */
 	void querySystemStatus() {
-		enqueueMessage( QUERY_SYSTEM_SENTINEL ); // sentinel value to trigger system query
+		this.enqueueMessage(QUERY_SYSTEM_SENTINEL); // sentinel value to trigger system query
 	}
 	
 	/**
@@ -440,6 +480,12 @@ public class SerialCommunicator implements Runnable {
 			if (status != null) {
 				result[status.deviceId - 1] = status;
 			}
+			
+			// Wait for a small amount of time before the next query
+			try {
+				Thread.sleep(5);
+			}
+			catch (InterruptedException e) {}
 		}
 		
 		return result;
@@ -529,9 +575,6 @@ public class SerialCommunicator implements Runnable {
 		}
 		log.info("...done querying boards and notifying GUI(s)");
 	}
-	
-	
-	
 	
 	/**
 	 * The hardware device ID layout is as follows:

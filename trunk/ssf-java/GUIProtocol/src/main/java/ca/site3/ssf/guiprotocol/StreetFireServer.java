@@ -134,7 +134,7 @@ public class StreetFireServer implements Runnable {
 		sendThread = new SendThread();
 		sendThread.start();
 		
-		while ( ! stop ) {
+		while (!stop) {
 			try {
 				// Accept incoming connections from GUI clients
 				Socket s = serverSocket.accept();
@@ -145,11 +145,13 @@ public class StreetFireServer implements Runnable {
 				activeHandlers.add(handler);
 				Thread t = new Thread(handler, "GuiHandler - " + handler.hashCode());
 				t.start();
-				// Don't touch the socket ('s') again, leave it to the new thread.
 				
-			} catch (SocketTimeoutException ex) {
+				// Don't touch the socket ('s') again, leave it to the new thread.
+			}
+			catch (SocketTimeoutException ex) {
 				log.info("Server socket timeout",ex);
-			} catch (IOException ex) {
+			}
+			catch (IOException ex) {
 				log.warn("Exception listening on server socket",ex);
 			}
 		}
@@ -159,11 +161,9 @@ public class StreetFireServer implements Runnable {
 		}
 	}
 	
-	
 	public void stop() {
 		stop = true;
 	}
-	
 	
 	/**
 	 * Monitors eventQueue and sends commands along to the clients.

@@ -37,7 +37,7 @@
 
 #define DEBUG          1
 
-#define NODE_ADDRESS   33
+#define NODE_ADDRESS   34
 #define HEART_LED      13
 
 #define RED            0xFF0000
@@ -310,12 +310,11 @@ void loop()
 //read a serial message
 //it looks like this:
 //0xAA 0xAA [length] [dest] [command] [value] ... [checksum]
-void readSerial()
-{
+void readSerial() {
   /* Consume as much serial data as available. The buffer will fill up until there is an entire package of 
    * data, in which case we process it below.
    */
-  while (Serial1.available() || messageBuf.complete) {
+  while (Serial1.available() && !messageBuf.complete) {
     messageBuf.receiveByte(Serial1.read());
 
   }
@@ -328,7 +327,8 @@ void readSerial()
   }
 }
 
-void showLife(byte lifeValue, uint32_t lifeColour) { //display the current life value
+// display the current life value
+void showLife(byte lifeValue, uint32_t lifeColour) {
 
 #if DEBUG
   Serial.print("show life ");
@@ -376,55 +376,56 @@ void showCharge(byte chargeValue, long chargeColour) {
  * Used when the player is being told to block an incoming attack.
  */
 void showBlockWord() {
-  
-  // 0 o o x o o o x o o o o o o o o o x o x o o o 
-  // 1 o o x x x o x o x x x o x x x o x x o o o o
-  // 2 o o x o x o x o x o x o x o o o x o x o o o
-  // 3 o o x x x o x o x x x o x x x o x o x o o o
-  
-  uint32_t blockWordColour = WHITE;
-  
-  leds.setPixel(LIFEBAR1 + 2,  blockWordColour);
-  leds.setPixel(LIFEBAR1 + 6,  blockWordColour);
-  leds.setPixel(LIFEBAR1 + 16, blockWordColour);
-  leds.setPixel(LIFEBAR1 + 18, blockWordColour);
-  
-  leds.setPixel(LIFEBAR2 + 2,  blockWordColour);
-  leds.setPixel(LIFEBAR2 + 3,  blockWordColour);
-  leds.setPixel(LIFEBAR2 + 4,  blockWordColour);
-  leds.setPixel(LIFEBAR2 + 6,  blockWordColour);
-  leds.setPixel(LIFEBAR2 + 8,  blockWordColour);
-  leds.setPixel(LIFEBAR2 + 9,  blockWordColour);
-  leds.setPixel(LIFEBAR2 + 10, blockWordColour);
-  leds.setPixel(LIFEBAR2 + 12, blockWordColour);
-  leds.setPixel(LIFEBAR2 + 13, blockWordColour);
-  leds.setPixel(LIFEBAR2 + 14, blockWordColour);  
-  leds.setPixel(LIFEBAR2 + 16, blockWordColour);
-  leds.setPixel(LIFEBAR2 + 17, blockWordColour); 
-  
-  leds.setPixel(LIFEBAR3 + 2,  blockWordColour);
-  leds.setPixel(LIFEBAR3 + 4,  blockWordColour);
-  leds.setPixel(LIFEBAR3 + 6,  blockWordColour);
-  leds.setPixel(LIFEBAR3 + 8,  blockWordColour);
-  leds.setPixel(LIFEBAR3 + 10, blockWordColour);
-  leds.setPixel(LIFEBAR3 + 12, blockWordColour);
-  leds.setPixel(LIFEBAR3 + 16, blockWordColour);
-  leds.setPixel(LIFEBAR3 + 18, blockWordColour);
-  
-  leds.setPixel(CHARGEBAR + 2,  blockWordColour);  
-  leds.setPixel(CHARGEBAR + 3,  blockWordColour);
-  leds.setPixel(CHARGEBAR + 4,  blockWordColour);
-  leds.setPixel(CHARGEBAR + 6,  blockWordColour);
-  leds.setPixel(CHARGEBAR + 8,  blockWordColour);
-  leds.setPixel(CHARGEBAR + 9,  blockWordColour);
-  leds.setPixel(CHARGEBAR + 10, blockWordColour);
-  leds.setPixel(CHARGEBAR + 12, blockWordColour);
-  leds.setPixel(CHARGEBAR + 13, blockWordColour);
-  leds.setPixel(CHARGEBAR + 14, blockWordColour);
-  leds.setPixel(CHARGEBAR + 16, blockWordColour);
-  leds.setPixel(CHARGEBAR + 18, blockWordColour);
-  
+  setPixelsForOneBlockWord(WHITE, LEDS_PER_STRIP/2);
   leds.show();
+}
+
+void setPixelsForOneBlockWord(uint32_t blockWordColour, int offset) {
+  // Here's the layout for the lower-case word "block", starting at the given offset
+  // LIFEBAR1  o o x o o o x o o o o o o o o o x o x o o o 
+  // LIFEBAR2  o o x x x o x o x x x o x x x o x x o o o o
+  // LIFEBAR3  o o x o x o x o x o x o x o o o x o x o o o
+  // CHARGEBAR o o x x x o x o x x x o x x x o x o x o o o
+  
+  leds.setPixel(LIFEBAR1 + 2 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR1 + 6 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR1 + 16 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR1 + 18 + offset, blockWordColour);
+  
+  leds.setPixel(LIFEBAR2 + 2 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 3 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 4 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 6 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 8 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 9 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR2 + 10 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 12 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 13 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 14 + offset, blockWordColour);  
+  leds.setPixel(LIFEBAR2 + 16 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR2 + 17 + offset, blockWordColour); 
+  
+  leds.setPixel(LIFEBAR3 + 2 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 4 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 6 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 8 + offset,  blockWordColour);
+  leds.setPixel(LIFEBAR3 + 10 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR3 + 12 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR3 + 16 + offset, blockWordColour);
+  leds.setPixel(LIFEBAR3 + 18 + offset, blockWordColour);
+  
+  leds.setPixel(CHARGEBAR + 2 + offset,  blockWordColour);  
+  leds.setPixel(CHARGEBAR + 3 + offset,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 4 + offset,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 6 + offset,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 8 + offset,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 9 + offset,  blockWordColour);
+  leds.setPixel(CHARGEBAR + 10 + offset, blockWordColour);
+  leds.setPixel(CHARGEBAR + 12 + offset, blockWordColour);
+  leds.setPixel(CHARGEBAR + 13 + offset, blockWordColour);
+  leds.setPixel(CHARGEBAR + 14 + offset, blockWordColour);
+  leds.setPixel(CHARGEBAR + 16 + offset, blockWordColour);
+  leds.setPixel(CHARGEBAR + 18 + offset, blockWordColour);
 }
 
 /**
