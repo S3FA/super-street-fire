@@ -1,5 +1,7 @@
 package ca.site3.ssf.ioserver;
 
+import java.awt.Color;
+
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
@@ -7,6 +9,7 @@ import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
 import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
+import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
@@ -31,6 +34,7 @@ public class GameEventRouter implements IGameModelListener {
 	StreetFireServer server;
 	SerialCommunicator serialComm;
 	
+	private GameState.GameStateType currGameState;
 	
 	/**
 	 * @param commQueue for events of interest to non-GUI game hardware
@@ -39,8 +43,8 @@ public class GameEventRouter implements IGameModelListener {
 	public GameEventRouter(StreetFireServer server, SerialCommunicator serialComm) {
 		this.server = server;
 		this.serialComm = serialComm;
+		this.currGameState = GameState.GameStateType.NO_STATE;
 	}
-
 
 	public void onGameModelEvent(IGameModelEvent event) {
 		// just blast all events out to GUI for now.
@@ -60,25 +64,23 @@ public class GameEventRouter implements IGameModelListener {
 				serialComm.onPlayerActionPointsChanged((PlayerActionPointsChangedEvent) event);
 				break;
 				
-			case ROUND_PLAY_TIMER_CHANGED:
-				serialComm.onTimerChanged((RoundPlayTimerChangedEvent) event);
+			case ROUND_PLAY_TIMER_CHANGED:				
+				serialComm.onTimerChanged((RoundPlayTimerChangedEvent) event, this.currGameState);
 				break;
 				
 			case ROUND_BEGIN_TIMER_CHANGED: {
 				RoundBeginTimerChangedEvent e = (RoundBeginTimerChangedEvent) event;
 				switch (e.getThreeTwoOneFightTime()) {
 				case THREE:
-					serialComm.onTimerChanged(3);
+					serialComm.onTimerChanged(3, this.currGameState, Color.YELLOW);
 					break;
 				case TWO:
-					serialComm.onTimerChanged(2);
+					serialComm.onTimerChanged(2, this.currGameState, new Color(255, 100, 0));
 					break;
 				case ONE:
-					serialComm.onTimerChanged(1);
+					serialComm.onTimerChanged(1, this.currGameState, Color.RED);
 					break;
 				case FIGHT:
-					serialComm.onTimerChanged(0);
-					break;
 				default:
 					break;
 				}
@@ -87,21 +89,28 @@ public class GameEventRouter implements IGameModelListener {
 			
 			case GAME_STATE_CHANGED: {
 				GameStateChangedEvent e = (GameStateChangedEvent)event;
+				this.currGameState = e.getNewState();
+				
 				if (e.getNewState() == GameStateType.IDLE_STATE) {
 					serialComm.setGlowfliesOn(false);
 					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
 					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
-					serialComm.onTimerChanged(new RoundPlayTimerChangedEvent(99));
-				} else {
+					serialComm.onTimerChanged(99, this.currGameState, Color.BLACK);
+				}
+				else {
 					serialComm.setGlowfliesOn(true);
 				}
+				
 				break;
 			}
+			
 			case GAME_INFO_REFRESH: {
 				GameInfoRefreshEvent e = (GameInfoRefreshEvent)event;
+				this.currGameState = e.getCurrentGameState();
 				if (e.getCurrentGameState() == GameStateType.IDLE_STATE) {
 					serialComm.setGlowfliesOn(false);
-				} else {
+				}
+				else {
 					serialComm.setGlowfliesOn(true);
 				}
 				break;

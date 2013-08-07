@@ -8,7 +8,7 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ca.site3.ssf.devgui.DevGUIMainWindow"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-s /dev/tty.usbserial-A40081Z7 -log 3"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-s /dev/tty.usbserial-A800K75T -log 3"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="DevGUI"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024M -Dapple.laf.useScreenMenuBar=true -Xdock:name=&quot;Super Street Fire&quot;"/>
 </launchConfiguration>
