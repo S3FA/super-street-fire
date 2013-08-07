@@ -19,8 +19,10 @@ import ca.site3.ssf.common.CommUtil;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.IGameModel.Entity;
+import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
+import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
@@ -51,7 +53,7 @@ public class SerialCommunicator implements Runnable {
 	private static final Color FULL_HEALTH_COLOUR = Color.GREEN;
 	private static final Color NO_HEALTH_COLOUR   = Color.RED;
 	
-	private static final Color FULL_ACTION_COLOUR = Color.CYAN;
+	private static final Color FULL_ACTION_COLOUR = new Color(0, 255, 255);
 	private static final Color NO_ACTION_COLOUR   = Color.BLUE;
 	
 	private static final Color DEFAULT_TIMER_COLOUR   = Color.YELLOW;
@@ -322,18 +324,18 @@ public class SerialCommunicator implements Runnable {
 			
 			payload = new byte[] {
 				(byte) boardId,
-				(byte) 0x4c,
-				(byte) Math.ceil((e.getNewLifePercentage() / 100.0f) * NUM_LEDS_PER_BAR),
 				(byte) 0x6c,
 				(byte) c.getRed(),
 				(byte) c.getGreen(),
-				(byte) c.getBlue()
+				(byte) c.getBlue(),
+				(byte) 0x4c,
+				(byte) Math.floor((e.getNewLifePercentage() / 100.0f) * NUM_LEDS_PER_BAR)
 			};
 			
 			msg = getMessageForPayload(payload);
 			log.debug("Enqueuing player {} life ({}) percentage message for board {}: {}", 
 					new Object[] {e.getPlayerNum(), e.getNewLifePercentage(), boardId, CommUtil.bytesToHexString(msg)});
-			enqueueMessage(msg);	
+			this.enqueueMessage(msg);	
 		}
 	}
 	
@@ -350,12 +352,12 @@ public class SerialCommunicator implements Runnable {
 		for (byte boardId : (e.getPlayerNum() == 1 ? p1LifeBoardIds : p2LifeBoardIds)) {
 			payload = new byte[] {
 				boardId,
-				(byte) 0x43,
-				(byte) Math.ceil((e.getNewActionPointAmt() / 100.0f) * NUM_LEDS_PER_BAR),
 				(byte) 0x63,
 				(byte) c.getRed(),
 				(byte) c.getGreen(),
-				(byte) c.getBlue()				
+				(byte) c.getBlue(),
+				(byte) 0x43,
+				(byte) Math.floor((e.getNewActionPointAmt() / 100.0f) * NUM_LEDS_PER_BAR)			
 			};
 			log.debug("Enqueuing action points percentage message for board {}", boardId);
 			enqueueMessage(getMessageForPayload(payload));
@@ -363,9 +365,51 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	private Color getColorFromActionBarPercentage(float actionBarPercentage) {
-		return Algebra.colorLerp(FULL_ACTION_COLOUR, NO_ACTION_COLOUR, actionBarPercentage / 100.0f);
+		return Algebra.colorLerp(NO_ACTION_COLOUR, FULL_ACTION_COLOUR, actionBarPercentage / 100.0f);
 	}
 
+	void onBlockWindow(BlockWindowEvent e) {
+		
+		if (e.getHasBlockWindowExpired()) {
+			byte[] payload;
+			for (byte boardId : (e.getBlockingPlayerNumber() == 1 ? p1LifeBoardIds : p2LifeBoardIds)) {
+				payload = new byte[] {
+					boardId,
+					(byte) 0x42
+				};
+				
+				log.debug("Enqueuing block window message for board {}", boardId);
+				enqueueMessage(getMessageForPayload(payload));
+			}
+			return;
+		}
+		
+		long blockWindowTimeInMillis = (long)(e.getBlockWindowTimeLengthInSeconds() * 1000);
+		if (blockWindowTimeInMillis <= 0 || blockWindowTimeInMillis > 0xFFFFFF) {
+			log.warn("Unsupported block window time {}", blockWindowTimeInMillis);
+			return;
+		}
+
+		// Turn the block window time in ms into 3 bytes...
+		byte topByte = (byte)((blockWindowTimeInMillis & 0xFF0000) >> 16);
+		byte midByte = (byte)((blockWindowTimeInMillis & 0x00FF00) >> 8);
+		byte lowByte = (byte)(blockWindowTimeInMillis  & 0x0000FF);
+		
+		byte[] payload;
+		for (byte boardId : (e.getBlockingPlayerNumber() == 1 ? p1LifeBoardIds : p2LifeBoardIds)) {
+			payload = new byte[] {
+				boardId,
+				(byte) 0x62,
+				topByte,
+				midByte,
+				lowByte
+			};
+			
+			log.debug("Enqueuing block window message for board {}", boardId);
+			enqueueMessage(getMessageForPayload(payload));
+		}
+	}
+	
 	void onTimerChanged(RoundPlayTimerChangedEvent e, GameState.GameStateType currGameState) {
 		
 		this.onTimerChanged(e.getTimeInSecs(), currGameState, null);
@@ -415,12 +459,12 @@ public class SerialCommunicator implements Runnable {
 			for (byte boardId : timerBoardIds) {
 				payload = new byte[] {
 						boardId,
-						(byte) 0x54,
-						(byte) lastTimerVal,
 						(byte) 0x74,
 						(byte) c.getRed(),
 						(byte) c.getGreen(),
-						(byte) c.getBlue()
+						(byte) c.getBlue(),
+						(byte) 0x54,
+						(byte) lastTimerVal
 					};
 					
 				msg = this.getMessageForPayload(payload);
@@ -681,17 +725,6 @@ public class SerialCommunicator implements Runnable {
 		if (this.messageQueue.offer(message) == false) {
 			log.warn("No room on queue for serial message");
 		}
-		
-		/*
-		if (message.length > 5 && lifeBoardIds.contains(message[4])) {
-			try {
-				Thread.sleep(10);
-			} 
-			catch (InterruptedException ex) {
-				log.warn("Interrupted while pausing after sending life board message", ex);
-			}
-		}
-		*/
 	}
 	
 }

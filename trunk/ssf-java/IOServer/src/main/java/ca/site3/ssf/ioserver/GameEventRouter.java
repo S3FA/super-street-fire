@@ -2,6 +2,7 @@ package ca.site3.ssf.ioserver;
 
 import java.awt.Color;
 
+import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
@@ -12,6 +13,7 @@ import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
 import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
+import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
@@ -63,6 +65,10 @@ public class GameEventRouter implements IGameModelListener {
 			case PLAYER_ACTION_POINTS_CHANGED:
 				serialComm.onPlayerActionPointsChanged((PlayerActionPointsChangedEvent) event);
 				break;
+			
+			case BLOCK_WINDOW:
+				serialComm.onBlockWindow((BlockWindowEvent)event);
+				break;
 				
 			case ROUND_PLAY_TIMER_CHANGED:				
 				serialComm.onTimerChanged((RoundPlayTimerChangedEvent) event, this.currGameState);
@@ -109,6 +115,9 @@ public class GameEventRouter implements IGameModelListener {
 				this.currGameState = e.getCurrentGameState();
 				if (e.getCurrentGameState() == GameStateType.IDLE_STATE) {
 					serialComm.setGlowfliesOn(false);
+					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
+					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
+					serialComm.onTimerChanged(99, this.currGameState, Color.BLACK);
 				}
 				else {
 					serialComm.setGlowfliesOn(true);

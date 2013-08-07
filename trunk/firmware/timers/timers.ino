@@ -54,7 +54,6 @@
 LEDTimer timer;
 
 int i = -1;          // loop counter
-uint32_t tempColour; // temporary holder for colour
 int tempInt;         // temporary holder for int values
 
 unsigned long messageStartTimeInMillis; // holds the starting time that a message was recieved in
@@ -81,8 +80,7 @@ void processMessage() {
 
       case 't':
         // Colour to display
-        tempColour = (((uint32_t)(payloadBuffer[i])) << 16) | (((uint32_t)payloadBuffer[i + 1]) << 8) | ((uint32_t)payloadBuffer[i + 2]);
-        timer.setColour(tempColour);
+        timer.setColour((payloadBuffer[i] << 16) | (payloadBuffer[i + 1] << 8) | payloadBuffer[i + 2]);
         i += 3;
         break;
 

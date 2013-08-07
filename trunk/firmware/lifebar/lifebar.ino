@@ -29,7 +29,6 @@
 
 #include <OctoWS2811.h>
 #include "SSF_Heartbeat.h"
-#include "SSF_Message.h"
 
 /*************/
 /* Constants */
@@ -37,18 +36,19 @@
 
 #define DEBUG          1
 
-#define NODE_ADDRESS   34
+#define NODE_ADDRESS   33
 #define HEART_LED      13
 
 #define RED            0xFF0000
 #define GREEN          0x00FF00
 #define BLUE           0x0000FF
 #define YELLOW         0xFFFF00
-#define MAGENTA        0xFF00FF
 #define PINK           0xFF1088
 #define ORANGE         0xE05800
 #define WHITE          0xFFFFFF
 #define BLACK          0x000000
+
+#define BLOCK_COLOUR 0xFF00EE
 
 /*
  * LED strip arrangement:
@@ -71,7 +71,7 @@
 enum STATE //overall state
 {
   IDLE,
-  SHOW_LIFE,
+  SHOW_LIFE_AND_CHARGE,
   SHOW_CHARGE,
   SHOW_BLOCK,
   IDLE_ANIM,
@@ -88,11 +88,6 @@ enum ANIMATION //animation state
   AN_RAINBOW,
 } animation;
 
-enum BLOCK_FLASH {
-  BLOCK_FLASH_OFF,
-  BLOCK_FLASH_ON
-} blockFlashState;
-
 /***********/
 /* Globals */
 /***********/
@@ -101,9 +96,6 @@ DMAMEM byte displayMemory[LEDS_PER_STRIP*8*3];
 byte drawingMemory[LEDS_PER_STRIP*8*3];
 OctoWS2811 leds(LEDS_PER_STRIP, displayMemory, drawingMemory, WS2811_GRB | WS2811_800kHz);
 Heartbeat heartbeat;
-
-/* The MessageBuf for receiving data from RS485 */
-MessageBuf messageBuf;
 
 unsigned long previousMillis = 0;
 
@@ -121,73 +113,103 @@ long animColour2 = 0;
 
 unsigned long blockLengthInMillis = 0;
 unsigned long blockStartTimeInMillis = 0;
-unsigned long lastBlockFlashTimeInMillis = 0;
-long blockColour = MAGENTA;
+
+int i;        // loop counter
+int tempInt;  // temporary holder for int values
+
+/* Messages (payload + framing) look like this: 
+ *
+ * 0xAA        ---+
+ * 0xAA           |  Header bytes
+ * [length]    ---+
+ * 
+ * [dest]      ---+
+ * [command]      |  Payload
+ * [value]        |
+ * ...         ---+
+ *
+ * [checksum]  ---+  Trailer byte
+ *
+ */
+
+#define FRAMING_BYTE        0xAA
+#define NUM_HEADER_BYTES    3
+#define NUM_FRAMING_BYTES   (NUM_HEADER_BYTES + 1)
+#define PAYLOAD_START       NUM_HEADER_BYTES
+
+#define MIN_MESSAGE_LEN  5   // Minumum possible packet length - 0xAA 0xAA length dest checksum
+#define MAX_MESSAGE_LEN  15  // Maximum possible packet length - 0xAA 0xAA length dest checksum
+#define MAX_PAYLOAD_LEN  (MAX_MESSAGE_LEN - NUM_FRAMING_BYTES)
+
+#define TIMEOUT_IN_MILLIS 800
+
+// Serial Read and Message Cache Variables
+unsigned long messageStartTimeInMillis; // holds the starting time that a message was recieved in
+int payloadLength = -1;
+int messageLength = -1;
+int checksum      = -1;
+
+byte payloadBuffer[MAX_PAYLOAD_LEN];
 
 /*************/
 /* Functions */
 /*************/
 
-void processMessage()
-{
-  if (!messageBuf.complete) {
-    return;
-  }
-  if (messageBuf.destination != NODE_ADDRESS) {
-    /* Command is not for this node */
-    return;
-  }
-  /* Parse the payload and look for commands */
-  byte *incomingMsg = messageBuf.payload;
-  for (int parsePos = 0; parsePos < messageBuf.payloadLen; )
-  {
-    switch(incomingMsg[parsePos++])
-    {
+void processMessage() {
+
+  // Parse the payload and look for commands
+  for (i = 0; i < payloadLength;) {
+
+    switch (payloadBuffer[i++]) {
+      
       case 'L': //life value
-        lifeValue = incomingMsg[parsePos++];
+        lifeValue = payloadBuffer[i++];
         if (state != SHOW_BLOCK) {
-          state = SHOW_LIFE;
+          state = SHOW_LIFE_AND_CHARGE;
         }
         break;
 
       case 'l': //life colour
-        lifeColour = (incomingMsg[parsePos] << 16) | (incomingMsg[parsePos + 1] << 8) | (incomingMsg[parsePos + 2]);
+        lifeColour = (payloadBuffer[i] << 16) | (payloadBuffer[i + 1] << 8) | (payloadBuffer[i + 2]);
         if (state != SHOW_BLOCK) {
-          state = SHOW_LIFE;
+          state = SHOW_LIFE_AND_CHARGE;
         }
-        parsePos += 3; //skip the index over the data to the next potential command
+        i += 3; //skip the index over the data to the next potential command
         break;
 
       case 'C': //charge value
-        chargeValue = incomingMsg[parsePos++];
+        chargeValue = payloadBuffer[i++];
         if (state != SHOW_BLOCK) {
-          state = SHOW_LIFE;
+          state = SHOW_LIFE_AND_CHARGE;
         }
         break;
 
       case 'c': //charge colour
-        chargeColour = (incomingMsg[parsePos] << 16) | (incomingMsg[parsePos + 1] << 8) | (incomingMsg[parsePos + 2]);
+        chargeColour = (payloadBuffer[i] << 16) | (payloadBuffer[i + 1] << 8) | (payloadBuffer[i + 2]);
         if (state != SHOW_BLOCK) {
-          state = SHOW_LIFE;
+          state = SHOW_LIFE_AND_CHARGE;
         }
-        parsePos += 3; //skip the index over the data to the next potential command
+        i += 3; //skip the index over the data to the next potential command
         break;
 
       case 'b': // Tells the board that there's a block window available to the player... overlay it on the lifebar/chargebar
         state = SHOW_BLOCK;
-        blockLengthInMillis = (incomingMsg[parsePos] << 16) | (incomingMsg[parsePos + 1] << 8) | (incomingMsg[parsePos + 2]);
+        blockLengthInMillis = (payloadBuffer[i] << 16) | (payloadBuffer[i + 1] << 8) | (payloadBuffer[i + 2]);
         blockStartTimeInMillis = millis();
-        lastBlockFlashTimeInMillis = blockStartTimeInMillis;
-        blockFlashState = BLOCK_FLASH_OFF;
+        break;
+        
+      case 'B': // Tells the board to cancel any currently executing block
+        blockLengthInMillis = 0;
+        state = SHOW_LIFE_AND_CHARGE;
         break;
 
       case 'A': //idle animation pattern
         state = IDLE_ANIM;
-        animation = (ANIMATION)incomingMsg[parsePos++];
+        animation = (ANIMATION)payloadBuffer[i++];
         break;
 
       case 'a': //idle animation period
-        animPeriod = incomingMsg[parsePos++];
+        animPeriod = payloadBuffer[i++];
         break;
         
       default:
@@ -197,95 +219,147 @@ void processMessage()
   }
 }
 
-void setup()
-{
+void setup() {
+  
   pinMode(HEART_LED, OUTPUT); //heartbeat LED on teensy board
   Serial1.begin(57600);
-  Serial.begin(38400);
 
   state = IDLE;
-  blockFlashState = BLOCK_FLASH_OFF;
-    
+ 
   leds.begin();
   leds.show();
   
-  showLife(lifeValue, lifeColour);
-  showCharge(chargeValue, chargeColour);
+  lifeValue = 0;
+  lifeColour = 0x000000;
+  chargeValue = 0;
+  chargeColour = 0x000000;
+  showLife(lifeValue, lifeColour, false);
+  showCharge(chargeValue, chargeColour, true);
 }
 
-void loop()
-{
+void loop() {
   // 1 Hz heartbeat
   heartbeat.update();
+  // Handle serial input and dump it into the message buffer
+  updateSerial();
+  // Update the state
+  updateState();
+}
 
-  /* Handle serial input and dump it into the message buffer */
-  readSerial();
+boolean isTimeout() {
+  return (millis() - messageStartTimeInMillis) > TIMEOUT_IN_MILLIS;
+}
 
-  /* Manage the state machine */  
+//read a serial message
+//it looks like this:
+//0xAA 0xAA [length] [dest] [command] [value] ... [checksum]
+void updateSerial() {
+
+  if (Serial1.available() <= 0) {
+    return;
+  }
+
+  tempInt = Serial1.read(); // Read the first framing byte
+  if (tempInt != FRAMING_BYTE) {
+    return;
+  }
+
+  // Set the start time for reading the rest of the message, this acts
+  // as a comparison value to check for timeouts
+  messageStartTimeInMillis = millis();
+    
+  // Wait for the next framing byte...
+  while (Serial1.available() <= 0) { if (isTimeout()) { return; } }
+
+  tempInt = Serial1.read(); // Read the second framing byte
+  if (tempInt != FRAMING_BYTE) {
+    return;
+  }
+  
+  // Wait for the next byte, which will indicate the length of the payload
+  while (Serial1.available() <= 0) { if (isTimeout()) { return; } }
+    
+  // Read the length of the payload...
+  payloadLength = Serial1.read();
+  messageLength = payloadLength + NUM_FRAMING_BYTES;
+  
+  // If the payload is an invalid length then exit
+  if ((payloadLength <= 0) || (payloadLength > MAX_PAYLOAD_LEN)) {
+    return;
+  }
+  
+  // Wait until we have the entire payload available on the serial line...
+  while (Serial1.available() < payloadLength) { if (isTimeout()) { return; } }
+  
+  // The first byte of the payload buffer will be the destination address - if it isn't
+  // addressed to this node then we're outta here
+  payloadBuffer[0] = Serial1.read();
+  if (payloadBuffer[0] != NODE_ADDRESS) {
+    return;
+  }
+  
+  // Read in the payload buffer and zero out the rest   
+  for (i = 1; i < payloadLength; i++) {
+    payloadBuffer[i] = Serial1.read();
+  }
+  for (; i < MAX_PAYLOAD_LEN; i++) {
+    payloadBuffer[i] = 0;
+  }
+  
+  // Wait for the final byte in the message: the checksum
+  while (Serial1.available() <= 0) { if (isTimeout()) { return; } }
+  
+  // Read in the checksum and then calculate and compare, we don't do further
+  // processing on invalid checksums
+  checksum = Serial1.read();
+  tempInt = 0;
+  for (i = 0; i < payloadLength; i++) {
+    tempInt += payloadBuffer[i];
+  }
+  if (((byte)~tempInt) != checksum) {
+    return;
+  }
+  
+  // The checksum is good, yay! Continue processing the message...
+  processMessage();
+}
+
+void updateState() {
+   /* Manage the state machine */  
   switch(state) {
     case IDLE:
       break;
 
-    case SHOW_LIFE:
-      showLife(lifeValue, lifeColour);
-      showCharge(chargeValue, chargeColour);
+    case SHOW_LIFE_AND_CHARGE:
+      showLife(lifeValue, lifeColour, false);
+      showCharge(chargeValue, chargeColour, true);
       state = IDLE;
       break;
 
     case SHOW_BLOCK: {
       
-      // Check to see if we should still be flashing "BLOCK" for the player...
-      unsigned long currTimeInMillis = millis();
-      unsigned long diffTimeInMillis = currTimeInMillis - blockStartTimeInMillis;
-      if (diffTimeInMillis <= blockLengthInMillis) {
-        
-        // Draw the life and charge, because we're about to draw "BLOCK" over them... 
+      // Check to see if we should be showing the block window...
+      unsigned long diffTimeInMillis = millis() - blockStartTimeInMillis;
+      
+      if (diffTimeInMillis <= blockLengthInMillis) { 
         // TODO: Optimize so we don't overdraw/redraw these each time?
-        showLife(lifeValue, lifeColour);
-        showCharge(chargeValue, chargeColour);
+        showLife(lifeValue, lifeColour, false);
+        showCharge(chargeValue, chargeColour, false);
         showBlockWindowBar(diffTimeInMillis);
-        
-        switch (blockFlashState) {
-          
-          case BLOCK_FLASH_OFF:
-            if (currTimeInMillis - lastBlockFlashTimeInMillis >= BLOCK_FLASH_BLINK_TIME_IN_MS) {
-              blockFlashState = BLOCK_FLASH_ON;
-              lastBlockFlashTimeInMillis = currTimeInMillis;
-              // Draw block as a word...
-              showBlockWord();
-            }
-            break;
-            
-          case BLOCK_FLASH_ON:
-            if (currTimeInMillis - lastBlockFlashTimeInMillis >= BLOCK_FLASH_BLINK_TIME_IN_MS) {
-              blockFlashState = BLOCK_FLASH_OFF;
-              lastBlockFlashTimeInMillis = currTimeInMillis;
-              // Don't draw block as a word
-            }
-            else {
-              // Draw block as a word...
-              showBlockWord();
-            }
-            break;
-            
-           default:
-             break; 
-        }
       }
       else {
         // The block window time has expired, don't show the block window any more, overwrite
         // it with the life and charge bars and go back to the typical 'IDLE' state
         state = IDLE;
-        showLife(lifeValue, lifeColour);
-        showCharge(chargeValue, chargeColour);
+        showLife(lifeValue, lifeColour, false);
+        showCharge(chargeValue, chargeColour, true);
       }
       
       break;
     }
 
     case IDLE_ANIM:
-      switch(animation)
-      {
+      switch (animation) {
         case AN_BLACKOUT:
           blackoutAnim(animPeriod);
         case AN_WHITEOUT:
@@ -307,68 +381,83 @@ void loop()
   }
 }
 
-//read a serial message
-//it looks like this:
-//0xAA 0xAA [length] [dest] [command] [value] ... [checksum]
-void readSerial() {
-  /* Consume as much serial data as available. The buffer will fill up until there is an entire package of 
-   * data, in which case we process it below.
-   */
-  while (Serial1.available() && !messageBuf.complete) {
-    messageBuf.receiveByte(Serial1.read());
-
-  }
-  messageBuf.update();
-
-  if (messageBuf.complete) {
-    /* Process and clear the message */
-    processMessage();
-    messageBuf.clear();
-  }
-}
-
 // display the current life value
-void showLife(byte lifeValue, uint32_t lifeColour) {
-
-#if DEBUG
-  Serial.print("show life ");
-  Serial.print(lifeValue);
-  Serial.print(" ");
-  Serial.println(lifeColour);
-#endif
-
-  uint32_t col;
-  for(int i = 0; i < BAR_LENGTH; i++) {
-    if (i <= lifeValue) {
-      col = lifeColour;
-    } else {
-      col = 0;
+void showLife(byte lifeValue, uint32_t lifeColour, boolean doShow) {
+  
+  if (lifeValue == 0) {
+    for (int i = 0; i < BAR_LENGTH; i++) {
+      leds.setPixel(LIFEBAR1 + i, BLACK);
+      leds.setPixel(LIFEBAR2 + i, BLACK);
+      leds.setPixel(LIFEBAR3 + i, BLACK);
     }
-    leds.setPixel(LIFEBAR1 + i, col);
-    leds.setPixel(LIFEBAR2 + i, col);
-    leds.setPixel(LIFEBAR3 + i, col);
   }
-  leds.show();
+  else {
+    uint32_t col;
+    for (int i = 0; i < BAR_LENGTH; i++) {
+      if (i <= lifeValue) {
+        col = lifeColour;
+      }
+      else {
+        col = 0;
+      }
+      leds.setPixel(LIFEBAR1 + i, col);
+      leds.setPixel(LIFEBAR2 + i, col);
+      leds.setPixel(LIFEBAR3 + i, col);
+    }
+  }
+  
+  if (doShow) {
+    leds.show();
+  }
 }
 
-void showCharge(byte chargeValue, long chargeColour) {
-#if DEBUG
-  Serial1.print("show charge ");
-  Serial1.print(chargeValue);
-  Serial1.print(" ");
-  Serial1.println(chargeColour);
-#endif
+void showCharge(byte chargeValue, long chargeColour, boolean doShow) {
+  
+  if (chargeValue == 0) {
+   for (int i = 0; i < BAR_LENGTH; i++) {
+      leds.setPixel(CHARGEBAR + i, BLACK);
+    }
+  }
+  else {
+    uint32_t col;
+    for (int i = 0; i < BAR_LENGTH; i++) {
+      if (i <= chargeValue) {
+        col = chargeColour;
+      }
+      else {
+        col = BLACK;
+      }
+      leds.setPixel(CHARGEBAR + i, col);
+    }
+  }
+  
+  if (doShow) {
+    leds.show();
+  }
+}
 
+/**
+ * Prints/shows a block "window" over one of the life rows, this indicates the length
+ * of time available to the player for them to block an incoming attack.
+ */
+void showBlockWindowBar(unsigned long timeSinceBlockStart) {
+  int blockBarValue = map(timeSinceBlockStart, 0, blockLengthInMillis, BAR_LENGTH, 0);
+  if (blockBarValue == 0) {
+    leds.show();
+    return;
+  }
+  
   uint32_t col;
-  for(int i=0; i < BAR_LENGTH; i++) {
-    if (i <= chargeValue) {
-      col = chargeColour;
-    } else {
+  for (int i = 0; i < BAR_LENGTH; i++) {
+    if (i <= blockBarValue) {
+      col = BLOCK_COLOUR;
+    }
+    else {
       col = BLACK;
     }
-    leds.setPixel(CHARGEBAR + i, col);
+    leds.setPixel(LIFEBAR1 + i, col);
   }
-  leds.show();  
+  leds.show();
 }
 
 /**
@@ -428,25 +517,6 @@ void setPixelsForOneBlockWord(uint32_t blockWordColour, int offset) {
   leds.setPixel(CHARGEBAR + 18 + offset, blockWordColour);
 }
 
-/**
- * Prints/shows a block "window" over one of the life rows, this indicates the length
- * of time available to the player for them to block an incoming attack.
- */
-void showBlockWindowBar(unsigned long timeSinceBlockStart) {
-  int blockBarValue = map(timeSinceBlockStart, 0, blockLengthInMillis, BAR_LENGTH, 0);
-  uint32_t col;
-  for (int i = 0; i < BAR_LENGTH; i++) {
-    if (i <= blockBarValue) {
-      col = blockColour;
-    }
-    else {
-      col = BLACK;
-    }
-    leds.setPixel(LIFEBAR1 + i, col);
-  }
-  leds.show();
-}
-
 //flying state monster something something - the FSM saves the value of period and calls larson
 //when appropriate, calling it repeatedly when in the "animate larson scanner" state, right?
 //so it will pass in period and colour every time, right? so i don't need to worry about
@@ -458,8 +528,7 @@ void larsonAnim(int period, long colour) { //larson scanner effect without delay
     
   unsigned long currentMillis = millis();
   
-  if(currentMillis - previousMillis >= (period / (2 * leds.numPixels() / 8)))
-  {
+  if (currentMillis - previousMillis >= (period / (2 * leds.numPixels() / 8))) {
     previousMillis = currentMillis;
     
     //calculate the two faded colours - subtract a value from each component
@@ -484,7 +553,7 @@ void larsonAnim(int period, long colour) { //larson scanner effect without delay
     long colour1 = colour1R + colour1G + colour1B;
     long colour2 = colour2R + colour2G + colour2B;
 
-    if(animDir <= 0) {
+    if (animDir <= 0) {
       leds.setPixel(min(0, animPos + 1), BLACK);
       leds.setPixel(min(0, animPos + 2), colour2);
       leds.setPixel(min(0, animPos + 3), colour1);
@@ -493,7 +562,7 @@ void larsonAnim(int period, long colour) { //larson scanner effect without delay
       animPos--;
     }
 
-    if(animDir >= 1) {
+    if (animDir >= 1) {
       leds.setPixel(animPos, colour);
       leds.setPixel(min(0, animPos + 1), colour1);
       leds.setPixel(min(0, animPos + 2), colour2);
@@ -502,47 +571,38 @@ void larsonAnim(int period, long colour) { //larson scanner effect without delay
     }
     
     //if position tracker is at either end, switch direction
-    if(animPos >= leds.numPixels() / 8) 
-    {
+    if (animPos >= leds.numPixels() / 8) {
       animDir = 0;
     }
-    else if(animPos <= 0)
+    else if (animPos <= 0)
     {
       animDir = 1;
     }
     
     //increment or decrement the position tracker depending on direction
-    if(animDir <= 0)
-    {
+    if (animDir <= 0) {
       animPos--;
     }
-    else if(animDir >= 1)
-    {
+    else if (animDir >= 1) {
       animPos++;
     }
   }
 }
 
 void diamondAnim(byte animPeriod, int animColour) {
-  
 }
 
 void whiteoutAnim(byte animPeriod) {
 }
 
 void blackoutAnim(byte animPeriod) {
-
 }
 
-void flashAnim(byte animPeriod, long colour1, long colour2) {
-  
+void flashAnim(byte animPeriod, long colour1, long colour2) {  
 }
 
-
-void colorWipe(int color, int wait)
-{
-  for (int i=0; i < leds.numPixels(); i++)
-  {
+void colorWipe(int color, int wait) {
+  for (int i=0; i < leds.numPixels(); i++) {
     leds.setPixel(i, color);
 
     //delayMicroseconds(wait);
@@ -550,10 +610,8 @@ void colorWipe(int color, int wait)
   leds.show();
 }
 
-void larsonDelay()
-{
-  for(int i = 2; i <= (leds.numPixels() / 8) - 2; i++)
-  {
+void larsonDelay() {
+  for (int i = 2; i <= (leds.numPixels() / 8) - 2; i++) {
     leds.setPixel(i-3, BLACK);
     leds.setPixel(i-2, 0x150500);
     leds.setPixel(i-1, 0x550000);
@@ -565,8 +623,7 @@ void larsonDelay()
     delay(75);
   }
   
-  for(int i = (leds.numPixels() / 8) - 3; i > 2; i--)
-  {
+  for(int i = (leds.numPixels() / 8) - 3; i > 2; i--) {
     leds.setPixel(i-3, BLACK);
     leds.setPixel(i-2, 0x150500);
     leds.setPixel(i-1, 0x550000);

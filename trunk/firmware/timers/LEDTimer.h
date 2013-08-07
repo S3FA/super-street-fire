@@ -6,20 +6,8 @@
 
 #include "Segment.h"
 
-class LEDTimer
-{
+class LEDTimer {
   public:
-    /* The tens and ones digits */
-    Segment onesDigit;
-    Segment tensDigit;
-
-    /* Whether we need to update the strips */
-    boolean doUpdate;
-    /* The time to display */
-    byte timeDisplayed;
-    /* WHat colour to use */
-    uint32_t timeColour;
-
     LEDTimer();
     
     void begin();
@@ -33,7 +21,18 @@ class LEDTimer
      * to. so it's safe to call this function a lot. */
     void update();
     
-  //private:
+  private:
+    /* The tens and ones digits */
+    Segment onesDigit;
+    Segment tensDigit;
+
+    /* Whether we need to update the strips */
+    boolean doUpdate;
+    /* The time to display */
+    byte timeDisplayed;
+    /* What colour to use */
+    uint32_t timeColour;
+    
     //boolean blinkingOn;
     //uint32_t lastBlinkTimeInMillis;
     //uint32_t millisDiff;
