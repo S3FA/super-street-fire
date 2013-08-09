@@ -2,7 +2,7 @@
  * Starter code taken from using OctoWS2811 library on Teensy 3.0
  * 
  * Author Trevyn Watson
- * Contributions by Peter Rogers
+ * Contributions by Peter Rogers, Callum Hay
  *
  * 8 strips in 4 rows, 2 columns of 22 LEDs each
  * Looks like 4 continuous rows but updates faster
@@ -36,7 +36,7 @@
 
 #define DEBUG          1
 
-#define NODE_ADDRESS   33
+#define NODE_ADDRESS   37
 #define HEART_LED      13
 
 #define RED            0xFF0000

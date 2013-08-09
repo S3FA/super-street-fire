@@ -1,12 +1,12 @@
 /* Timers for super street fire */
-/* Peter Rogesr 2013 */
+/* Peter Rogers, Callum Hay 2013 */
 
 #include <Adafruit_NeoPixel.h>
 
 #include "Segment.h"
 #include "LEDTimer.h"
 
-#define NODE_ADDRESS     35
+#define NODE_ADDRESS     38
 #define RECV_ENABLE      8
 
 #define BLINK_TIMER_TIME 10

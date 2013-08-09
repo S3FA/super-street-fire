@@ -301,7 +301,6 @@ public class SerialCommunicator implements Runnable {
 		setGlowfliesOn(makeSurfaceHot, true);
 	}
 	
-	
 	private byte[] getMessageForPayload(byte[] payload) {
 		byte[] message = new byte[payload.length + 4];
 		message[0] = message[1] = (byte) 0xAA; // framing bytes
@@ -340,7 +339,10 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	private Color getColorFromLifePercentage(float lifePercentage) {
-		return Algebra.colorLerp(NO_HEALTH_COLOUR, FULL_HEALTH_COLOUR, lifePercentage / 100.0f);
+		if (lifePercentage <= 10.0f) {
+			return NO_HEALTH_COLOUR;
+		}
+		return Algebra.colorLerp(10.0f, 100.0f, NO_HEALTH_COLOUR, FULL_HEALTH_COLOUR, lifePercentage);
 	}
 	
 	void onPlayerActionPointsChanged(PlayerActionPointsChangedEvent e) {
@@ -365,7 +367,10 @@ public class SerialCommunicator implements Runnable {
 	}
 	
 	private Color getColorFromActionBarPercentage(float actionBarPercentage) {
-		return Algebra.colorLerp(NO_ACTION_COLOUR, FULL_ACTION_COLOUR, actionBarPercentage / 100.0f);
+		if (actionBarPercentage <= 10.0f) {
+			return NO_ACTION_COLOUR;
+		}
+		return Algebra.colorLerp(10.0f, 100.0f, NO_ACTION_COLOUR, FULL_ACTION_COLOUR, actionBarPercentage);
 	}
 
 	void onBlockWindow(BlockWindowEvent e) {
