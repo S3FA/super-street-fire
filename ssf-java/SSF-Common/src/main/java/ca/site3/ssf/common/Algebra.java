@@ -30,4 +30,13 @@ public class Algebra {
 				Math.round(start.getBlue()  + ratio * (dest.getBlue()  - start.getBlue()))
 		);
 	}
+	
+	public static Color colorLerp(float x0, float x1, Color start, Color dest, float x) {
+		float ratio = (x - x0) / (x1 - x0);
+		return new Color(
+				Math.round(start.getRed()   + ratio * (dest.getRed()   - start.getRed())),
+				Math.round(start.getGreen() + ratio * (dest.getGreen() - start.getGreen())),
+				Math.round(start.getBlue()  + ratio * (dest.getBlue()  - start.getBlue()))
+		);
+	}
 }

@@ -94,10 +94,13 @@ public class GameEventRouter implements IGameModelListener {
 			}
 			
 			case GAME_STATE_CHANGED: {
+				
 				GameStateChangedEvent e = (GameStateChangedEvent)event;
 				this.currGameState = e.getNewState();
 				
-				if (e.getNewState() == GameStateType.IDLE_STATE) {
+				if (e.getNewState() == GameStateType.IDLE_STATE ||
+					e.getNewState() == GameStateType.NO_STATE) {
+					
 					serialComm.setGlowfliesOn(false);
 					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
 					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
@@ -111,9 +114,12 @@ public class GameEventRouter implements IGameModelListener {
 			}
 			
 			case GAME_INFO_REFRESH: {
+				
 				GameInfoRefreshEvent e = (GameInfoRefreshEvent)event;
 				this.currGameState = e.getCurrentGameState();
-				if (e.getCurrentGameState() == GameStateType.IDLE_STATE) {
+				if (e.getCurrentGameState() == GameStateType.IDLE_STATE ||
+					e.getCurrentGameState() == GameStateType.NO_STATE) {
+					
 					serialComm.setGlowfliesOn(false);
 					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(1, 0, 0));
 					serialComm.onPlayerHealthChanged(new PlayerHealthChangedEvent(2, 0, 0));
