@@ -111,9 +111,8 @@ class TrainingPanel extends JPanel implements ActionListener {
 		this.trainingDirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		
 		this.moreTrainingFileChooser = new JFileChooser();
-		this.moreTrainingFileChooser.setMultiSelectionEnabled(true);
-		this.moreTrainingFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		this.moreTrainingFileChooser.setFileFilter(new FileNameExtensionFilter("Gesture Recording Instance Files", FileInfoPanel.GESTURE_INSTANCE_FILE_EXT));
+		this.moreTrainingFileChooser.setMultiSelectionEnabled(false);
+		this.moreTrainingFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		
 		this.engineFileSaver = new JFileChooser();
 		this.engineFileSaver.setMultiSelectionEnabled(false);
@@ -278,8 +277,7 @@ class TrainingPanel extends JPanel implements ActionListener {
 	}
 	
 	// Handles button events
-	public void actionPerformed(ActionEvent e)
-	{
+	public void actionPerformed(ActionEvent e) {
 		// Add the file to the list of files to convert
 		if (e.getSource() == this.selectDirButton) {
 			this.handleTrainingDirChooserDialog();
@@ -318,24 +316,21 @@ class TrainingPanel extends JPanel implements ActionListener {
 		}
 		else if (e.getSource() == this.trainMoreButton) {
 			
-			Map<GestureType, List<File>> trainingFiles = new HashMap<GestureType, List<File>>(GestureType.values().length);
+			// Get a list of the gestures that need to be trained...
+			File moreTrainingParentDir = this.handleMoreTrainingDirChooserDialog();
 			for (int i = 0; i < this.toTrainListModel.size(); i++) {
 				
 				GestureType gesture = (GestureType)this.toTrainListModel.get(i);
 				assert(gesture != null);
-				List<File> gestureFiles = this.loadGestureFilesForMoreTraining(gesture);
-				if (gestureFiles != null && !gestureFiles.isEmpty()) {
-					trainingFiles.put(gesture, gestureFiles);
+				List<File> gestureFiles = this.findTrainingFilesInGestureDir(gesture, moreTrainingParentDir);
+				if (gestureFiles.isEmpty()) {
+					this.loggingPanel.appendLogTextLine("No gesture files found for " + gesture.toString());
+					continue;
 				}
+				
+				this.trainGestureRecognitionEngineFromFileList(gesture, gestureFiles);
 			}
-			
-			this.loggingPanel.appendLogTextLine("");
-			for (Entry<GestureType, List<File>> entry : trainingFiles.entrySet()) {
-				this.loggingPanel.appendLogTextLine("Peforming more training for " + entry.getKey().toString() + "...");
-				this.trainGestureRecognitionEngineFromFileList(entry.getKey(), entry.getValue());
-				this.loggingPanel.appendLogTextLine("");
-			}
-			if (!trainingFiles.isEmpty()) {
+			if (!this.toTrainListModel.isEmpty()) {
 				this.loggingPanel.appendLogTextLine("Done.");
 			}
 			
@@ -397,14 +392,18 @@ class TrainingPanel extends JPanel implements ActionListener {
 
 	}
 	
-	private List<File> findTrainingFilesInGestureDir(GestureType gesture) {
+	private List<File> findTrainingFilesInGestureDir(GestureType gesture)  {
+		return this.findTrainingFilesInGestureDir(gesture, this.selectedBaseGestureDir);
+	}
+	
+	private List<File> findTrainingFilesInGestureDir(GestureType gesture, File selectedBaseDir) {
 		
-		if (gesture == null || !this.selectedBaseGestureDir.canRead()) {
+		if (gesture == null || !selectedBaseDir.canRead()) {
 			return new ArrayList<File>();
 		}
 		
 		List<File> result = new ArrayList<File>();
-		File[] children = this.selectedBaseGestureDir.listFiles();
+		File[] children = selectedBaseDir.listFiles();
 		for (File child : children) {
 			
 			// We're only looking for subdirectories with the expected parent directory name for the given gesture 
@@ -467,36 +466,19 @@ class TrainingPanel extends JPanel implements ActionListener {
 		}
 	}
 	
-	private List<File> loadGestureFilesForMoreTraining(GestureType gesture) {
-		this.moreTrainingFileChooser.setDialogTitle("More training for " + gesture.toString());
-		
-		int status = this.moreTrainingFileChooser.showOpenDialog(this);
-		
+	private File handleMoreTrainingDirChooserDialog() {
+
+		int status = this.moreTrainingFileChooser.showOpenDialog(this);		
 		if (status == JFileChooser.APPROVE_OPTION) {
-			File[] selectedFiles = this.moreTrainingFileChooser.getSelectedFiles();
-			if (selectedFiles.length == 0) {
-				return null;
-			}
+			File selectedDir = this.moreTrainingFileChooser.getSelectedFile();
 			
             Preferences userPreferences = Preferences.userRoot();
-            userPreferences.put(MORE_TRAINING_LOAD_DIALOG_PATH_KEY, selectedFiles[0].getAbsolutePath());
+            userPreferences.put(MORE_TRAINING_LOAD_DIALOG_PATH_KEY, selectedDir.getAbsolutePath());
             
-            List<File> result = new ArrayList<File>(selectedFiles.length);
-            Collections.addAll(result, selectedFiles);
-            
-            Iterator<File> iter = result.iterator();
-            while (iter.hasNext()) {
-            	File currFile = iter.next();
-            	if (!currFile.getName().contains(gesture.toString())) {
-            		iter.remove();
-            	}
-            }
-            
-            return result;
+            return selectedDir;
 		}
-		else {
-			return null;
-		}
+		
+		return null;
 	}
 	
 	private void handleEngineLoadDialog() {
@@ -625,10 +607,11 @@ class TrainingPanel extends JPanel implements ActionListener {
 			}	
 		}
 		
-		boolean success = this.gestureRecognizer.trainGesture(gestureToTrain, gestureDataSet);	
+		boolean success = this.gestureRecognizer.trainGesture(gestureToTrain, gestureDataSet);
+
 		if (success) {
 			this.loggingPanel.appendLogTextLine("Training succeeded for gesture " + gestureToTrain.toString() + "!");
-			this.loggingPanel.appendLogTextLine("Files used to train " + gestureToTrain.toString() + ":");
+			this.loggingPanel.appendLogTextLine(files.size() + " Files used to train " + gestureToTrain.toString() + ":");
 			String gestureFiles = "";
 			for (File file : files) {
 				gestureFiles += file.getName() + ", ";
