@@ -32,13 +32,13 @@ public class DeviceStatus {
 	
 	
 	private Map<Device, InetAddress> deviceToAddress = 
-			new EnumMap<Device, InetAddress>(Device.class);
+			new ConcurrentHashMap<Device, InetAddress>();
 	private Map<InetAddress, Device> addressToDevice = 
 			new ConcurrentHashMap<InetAddress, DeviceConstants.Device>(EnumSet.allOf(Device.class).size());
 	private Map<Device, Float> deviceToRssi = 
-			new EnumMap<Device, Float>(Device.class);
+			new ConcurrentHashMap<Device, Float>();
 	private Map<Device, Float> deviceToBattery = 
-			new EnumMap<Device, Float>(Device.class);
+			new ConcurrentHashMap<Device, Float>();
 	
 	private Map<Device, Long> latestHeartbeats = new EnumMap<Device, Long>(Device.class);
 	
