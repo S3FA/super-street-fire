@@ -1,13 +1,16 @@
 package ca.site3.ssf.ioserver;
 
 import java.awt.Color;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -16,13 +19,11 @@ import org.slf4j.LoggerFactory;
 
 import ca.site3.ssf.common.Algebra;
 import ca.site3.ssf.common.CommUtil;
-import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
-import ca.site3.ssf.gamemodel.GameState.GameStateType;
-import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.BlockWindowEvent;
+import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
 import ca.site3.ssf.gamemodel.GameState;
+import ca.site3.ssf.gamemodel.IGameModel.Entity;
 import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
-import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;
 import ca.site3.ssf.gamemodel.SystemInfoRefreshEvent;
@@ -40,9 +41,7 @@ import ca.site3.ssf.guiprotocol.StreetFireServer;
 public class SerialCommunicator implements Runnable {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
-	
-	private final CommandLineArgs args;
-	
+		
 	private static final byte[] STOP_SENTINEL = new byte[] { (byte)0 };
 	private static final byte[] QUERY_SYSTEM_SENTINEL = new byte[] { (byte)'?' };
 	
@@ -100,12 +99,35 @@ public class SerialCommunicator implements Runnable {
 		
 	private volatile boolean glowfliesOn = false;
 	
-
+	/**
+	 * Updated when {@link FireEmitterChangedEvent}s are received -- binary off (0)
+	 * or on (> 0). Indexes of this array correspond to hardware IDs (and therefore
+	 * 0 is unused).
+	 * So if currentEmitterState[12] == true then effect head 12 should be on, otherwise
+	 * it should be off.
+	 */
+	private final class EmitterState {
+		EmitterState(boolean isOn) {
+			this.isOn = isOn;
+			lastUpdated = System.currentTimeMillis();
+		}
+		final boolean isOn;
+		final long lastUpdated;
+	}
+	private ConcurrentMap<Byte, EmitterState> emitterStates = new ConcurrentHashMap<Byte, SerialCommunicator.EmitterState>(32);
+	private Timer turnSolenoidsOffTimer;
+	
 	public SerialCommunicator(CommandLineArgs args, InputStream serialIn, OutputStream serialOut, StreetFireServer guiOut) {
-		this.args = args;
 		this.reader = new SerialDataReader(serialIn);
 		this.out    = serialOut;
 		this.server = guiOut;
+		
+		for (byte i = 1; i <= 32; i++) {
+			emitterStates.put(i, new EmitterState(false));
+		}
+		
+		turnSolenoidsOffTimer = new Timer();
+		turnSolenoidsOffTimer.scheduleAtFixedRate(new EmitterOffPulse(), 0, EmitterOffPulse.DIFF_TIME_BEFORE_PULSE_MS);
 	}
 	
 	/**
@@ -230,6 +252,8 @@ public class SerialCommunicator implements Runnable {
 		 * effect output 4 -> currently unused
 		 */
 		
+		byte hardwareId = getHardwareIdFromEvent(event);
+		
 		// corresponds to effect outputs '1' to '4' (i _think_ this is meant to be ASCII)
 		byte[] commands = new byte[] { (byte)49,(byte)50,(byte)51,(byte)52 }; 
 		byte[] values = new byte[] { 0, 0, 0, 0 }; // the values for the commands
@@ -242,11 +266,18 @@ public class SerialCommunicator implements Runnable {
 			}
 			if (event.getContributingEntities().contains(Entity.PLAYER2_ENTITY)) {
 				values[2] = (byte) (100 * event.getIntensity(Entity.PLAYER2_ENTITY));
-			}
+			} 
+		}
+		boolean shouldBeOn = event.getMaxIntensity() > 0;
+		if (shouldBeOn && emitterStates.get(hardwareId).isOn) {
+			// solenoids are binary on/off so avoid redundant messages
+			return;
+		} else {
+			emitterStates.put(hardwareId, new EmitterState(shouldBeOn));
 		}
 		
 		byte[] payload = new byte[11]; // 1 byte for dest node + 4*2 bytes command/values + 2 bytes for HSI 
-		payload[0] = getHardwareIdFromEvent(event);
+		payload[0] = hardwareId;
 		
 		for (int effectOutputIndex=0; effectOutputIndex < 4; effectOutputIndex++) {
 			payload[effectOutputIndex*2 + 1] = commands[effectOutputIndex];
@@ -258,6 +289,9 @@ public class SerialCommunicator implements Runnable {
 		} else {
 			payload[10] = (byte) 0x30; // '0' is ascii 30
 		}
+		
+		log.debug("FireEmitterChanged: loc: " + event.getLocation() + ", intensity: " + event.getMaxIntensity());
+		
 		enqueueMessage(getMessageForPayload(payload));
 	}
 	
@@ -529,12 +563,6 @@ public class SerialCommunicator implements Runnable {
 			if (status != null) {
 				result[status.deviceId - 1] = status;
 			}
-			
-			// Wait for a small amount of time before the next query
-			try {
-				Thread.sleep(5);
-			}
-			catch (InterruptedException e) {}
 		}
 		
 		return result;
@@ -732,4 +760,54 @@ public class SerialCommunicator implements Runnable {
 		}
 	}
 	
+	
+	
+	/**
+	 * Filthy dirty playa coding
+	 * This exists because serial events for turning off the solenoids don't always
+	 * seem to get picked up by the cards.
+	 * So every second we pulse out a message reiterating to them that they should
+	 * be off if in fact that is the case.
+	 * @author ssf
+	 *
+	 */
+	private class EmitterOffPulse extends TimerTask {
+		static final long DIFF_TIME_BEFORE_PULSE_MS = 1000;
+		
+		@Override
+		public void run() {
+			long rightNow = System.currentTimeMillis();
+			for (byte hardwareId=1; hardwareId<=32; hardwareId++) {
+				EmitterState state = emitterStates.get(hardwareId);
+				assert state != null;
+				if (state.isOn == false && rightNow - state.lastUpdated >= DIFF_TIME_BEFORE_PULSE_MS) {
+					turnEmitterOff(hardwareId);
+				}
+			}
+		}
+
+		private void turnEmitterOff(byte hardwareId) {
+			// see notifyFireEmitter for details
+			// corresponds to effect outputs '1' to '4' (i _think_ this is meant to be ASCII)
+			byte[] commands = new byte[] { (byte)49,(byte)50,(byte)51,(byte)52 }; 
+			byte[] values = new byte[] { 0, 0, 0, 0 }; // the values for the commands
+			
+			byte[] payload = new byte[11]; // 1 byte for dest node + 4*2 bytes command/values + 2 bytes for HSI 
+			payload[0] = hardwareId;
+			
+			for (int effectOutputIndex=0; effectOutputIndex < 4; effectOutputIndex++) {
+				payload[effectOutputIndex*2 + 1] = commands[effectOutputIndex];
+				payload[effectOutputIndex*2 + 2] = values[effectOutputIndex];
+			}
+			payload[9] = (byte) 0x41; // 'A' for A/C out (hot surface igniter)
+			if (glowfliesOn) {
+				payload[10] = (byte) 0x31; // '1' is ascii 31
+			} else {
+				payload[10] = (byte) 0x30; // '0' is ascii 30
+			}			
+			
+			enqueueMessage(getMessageForPayload(payload));
+		}
+		
+	}
 }

@@ -2,9 +2,6 @@ package ca.site3.ssf.devgui;
 
 import java.awt.Color;
 import java.awt.GridBagLayout;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -32,7 +29,8 @@ class GloveDataInfoPanel extends JPanel {
 	
 	private static final String NOT_CONNECTED_STR = "Not Connected";
 	
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+	private static final int HEARTBEAT_INTERVAL_MS = 7000;
+	private static final int HEARTBEAT_GRACE_TIME_MS = 100;
 	
 	private JLabel ipAddress;
 	private JProgressBar rssiMeter;
@@ -40,9 +38,11 @@ class GloveDataInfoPanel extends JPanel {
 	private long lastUpdate = -1;
 	private JLabel lastUpdateLabel;
 	
+	private TitledBorder border;
+	
 	GloveDataInfoPanel(GloveType gloveType) {
 		
-		TitledBorder border = BorderFactory.createTitledBorder(
+		border = BorderFactory.createTitledBorder(
 				BorderFactory.createLineBorder(Color.black), gloveType.toString());
 		border.setTitleColor(Color.black);
 		this.setBorder(border);
@@ -108,8 +108,25 @@ class GloveDataInfoPanel extends JPanel {
 		if (time < 0) {
 			this.lastUpdateLabel.setText("[never]");
 		} else {
-			this.lastUpdateLabel.setText(DATE_FORMAT.format(new Date(time)));
+			long secondsAgo = Math.round((System.currentTimeMillis() - lastUpdate) / 1000);
+			this.lastUpdateLabel.setText(secondsAgo + "s ago");
 		}
+	}
+	
+	void tick() {
+		long now = System.currentTimeMillis();
+		if (lastUpdate <= 0) {
+			return;
+		} else if (now - lastUpdate > HEARTBEAT_INTERVAL_MS + HEARTBEAT_GRACE_TIME_MS) {
+			setSignalPercent(0);
+			border.setTitleColor(Color.RED);
+			lastUpdateLabel.setForeground(Color.RED);
+		} else {
+			border.setTitleColor(Color.BLACK);
+			lastUpdateLabel.setForeground(Color.BLACK);
+		}
+		long secondsAgo = Math.round((now - lastUpdate) / 1000);
+		lastUpdateLabel.setText(secondsAgo + "s ago");
 	}
 	
 	@Override
@@ -124,4 +141,5 @@ class GloveDataInfoPanel extends JPanel {
 			return "Last heartbeat received " + secondsAgo + " seconds ago";
 		}
 	}
+	
 }

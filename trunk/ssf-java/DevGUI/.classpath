@@ -19,6 +19,5 @@
 	<classpathentry kind="lib" path="../lib/protobuf-java-2.4.1.jar"/>
 	<classpathentry kind="lib" path="../lib/slf4j-api-1.6.4.jar"/>
 	<classpathentry kind="lib" path="../lib/OrangeExtensions-1.2.jar"/>
-	<classpathentry kind="lib" path="../lib/rxtx-2.1.7.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

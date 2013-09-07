@@ -1,6 +1,5 @@
 package ca.site3.ssf.ioserver;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
