@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 class RoundEndedGameState extends GameState {
 
-	final static private double ROUND_ENDED_LENGTH_IN_SECS = 1.75;
+	final static private double ROUND_ENDED_LENGTH_IN_SECS = 1.0;
 	
 	private final Player roundVictor;
 	private final boolean roundTimedOut;

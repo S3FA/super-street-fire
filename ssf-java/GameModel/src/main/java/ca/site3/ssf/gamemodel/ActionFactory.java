@@ -109,7 +109,7 @@ final public class ActionFactory {
 				// attacks coming in on both rails...
 				final int BLOCK_WIDTH = 1;
 				final int BLOCK_NUM_BURSTS = 1;
-				final double BLOCK_DURATION_IN_SECS = 1.25;
+				final double BLOCK_DURATION_IN_SECS = 0.5;
 				final double BLOCK_PERCENT_ON = 0.99;
 				final double BLOCK_PERCENT_OFF = 1.0 - BLOCK_PERCENT_ON;
 				final double BLOCK_DELAY = 0.0;

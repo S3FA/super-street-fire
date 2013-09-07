@@ -32,6 +32,7 @@ class PlaybackHandler {
 			// Check to see if the audio file is even readable...
 			File audioFile = new File(controller.getResourcePath() + source);
 			if (!audioFile.canRead()) {
+				logger.warn("Could not load audio file: {}", audioFile.getAbsoluteFile());
 				return null;
 			}
 

@@ -169,20 +169,19 @@ public class SoundEventMapper {
 			}
 			case PLAYER_ATTACK_ACTION: {
 				PlayerAttackActionEvent playerAttackActionEvent = (PlayerAttackActionEvent)gameModelEvent;
-				double chanceOfNyanWaits = Math.random();
-				
-				// 10% of the time nyan cat is triggered, play Nyan Waits instead
-				if(playerAttackActionEvent.getAttackType() == AttackType.NYAN_CAT_ATTACK && chanceOfNyanWaits > 0.9)
-				{
-					return playerAttackActionHandler_nyanWaits;
-				}
+//				double chanceOfNyanWaits = 0; //Math.random();
+//				
+//				// 10% of the time nyan cat is triggered, play Nyan Waits instead
+//				if(playerAttackActionEvent.getAttackType() == AttackType.NYAN_CAT_ATTACK && chanceOfNyanWaits > 0.5)
+//				{
+//					return playerAttackActionHandler_nyanWaits;
+//				}
 				
 				return this.attackTypeAudioMap.get(playerAttackActionEvent.getAttackType());
 			}
 			case PLAYER_BLOCK_ACTION: {
 				PlayerBlockActionEvent playerBlockActionEvent = (PlayerBlockActionEvent)gameModelEvent;
 
-				// 10% of the time nyan cat is triggered, play Nyan Waits instead
 				if(playerBlockActionEvent.getBlockWasEffective() && playerBlockActionEvent.getPlayerNum() == 1)
 				{
 					return playerBlockActionHandler_P1BlockSuccess;

@@ -4,16 +4,14 @@ import java.awt.Color;
 
 import ca.site3.ssf.gamemodel.BlockWindowEvent;
 import ca.site3.ssf.gamemodel.FireEmitterChangedEvent;
-import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameInfoRefreshEvent;
+import ca.site3.ssf.gamemodel.GameState;
+import ca.site3.ssf.gamemodel.GameState.GameStateType;
 import ca.site3.ssf.gamemodel.GameStateChangedEvent;
 import ca.site3.ssf.gamemodel.IGameModel;
 import ca.site3.ssf.gamemodel.IGameModelEvent;
-import ca.site3.ssf.gamemodel.IGameModelEvent.Type;
-import ca.site3.ssf.gamemodel.GameState;
 import ca.site3.ssf.gamemodel.IGameModelListener;
 import ca.site3.ssf.gamemodel.PlayerActionPointsChangedEvent;
-import ca.site3.ssf.gamemodel.PlayerBlockActionEvent;
 import ca.site3.ssf.gamemodel.PlayerHealthChangedEvent;
 import ca.site3.ssf.gamemodel.RoundBeginTimerChangedEvent;
 import ca.site3.ssf.gamemodel.RoundPlayTimerChangedEvent;

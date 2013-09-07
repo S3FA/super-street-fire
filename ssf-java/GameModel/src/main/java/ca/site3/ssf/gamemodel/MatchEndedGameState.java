@@ -8,6 +8,8 @@ import ca.site3.ssf.gamemodel.MatchEndedEvent.MatchResult;
 
 class MatchEndedGameState extends GameState {
 
+	private static final double MATCH_ENDED_TIME_IN_SECS = 2.0;
+	
 	final private Player victoryPlayer;
 	private Collection<Action> matchEndActions = new ArrayList<Action>(3);
 	private boolean firstTick = true;
@@ -41,17 +43,17 @@ class MatchEndedGameState extends GameState {
 		Action tempAction = null;
 		
 		tempAction = actionFactory.buildPlayerWinAction(victoryPlayer.getPlayerNumber(), 
-				FireEmitter.Location.OUTER_RING, 2.75, 1, 0.0, victoryRingFlameWidth);
+				FireEmitter.Location.OUTER_RING, MATCH_ENDED_TIME_IN_SECS, 1, 0.0, victoryRingFlameWidth);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
 		tempAction  = actionFactory.buildPlayerWinAction(
-				victoryPlayer.getPlayerNumber(), FireEmitter.Location.LEFT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
+				victoryPlayer.getPlayerNumber(), FireEmitter.Location.LEFT_RAIL, MATCH_ENDED_TIME_IN_SECS, 4, 0.0, victoryRailFlameWidth);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		
 		tempAction = actionFactory.buildPlayerWinAction(
-				victoryPlayer.getPlayerNumber(), FireEmitter.Location.RIGHT_RAIL, 2.75, 4, 0.0, victoryRailFlameWidth);
+				victoryPlayer.getPlayerNumber(), FireEmitter.Location.RIGHT_RAIL, MATCH_ENDED_TIME_IN_SECS, 4, 0.0, victoryRailFlameWidth);
 		assert(tempAction != null);
 		this.matchEndActions.add(tempAction);
 		

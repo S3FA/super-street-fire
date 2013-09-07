@@ -335,6 +335,13 @@ public class DevGUIMainWindow extends JFrame implements ActionListener, IDeviceS
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				DevGUIMainWindow.this.infoPanel.tick(dT);
+				
+				p1LeftGloveInfoPanel.tick();
+				p1RightGloveInfoPanel.tick();
+				p2LeftGloveInfoPanel.tick();
+				p2RightGloveInfoPanel.tick();
+				rmLeftGloveInfoPanel.tick();
+				rmRightGloveInfoPanel.tick();
 			}
 		});
 	}
